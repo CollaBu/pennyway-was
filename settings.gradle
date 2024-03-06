@@ -1,1 +1,7 @@
 rootProject.name = 'pennyway'
+
+include 'pennyway-app-external-api'
+include 'pennyway-domain'
+include 'pennyway-infra'
+include 'pennyway-common'
+
