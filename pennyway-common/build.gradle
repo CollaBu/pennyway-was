@@ -2,5 +2,10 @@ bootJar {enabled = false}
 jar {enabled = true}
 
 dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-aop'
+
+    /* Jackson */
+    api 'com.fasterxml.jackson.core:jackson-annotations:2.10.1'
+    api 'com.fasterxml.jackson.core:jackson-databind:2.13.5'
 
 }
