@@ -56,7 +56,7 @@
 
 ## 🤝 Commit Convention
 > 💡 angular commit convention
-- feat: 신규 기능 추가 #1
+- feat: 신규 기능 추가
 - fix: 버그 수정
 - docs: 문서 수정
 - rename: 주석, 로그, 변수명 등 수정
