@@ -3,6 +3,9 @@ package kr.co.pennyway.common.exception;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+/**
+ * HTTP 상태 코드
+ */
 @Getter
 @RequiredArgsConstructor
 public enum StatusCode {

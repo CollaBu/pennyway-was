@@ -3,6 +3,9 @@ package kr.co.pennyway.common.exception;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+/**
+ * 에러 발생 이유 코드
+ */
 @Getter
 @RequiredArgsConstructor
 public enum ReasonCode {
