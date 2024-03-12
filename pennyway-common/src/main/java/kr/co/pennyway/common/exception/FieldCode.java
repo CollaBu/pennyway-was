@@ -6,12 +6,12 @@ package kr.co.pennyway.common.exception;
  * {@code
  * @RequiredArgsConstructor
  * public enum UserFieldCode implements FieldCode {
+ *    ZERO(0),
  *    ID(1),
  *    PASSWORD(2),
  *    NAME(3);
  *
  *    private final int code;
- *    private final String fieldName;
  *
  *    @Override
  *    public int getCode() {
