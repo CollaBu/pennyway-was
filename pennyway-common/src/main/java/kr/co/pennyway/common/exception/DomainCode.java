@@ -10,7 +10,7 @@ package kr.co.pennyway.common.exception;
  * ZERO 필드는 모든 BaseErrorCode를 구현하는 모든 도메인 코드에서 정의되어야 한다.
  * {@code
  * @RequiredArgsConstructor
- * public enum DomainCode implements BaseErrorCode {
+ * public enum DomainBitCode implements DomainCode {
  *      ZERO(0),
  *      USER(1),
  *      PRODUCT(2),
