@@ -6,10 +6,10 @@ import java.util.stream.Stream;
 /**
  * 에러 코드를 구성하는 상세 코드
  *
- * @param statusCode {@link StatusCode} 상태 코드 (3자리)
- * @param reasonCode {@link ReasonCode} 이유 코드 (1자리)
- * @param domainCode {@link DomainCode} 도메인 코드 (2자리)
- * @param fieldCode {@link FieldCode} 필드 코드 (1자리)
+ * @param statusCode {@link StatusCode} 상태 코드
+ * @param reasonCode {@link ReasonCode} 이유 코드
+ * @param domainCode {@link DomainCode} 도메인 코드
+ * @param fieldCode {@link FieldCode} 필드 코드
  *
  * - see also: {@link StatusCode}, {@link ReasonCode}, {@link DomainCode}, {@link FieldCode}
  */
@@ -37,13 +37,13 @@ public record CausedBy(
     /**
      * CausedBy 객체를 생성하는 정적 팩토리 메서드
      * <br/>
-     * 모든 코드의 조합으로 생성된 최종 코드는 7자리의 문자열로 구성된다. (상태 코드(2자리) + 이유 코드(2자리) + 도메인 코드(1자리) + 필드 코드(2자리))
-     * <br/>
-     * 7자리가 아닌 경우 IllegalArgumentException을 발생시킨다.
-     * @param statusCode {@link StatusCode} 상태 코드
-     * @param reasonCode {@link ReasonCode} 이유 코드
-     * @param domainCode {@link DomainCode} 도메인 코드
-     * @param fieldCode {@link FieldCode} 필드 코드
+     * 모든 코드의 조합으로 생성된 최종 코드는 7자리의 문자열로 구성된다.
+     * @param statusCode {@link StatusCode} 상태 코드 (3자리)
+     * @param reasonCode {@link ReasonCode} 이유 코드 (1자리)
+     * @param domainCode {@link DomainCode} 도메인 코드 (1자리 or 2자리)
+     * @param fieldCode {@link FieldCode} 필드 코드 (1자리)
+     * @throws IllegalArgumentException 전체 코드가 7자리가 아닌 경우, 혹은 각 상태 코드가 자릿수를 준수하지 않은 경우
+     * @throws NullPointerException 인자가 null인 경우
      * @return CausedBy
      */
     public static CausedBy of(StatusCode statusCode, ReasonCode reasonCode, DomainCode domainCode, FieldCode fieldCode) {

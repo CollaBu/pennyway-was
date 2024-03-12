@@ -95,7 +95,7 @@ public class CausedByTest {
         CausedBy causedBy = CausedBy.of(statusCode, reasonCode, domainCode, fieldCode);
 
         // then
-        assertEquals("REQUIRED_PARAMETERS_MISSING_IN_REQUEST_BODY", causedBy.reasonCode().name());
+        assertEquals("REQUIRED_PARAMETERS_MISSING_IN_REQUEST_BODY", causedBy.getReason());
     }
 
     private enum DomainBitCode implements DomainCode {
