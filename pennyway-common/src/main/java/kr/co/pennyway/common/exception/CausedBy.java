@@ -43,7 +43,7 @@ public record CausedBy(
      * @param fieldCode {@link FieldCode} 필드 코드
      * @return CausedBy
      */
-    public static CausedBy valueOf(StatusCode statusCode, ReasonCode reasonCode, DomainCode domainCode, FieldCode fieldCode) {
+    public static CausedBy of(StatusCode statusCode, ReasonCode reasonCode, DomainCode domainCode, FieldCode fieldCode) {
         return new CausedBy(statusCode, reasonCode, domainCode, fieldCode);
     }
 
