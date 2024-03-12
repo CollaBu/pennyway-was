@@ -1,14 +1,17 @@
 package kr.co.pennyway.common.exception;
 
 import java.util.Objects;
+import java.util.stream.Stream;
 
 /**
  * 에러 코드를 구성하는 상세 코드
  *
- * @param statusCode {@link StatusCode} 상태 코드
- * @param reasonCode {@link ReasonCode} 이유 코드
- * @param domainCode {@link DomainCode} 도메인 코드
- * @param fieldCode {@link FieldCode} 필드 코드
+ * @param statusCode {@link StatusCode} 상태 코드 (3자리)
+ * @param reasonCode {@link ReasonCode} 이유 코드 (1자리)
+ * @param domainCode {@link DomainCode} 도메인 코드 (2자리)
+ * @param fieldCode {@link FieldCode} 필드 코드 (1자리)
+ *
+ * - see also: {@link StatusCode}, {@link ReasonCode}, {@link DomainCode}, {@link FieldCode}
  */
 public record CausedBy(
     StatusCode statusCode,
@@ -26,8 +29,8 @@ public record CausedBy(
         Objects.requireNonNull(domainCode, "domainCode must not be null");
         Objects.requireNonNull(fieldCode, "fieldCode must not be null");
 
-        if (generateCode().length() != 7) {
-            throw new IllegalArgumentException("Invalid code length");
+        if (!isValidCodes(statusCode.getCode(), reasonCode.getCode(), domainCode.getCode(), fieldCode.getCode())) {
+            throw new IllegalArgumentException("Invalid bit count");
         }
     }
 
@@ -52,7 +55,7 @@ public record CausedBy(
      * @return String : 7자리 정수로 구성된 에러 코드
      */
     public String getCode() {
-        return String.valueOf(generateCode());
+        return generateCode();
     }
 
     /**
@@ -67,5 +70,19 @@ public record CausedBy(
 
     private String generateCode() {
         return String.valueOf(statusCode.getCode() * STATUS_CODE_MULTIPLIER + reasonCode.getCode() * REASON_CODE_MULTIPLIER + domainCode.getCode() * DOMAIN_CODE_MULTIPLIER + fieldCode.getCode());
+    }
+
+    private boolean isValidCodes(int statusCode, int reasonCode, int domainCode, int fieldCode) {
+        return isValidDigit(statusCode, 3) && isValidDigit(reasonCode, 1) && (isValidDigit(domainCode, 1) || isValidDigit(domainCode, 2)) && isValidDigit(fieldCode, 1);
+    }
+
+    private boolean isValidDigit(int number, long expectedDigit) {
+        return calcDigit(number) == expectedDigit;
+    }
+
+    private long calcDigit(int number) {
+        if (number == 0) return 1;
+        return Stream.iterate(number, n -> n > 0, n -> n / 10)
+            .count();
     }
 }
