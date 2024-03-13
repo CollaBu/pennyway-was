@@ -1,5 +1,7 @@
 package kr.co.pennyway.common.security.jwt.access;
 
+import kr.co.infra.common.exception.JwtErrorCode;
+import kr.co.infra.common.exception.JwtErrorException;
 import kr.co.infra.common.jwt.JwtClaims;
 import kr.co.infra.common.jwt.JwtProvider;
 import org.junit.jupiter.api.BeforeEach;
@@ -74,5 +76,19 @@ public class AccessTokenProviderTest {
 
         // then
         assertFalse(jwtProvider.isTokenExpired(token));
+    }
+
+    @Test
+    @DisplayName("서명이 올바르지 않은 토큰을 파싱하면 TAMPERED_TOKEN 예외가 발생한다.")
+    public void getClaimsFromTokenWithInvalidSignature() {
+        // given
+        String token = jwtProvider.generateToken(jwtClaims);
+        String invalidToken = token + "invalid";
+
+        // when
+        JwtErrorException exception = assertThrows(JwtErrorException.class, () -> jwtProvider.getClaimsFromToken(invalidToken));
+
+        // then
+        assertEquals(JwtErrorCode.TAMPERED_TOKEN, exception.getErrorCode());
     }
 }

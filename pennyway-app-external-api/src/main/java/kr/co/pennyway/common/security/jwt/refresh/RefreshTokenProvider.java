@@ -9,7 +9,7 @@ import kr.co.infra.common.exception.JwtErrorException;
 import kr.co.infra.common.jwt.JwtClaims;
 import kr.co.infra.common.jwt.JwtProvider;
 import kr.co.infra.common.util.JwtErrorCodeUtil;
-import kr.co.pennyway.common.annotation.AccessTokenStrategy;
+import kr.co.pennyway.common.annotation.RefreshTokenStrategy;
 import kr.co.pennyway.common.security.jwt.access.AccessTokenClaim;
 import kr.co.pennyway.common.util.DateUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +30,7 @@ import static kr.co.pennyway.common.security.jwt.refresh.RefreshTokenClaimKeys.U
 @Slf4j
 @Primary
 @Component
-@AccessTokenStrategy
+@RefreshTokenStrategy
 public class RefreshTokenProvider implements JwtProvider {
     private final SecretKey secretKey;
     private final Duration tokenExpiration;
