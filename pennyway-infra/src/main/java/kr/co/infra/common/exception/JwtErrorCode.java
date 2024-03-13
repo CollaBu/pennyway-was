@@ -35,7 +35,11 @@ public enum JwtErrorCode implements BaseErrorCode {
     FORBIDDEN_ACCESS_TOKEN(FORBIDDEN, ACCESS_TO_THE_REQUESTED_RESOURCE_IS_FORBIDDEN, "해당 토큰에는 엑세스 권한이 없습니다"),
     SUSPENDED_OR_BANNED_TOKEN(FORBIDDEN, USER_ACCOUNT_SUSPENDED_OR_BANNED, "사용자 계정이 정지되었습니다"),
 
-
+    /**
+     * 500 INTERNAL_SERVER_ERROR: 서버 내부 에러
+     */
+    INVALID_JWT_DTO_FORMAT(INTERNAL_SERVER_ERROR, ZERO, "서버 내부 에러가 발생했습니다."),
+    UNEXPECTED_ERROR(INTERNAL_SERVER_ERROR, ZERO, "예상치 못한 에러가 발생했습니다.");
     ;
 
     private final StatusCode statusCode;
