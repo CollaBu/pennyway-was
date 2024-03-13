@@ -1,6 +1,5 @@
 package kr.co.infra.common.exception;
 
-import kr.co.pennyway.common.exception.BaseErrorCode;
 import kr.co.pennyway.common.exception.CausedBy;
 import kr.co.pennyway.common.exception.GlobalErrorException;
 
