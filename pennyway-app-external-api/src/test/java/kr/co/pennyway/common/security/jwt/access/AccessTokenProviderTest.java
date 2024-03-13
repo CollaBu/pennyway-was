@@ -66,7 +66,7 @@ public class AccessTokenProviderTest {
     }
 
     @Test
-    @DisplayName("토큰의 만료 여부를 확인한다.")
+    @DisplayName("토큰의 만료되지 않았을 때 false를 반환한다.")
     public void isTokenExpired() {
         // given
         String token = jwtProvider.generateToken(jwtClaims);
@@ -76,6 +76,18 @@ public class AccessTokenProviderTest {
 
         // then
         assertFalse(jwtProvider.isTokenExpired(token));
+    }
+
+    @Test
+    @DisplayName("토큰의 만료일이 지났을 때 true를 반환한다.")
+    public void isTokenExpiredWhenTokenIsExpired() {
+        // given
+        jwtClaims = AccessTokenClaim.of(1L, "ROLE_USER");
+        jwtProvider = new AccessTokenProvider(secretStr, Duration.ofMillis(1));
+        String token = jwtProvider.generateToken(jwtClaims);
+
+        // then
+        assertTrue(jwtProvider.isTokenExpired(token));
     }
 
     @Test
