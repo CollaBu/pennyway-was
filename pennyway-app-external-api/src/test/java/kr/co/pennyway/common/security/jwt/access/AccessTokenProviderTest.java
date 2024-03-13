@@ -16,22 +16,19 @@ import static org.junit.jupiter.api.Assertions.*;
 public class AccessTokenProviderTest {
     private final String secretStr = "helloMyNameIsPennywayThisIsSecretKeyItNeedsToBeLongerThan256Bits";
     private JwtProvider jwtProvider;
+    private JwtClaims jwtClaims;
 
     @BeforeEach
     public void setUp() {
         jwtProvider = new AccessTokenProvider(secretStr, Duration.ofMinutes(5));
+        jwtClaims = AccessTokenClaim.of("1", "ROLE_USER");
     }
 
     @Test
     @DisplayName("토큰 생성이 정상적으로 이루어지는지 확인한다.")
     public void createToken() {
-        // given
-        Long userId = 1L;
-        String role = "ROLE_USER";
-        JwtClaims accessTokenClaim = AccessTokenClaim.of(userId.toString(), role);
-
         // when
-        String token = jwtProvider.generateToken(accessTokenClaim);
+        String token = jwtProvider.generateToken(jwtClaims);
 
         // then
         assertNotNull(token);
@@ -42,10 +39,7 @@ public class AccessTokenProviderTest {
     @DisplayName("토큰에서 정보를 추출할 수 있는지 확인한다.")
     public void getSubInfoFromToken() {
         // given
-        Long userId = 1L;
-        String role = "ROLE_USER";
-        JwtClaims accessTokenClaim = AccessTokenClaim.of(userId.toString(), role);
-        String token = jwtProvider.generateToken(accessTokenClaim);
+        String token = jwtProvider.generateToken(jwtClaims);
 
         // when
         JwtClaims subInfo = jwtProvider.getSubInfoFromToken(token);
@@ -59,10 +53,7 @@ public class AccessTokenProviderTest {
     @DisplayName("토큰의 만료일을 확인한다.")
     public void getExpiryDate() {
         // given
-        Long userId = 1L;
-        String role = "ROLE_USER";
-        JwtClaims accessTokenClaim = AccessTokenClaim.of(userId.toString(), role);
-        String token = jwtProvider.generateToken(accessTokenClaim);
+        String token = jwtProvider.generateToken(jwtClaims);
 
         // when
         jwtProvider.getExpiryDate(token);
@@ -76,10 +67,7 @@ public class AccessTokenProviderTest {
     @DisplayName("토큰의 만료 여부를 확인한다.")
     public void isTokenExpired() {
         // given
-        Long userId = 1L;
-        String role = "ROLE_USER";
-        JwtClaims accessTokenClaim = AccessTokenClaim.of(userId.toString(), role);
-        String token = jwtProvider.generateToken(accessTokenClaim);
+        String token = jwtProvider.generateToken(jwtClaims);
 
         // when
         jwtProvider.isTokenExpired(token);
