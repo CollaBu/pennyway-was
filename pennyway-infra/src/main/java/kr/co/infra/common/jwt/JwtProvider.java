@@ -20,25 +20,18 @@ public interface JwtProvider {
     }
 
     /**
-     * 사용자 정보 기반으로 토큰을 생성하는 메서드
+     * 토큰을 생성하는 메서드
      * @param subs {@link JwtClaims} : 토큰 payload에 담을 정보
      * @return String : 토큰
      */
     String generateToken(JwtClaims subs);
 
     /**
-     * 토큰으로 부터 사용자 정보를 추출하여 JwtUserInfo 객체로 반환하는 메서드
+     * 토큰으로 부터 payload를 추출하여 JwtClaims 객체로 반환하는 메서드
      * @param token String : 토큰
      * @return {@link JwtClaims} : 사용자 정보
      */
     JwtClaims getJwtClaimsFromToken(String token);
-
-    /**
-     * 토큰으로부터 payload 정보를 추출하는 메서드
-     * @param token String : 토큰
-     * @return Claims : 사용자 정보
-     */
-    Claims getClaimsFromToken(String token);
 
     /**
      * 토큰의 만료일을 추출하는 메서드
@@ -52,4 +45,11 @@ public interface JwtProvider {
      * @param token String : 토큰
      */
     boolean isTokenExpired(String token);
+
+    /**
+     * 토큰으로부터 payload 정보를 추출하는 메서드
+     * @param token String : 토큰
+     * @return Claims : 사용자 정보
+     */
+    Claims getClaimsFromToken(String token);
 }
