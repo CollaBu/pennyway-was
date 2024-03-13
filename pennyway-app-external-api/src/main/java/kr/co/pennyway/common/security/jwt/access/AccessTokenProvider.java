@@ -29,6 +29,9 @@ import java.util.Base64;
 import java.util.Date;
 import java.util.Map;
 
+import static kr.co.pennyway.common.security.jwt.access.AccessTokenClaimKeys.ROLE;
+import static kr.co.pennyway.common.security.jwt.access.AccessTokenClaimKeys.USER_ID;
+
 @Slf4j
 @Primary
 @Component
@@ -61,7 +64,7 @@ public class AccessTokenProvider implements JwtProvider {
     @Override
     public JwtClaims getSubInfoFromToken(String token) {
         Claims claims = getClaimsFromToken(token);
-        return AccessTokenClaim.of(claims.get("userId", String.class), claims.get("role", String.class));
+        return AccessTokenClaim.of(Long.parseLong(claims.get(USER_ID.getValue(), String.class)), claims.get(ROLE.getValue(), String.class));
     }
 
     @Override

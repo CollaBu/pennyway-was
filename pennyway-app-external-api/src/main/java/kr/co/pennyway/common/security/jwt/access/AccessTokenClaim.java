@@ -6,16 +6,17 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.Map;
 
+import static kr.co.pennyway.common.security.jwt.access.AccessTokenClaimKeys.ROLE;
+import static kr.co.pennyway.common.security.jwt.access.AccessTokenClaimKeys.USER_ID;
+
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class AccessTokenClaim implements JwtClaims {
-    private static final String USER_ID = "userId";
-    private static final String ROLE = "role";
     private final Map<String, ?> claims;
 
-    public static AccessTokenClaim of(String userId, String role) {
+    public static AccessTokenClaim of(Long userId, String role) {
         Map<String, Object> claims = Map.of(
-                USER_ID, userId,
-                ROLE, role
+                USER_ID.getValue(), userId.toString(),
+                ROLE.getValue(), role
         );
         return new AccessTokenClaim(claims);
     }
@@ -23,13 +24,5 @@ public class AccessTokenClaim implements JwtClaims {
     @Override
     public Map<String, ?> getClaims() {
         return claims;
-    }
-
-    public String getUserId() {
-        return (String) claims.get(USER_ID);
-    }
-
-    public String getRole() {
-        return (String) claims.get(ROLE);
     }
 }

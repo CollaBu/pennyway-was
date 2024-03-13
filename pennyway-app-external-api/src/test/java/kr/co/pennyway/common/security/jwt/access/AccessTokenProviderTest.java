@@ -21,7 +21,7 @@ public class AccessTokenProviderTest {
     @BeforeEach
     public void setUp() {
         jwtProvider = new AccessTokenProvider(secretStr, Duration.ofMinutes(5));
-        jwtClaims = AccessTokenClaim.of("1", "ROLE_USER");
+        jwtClaims = AccessTokenClaim.of(1L, "ROLE_USER");
     }
 
     @Test
