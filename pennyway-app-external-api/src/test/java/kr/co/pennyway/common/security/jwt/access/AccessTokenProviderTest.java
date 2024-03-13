@@ -44,7 +44,7 @@ public class AccessTokenProviderTest {
         String token = jwtProvider.generateToken(jwtClaims);
 
         // when
-        JwtClaims subInfo = jwtProvider.getSubInfoFromToken(token);
+        JwtClaims subInfo = jwtProvider.getJwtClaimsFromToken(token);
 
         // then
         assertNotNull(subInfo);

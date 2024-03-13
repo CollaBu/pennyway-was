@@ -56,7 +56,7 @@ public class AccessTokenProvider implements JwtProvider {
     }
 
     @Override
-    public JwtClaims getSubInfoFromToken(String token) {
+    public JwtClaims getJwtClaimsFromToken(String token) {
         Claims claims = getClaimsFromToken(token);
         return AccessTokenClaim.of(Long.parseLong(claims.get(USER_ID.getValue(), String.class)), claims.get(ROLE.getValue(), String.class));
     }

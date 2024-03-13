@@ -31,7 +31,7 @@ public interface JwtProvider {
      * @param token String : 토큰
      * @return {@link JwtClaims} : 사용자 정보
      */
-    JwtClaims getSubInfoFromToken(String token);
+    JwtClaims getJwtClaimsFromToken(String token);
 
     /**
      * 토큰으로부터 payload 정보를 추출하는 메서드
