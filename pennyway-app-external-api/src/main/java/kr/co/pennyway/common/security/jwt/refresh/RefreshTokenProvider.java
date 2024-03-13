@@ -70,8 +70,17 @@ public class RefreshTokenProvider implements JwtProvider {
 
     @Override
     public boolean isTokenExpired(String token) {
-        Claims claims = getClaimsFromToken(token);
-        return claims.getExpiration().before(new Date());
+        try {
+            Claims claims = getClaimsFromToken(token);
+            return claims.getExpiration().before(new Date());
+        } catch (JwtException e) {
+            final JwtErrorCode errorCode = JwtErrorCodeUtil.determineErrorCode(e, JwtErrorCode.FAILED_AUTHENTICATION);
+
+            if (JwtErrorCode.EXPIRED_TOKEN.equals(errorCode)) return true;
+
+            log.warn("Error code : {}, Error - {},  {}", errorCode, e.getClass(), e.getMessage());
+            throw new JwtErrorException(errorCode);
+        }
     }
 
     @Override
