@@ -4,8 +4,10 @@ jar {enabled = true}
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-aop'
 
+    /* Spring Core */
+    api group: 'org.springframework', name: 'spring-core', version: '6.1.4'
+
     /* Jackson */
     api 'com.fasterxml.jackson.core:jackson-annotations:2.10.1'
     api 'com.fasterxml.jackson.core:jackson-databind:2.13.5'
-
 }
