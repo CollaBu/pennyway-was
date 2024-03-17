@@ -1,2 +1,4 @@
-package kr.co.pennyway;public interface DomainPackageLocation {
+package kr.co.pennyway;
+
+public interface DomainPackageLocation {
 }
