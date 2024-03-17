@@ -1,3 +1,9 @@
+spring:
+  profiles:
+    group:
+      local: common
+      prod: common
+
 ---
 spring:
   config:
