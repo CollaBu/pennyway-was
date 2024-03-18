@@ -35,3 +35,6 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### Conventional Commit ###
+/node_modules
