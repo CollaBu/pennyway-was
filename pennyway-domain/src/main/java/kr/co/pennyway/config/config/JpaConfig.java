@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @Configuration
-@EnableJpaAuditing(auditorAwareRef = "authorAwareAudit")
+@EnableJpaAuditing
 @EntityScan(basePackageClasses = DomainPackageLocation.class)
 @EnableJpaRepositories(basePackageClasses = DomainPackageLocation.class)
 public class JpaConfig {
