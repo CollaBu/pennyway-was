@@ -1,4 +1,4 @@
-package kr.co.pennyway.config.config;
+package kr.co.pennyway.config;
 
 import kr.co.pennyway.DomainPackageLocation;
 import org.springframework.boot.autoconfigure.domain.EntityScan;

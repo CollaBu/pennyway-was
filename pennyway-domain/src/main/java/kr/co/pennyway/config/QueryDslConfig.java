@@ -1,4 +1,4 @@
-package kr.co.pennyway.config.config;
+package kr.co.pennyway.config;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
