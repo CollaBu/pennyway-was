@@ -1,3 +1,9 @@
+spring:
+  profiles:
+    group:
+      local: common, domain, infra
+      prod: common, domain, infra
+
 jwt:
   secret-key:
     access-token: ${JWT_ACCESS_SECRET_KEY}

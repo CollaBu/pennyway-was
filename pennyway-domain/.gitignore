@@ -28,6 +28,8 @@ bin/
 !**/src/main/**/bin/
 !**/src/test/**/bin/
 
+./main/generated/*
+
 ### NetBeans ###
 /nbproject/private/
 /nbbuild/
