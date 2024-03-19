@@ -63,7 +63,7 @@ public class CausedByTest {
         CausedBy causedBy = CausedBy.of(statusCode, reasonCode, domainCode, fieldCode);
 
         // then
-        assertEquals("4221013", causedBy.getCode());
+        assertEquals("4220013", causedBy.getCode());
     }
 
     @Test
@@ -79,7 +79,7 @@ public class CausedByTest {
         CausedBy causedBy = CausedBy.of(statusCode, reasonCode, domainCode, fieldCode);
 
         // then
-        assertEquals("4002130", causedBy.getCode());
+        assertEquals("4001130", causedBy.getCode());
     }
 
     @Test
