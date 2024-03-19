@@ -2,7 +2,7 @@ spring:
   profiles:
     group:
       local: common
-      prod: common
+      dev: common
 
   datasource:
     url: ${DB_URL}
@@ -42,7 +42,7 @@ logging:
 spring:
   config:
     activate:
-      on-profile: prod
+      on-profile: dev
 
   jpa:
     database: MySQL
