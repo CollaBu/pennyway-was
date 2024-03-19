@@ -2,7 +2,12 @@ spring:
   profiles:
     group:
       local: common, domain, infra
-      prod: common, domain, infra
+      dev: common, domain, infra
+
+pennywah:
+  domain:
+    local: ${PENNYWAY_DOMAIN_LOCAL}
+    dev: ${PENNYWAY_DOMAIN_DEV}
 
 jwt:
   secret-key:
@@ -19,8 +24,32 @@ spring:
     activate:
       on-profile: local
 
+springdoc:
+  default-consumes-media-type: application/json;charset=UTF-8
+  default-produces-media-type: application/json;charset=UTF-8
+  swagger-ui:
+    path: /swagger-ui
+    disable-swagger-default-url: true
+    display-request-duration: true
+    operations-sorter: alpha
+  api-docs:
+    groups:
+      enabled: true
+
 ---
 spring:
   config:
     activate:
-      on-profile: prod
+      on-profile: dev
+
+springdoc:
+  default-consumes-media-type: application/json;charset=UTF-8
+  default-produces-media-type: application/json;charset=UTF-8
+  swagger-ui:
+    path: /swagger-ui
+    disable-swagger-default-url: true
+    display-request-duration: true
+    operations-sorter: alpha
+  api-docs:
+    groups:
+      enabled: true
