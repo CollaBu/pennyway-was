@@ -1,6 +1,7 @@
 package kr.co.pennyway.domain.domains.user.domain;
 
 import jakarta.persistence.*;
+import kr.co.pennyway.domain.common.converter.ProfileVisibilityConverter;
 import kr.co.pennyway.domain.common.converter.RoleConverter;
 import kr.co.pennyway.domain.common.model.DateAuditable;
 import kr.co.pennyway.domain.domains.user.type.ProfileVisibility;
@@ -35,7 +36,7 @@ public class User extends DateAuditable {
     private String phone;
     @Convert(converter = RoleConverter.class)
     private Role role;
-    @Convert(converter = ProfileVisibility.class)
+    @Convert(converter = ProfileVisibilityConverter.class)
     private ProfileVisibility profileVisibility;
     @ColumnDefault("false")
     private Boolean locked;
