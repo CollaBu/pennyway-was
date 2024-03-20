@@ -99,7 +99,7 @@ public class GlobalExceptionHandler {
         log.warn("handleMissingRequestHeaderException : {}", e.getMessage());
 
         String code = String.valueOf(StatusCode.BAD_REQUEST.getCode()*10 + ReasonCode.MISSING_REQUIRED_PARAMETER.getCode());
-        final ErrorResponse response = ErrorResponse.of(code, e.getMessage());
+        ErrorResponse response = ErrorResponse.of(code, e.getMessage());
         return ResponseEntity.badRequest().body(response);
     }
 
@@ -107,6 +107,7 @@ public class GlobalExceptionHandler {
      * JSON 형식의 요청 데이터를 파싱하는 과정에서 발생하는 예외를 처리하는 메서드
      * @see HttpMessageNotReadableException
      */
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(HttpMessageNotReadableException.class)
     protected ErrorResponse handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
         log.warn("handleHttpMessageNotReadableException : {}", e.getMessage());
@@ -125,6 +126,7 @@ public class GlobalExceptionHandler {
      * API 호출 시 'Parameter' 내에 데이터 값이 존재하지 않은 경우
      * @see MissingServletRequestParameterException
      */
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MissingServletRequestParameterException.class)
     protected ErrorResponse handleMissingServletRequestParameterException(MissingServletRequestParameterException e) {
         log.warn("handleMissingServletRequestParameterException : {}", e.getMessage());
@@ -137,6 +139,7 @@ public class GlobalExceptionHandler {
      * 잘못된 URL 호출 시
      * @see NoHandlerFoundException
      */
+    @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(NoHandlerFoundException.class)
     protected ErrorResponse handleNoHandlerFoundException(NoHandlerFoundException e) {
         log.warn("handleNoHandlerFoundException : {}", e.getMessage());
