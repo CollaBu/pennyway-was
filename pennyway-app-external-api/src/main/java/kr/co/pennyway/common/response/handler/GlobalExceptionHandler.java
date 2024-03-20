@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.http.converter.HttpMessageNotWritableException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingRequestHeaderException;
@@ -142,6 +143,19 @@ public class GlobalExceptionHandler {
         log.warn("handleNoHandlerFoundException : {}", e.getMessage());
 
         String code = String.valueOf(StatusCode.NOT_FOUND.getCode()*10 + ReasonCode.INVALID_URL_OR_ENDPOINT.getCode());
+        return ErrorResponse.of(code, e.getMessage());
+    }
+
+    /**
+     * API 호출 시 데이터를 반환할 수 없는 경우
+     * @return ResponseEntity<ErrorResponse>
+     */
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(HttpMessageNotWritableException.class)
+    protected ErrorResponse handleHttpMessageNotWritableException(HttpMessageNotWritableException e) {
+        log.warn("handleHttpMessageNotWritableException : {}", e.getMessage());
+
+        String code = String.valueOf(StatusCode.INTERNAL_SERVER_ERROR.getCode()*10 + ReasonCode.UNEXPECTED_ERROR.getCode());
         return ErrorResponse.of(code, e.getMessage());
     }
 }
