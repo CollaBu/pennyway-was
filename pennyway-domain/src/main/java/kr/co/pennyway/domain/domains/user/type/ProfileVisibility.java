@@ -5,7 +5,7 @@ import kr.co.pennyway.domain.common.converter.LegacyCommonType;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public enum Visibility implements LegacyCommonType {
+public enum ProfileVisibility implements LegacyCommonType {
     PUBLIC("0", "전체 공개"),
     FRIEND("1", "친구 공개"),
     PRIVATE("2", "비공개");
@@ -15,7 +15,7 @@ public enum Visibility implements LegacyCommonType {
 
     @Override
     public String getCode() {
-        return null;
+        return code;
     }
 
     @JsonValue
