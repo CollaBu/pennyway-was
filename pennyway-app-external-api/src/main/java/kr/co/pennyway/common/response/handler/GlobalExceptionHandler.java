@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
 import java.nio.file.AccessDeniedException;
 import java.util.HashMap;
@@ -129,6 +130,18 @@ public class GlobalExceptionHandler {
         log.warn("handleMissingServletRequestParameterException : {}", e.getMessage());
 
         String code = String.valueOf(StatusCode.BAD_REQUEST.getCode()*10 + ReasonCode.MISSING_REQUIRED_PARAMETER.getCode());
+        return ErrorResponse.of(code, e.getMessage());
+    }
+
+    /**
+     * 잘못된 URL 호출 시
+     * @see NoHandlerFoundException
+     */
+    @ExceptionHandler(NoHandlerFoundException.class)
+    protected ErrorResponse handleNoHandlerFoundException(NoHandlerFoundException e) {
+        log.warn("handleNoHandlerFoundException : {}", e.getMessage());
+
+        String code = String.valueOf(StatusCode.NOT_FOUND.getCode()*10 + ReasonCode.INVALID_URL_OR_ENDPOINT.getCode());
         return ErrorResponse.of(code, e.getMessage());
     }
 }
