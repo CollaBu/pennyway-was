@@ -39,8 +39,7 @@ public enum JwtErrorCode implements BaseErrorCode {
      * 500 INTERNAL_SERVER_ERROR: 서버 내부 에러
      */
     INVALID_JWT_DTO_FORMAT(INTERNAL_SERVER_ERROR, ReasonCode.UNEXPECTED_ERROR, "서버 내부 에러가 발생했습니다."),
-    UNEXPECTED_ERROR(INTERNAL_SERVER_ERROR, ReasonCode.UNEXPECTED_ERROR, "예상치 못한 에러가 발생했습니다.");
-    ;
+    UNEXPECTED_ERROR(INTERNAL_SERVER_ERROR, ReasonCode.UNEXPECTED_ERROR, "예상치 못한 에러가 발생했습니다.");;
 
     private final StatusCode statusCode;
     private final ReasonCode reasonCode;
@@ -48,7 +47,7 @@ public enum JwtErrorCode implements BaseErrorCode {
 
     @Override
     public CausedBy causedBy() {
-        return CausedBy.of(statusCode, reasonCode, DomainErrorCode.ZERO, FieldErrorCode.ZERO);
+        return CausedBy.of(statusCode, reasonCode);
     }
 
     @Override
