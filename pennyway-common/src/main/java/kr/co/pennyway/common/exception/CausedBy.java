@@ -8,6 +8,7 @@ import java.util.stream.Stream;
  *
  * @param statusCode {@link StatusCode} 상태 코드
  * @param reasonCode {@link ReasonCode} 이유 코드
+ * @author YANG JAESEO
  */
 public record CausedBy(
         StatusCode statusCode,
@@ -42,7 +43,7 @@ public record CausedBy(
     /**
      * status code, reason code, domain code, field code를 조합하여 에러 코드를 생성한다.
      *
-     * @return String : 7자리 정수로 구성된 에러 코드
+     * @return String : 4자리 정수로 구성된 에러 코드
      */
     public String getCode() {
         return generateCode();
