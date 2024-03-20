@@ -125,7 +125,6 @@ public class GlobalExceptionHandler {
      * API 호출 시 'Parameter' 내에 데이터 값이 존재하지 않은 경우
      * @see MissingServletRequestParameterException
      */
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MissingServletRequestParameterException.class)
     protected ErrorResponse handleMissingServletRequestParameterException(MissingServletRequestParameterException e) {
         log.warn("handleMissingServletRequestParameterException : {}", e.getMessage());
@@ -157,5 +156,36 @@ public class GlobalExceptionHandler {
 
         String code = String.valueOf(StatusCode.INTERNAL_SERVER_ERROR.getCode()*10 + ReasonCode.UNEXPECTED_ERROR.getCode());
         return ErrorResponse.of(code, e.getMessage());
+    }
+
+    /**
+     * NullPointerException이 발생한 경우
+     * @return ResponseEntity<ErrorResponse>
+     */
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(NullPointerException.class)
+    protected ErrorResponse handleNullPointerException(NullPointerException e) {
+        log.warn("handleNullPointerException : {}", e.getMessage());
+        e.printStackTrace();
+
+        String code = String.valueOf(StatusCode.INTERNAL_SERVER_ERROR.getCode()*10 + ReasonCode.UNEXPECTED_ERROR.getCode());
+        return ErrorResponse.of(code, StatusCode.INTERNAL_SERVER_ERROR.name());
+    }
+
+    // ================================================================================== //
+
+    /**
+     * 기타 예외가 발생한 경우
+     * @param e Exception
+     * @return ResponseEntity<ErrorResponse>
+     */
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(Exception.class)
+    protected ErrorResponse handleException(Exception e) {
+        log.warn("{} : handleException : {}", e.getClass(), e.getMessage());
+        e.printStackTrace();
+
+        String code = String.valueOf(StatusCode.INTERNAL_SERVER_ERROR.getCode()*10 + ReasonCode.UNEXPECTED_ERROR.getCode());
+        return ErrorResponse.of(code, StatusCode.INTERNAL_SERVER_ERROR.name());
     }
 }
