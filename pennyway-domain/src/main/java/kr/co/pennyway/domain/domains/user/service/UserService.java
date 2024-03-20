@@ -22,4 +22,9 @@ public class UserService {
     public User readUser(Long id) {
         return userRepository.findById(id).orElseThrow(() -> new UserErrorException(UserErrorCode.NOT_FOUND));
     }
+
+    @Transactional(readOnly = true)
+    public boolean isExistUser(Long id) {
+        return userRepository.existsById(id);
+    }
 }
