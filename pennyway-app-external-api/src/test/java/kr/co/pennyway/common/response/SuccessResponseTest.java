@@ -1,5 +1,6 @@
 package kr.co.pennyway.common.response;
 
+import kr.co.pennyway.api.common.response.SuccessResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -9,7 +10,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 
 @ExtendWith(MockitoExtension.class)
 public class SuccessResponseTest {
@@ -73,5 +73,6 @@ public class SuccessResponseTest {
         System.out.println(response);
     }
 
-    private record TestDto(String name, int age) { }
+    private record TestDto(String name, int age) {
+    }
 }

@@ -42,4 +42,4 @@ bin/
 .DS_Store
 
 ## Test API
-src/main/java/kr/co/pennyway/apis/test
+src/main/java/kr/co/pennyway/api/apis/test
