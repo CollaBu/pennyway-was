@@ -1,5 +1,6 @@
 package kr.co.pennyway.common.response.handler;
 
+import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import kr.co.pennyway.common.exception.GlobalErrorException;
 import kr.co.pennyway.common.exception.ReasonCode;
 import kr.co.pennyway.common.exception.StatusCode;
@@ -8,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingRequestHeaderException;
@@ -96,5 +98,23 @@ public class GlobalExceptionHandler {
         String code = String.valueOf(StatusCode.BAD_REQUEST.getCode()*10 + ReasonCode.MISSING_REQUIRED_PARAMETER.getCode());
         final ErrorResponse response = ErrorResponse.of(code, e.getMessage());
         return ResponseEntity.badRequest().body(response);
+    }
+
+    /**
+     * JSON 형식의 요청 데이터를 파싱하는 과정에서 발생하는 예외를 처리하는 메서드
+     * @see HttpMessageNotReadableException
+     */
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    protected ErrorResponse handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
+        log.warn("handleHttpMessageNotReadableException : {}", e.getMessage());
+
+        String code;
+        if (e.getCause() instanceof MismatchedInputException mismatchedInputException) {
+            code = String.valueOf(StatusCode.UNPROCESSABLE_CONTENT.getCode()*10 + TYPE_MISMATCH_ERROR_IN_REQUEST_BODY.getCode());
+            return ErrorResponse.of(code, mismatchedInputException.getPath().get(0).getFieldName() + " 필드의 값이 유효하지 않습니다.");
+        }
+
+        code = String.valueOf(StatusCode.BAD_REQUEST.getCode()*10 + ReasonCode.MALFORMED_REQUEST_BODY.getCode());
+        return ErrorResponse.of(code, e.getMessage());
     }
 }
