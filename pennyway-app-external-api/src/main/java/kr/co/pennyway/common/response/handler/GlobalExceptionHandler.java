@@ -13,6 +13,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingRequestHeaderException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -115,6 +116,19 @@ public class GlobalExceptionHandler {
         }
 
         code = String.valueOf(StatusCode.BAD_REQUEST.getCode()*10 + ReasonCode.MALFORMED_REQUEST_BODY.getCode());
+        return ErrorResponse.of(code, e.getMessage());
+    }
+
+    /**
+     * API 호출 시 'Parameter' 내에 데이터 값이 존재하지 않은 경우
+     * @see MissingServletRequestParameterException
+     */
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    protected ErrorResponse handleMissingServletRequestParameterException(MissingServletRequestParameterException e) {
+        log.warn("handleMissingServletRequestParameterException : {}", e.getMessage());
+
+        String code = String.valueOf(StatusCode.BAD_REQUEST.getCode()*10 + ReasonCode.MISSING_REQUIRED_PARAMETER.getCode());
         return ErrorResponse.of(code, e.getMessage());
     }
 }
