@@ -18,7 +18,7 @@ public class SuccessResponse<T> {
             data: {
                 "aDomain": { // 단수명사는 object 형태로 반환
                     ...
-                },
+                },`
                 "bDomains": [ // 복수명사는 array 형태로 반환
                     ...
                 ]
