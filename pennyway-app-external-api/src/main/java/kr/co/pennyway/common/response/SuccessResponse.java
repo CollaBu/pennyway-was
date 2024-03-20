@@ -48,9 +48,11 @@ public class SuccessResponse<T> {
 
     /**
      * data가 null인 경우 사용한다.
+     * <br/>
+     * data : {} 형태의 성공 응답을 반환한다.
      */
     public static SuccessResponse<?> noContent() {
-        return SuccessResponse.builder().build();
+        return SuccessResponse.builder().data(Map.of()).build();
     }
 
     @Override
