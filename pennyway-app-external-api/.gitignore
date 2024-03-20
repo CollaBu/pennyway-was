@@ -40,3 +40,6 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+
+## Test API
+src/main/java/kr/co/pennyway/apis/test
