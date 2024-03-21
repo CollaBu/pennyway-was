@@ -31,7 +31,7 @@ public class SignUpReq {
             String password,
             @Schema(description = "전화번호", example = "010-1234-5678")
             @NotEmpty(message = "전화번호를 입력해주세요")
-            @Pattern(regexp = "^01[01]-\\d{4}-\\d{4}$\n", message = "전화번호 형식이 올바르지 않습니다.")
+            @Pattern(regexp = "^01[01]-\\d{4}-\\d{4}$", message = "전화번호 형식이 올바르지 않습니다.")
             String phone,
             @Schema(description = "6자리 정수 인증번호", example = "123456")
             @NotBlank(message = "인증번호는 필수입니다.")

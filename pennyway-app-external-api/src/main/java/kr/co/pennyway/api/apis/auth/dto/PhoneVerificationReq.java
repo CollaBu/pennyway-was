@@ -10,7 +10,7 @@ public class PhoneVerificationReq {
     public record PushCodeReq(
             @Schema(description = "전화번호", example = "01012345678")
             @NotNull(message = "전화번호는 필수입니다.")
-            @Pattern(regexp = "^01[01]-\\d{4}-\\d{4}$\n", message = "전화번호 형식이 올바르지 않습니다.")
+            @Pattern(regexp = "^01[01]-\\d{4}-\\d{4}$", message = "전화번호 형식이 올바르지 않습니다.")
             String phone
     ) {
     }
@@ -19,7 +19,7 @@ public class PhoneVerificationReq {
     public record VerifyCodeReq(
             @Schema(description = "전화번호", example = "01012345678")
             @NotNull(message = "전화번호는 필수입니다.")
-            @Pattern(regexp = "^01[01]-\\d{4}-\\d{4}$\n", message = "전화번호 형식이 올바르지 않습니다.")
+            @Pattern(regexp = "^01[01]-\\d{4}-\\d{4}$", message = "전화번호 형식이 올바르지 않습니다.")
             String phone,
             @Schema(description = "6자리 정수 인증번호", example = "123456")
             @NotBlank(message = "인증번호는 필수입니다.")
