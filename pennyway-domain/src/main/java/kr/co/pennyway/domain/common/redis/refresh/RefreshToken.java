@@ -1,6 +1,7 @@
 package kr.co.pennyway.domain.common.redis.refresh;
 
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import org.springframework.data.annotation.Id;
@@ -12,6 +13,7 @@ import java.util.concurrent.TimeUnit;
 @RedisHash("refreshToken")
 @Getter
 @ToString(of = {"userId", "token", "ttl"})
+@EqualsAndHashCode(of = {"userId", "token"})
 public class RefreshToken {
     @Id
     private final Long userId;
