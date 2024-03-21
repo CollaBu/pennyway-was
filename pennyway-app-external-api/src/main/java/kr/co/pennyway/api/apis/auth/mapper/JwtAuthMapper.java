@@ -1,9 +1,9 @@
 package kr.co.pennyway.api.apis.auth.mapper;
 
 import kr.co.infra.common.jwt.JwtProvider;
-import kr.co.pennyway.api.apis.auth.dto.Jwts;
 import kr.co.pennyway.api.common.annotation.AccessTokenStrategy;
 import kr.co.pennyway.api.common.annotation.RefreshTokenStrategy;
+import kr.co.pennyway.api.common.security.jwt.Jwts;
 import kr.co.pennyway.api.common.security.jwt.access.AccessTokenClaim;
 import kr.co.pennyway.common.annotation.Mapper;
 import kr.co.pennyway.domain.common.redis.refresh.RefreshToken;
