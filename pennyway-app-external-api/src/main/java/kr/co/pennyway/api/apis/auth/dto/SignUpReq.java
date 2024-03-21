@@ -29,7 +29,7 @@ public class SignUpReq {
             @NotEmpty(message = "비밀번호를 입력해주세요")
             @Password(message = "8~16자의 영문 대/소문자, 숫자, 특수문자를 사용해주세요. (적어도 하나의 영문 소문자, 숫자 포함)")
             String password,
-            @Schema(description = "전화번호", example = "01012345678")
+            @Schema(description = "전화번호", example = "010-1234-5678")
             @NotEmpty(message = "전화번호를 입력해주세요")
             @Pattern(regexp = "^01[01]-\\d{4}-\\d{4}$\n", message = "전화번호 형식이 올바르지 않습니다.")
             String phone,
@@ -48,7 +48,7 @@ public class SignUpReq {
                     .profileVisibility(ProfileVisibility.PUBLIC)
                     .build();
         }
-        
+
     }
 
     @Schema(title = "소셜 회원가입 요청 DTO")
