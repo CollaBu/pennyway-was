@@ -7,13 +7,15 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 import org.springframework.data.redis.core.TimeToLive;
 
+import java.util.concurrent.TimeUnit;
+
 @RedisHash("refreshToken")
 @Getter
 @ToString(of = {"userId", "token", "ttl"})
 public class RefreshToken {
     @Id
     private final Long userId;
-    @TimeToLive
+    @TimeToLive(unit = TimeUnit.MILLISECONDS)
     private final long ttl;
     private String token;
 
