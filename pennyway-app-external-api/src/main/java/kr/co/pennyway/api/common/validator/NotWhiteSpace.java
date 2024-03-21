@@ -10,6 +10,13 @@ import java.lang.annotation.Target;
 import static java.lang.annotation.ElementType.*;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
+/**
+ * 어노테이션된 요소는 반드시 공백문자가 포함되어서는 안 됩니다. <br/>
+ * 단, null인 경우 true를 반환합니다.
+ *
+ * @author Yang JaeSeo
+ * @see Character#isWhitespace(char)
+ */
 @Documented
 @Constraint(validatedBy = {NotWhiteSpaceValidator.class})
 @Target({METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE})
