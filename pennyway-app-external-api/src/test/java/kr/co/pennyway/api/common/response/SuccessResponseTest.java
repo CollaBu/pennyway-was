@@ -1,6 +1,5 @@
-package kr.co.pennyway.common.response;
+package kr.co.pennyway.api.common.response;
 
-import kr.co.pennyway.api.common.response.SuccessResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
