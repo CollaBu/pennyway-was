@@ -34,10 +34,10 @@ public class CookieUtil {
      *
      * @param cookieName String : 생성할 쿠키의 이름
      * @param value      String : 생성할 쿠키의 값
-     * @param maxAge     int : 생성할 쿠키의 만료 시간
+     * @param maxAge     long : 생성할 쿠키의 만료 시간
      * @return ResponseCookie : 생성된 쿠키
      */
-    public ResponseCookie createCookie(String cookieName, String value, int maxAge) {
+    public ResponseCookie createCookie(String cookieName, String value, long maxAge) {
         return ResponseCookie.from(cookieName, value)
                 .path("/")
                 .httpOnly(true)
