@@ -6,9 +6,6 @@ import lombok.Getter;
 import lombok.ToString;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
-import org.springframework.data.redis.core.TimeToLive;
-
-import java.util.concurrent.TimeUnit;
 
 @RedisHash("refreshToken")
 @Getter
@@ -17,7 +14,6 @@ import java.util.concurrent.TimeUnit;
 public class RefreshToken {
     @Id
     private final Long userId;
-    @TimeToLive(unit = TimeUnit.MILLISECONDS)
     private final long ttl;
     private String token;
 
