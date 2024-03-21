@@ -1,4 +1,4 @@
-package kr.co.pennyway.api.apis.auth.dto;
+package kr.co.pennyway.api.common.security.jwt;
 
 public record Jwts(
         String accessToken,
