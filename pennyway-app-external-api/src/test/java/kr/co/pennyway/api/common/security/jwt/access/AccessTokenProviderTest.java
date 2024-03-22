@@ -1,11 +1,9 @@
-package kr.co.pennyway.common.security.jwt.access;
+package kr.co.pennyway.api.common.security.jwt.access;
 
 import kr.co.infra.common.exception.JwtErrorCode;
 import kr.co.infra.common.exception.JwtErrorException;
 import kr.co.infra.common.jwt.JwtClaims;
 import kr.co.infra.common.jwt.JwtProvider;
-import kr.co.pennyway.api.common.security.jwt.access.AccessTokenClaim;
-import kr.co.pennyway.api.common.security.jwt.access.AccessTokenProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

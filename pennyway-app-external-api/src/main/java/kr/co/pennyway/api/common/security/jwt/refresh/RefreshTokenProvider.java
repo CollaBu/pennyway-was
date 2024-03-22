@@ -14,7 +14,6 @@ import kr.co.pennyway.api.common.security.jwt.access.AccessTokenClaim;
 import kr.co.pennyway.common.util.DateUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -28,7 +27,6 @@ import static kr.co.pennyway.api.common.security.jwt.refresh.RefreshTokenClaimKe
 import static kr.co.pennyway.api.common.security.jwt.refresh.RefreshTokenClaimKeys.USER_ID;
 
 @Slf4j
-@Primary
 @Component
 @RefreshTokenStrategy
 public class RefreshTokenProvider implements JwtProvider {
