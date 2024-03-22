@@ -5,6 +5,7 @@ import kr.co.pennyway.api.common.annotation.AccessTokenStrategy;
 import kr.co.pennyway.api.common.annotation.RefreshTokenStrategy;
 import kr.co.pennyway.api.common.security.jwt.Jwts;
 import kr.co.pennyway.api.common.security.jwt.access.AccessTokenClaim;
+import kr.co.pennyway.api.common.security.jwt.refresh.RefreshTokenClaim;
 import kr.co.pennyway.common.annotation.Mapper;
 import kr.co.pennyway.domain.common.redis.refresh.RefreshToken;
 import kr.co.pennyway.domain.common.redis.refresh.RefreshTokenService;
@@ -40,7 +41,7 @@ public class JwtAuthMapper {
      */
     public Jwts createToken(User user) {
         String accessToken = accessTokenProvider.generateToken(AccessTokenClaim.of(user.getId(), user.getRole().getType()));
-        String refreshToken = refreshTokenProvider.generateToken(AccessTokenClaim.of(user.getId(), user.getRole().getType()));
+        String refreshToken = refreshTokenProvider.generateToken(RefreshTokenClaim.of(user.getId(), user.getRole().getType()));
 
         refreshTokenService.save(RefreshToken.of(user.getId(), refreshToken, toSeconds(refreshTokenProvider.getExpiryDate(refreshToken))));
         return Jwts.of(accessToken, refreshToken);
