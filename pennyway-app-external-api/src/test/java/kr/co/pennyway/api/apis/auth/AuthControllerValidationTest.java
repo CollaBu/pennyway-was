@@ -48,7 +48,7 @@ public class AuthControllerValidationTest {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                post("/api/v1/auth/sign-up")
+                post("/v1/auth/sign-up")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request))
         );
@@ -72,7 +72,7 @@ public class AuthControllerValidationTest {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                post("/api/v1/auth/sign-up")
+                post("/v1/auth/sign-up")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request))
         );
@@ -92,7 +92,7 @@ public class AuthControllerValidationTest {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                post("/api/v1/auth/sign-up")
+                post("/v1/auth/sign-up")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request))
         );
@@ -112,7 +112,7 @@ public class AuthControllerValidationTest {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                post("/api/v1/auth/sign-up")
+                post("/v1/auth/sign-up")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request))
         );
@@ -132,7 +132,7 @@ public class AuthControllerValidationTest {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                post("/api/v1/auth/sign-up")
+                post("/v1/auth/sign-up")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request))
         );
@@ -152,7 +152,7 @@ public class AuthControllerValidationTest {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                post("/api/v1/auth/sign-up")
+                post("/v1/auth/sign-up")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request))
         );
@@ -172,7 +172,7 @@ public class AuthControllerValidationTest {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                post("/api/v1/auth/sign-up")
+                post("/v1/auth/sign-up")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)
                                 .replace("\"username\":\"pennyway\",", "")
@@ -200,7 +200,7 @@ public class AuthControllerValidationTest {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                post("/api/v1/auth/sign-up")
+                post("/v1/auth/sign-up")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request))
         );
