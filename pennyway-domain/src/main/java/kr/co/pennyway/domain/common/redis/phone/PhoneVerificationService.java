@@ -4,6 +4,8 @@ import kr.co.pennyway.common.annotation.DomainService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.time.LocalDateTime;
+
 @Slf4j
 @DomainService
 @RequiredArgsConstructor
@@ -18,9 +20,10 @@ public class PhoneVerificationService {
      * @param phone    String : 휴대폰 번호
      * @param code     String : 6자리 정수 코드
      * @param codeType {@link Code} : 코드 타입
+     * @return LocalDateTime : 만료 시간
      */
-    public void create(String phone, String code, Code codeType) {
-        phoneVerificationRepository.save(phone, code, codeType);
+    public LocalDateTime create(String phone, String code, Code codeType) {
+        return phoneVerificationRepository.save(phone, code, codeType);
     }
 
     /**
