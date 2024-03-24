@@ -38,7 +38,7 @@ public class PhoneVerificationService {
         try {
             return phoneVerificationRepository.findCodeByPhone(phone, codeType);
         } catch (NullPointerException e) {
-            log.error("PhoneVerificationService.readByPhone: code not found");
+            log.error("{}:{}에 해당하는 키가 존재하지 않습니다.", phone, codeType);
             throw new IllegalArgumentException(e);
         }
     }
