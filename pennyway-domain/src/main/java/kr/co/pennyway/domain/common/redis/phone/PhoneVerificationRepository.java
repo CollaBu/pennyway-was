@@ -5,6 +5,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Repository
@@ -15,9 +16,11 @@ public class PhoneVerificationRepository {
         this.redisTemplate = redisTemplate;
     }
 
-    public void save(String phone, String code, Code codeType) {
-        redisTemplate.expire(codeType.getPrefix() + ":" + phone, Duration.ofMinutes(5));
+    public LocalDateTime save(String phone, String code, Code codeType) {
+        LocalDateTime expiresAt = LocalDateTime.now().plusMinutes(5);
+        redisTemplate.expire(codeType.getPrefix() + ":" + phone, Duration.between(LocalDateTime.now(), expiresAt));
         redisTemplate.opsForHash().put(codeType.getPrefix(), phone, code);
+        return expiresAt;
     }
 
     public String findCodeByPhone(String phone, Code codeType) throws NullPointerException {
