@@ -1,5 +1,5 @@
-bootJar {enabled = false}
-jar {enabled = true}
+bootJar { enabled = false }
+jar { enabled = true }
 
 dependencies {
     implementation project(':pennyway-common')
@@ -19,6 +19,7 @@ dependencies {
 
     /* Redis */
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    implementation group: 'it.ozimov', name: 'embedded-redis', version: '0.7.3'
 }
 
 def querydslDir = 'src/main/generated'
