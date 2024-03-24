@@ -72,4 +72,12 @@ public class PhoneValidationDaoTest extends ContainerRedisTestConfig {
         // then
         assertThrows(NullPointerException.class, () -> phoneVerificationRepository.findCodeByPhone(phone, codeType));
     }
+
+    @Test
+    @DisplayName("저장되지 않은 데이터를 삭제해도 에러가 발생하지 않는다.")
+    void codeRemoveError() {
+        // when - thengi
+        assertThrows(NullPointerException.class, () -> phoneVerificationRepository.findCodeByPhone(phone, codeType));
+        phoneVerificationRepository.remove(phone, codeType);
+    }
 }
