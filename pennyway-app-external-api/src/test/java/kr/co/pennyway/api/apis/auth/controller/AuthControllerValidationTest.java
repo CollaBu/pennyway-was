@@ -1,7 +1,6 @@
-package kr.co.pennyway.api.apis.auth;
+package kr.co.pennyway.api.apis.auth.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kr.co.pennyway.api.apis.auth.controller.AuthController;
 import kr.co.pennyway.api.apis.auth.dto.SignUpReq;
 import kr.co.pennyway.api.apis.auth.usecase.AuthUseCase;
 import kr.co.pennyway.api.common.security.jwt.Jwts;
