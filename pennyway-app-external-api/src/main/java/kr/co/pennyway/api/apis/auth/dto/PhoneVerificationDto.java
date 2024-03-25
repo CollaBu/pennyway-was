@@ -56,4 +56,14 @@ public class PhoneVerificationDto {
             String code
     ) {
     }
+
+    @Schema(title = "인증번호 검증 응답 DTO")
+    public record VerifyCodeRes(
+            @Schema(description = "코드 일치 여부 : 일치하지 않으면 예외이므로 성공하면 언제나 true", example = "true")
+            Boolean code
+    ) {
+        public static VerifyCodeRes of(Boolean isValid) {
+            return new VerifyCodeRes(isValid);
+        }
+    }
 }
