@@ -62,7 +62,7 @@ public class PhoneVerificationDto {
             @Schema(description = "코드 일치 여부 : 일치하지 않으면 예외이므로 성공하면 언제나 true", example = "true")
             Boolean code
     ) {
-        public static VerifyCodeRes of(Boolean isValid) {
+        public static VerifyCodeRes valueOf(Boolean isValid) {
             return new VerifyCodeRes(isValid);
         }
     }
