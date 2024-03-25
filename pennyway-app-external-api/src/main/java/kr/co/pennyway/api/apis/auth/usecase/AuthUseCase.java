@@ -10,6 +10,7 @@ import kr.co.pennyway.common.annotation.UseCase;
 import kr.co.pennyway.domain.common.redis.phone.PhoneVerificationCode;
 import kr.co.pennyway.domain.common.redis.phone.PhoneVerificationService;
 import kr.co.pennyway.domain.domains.user.domain.User;
+import kr.co.pennyway.domain.domains.user.exception.UserErrorException;
 import kr.co.pennyway.domain.domains.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +34,8 @@ public class AuthUseCase {
 
     public PhoneVerificationDto.VerifyCodeRes verifyCode(PhoneVerificationDto.VerifyCodeReq request) {
         Boolean isValidCode = phoneVerificationMapper.isValidCode(request, PhoneVerificationCode.SIGN_UP);
-        Boolean isOauthUser = userSyncHelper.isSignedUserWhenGeneral(request.phone());
+        Boolean isOauthUser = checkOauthUser(request.phone());
+
         phoneVerificationService.extendTimeToLeave(request.phone(), PhoneVerificationCode.SIGN_UP);
 
         return PhoneVerificationDto.VerifyCodeRes.valueOf(isValidCode, isOauthUser);
@@ -47,5 +49,14 @@ public class AuthUseCase {
         User user = userService.createUser(request.toEntity());
 
         return Pair.of(user.getId(), jwtAuthMapper.createToken(user));
+    }
+
+    private Boolean checkOauthUser(String phone) {
+        try {
+            return userSyncHelper.isSignedUserWhenGeneral(phone);
+        } catch (UserErrorException e) {
+            phoneVerificationService.delete(phone, PhoneVerificationCode.SIGN_UP);
+            throw e;
+        }
     }
 }
