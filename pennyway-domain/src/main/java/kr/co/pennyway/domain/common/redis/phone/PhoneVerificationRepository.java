@@ -26,6 +26,10 @@ public class PhoneVerificationRepository {
         return Objects.requireNonNull(redisTemplate.opsForValue().get(codeType.getPrefix() + ":" + phone)).toString();
     }
 
+    public void extendTimeToLeave(String phone, PhoneVerificationCode codeType) {
+        redisTemplate.expire(codeType.getPrefix() + ":" + phone, Duration.ofMinutes(5));
+    }
+
     public void remove(String phone, PhoneVerificationCode codeType) {
         redisTemplate.opsForValue().getAndDelete(codeType.getPrefix() + ":" + phone);
     }

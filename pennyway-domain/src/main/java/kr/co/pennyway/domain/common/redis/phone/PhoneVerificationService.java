@@ -44,6 +44,16 @@ public class PhoneVerificationService {
     }
 
     /**
+     * 휴대폰 번호로 저장된 데이터의 ttl을 5분으로 연장(롤백)한다.
+     *
+     * @param phone    String : 휴대폰 번호
+     * @param codeType {@link PhoneVerificationCode} : 코드 타입
+     */
+    public void extendTimeToLeave(String phone, PhoneVerificationCode codeType) {
+        phoneVerificationRepository.extendTimeToLeave(phone, codeType);
+    }
+
+    /**
      * 휴대폰 번호로 저장된 코드를 삭제한다.
      *
      * @param phone    String : 휴대폰 번호
