@@ -26,21 +26,21 @@ public class PhoneVerificationDto {
             @Schema(description = "발송 시간")
             @JsonSerialize(using = LocalDateTimeSerializer.class)
             @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-            LocalDateTime sendTime,
+            LocalDateTime sendAt,
             @Schema(description = "만료 시간 (default: 3분)", example = "2021-08-01T00:00:00")
             @JsonSerialize(using = LocalDateTimeSerializer.class)
             @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-            LocalDateTime expireTime
+            LocalDateTime expiresAt
     ) {
         /**
          * 인증번호 발송 응답 객체 생성
          *
-         * @param to         String : 수신자 번호
-         * @param sendTime   LocalDateTime : 발송 시간
-         * @param expireTime LocalDateTime : 만료 시간 (default: 5분)
+         * @param to        String : 수신자 번호
+         * @param sendAt    LocalDateTime : 발송 시간
+         * @param expiresAt LocalDateTime : 만료 시간 (default: 5분)
          */
-        public static PushCodeRes of(String to, LocalDateTime sendTime, LocalDateTime expireTime) {
-            return new PushCodeRes(to, sendTime, expireTime);
+        public static PushCodeRes of(String to, LocalDateTime sendAt, LocalDateTime expiresAt) {
+            return new PushCodeRes(to, sendAt, expiresAt);
         }
     }
 
