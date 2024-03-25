@@ -34,11 +34,11 @@ public class AuthUseCase {
 
     public PhoneVerificationDto.VerifyCodeRes verifyCode(PhoneVerificationDto.VerifyCodeReq request) {
         Boolean isValidCode = phoneVerificationMapper.isValidCode(request, PhoneVerificationCode.SIGN_UP);
-        Boolean isOauthUser = checkOauthUser(request.phone());
+        Pair<Boolean, String> isOauthUser = checkOauthUser(request.phone());
 
         phoneVerificationService.extendTimeToLeave(request.phone(), PhoneVerificationCode.SIGN_UP);
 
-        return PhoneVerificationDto.VerifyCodeRes.valueOf(isValidCode, isOauthUser);
+        return PhoneVerificationDto.VerifyCodeRes.valueOf(isValidCode, isOauthUser.getKey(), isOauthUser.getValue());
     }
 
     @Transactional
@@ -51,7 +51,7 @@ public class AuthUseCase {
         return Pair.of(user.getId(), jwtAuthMapper.createToken(user));
     }
 
-    private Boolean checkOauthUser(String phone) {
+    private Pair<Boolean, String> checkOauthUser(String phone) {
         try {
             return userSyncHelper.isSignedUserWhenGeneral(phone);
         } catch (UserErrorException e) {
