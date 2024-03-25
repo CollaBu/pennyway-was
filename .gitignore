@@ -38,3 +38,6 @@ out/
 
 ### Conventional Commit ###
 /node_modules
+
+### docker-compose environments ###
+.env
