@@ -1,4 +1,4 @@
-package kr.co.infra.common.exception;
+package kr.co.pennyway.infra.common.exception;
 
 import kr.co.pennyway.common.exception.CausedBy;
 import kr.co.pennyway.common.exception.GlobalErrorException;

@@ -1,4 +1,4 @@
-package kr.co.infra.common.annotation;
+package kr.co.pennyway.infra.common.annotation;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 
@@ -8,6 +8,6 @@ import java.lang.annotation.*;
         ElementType.TYPE, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@Qualifier("infraRedisConnectionFactory")
-public @interface InfraRedisConnectionFactory {
+@Qualifier("securityUserCacheManager")
+public @interface SecurityUserCacheManager {
 }

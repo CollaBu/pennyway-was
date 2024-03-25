@@ -1,4 +1,4 @@
-package kr.co.infra.common.jwt;
+package kr.co.pennyway.infra.common.jwt;
 
 import java.util.Map;
 

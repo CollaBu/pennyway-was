@@ -1,11 +1,11 @@
-package kr.co.infra.common.util;
+package kr.co.pennyway.infra.common.util;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.SignatureException;
-import kr.co.infra.common.exception.JwtErrorCode;
-import kr.co.infra.common.exception.JwtErrorException;
+import kr.co.pennyway.infra.common.exception.JwtErrorCode;
+import kr.co.pennyway.infra.common.exception.JwtErrorException;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -27,7 +27,7 @@ public class JwtErrorCodeUtil {
     /**
      * 예외에 해당하는 오류 코드를 반환하거나 기본 오류 코드를 반환합니다.
      *
-     * @param exception {@link Exception} : 발생한 예외
+     * @param exception        {@link Exception} : 발생한 예외
      * @param defaultErrorCode {@link JwtErrorCode} : 기본 오류 코드
      * @return {@link JwtErrorException}
      */

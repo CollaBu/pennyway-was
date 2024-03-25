@@ -1,6 +1,6 @@
 package kr.co.pennyway.api.common.security.jwt.refresh;
 
-import kr.co.infra.common.jwt.JwtClaims;
+import kr.co.pennyway.infra.common.jwt.JwtClaims;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 

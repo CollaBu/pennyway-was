@@ -1,8 +1,8 @@
-package kr.co.infra.config;
+package kr.co.pennyway.infra.config;
 
-import kr.co.infra.common.annotation.InfraRedisConnectionFactory;
-import kr.co.infra.common.annotation.OidcCacheManager;
-import kr.co.infra.common.annotation.SecurityUserCacheManager;
+import kr.co.pennyway.infra.common.annotation.InfraRedisConnectionFactory;
+import kr.co.pennyway.infra.common.annotation.OidcCacheManager;
+import kr.co.pennyway.infra.common.annotation.SecurityUserCacheManager;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;

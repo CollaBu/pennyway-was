@@ -1,4 +1,4 @@
-package kr.co.infra.client.aws.sms;
+package kr.co.pennyway.infra.client.aws.sms;
 
 public interface SmsProvider {
     /**

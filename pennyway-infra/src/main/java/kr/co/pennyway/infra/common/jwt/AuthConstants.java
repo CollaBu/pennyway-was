@@ -1,4 +1,4 @@
-package kr.co.infra.common.jwt;
+package kr.co.pennyway.infra.common.jwt;
 
 import lombok.Getter;
 
@@ -12,7 +12,8 @@ public enum AuthConstants {
         this.value = value;
     }
 
-    @Override public String toString() {
+    @Override
+    public String toString() {
         return "AuthConstants(value=" + this.value + ")";
     }
 }

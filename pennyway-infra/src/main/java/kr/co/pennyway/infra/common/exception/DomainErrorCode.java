@@ -1,10 +1,10 @@
-package kr.co.infra.common.exception;
+package kr.co.pennyway.infra.common.exception;
 
-import kr.co.pennyway.common.exception.FieldCode;
+import kr.co.pennyway.common.exception.DomainCode;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public enum FieldErrorCode implements FieldCode {
+public enum DomainErrorCode implements DomainCode {
     ZERO(0);
 
     private final int code;
@@ -15,7 +15,7 @@ public enum FieldErrorCode implements FieldCode {
     }
 
     @Override
-    public String getFieldName() {
+    public String getDomainName() {
         return name().toLowerCase();
     }
 }

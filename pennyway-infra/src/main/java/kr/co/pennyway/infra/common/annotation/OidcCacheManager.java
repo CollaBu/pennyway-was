@@ -1,4 +1,4 @@
-package kr.co.infra.common.annotation;
+package kr.co.pennyway.infra.common.annotation;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 
