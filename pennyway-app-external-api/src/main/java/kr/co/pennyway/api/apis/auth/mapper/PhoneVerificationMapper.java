@@ -34,6 +34,8 @@ public class PhoneVerificationMapper {
             throw new PhoneVerificationException(PhoneVerificationErrorCode.EXPIRED_OR_INVALID_PHONE);
         }
 
-        return expectedCode.equals(request.code());
+        if (!expectedCode.equals(request.code()))
+            throw new PhoneVerificationException(PhoneVerificationErrorCode.IS_NOT_VALID_CODE);
+        return Boolean.TRUE;
     }
 }
