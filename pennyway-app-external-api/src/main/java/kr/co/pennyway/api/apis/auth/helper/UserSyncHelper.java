@@ -8,7 +8,6 @@ import kr.co.pennyway.domain.domains.user.exception.UserErrorException;
 import kr.co.pennyway.domain.domains.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Helper
@@ -23,12 +22,11 @@ public class UserSyncHelper {
      * @return Boolean : oauth 회원 여부 (TRUE: oauth 회원, FALSE: 일반 회원)
      * @throws UserErrorException : 이미 일반 회원가입을 한 유저인 경우
      */
-    @Transactional(readOnly = true)
     public Boolean isSignedUserWhenGeneral(String phone) {
         User user;
         try {
             user = userService.readUserByPhone(phone);
-        } catch (GlobalErrorException e) { // 일반 회원가입
+        } catch (GlobalErrorException e) {
             log.info("User not found. phone: {}", phone);
             return Boolean.FALSE;
         }
