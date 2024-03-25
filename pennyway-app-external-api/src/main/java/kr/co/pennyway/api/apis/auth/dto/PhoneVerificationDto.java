@@ -6,7 +6,6 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
-import kr.co.pennyway.domain.common.redis.phone.PhoneVerificationCode;
 
 import java.time.LocalDateTime;
 
@@ -51,9 +50,10 @@ public class PhoneVerificationDto {
             @NotBlank(message = "전화번호는 필수입니다.")
             @Pattern(regexp = "^01[01]-\\d{4}-\\d{4}$", message = "전화번호 형식이 올바르지 않습니다.")
             String phone,
-            @Schema(description = "전화번호 인증 종류", example = "SIGN_UP")
-            @NotBlank(message = "인증 종류는 필수입니다.")
-            PhoneVerificationCode codeType
+            @Schema(description = "6자리 정수 인증번호", example = "123456")
+            @NotBlank(message = "인증번호는 필수입니다.")
+            @Pattern(regexp = "^\\d{6}$", message = "인증번호는 6자리 숫자여야 합니다.")
+            String code
     ) {
     }
 }
