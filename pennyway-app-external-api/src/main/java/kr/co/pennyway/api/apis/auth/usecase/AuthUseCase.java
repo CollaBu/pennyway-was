@@ -2,6 +2,7 @@ package kr.co.pennyway.api.apis.auth.usecase;
 
 import kr.co.pennyway.api.apis.auth.dto.PhoneVerificationDto;
 import kr.co.pennyway.api.apis.auth.dto.SignUpReq;
+import kr.co.pennyway.api.apis.auth.helper.UserSyncHelper;
 import kr.co.pennyway.api.apis.auth.mapper.JwtAuthMapper;
 import kr.co.pennyway.api.apis.auth.mapper.PhoneVerificationMapper;
 import kr.co.pennyway.api.common.security.jwt.Jwts;
@@ -20,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class AuthUseCase {
     private final UserService userService;
+    private final UserSyncHelper userSyncHelper;
 
     private final JwtAuthMapper jwtAuthMapper;
     private final PhoneVerificationMapper phoneVerificationMapper;
@@ -30,7 +32,11 @@ public class AuthUseCase {
     }
 
     public PhoneVerificationDto.VerifyCodeRes verifyCode(PhoneVerificationDto.VerifyCodeReq request) {
-        return PhoneVerificationDto.VerifyCodeRes.valueOf(phoneVerificationMapper.isValidCode(request, PhoneVerificationCode.SIGN_UP));
+        Boolean isValidCode = phoneVerificationMapper.isValidCode(request, PhoneVerificationCode.SIGN_UP);
+        Boolean isOauthUser = userSyncHelper.isSignedUserWhenGeneral(request.phone());
+        phoneVerificationService.extendTimeToLeave(request.phone(), PhoneVerificationCode.SIGN_UP);
+
+        return PhoneVerificationDto.VerifyCodeRes.valueOf(isValidCode, isOauthUser);
     }
 
     @Transactional
