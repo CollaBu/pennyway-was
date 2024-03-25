@@ -20,7 +20,7 @@ public class PhoneVerificationMapper {
     private final PhoneVerificationService phoneVerificationService;
     private final SmsProvider smsProvider;
 
-    public PhoneVerificationDto.PushCodeRes saveCode(PhoneVerificationDto.PushCodeReq request, PhoneVerificationCode codeType) {
+    public PhoneVerificationDto.PushCodeRes sendCode(PhoneVerificationDto.PushCodeReq request, PhoneVerificationCode codeType) {
         SmsDto.Info info = smsProvider.sendCode(SmsDto.To.of(request.phone()));
         LocalDateTime expiresAt = phoneVerificationService.create(request.phone(), info.code(), codeType);
         return PhoneVerificationDto.PushCodeRes.of(request.phone(), info.requestAt(), expiresAt);
