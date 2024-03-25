@@ -1,6 +1,7 @@
 package kr.co.pennyway.api.apis.auth.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -62,10 +63,13 @@ public class PhoneVerificationDto {
             @Schema(description = "코드 일치 여부 : 일치하지 않으면 예외이므로 성공하면 언제나 true", example = "true")
             Boolean code,
             @Schema(description = "oauth 사용자 여부", example = "true")
-            Boolean oauth
+            Boolean oauth,
+            @Schema(description = "기존 사용자 아이디", example = "pennyway")
+            @JsonInclude(JsonInclude.Include.NON_NULL)
+            String username
     ) {
-        public static VerifyCodeRes valueOf(Boolean isValidCode, Boolean isOauthUser) {
-            return new VerifyCodeRes(isValidCode, isOauthUser);
+        public static VerifyCodeRes valueOf(Boolean isValidCode, Boolean isOauthUser, String username) {
+            return new VerifyCodeRes(isValidCode, isOauthUser, username);
         }
     }
 }
