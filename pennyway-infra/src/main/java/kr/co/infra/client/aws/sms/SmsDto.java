@@ -52,15 +52,15 @@ public class SmsDto {
     /**
      * AWS SNS API 요청에 대한 응답 객체
      *
-     * @param requestId   String : 요청 ID
-     * @param requestTime LocalDateTime : 요청 시간
-     * @param statusCode  String : 응답 코드
-     * @param statusName  String : 응답 상태
+     * @param requestId  String : 요청 ID
+     * @param requestAt  LocalDateTime : 요청 시간
+     * @param statusCode String : 응답 코드
+     * @param statusName String : 응답 상태
      */
     @Builder
     public record Response(
             String requestId,
-            LocalDateTime requestTime,
+            LocalDateTime requestAt,
             String statusCode,
             String statusName
     ) {
@@ -69,17 +69,17 @@ public class SmsDto {
     /**
      * 인증번호 전송 정보를 확인할 수 있는 DTO
      *
-     * @param requestId   String : 요청 ID (NCP SMS API 요청 시 발급된 요청 ID)
-     * @param code        String : 발급된 인증번호 정수 6자리 문자열
-     * @param requestTime LocalDateTime : 요청 시간
-     * @param statusCode  String : 응답 코드
-     * @param statusName  String : 응답 상태
+     * @param requestId  String : 요청 ID (NCP SMS API 요청 시 발급된 요청 ID)
+     * @param code       String : 발급된 인증번호 정수 6자리 문자열
+     * @param requestAt  LocalDateTime : 요청 시간
+     * @param statusCode String : 응답 코드
+     * @param statusName String : 응답 상태
      */
     @Builder
     public record Info(
             String requestId,
             String code,
-            LocalDateTime requestTime,
+            LocalDateTime requestAt,
             String statusCode,
             String statusName
     ) {
@@ -91,7 +91,7 @@ public class SmsDto {
             return Info.builder()
                     .requestId(request.requestId())
                     .code(code)
-                    .requestTime(request.requestTime())
+                    .requestAt(request.requestAt())
                     .statusCode(request.statusCode())
                     .statusName(request.statusName())
                     .build();

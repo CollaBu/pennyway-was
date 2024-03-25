@@ -7,5 +7,5 @@ public interface SmsProvider {
      * @param dto {@link SmsDto.To} : 수신자 번호
      * @return {@link SmsDto.Info} : SNS 전송 정보
      */
-    SmsDto.Info sendCodeByPhoneNumber(SmsDto.To dto);
+    SmsDto.Info sendCode(SmsDto.To dto);
 }
