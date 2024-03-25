@@ -19,10 +19,10 @@ public class PhoneVerificationService {
      *
      * @param phone    String : 휴대폰 번호
      * @param code     String : 6자리 정수 코드
-     * @param codeType {@link Code} : 코드 타입
+     * @param codeType {@link PhoneVerificationCode} : 코드 타입
      * @return LocalDateTime : 만료 시간
      */
-    public LocalDateTime create(String phone, String code, Code codeType) {
+    public LocalDateTime create(String phone, String code, PhoneVerificationCode codeType) {
         return phoneVerificationRepository.save(phone, code, codeType);
     }
 
@@ -30,11 +30,11 @@ public class PhoneVerificationService {
      * 휴대폰 번호로 저장된 코드를 조회한다.
      *
      * @param phone    String : 휴대폰 번호
-     * @param codeType {@link Code} : 코드 타입
+     * @param codeType {@link PhoneVerificationCode} : 코드 타입
      * @return String : 6자리 정수 코드
      * @throws IllegalArgumentException : 코드가 없을 경우
      */
-    public String readByPhone(String phone, Code codeType) throws IllegalArgumentException {
+    public String readByPhone(String phone, PhoneVerificationCode codeType) throws IllegalArgumentException {
         try {
             return phoneVerificationRepository.findCodeByPhone(phone, codeType);
         } catch (NullPointerException e) {
@@ -47,9 +47,9 @@ public class PhoneVerificationService {
      * 휴대폰 번호로 저장된 코드를 삭제한다.
      *
      * @param phone    String : 휴대폰 번호
-     * @param codeType {@link Code} : 코드 타입
+     * @param codeType {@link PhoneVerificationCode} : 코드 타입
      */
-    public void delete(String phone, Code codeType) {
+    public void delete(String phone, PhoneVerificationCode codeType) {
         phoneVerificationRepository.remove(phone, codeType);
     }
 }

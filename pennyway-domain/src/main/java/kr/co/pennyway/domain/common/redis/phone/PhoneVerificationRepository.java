@@ -16,18 +16,18 @@ public class PhoneVerificationRepository {
         this.redisTemplate = redisTemplate;
     }
 
-    public LocalDateTime save(String phone, String code, Code codeType) {
+    public LocalDateTime save(String phone, String code, PhoneVerificationCode codeType) {
         LocalDateTime expiresAt = LocalDateTime.now().plusMinutes(5);
         redisTemplate.expire(codeType.getPrefix() + ":" + phone, Duration.between(LocalDateTime.now(), expiresAt));
         redisTemplate.opsForHash().put(codeType.getPrefix(), phone, code);
         return expiresAt;
     }
 
-    public String findCodeByPhone(String phone, Code codeType) throws NullPointerException {
+    public String findCodeByPhone(String phone, PhoneVerificationCode codeType) throws NullPointerException {
         return Objects.requireNonNull(redisTemplate.opsForHash().get(codeType.getPrefix(), phone)).toString();
     }
 
-    public void remove(String phone, Code codeType) {
+    public void remove(String phone, PhoneVerificationCode codeType) {
         redisTemplate.opsForHash().delete(codeType.getPrefix(), phone);
     }
 }
