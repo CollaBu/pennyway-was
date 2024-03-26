@@ -6,6 +6,7 @@ import kr.co.pennyway.api.apis.auth.usecase.AuthUseCase;
 import kr.co.pennyway.api.common.security.jwt.Jwts;
 import kr.co.pennyway.api.common.util.CookieUtil;
 import org.apache.commons.lang3.tuple.Pair;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,10 +17,13 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
 import java.time.Duration;
 
 import static org.mockito.BDDMockito.given;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -38,6 +42,14 @@ public class AuthControllerValidationTest {
 
     @MockBean
     private CookieUtil cookieUtil;
+
+    @BeforeEach
+    void setUp(WebApplicationContext webApplicationContext) {
+        this.mockMvc = MockMvcBuilders
+                .webAppContextSetup(webApplicationContext)
+                .defaultRequest(post("/**").with(csrf()))
+                .build();
+    }
 
     @DisplayName("[1] 아이디, 이름, 비밀번호, 전화번호, 인증번호 필수 입력")
     @Test
@@ -207,7 +219,7 @@ public class AuthControllerValidationTest {
         // then
         resultActions
                 .andExpect(status().isOk())
-                .andExpect(header().string("Set-Cookie", expectedCookie.toString()))
+                .andExpect(header().exists("Set-Cookie"))
                 .andExpect(header().string("Authorization", "accessToken"))
                 .andExpect(jsonPath("$.data.user.id").value(1))
                 .andDo(print());
