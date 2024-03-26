@@ -51,14 +51,14 @@ jobs:
           ./gradlew build --stacktrace --info -x test
         shell: bash
 
-      # 3. Docker 이미지 build 및 push
+      # 4. Docker 이미지 build 및 push
       - name: docker build and push
         run: |
           docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
           docker build -t jinlee1703/pennyway-was .
           docker push jinlee1703/pennyway-was
 
-      # 4. AWS SSM을 통한 Run-Command (Docker 이미지 pull 후 docker-compose를 통한 실행)
+      # 5. AWS SSM을 통한 Run-Command (Docker 이미지 pull 후 docker-compose를 통한 실행)
       - name: AWS SSM Send-Command
         uses: peterkimzz/aws-ssm-send-command@master
         id: ssm

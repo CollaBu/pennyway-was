@@ -36,13 +36,13 @@ public class GlobalExceptionHandler {
     /**
      * Pennyway Custom Exception을 처리하는 메서드
      *
-     * @see kr.co.pennyway.common.exception.GlobalErrorException
+     * @see GlobalErrorException
      */
     @ExceptionHandler(GlobalErrorException.class)
     protected ResponseEntity<ErrorResponse> handleGlobalErrorException(GlobalErrorException e) {
         log.warn("handleGlobalErrorException : {}", e.getMessage());
         ErrorResponse response = ErrorResponse.of(e.getBaseErrorCode().causedBy().getCode(), e.getBaseErrorCode().getExplainError());
-        return ResponseEntity.status(e.getBaseErrorCode().causedBy().reasonCode().getCode()).body(response);
+        return ResponseEntity.status(e.getBaseErrorCode().causedBy().statusCode().getCode()).body(response);
     }
 
     /**

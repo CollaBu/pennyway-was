@@ -15,8 +15,8 @@ import java.util.Map;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Schema(description = "API 응답 - 성공")
 public class SuccessResponse<T> {
-    @Schema(description = "응답 코드", defaultValue = "2000000")
-    private final String code = "2000000";
+    @Schema(description = "응답 코드", defaultValue = "2000")
+    private final String code = "2000";
     @Schema(description = "응답 메시지", example = """
             data: {
                 "aDomain": { // 단수명사는 object 형태로 반환
