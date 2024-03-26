@@ -44,14 +44,6 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      # 3. Testing을 위한 MySQL 설정
-      - name: Setup MySQL
-        uses: mirromutth/mysql-action@v1.1
-        with:
-          mysql database: ${{ secrets.MYSQL_TEST_DATABASE }}
-          mysql user: ${{ secrets.MYSQL_TEST_USER }}
-          mysql password: ${{ secrets.MYSQL_TEST_PASSWORD }}
-
-      # 4. Gradle Test 실행
+      # 3. Gradle Test 실행
       - name: Test with Gradle
         run: ./gradlew --info test
