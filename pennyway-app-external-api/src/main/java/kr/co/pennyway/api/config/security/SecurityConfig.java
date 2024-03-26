@@ -10,11 +10,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.access.AccessDeniedHandler;
-import org.springframework.security.web.access.AccessDeniedHandlerImpl;
-import org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -30,16 +26,6 @@ public class SecurityConfig {
             // Swagger
             "/api-docs/**", "/v3/api-docs/**", "/swagger-ui/**", "/swagger",
     };
-
-    @Bean
-    public AccessDeniedHandler accessDeniedHandler() {
-        return new AccessDeniedHandlerImpl();
-    }
-
-    @Bean
-    public AuthenticationEntryPoint authenticationEntryPoint() {
-        return new BasicAuthenticationEntryPoint();
-    }
 
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
@@ -60,11 +46,6 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.OPTIONS, "*").permitAll()
                                 .requestMatchers(HttpMethod.GET, publicReadOnlyPublicEndpoints).permitAll()
                                 .anyRequest().permitAll()
-                )
-                .exceptionHandling(
-                        exception -> exception
-                                .accessDeniedHandler(accessDeniedHandler())
-                                .authenticationEntryPoint(authenticationEntryPoint())
                 );
         return http.build();
     }
