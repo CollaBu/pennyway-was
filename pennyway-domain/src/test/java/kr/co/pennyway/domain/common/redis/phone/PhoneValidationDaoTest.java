@@ -21,13 +21,13 @@ public class PhoneValidationDaoTest extends ContainerRedisTestConfig {
     private PhoneVerificationRepository phoneVerificationRepository;
     private String phone;
     private String code;
-    private PhoneVerificationCode codeType;
+    private PhoneVerificationType codeType;
 
     @BeforeEach
     void setUp() {
         phone = "01012345678";
         code = "123456";
-        codeType = PhoneVerificationCode.SIGN_UP;
+        codeType = PhoneVerificationType.SIGN_UP;
     }
 
     @AfterEach

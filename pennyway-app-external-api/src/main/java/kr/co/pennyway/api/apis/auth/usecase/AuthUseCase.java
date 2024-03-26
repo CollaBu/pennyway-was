@@ -7,8 +7,8 @@ import kr.co.pennyway.api.apis.auth.mapper.JwtAuthMapper;
 import kr.co.pennyway.api.apis.auth.mapper.PhoneVerificationMapper;
 import kr.co.pennyway.api.common.security.jwt.Jwts;
 import kr.co.pennyway.common.annotation.UseCase;
-import kr.co.pennyway.domain.common.redis.phone.PhoneVerificationCode;
 import kr.co.pennyway.domain.common.redis.phone.PhoneVerificationService;
+import kr.co.pennyway.domain.common.redis.phone.PhoneVerificationType;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorException;
 import kr.co.pennyway.domain.domains.user.service.UserService;
@@ -29,14 +29,14 @@ public class AuthUseCase {
     private final PhoneVerificationService phoneVerificationService;
 
     public PhoneVerificationDto.PushCodeRes sendCode(PhoneVerificationDto.PushCodeReq request) {
-        return phoneVerificationMapper.sendCode(request, PhoneVerificationCode.SIGN_UP);
+        return phoneVerificationMapper.sendCode(request, PhoneVerificationType.SIGN_UP);
     }
 
     public PhoneVerificationDto.VerifyCodeRes verifyCode(PhoneVerificationDto.VerifyCodeReq request) {
-        Boolean isValidCode = phoneVerificationMapper.isValidCode(request, PhoneVerificationCode.SIGN_UP);
+        Boolean isValidCode = phoneVerificationMapper.isValidCode(request, PhoneVerificationType.SIGN_UP);
         Pair<Boolean, String> isOauthUser = checkOauthUser(request.phone());
 
-        phoneVerificationService.extendTimeToLeave(request.phone(), PhoneVerificationCode.SIGN_UP);
+        phoneVerificationService.extendTimeToLeave(request.phone(), PhoneVerificationType.SIGN_UP);
 
         return PhoneVerificationDto.VerifyCodeRes.valueOf(isValidCode, isOauthUser.getKey(), isOauthUser.getValue());
     }
@@ -55,7 +55,7 @@ public class AuthUseCase {
         try {
             return userSyncHelper.isSignedUserWhenGeneral(phone);
         } catch (UserErrorException e) {
-            phoneVerificationService.delete(phone, PhoneVerificationCode.SIGN_UP);
+            phoneVerificationService.delete(phone, PhoneVerificationType.SIGN_UP);
             throw e;
         }
     }

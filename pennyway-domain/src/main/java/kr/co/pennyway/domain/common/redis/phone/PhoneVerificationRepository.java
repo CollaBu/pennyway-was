@@ -16,21 +16,21 @@ public class PhoneVerificationRepository {
         this.redisTemplate = redisTemplate;
     }
 
-    public LocalDateTime save(String phone, String code, PhoneVerificationCode codeType) {
+    public LocalDateTime save(String phone, String code, PhoneVerificationType codeType) {
         LocalDateTime expiresAt = LocalDateTime.now().plusMinutes(5);
         redisTemplate.opsForValue().set(codeType.getPrefix() + ":" + phone, code, Duration.between(LocalDateTime.now(), expiresAt));
         return expiresAt;
     }
 
-    public String findCodeByPhone(String phone, PhoneVerificationCode codeType) throws NullPointerException {
+    public String findCodeByPhone(String phone, PhoneVerificationType codeType) throws NullPointerException {
         return Objects.requireNonNull(redisTemplate.opsForValue().get(codeType.getPrefix() + ":" + phone)).toString();
     }
 
-    public void extendTimeToLeave(String phone, PhoneVerificationCode codeType) {
+    public void extendTimeToLeave(String phone, PhoneVerificationType codeType) {
         redisTemplate.expire(codeType.getPrefix() + ":" + phone, Duration.ofMinutes(5));
     }
 
-    public void delete(String phone, PhoneVerificationCode codeType) {
+    public void delete(String phone, PhoneVerificationType codeType) {
         redisTemplate.opsForValue().getAndDelete(codeType.getPrefix() + ":" + phone);
     }
 }

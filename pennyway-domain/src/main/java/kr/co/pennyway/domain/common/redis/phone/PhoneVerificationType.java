@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum PhoneVerificationCode {
+public enum PhoneVerificationType {
     SIGN_UP("signUp"), OAUTH_SIGN_UP("oauthSignUp"), FIND_USERNAME("username"), FIND_PASSWORD("password");
 
     private final String prefix;
