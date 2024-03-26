@@ -46,4 +46,6 @@ jobs:
 
       # 3. Gradle Test 실행
       - name: Test with Gradle
-        run: ./gradlew --info test
+        run: |
+          chmod +x ./gradlew
+          ./gradlew --info test
