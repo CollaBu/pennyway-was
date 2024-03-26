@@ -30,7 +30,7 @@ public class PhoneVerificationRepository {
         redisTemplate.expire(codeType.getPrefix() + ":" + phone, Duration.ofMinutes(5));
     }
 
-    public void remove(String phone, PhoneVerificationCode codeType) {
+    public void delete(String phone, PhoneVerificationCode codeType) {
         redisTemplate.opsForValue().getAndDelete(codeType.getPrefix() + ":" + phone);
     }
 }

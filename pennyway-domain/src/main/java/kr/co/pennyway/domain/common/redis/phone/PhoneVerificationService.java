@@ -60,6 +60,6 @@ public class PhoneVerificationService {
      * @param codeType {@link PhoneVerificationCode} : 코드 타입
      */
     public void delete(String phone, PhoneVerificationCode codeType) {
-        phoneVerificationRepository.remove(phone, codeType);
+        phoneVerificationRepository.delete(phone, codeType);
     }
 }

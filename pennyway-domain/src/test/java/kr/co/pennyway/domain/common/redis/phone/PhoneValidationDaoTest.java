@@ -32,7 +32,7 @@ public class PhoneValidationDaoTest extends ContainerRedisTestConfig {
 
     @AfterEach
     void tearDown() {
-        phoneVerificationRepository.remove(phone, codeType);
+        phoneVerificationRepository.delete(phone, codeType);
     }
 
     @Test
@@ -53,7 +53,7 @@ public class PhoneValidationDaoTest extends ContainerRedisTestConfig {
     @DisplayName("Redis에 'codeType:phone'에 해당하는 값이 없으면 NullPointerException이 발생한다.")
     void codeReadError() {
         // given
-        phoneVerificationRepository.remove(phone, codeType);
+        phoneVerificationRepository.delete(phone, codeType);
         String wrongPhone = "01087654321";
 
         // when - then
@@ -67,7 +67,7 @@ public class PhoneValidationDaoTest extends ContainerRedisTestConfig {
         phoneVerificationRepository.save(phone, code, codeType);
 
         // when
-        phoneVerificationRepository.remove(phone, codeType);
+        phoneVerificationRepository.delete(phone, codeType);
 
         // then
         assertThrows(NullPointerException.class, () -> phoneVerificationRepository.findCodeByPhone(phone, codeType));
@@ -78,6 +78,6 @@ public class PhoneValidationDaoTest extends ContainerRedisTestConfig {
     void codeRemoveError() {
         // when - thengi
         assertThrows(NullPointerException.class, () -> phoneVerificationRepository.findCodeByPhone(phone, codeType));
-        phoneVerificationRepository.remove(phone, codeType);
+        phoneVerificationRepository.delete(phone, codeType);
     }
 }
