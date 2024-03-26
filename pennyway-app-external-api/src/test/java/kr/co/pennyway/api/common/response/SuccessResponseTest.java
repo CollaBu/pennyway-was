@@ -12,6 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(MockitoExtension.class)
 public class SuccessResponseTest {
+
     private TestDto dto;
 
     @BeforeEach
@@ -73,5 +74,6 @@ public class SuccessResponseTest {
     }
 
     private record TestDto(String name, int age) {
+
     }
 }

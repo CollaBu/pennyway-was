@@ -31,6 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(controllers = {AuthController.class})
 @ActiveProfiles("local")
 public class AuthControllerValidationTest {
+
     @Autowired
     private MockMvc mockMvc;
 
@@ -79,7 +80,8 @@ public class AuthControllerValidationTest {
     @Test
     void idValidError() throws Exception {
         // given
-        SignUpReq.General request = new SignUpReq.General("#pennyway", "페니웨이", "pennyway1234", "010-1234-5678", "123456");
+        SignUpReq.General request = new SignUpReq.General("#pennyway", "페니웨이", "pennyway1234",
+                "010-1234-5678", "123456");
 
         // when
         ResultActions resultActions = mockMvc.perform(
@@ -99,7 +101,8 @@ public class AuthControllerValidationTest {
     @Test
     void nameValidError() throws Exception {
         // given
-        SignUpReq.General request = new SignUpReq.General("pennyway", "페니웨이1", "pennyway1234", "010-1234-5678", "123456");
+        SignUpReq.General request = new SignUpReq.General("pennyway", "페니웨이1", "pennyway1234",
+                "010-1234-5678", "123456");
 
         // when
         ResultActions resultActions = mockMvc.perform(
@@ -119,7 +122,8 @@ public class AuthControllerValidationTest {
     @Test
     void passwordValidError() throws Exception {
         // given
-        SignUpReq.General request = new SignUpReq.General("pennyway", "페니웨이", "pennyway", "010-1234-5678", "123456");
+        SignUpReq.General request = new SignUpReq.General("pennyway", "페니웨이", "pennyway",
+                "010-1234-5678", "123456");
 
         // when
         ResultActions resultActions = mockMvc.perform(
@@ -131,7 +135,8 @@ public class AuthControllerValidationTest {
         // then
         resultActions
                 .andExpect(status().isUnprocessableEntity())
-                .andExpect(jsonPath("$.fieldErrors.password").value("8~16자의 영문 대/소문자, 숫자, 특수문자를 사용해주세요. (적어도 하나의 영문 소문자, 숫자 포함)"))
+                .andExpect(jsonPath("$.fieldErrors.password").value(
+                        "8~16자의 영문 대/소문자, 숫자, 특수문자를 사용해주세요. (적어도 하나의 영문 소문자, 숫자 포함)"))
                 .andDo(print());
     }
 
@@ -139,7 +144,8 @@ public class AuthControllerValidationTest {
     @Test
     void phoneValidError() throws Exception {
         // given
-        SignUpReq.General request = new SignUpReq.General("pennyway", "페니웨이", "pennyway1234", "01012345673", "123456");
+        SignUpReq.General request = new SignUpReq.General("pennyway", "페니웨이", "pennyway1234",
+                "01012345673", "123456");
 
         // when
         ResultActions resultActions = mockMvc.perform(
@@ -159,7 +165,8 @@ public class AuthControllerValidationTest {
     @Test
     void codeValidError() throws Exception {
         // given
-        SignUpReq.General request = new SignUpReq.General("pennyway", "페니웨이", "pennyway1234", "010-1234-5678", "12345");
+        SignUpReq.General request = new SignUpReq.General("pennyway", "페니웨이", "pennyway1234",
+                "010-1234-5678", "12345");
 
         // when
         ResultActions resultActions = mockMvc.perform(
@@ -179,7 +186,8 @@ public class AuthControllerValidationTest {
     @Test
     void someFieldMissingError() throws Exception {
         // given
-        SignUpReq.General request = new SignUpReq.General("pennyway", "페니웨이", "pennyway1234", "010-1234-5678", "123456");
+        SignUpReq.General request = new SignUpReq.General("pennyway", "페니웨이", "pennyway1234",
+                "010-1234-5678", "123456");
 
         // when
         ResultActions resultActions = mockMvc.perform(
@@ -201,8 +209,10 @@ public class AuthControllerValidationTest {
     @Test
     void signUp() throws Exception {
         // given
-        SignUpReq.General request = new SignUpReq.General("pennyway", "페니웨이", "pennyway1234", "010-1234-5678", "123456");
-        ResponseCookie expectedCookie = ResponseCookie.from("refreshToken", "refreshToken").maxAge(Duration.ofDays(7).toSeconds()).httpOnly(true).path("/").build();
+        SignUpReq.General request = new SignUpReq.General("pennyway", "페니웨이", "pennyway1234",
+                "010-1234-5678", "123456");
+        ResponseCookie expectedCookie = ResponseCookie.from("refreshToken", "refreshToken")
+                .maxAge(Duration.ofDays(7).toSeconds()).httpOnly(true).path("/").build();
 
         given(authUseCase.signUp(request))
                 .willReturn(Pair.of(1L, Jwts.of("accessToken", "refreshToken")));
