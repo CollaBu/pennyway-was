@@ -30,7 +30,7 @@ public class SuccessResponseTest {
         SuccessResponse<?> response = SuccessResponse.from(key, value);
 
         // Then
-        assertEquals("2000000", response.getCode());
+        assertEquals("2000", response.getCode());
         assertEquals(Map.of(key, value), response.getData());
     }
 
@@ -41,7 +41,7 @@ public class SuccessResponseTest {
         SuccessResponse<?> response = SuccessResponse.noContent();
 
         // Then
-        assertEquals("2000000", response.getCode());
+        assertEquals("2000", response.getCode());
         assertEquals(Map.of(), response.getData());
     }
 
@@ -52,7 +52,7 @@ public class SuccessResponseTest {
         SuccessResponse<TestDto> response = SuccessResponse.from(dto);
 
         // Then
-        assertEquals("2000000", response.getCode());
+        assertEquals("2000", response.getCode());
         assertEquals(dto, response.getData());
         System.out.println(response);
     }
@@ -67,7 +67,7 @@ public class SuccessResponseTest {
         SuccessResponse<Map<String, TestDto>> response = SuccessResponse.from(key, dto);
 
         // Then
-        assertEquals("2000000", response.getCode());
+        assertEquals("2000", response.getCode());
         assertEquals(Map.of(key, dto), response.getData());
         System.out.println(response);
     }
