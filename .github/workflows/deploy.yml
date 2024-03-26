@@ -2,7 +2,7 @@ name: Continuous Deployment
 
 on:
   push:
-    branches: [ "dev", "fix/PW-156-cicd" ]
+    branches: [ "dev" ]
   workflow_dispatch:
     inputs:
       logLevel:
