@@ -29,7 +29,7 @@ public class UserSyncHelper {
             user = userService.readUserByPhone(phone);
         } catch (GlobalErrorException e) {
             log.info("User not found. phone: {}", phone);
-            return Pair.of(Boolean.TRUE, null);
+            return Pair.of(Boolean.FALSE, null);
         }
 
         if (user.getPassword() != null) {
@@ -37,6 +37,6 @@ public class UserSyncHelper {
             throw new UserErrorException(UserErrorCode.ALREADY_SIGNUP);
         }
 
-        return Pair.of(Boolean.FALSE, user.getUsername());
+        return Pair.of(Boolean.TRUE, user.getUsername());
     }
 }
