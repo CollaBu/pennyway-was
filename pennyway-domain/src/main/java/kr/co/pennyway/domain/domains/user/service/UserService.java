@@ -24,6 +24,11 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
+    public User readUserByPhone(String phone) {
+        return userRepository.findByPhone(phone).orElseThrow(() -> new UserErrorException(UserErrorCode.NOT_FOUND));
+    }
+
+    @Transactional(readOnly = true)
     public boolean isExistUser(Long id) {
         return userRepository.existsById(id);
     }

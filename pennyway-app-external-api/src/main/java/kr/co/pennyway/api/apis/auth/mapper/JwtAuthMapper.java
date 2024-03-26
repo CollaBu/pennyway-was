@@ -1,6 +1,5 @@
 package kr.co.pennyway.api.apis.auth.mapper;
 
-import kr.co.infra.common.jwt.JwtProvider;
 import kr.co.pennyway.api.common.annotation.AccessTokenStrategy;
 import kr.co.pennyway.api.common.annotation.RefreshTokenStrategy;
 import kr.co.pennyway.api.common.security.jwt.Jwts;
@@ -10,6 +9,7 @@ import kr.co.pennyway.common.annotation.Mapper;
 import kr.co.pennyway.domain.common.redis.refresh.RefreshToken;
 import kr.co.pennyway.domain.common.redis.refresh.RefreshTokenService;
 import kr.co.pennyway.domain.domains.user.domain.User;
+import kr.co.pennyway.infra.common.jwt.JwtProvider;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.Duration;

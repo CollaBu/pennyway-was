@@ -2,6 +2,7 @@ package kr.co.pennyway.api.apis.auth.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import kr.co.pennyway.api.apis.auth.dto.PhoneVerificationDto;
 import kr.co.pennyway.api.apis.auth.dto.SignUpReq;
 import kr.co.pennyway.api.apis.auth.usecase.AuthUseCase;
 import kr.co.pennyway.api.common.response.SuccessResponse;
@@ -26,10 +27,24 @@ import java.util.Map;
 @Tag(name = "[인증 API]")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/auth")
+@RequestMapping("/v1/auth")
 public class AuthController {
     private final AuthUseCase authUseCase;
     private final CookieUtil cookieUtil;
+
+    @Operation(summary = "인증번호 전송")
+    @PostMapping("/phone")
+    // TODO: Spring Security 설정 후 @PreAuthorize("permitAll()") 추가 && ip 당 횟수 제한
+    public ResponseEntity<?> sendCode(@RequestBody @Validated PhoneVerificationDto.PushCodeReq request) {
+        return ResponseEntity.ok(SuccessResponse.from("sms", authUseCase.sendCode(request)));
+    }
+
+    @Operation(summary = "인증번호 검증")
+    @PostMapping("/phone/verification")
+    // TODO: Spring Security 설정 후 @PreAuthorize("permitAll()") 추가
+    public ResponseEntity<?> verifyCode(@RequestBody @Validated PhoneVerificationDto.VerifyCodeReq request) {
+        return ResponseEntity.ok(SuccessResponse.from("sms", authUseCase.verifyCode(request)));
+    }
 
     @Operation(summary = "일반 회원가입")
     @PostMapping("/sign-up")

@@ -9,27 +9,27 @@ import org.hibernate.annotations.DynamicInsert;
 @Embeddable
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @DynamicInsert
-@ToString(of = {"accountBookNotify", "feedNotify", "feedCommentNotify"})
+@ToString(of = {"accountBookNotify", "feedNotify", "chatNotify"})
 public class NotifySetting {
     @ColumnDefault("true")
     private Boolean accountBookNotify;
     @ColumnDefault("true")
     private Boolean feedNotify;
     @ColumnDefault("true")
-    private Boolean feedCommentNotify;
+    private Boolean chatNotify;
 
     @Builder
-    private NotifySetting(Boolean accountBookNotify, Boolean feedNotify, Boolean feedCommentNotify) {
+    private NotifySetting(Boolean accountBookNotify, Boolean feedNotify, Boolean chatNotify) {
         this.accountBookNotify = accountBookNotify;
         this.feedNotify = feedNotify;
-        this.feedCommentNotify = feedCommentNotify;
+        this.chatNotify = chatNotify;
     }
 
-    public static NotifySetting of(Boolean accountBookNotify, Boolean feedNotify, Boolean feedCommentNotify) {
+    public static NotifySetting of(Boolean accountBookNotify, Boolean feedNotify, Boolean chatNotify) {
         return NotifySetting.builder()
                 .accountBookNotify(accountBookNotify)
                 .feedNotify(feedNotify)
-                .feedCommentNotify(feedCommentNotify)
+                .chatNotify(chatNotify)
                 .build();
     }
 }
