@@ -44,6 +44,13 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
+      # 3. Build Gradle
+      - name: Build Gradle
+        run: |
+          chmod +x ./gradlew
+          ./gradlew build --stacktrace --info -x test
+        shell: bash
+
       # 3. Docker 이미지 build 및 push
       - name: docker build and push
         run: |
