@@ -8,6 +8,7 @@ import kr.co.pennyway.domain.domains.user.exception.UserErrorException;
 import kr.co.pennyway.domain.domains.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,10 +25,23 @@ public class UserGeneralSignHelper {
 
     private final PasswordEncoder bCryptPasswordEncoder;
 
+    /**
+     * 일반 회원가입이라면 새롭게 유저를 생성하고, 기존 Oauth 유저라면 비밀번호를 업데이트한다.
+     *
+     * @param request {@link SignUpReq.Info}
+     */
     @Transactional
-    public User createUserWithEncryptedPassword(SignUpReq.Info request) {
-        User user = request.toEntity(bCryptPasswordEncoder);
-        return userService.createUser(user);
+    public User createUserWithEncryptedPassword(SignUpReq.Info request, Pair<Boolean, String> isOauthUser) {
+        User user;
+
+        if (isOauthUser.getLeft().equals(Boolean.TRUE)) {
+            user = userService.readUserByUsername(isOauthUser.getRight());
+            user.updatePassword(request.password(bCryptPasswordEncoder));
+        } else {
+            user = userService.createUser(request.toEntity(bCryptPasswordEncoder));
+        }
+
+        return user;
     }
 
     /**
