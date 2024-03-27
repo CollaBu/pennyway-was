@@ -52,27 +52,29 @@ public class AuthController {
     @PostMapping("/sign-up")
     @PreAuthorize("isAnonymous()")
     public ResponseEntity<?> signUp(@RequestBody @Validated SignUpReq.General request) {
-        Pair<Long, Jwts> jwts = authUseCase.signUp(request.toInfo());
-        ResponseCookie cookie = cookieUtil.createCookie("refreshToken", jwts.getValue().refreshToken(), Duration.ofDays(7).toSeconds());
+        return createAuthenticatedResponse(authUseCase.signUp(request.toInfo()));
+    }
 
-        return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                .header(HttpHeaders.AUTHORIZATION, jwts.getValue().accessToken())
-                .body(SuccessResponse.from("user", Map.of("id", jwts.getKey())))
-                ;
+    @Operation(summary = "기존 소셜 계정에 일반 계정을 연동하는 회원가입")
+    @PostMapping("/link-oauth")
+    @PreAuthorize("isAnonymous()")
+    public ResponseEntity<?> linkOauth(@RequestBody @Validated SignUpReq.SyncWithOauth request) {
+        return createAuthenticatedResponse(authUseCase.signUp(request.toInfo()));
     }
 
     @Operation(summary = "일반 로그인")
     @PostMapping("/sign-in")
     @PreAuthorize("isAnonymous()")
     public ResponseEntity<?> signIn(@RequestBody @Validated SignInReq.General request) {
-        Pair<Long, Jwts> jwts = authUseCase.signIn(request);
-        ResponseCookie cookie = cookieUtil.createCookie("refreshToken", jwts.getValue().refreshToken(), Duration.ofDays(7).toSeconds());
+        return createAuthenticatedResponse(authUseCase.signIn(request));
+    }
 
+    private ResponseEntity<?> createAuthenticatedResponse(Pair<Long, Jwts> userInfo) {
+        ResponseCookie cookie = cookieUtil.createCookie("refreshToken", userInfo.getValue().refreshToken(), Duration.ofDays(7).toSeconds());
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                .header(HttpHeaders.AUTHORIZATION, jwts.getValue().accessToken())
-                .body(SuccessResponse.from("user", Map.of("id", jwts.getKey())))
+                .header(HttpHeaders.AUTHORIZATION, userInfo.getValue().accessToken())
+                .body(SuccessResponse.from("user", Map.of("id", userInfo.getKey())))
                 ;
     }
 }
