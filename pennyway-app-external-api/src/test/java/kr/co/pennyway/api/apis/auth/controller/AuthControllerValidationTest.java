@@ -214,7 +214,7 @@ public class AuthControllerValidationTest {
         ResponseCookie expectedCookie = ResponseCookie.from("refreshToken", "refreshToken")
                 .maxAge(Duration.ofDays(7).toSeconds()).httpOnly(true).path("/").build();
 
-        given(authUseCase.signUp(request))
+        given(authUseCase.signUp(request.toInfo()))
                 .willReturn(Pair.of(1L, Jwts.of("accessToken", "refreshToken")));
         given(cookieUtil.createCookie("refreshToken", "refreshToken", Duration.ofDays(7).toSeconds()))
                 .willReturn(expectedCookie);
