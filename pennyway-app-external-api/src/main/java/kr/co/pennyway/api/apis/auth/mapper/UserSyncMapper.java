@@ -11,7 +11,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 
 /**
- * 일반 회원가입, Oauth 회원가입 시나리오를 제어하여 유저 정보를 동기화하는 Helper
+ * 일반 회원가입, Oauth 회원가입 시나리오를 제어하여 유저 정보를 동기화하는 클래스
+ *
+ * @author YANG JAESEO
  */
 @Slf4j
 @Mapper
