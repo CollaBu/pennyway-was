@@ -52,7 +52,7 @@ public class AuthController {
     @PostMapping("/sign-up")
     @PreAuthorize("isAnonymous()")
     public ResponseEntity<?> signUp(@RequestBody @Validated SignUpReq.General request) {
-        Pair<Long, Jwts> jwts = authUseCase.signUp(request);
+        Pair<Long, Jwts> jwts = authUseCase.signUp(request.toInfo());
         ResponseCookie cookie = cookieUtil.createCookie("refreshToken", jwts.getValue().refreshToken(), Duration.ofDays(7).toSeconds());
 
         return ResponseEntity.ok()
