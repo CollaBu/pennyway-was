@@ -25,7 +25,7 @@ public class UserGeneralSignHelper {
     private final PasswordEncoder bCryptPasswordEncoder;
 
     @Transactional
-    public User createUserWithEncryptedPassword(SignUpReq.General request) {
+    public User createUserWithEncryptedPassword(SignUpReq.Info request) {
         User user = request.toEntity(bCryptPasswordEncoder);
         return userService.createUser(user);
     }
