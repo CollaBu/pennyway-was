@@ -2,7 +2,6 @@ package kr.co.pennyway.api.apis.auth.mapper;
 
 import kr.co.pennyway.common.annotation.Mapper;
 import kr.co.pennyway.domain.domains.user.domain.User;
-import kr.co.pennyway.domain.domains.user.exception.UserErrorCode;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorException;
 import kr.co.pennyway.domain.domains.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -38,7 +37,7 @@ public class UserSyncMapper {
 
         if (user.get().getPassword() != null) {
             log.warn("이미 회원가입된 사용자입니다. phone: {}", phone);
-            throw new UserErrorException(UserErrorCode.ALREADY_SIGNUP);
+            return null;
         }
 
         return Pair.of(Boolean.TRUE, user.get().getUsername());
