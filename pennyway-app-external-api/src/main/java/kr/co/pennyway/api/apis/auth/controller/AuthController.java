@@ -14,6 +14,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -34,21 +35,21 @@ public class AuthController {
 
     @Operation(summary = "인증번호 전송")
     @PostMapping("/phone")
-    // TODO: Spring Security 설정 후 @PreAuthorize("permitAll()") 추가 && ip 당 횟수 제한
+    @PreAuthorize("isAnonymous()")
     public ResponseEntity<?> sendCode(@RequestBody @Validated PhoneVerificationDto.PushCodeReq request) {
         return ResponseEntity.ok(SuccessResponse.from("sms", authUseCase.sendCode(request)));
     }
 
     @Operation(summary = "인증번호 검증")
     @PostMapping("/phone/verification")
-    // TODO: Spring Security 설정 후 @PreAuthorize("permitAll()") 추가
+    @PreAuthorize("isAnonymous()")
     public ResponseEntity<?> verifyCode(@RequestBody @Validated PhoneVerificationDto.VerifyCodeReq request) {
         return ResponseEntity.ok(SuccessResponse.from("sms", authUseCase.verifyCode(request)));
     }
 
     @Operation(summary = "일반 회원가입")
     @PostMapping("/sign-up")
-    // TODO: Spring Security 설정 후 @PreAuthorize("isAnonymous()") 추가
+    @PreAuthorize("isAnonymous()")
     public ResponseEntity<?> signUp(@RequestBody @Validated SignUpReq.General request) {
         Pair<Long, Jwts> jwts = authUseCase.signUp(request);
         ResponseCookie cookie = cookieUtil.createCookie("refreshToken", jwts.getValue().refreshToken(), Duration.ofDays(7).toSeconds());
