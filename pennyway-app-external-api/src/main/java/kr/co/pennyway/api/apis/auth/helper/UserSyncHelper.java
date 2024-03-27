@@ -20,14 +20,14 @@ public class UserSyncHelper {
     private final UserService userService;
 
     /**
-     * 일반 회원가입 시 이미 가입된 회원인지 확인
+     * 일반 회원가입이 가능한 유저인지 확인
      *
      * @param phone String : 전화번호
      * @return Pair<Boolean, String> : 이미 가입된 회원인지 여부 (TRUE: 가입되지 않은 회원, FALSE: 가입된 회원), 가입된 회원인 경우 회원
      * ID 반환
      * @throws UserErrorException : 이미 일반 회원가입을 한 유저인 경우
      */
-    public Pair<Boolean, String> isSignedUserWhenGeneral(String phone) {
+    public Pair<Boolean, String> isGeneralSignUpAllowed(String phone) {
         User user;
         try {
             user = userService.readUserByPhone(phone);

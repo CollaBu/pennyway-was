@@ -38,7 +38,7 @@ public class UserSyncHelperTest {
                 new UserErrorException(UserErrorCode.NOT_FOUND));
 
         // when
-        Boolean result = userSyncHelper.isSignedUserWhenGeneral(phone).getKey();
+        Boolean result = userSyncHelper.isGeneralSignUpAllowed(phone).getKey();
 
         // then
         assertEquals(result, Boolean.FALSE);
@@ -51,7 +51,7 @@ public class UserSyncHelperTest {
         given(userService.readUserByPhone(phone)).willReturn(User.builder().password(null).build());
 
         // when
-        Boolean result = userSyncHelper.isSignedUserWhenGeneral(phone).getKey();
+        Boolean result = userSyncHelper.isGeneralSignUpAllowed(phone).getKey();
 
         // then
         assertEquals(result, Boolean.TRUE);
@@ -66,7 +66,7 @@ public class UserSyncHelperTest {
 
         // when - then
         UserErrorException exception = org.junit.jupiter.api.Assertions.assertThrows(
-                UserErrorException.class, () -> userSyncHelper.isSignedUserWhenGeneral(phone));
+                UserErrorException.class, () -> userSyncHelper.isGeneralSignUpAllowed(phone));
         System.out.println(exception.getExplainError());
     }
 
