@@ -3,6 +3,7 @@ package kr.co.pennyway.api.apis.auth.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.co.pennyway.api.apis.auth.dto.PhoneVerificationDto;
+import kr.co.pennyway.api.apis.auth.dto.SignInReq;
 import kr.co.pennyway.api.apis.auth.dto.SignUpReq;
 import kr.co.pennyway.api.apis.auth.usecase.AuthUseCase;
 import kr.co.pennyway.api.common.response.SuccessResponse;
@@ -52,6 +53,20 @@ public class AuthController {
     @PreAuthorize("isAnonymous()")
     public ResponseEntity<?> signUp(@RequestBody @Validated SignUpReq.General request) {
         Pair<Long, Jwts> jwts = authUseCase.signUp(request);
+        ResponseCookie cookie = cookieUtil.createCookie("refreshToken", jwts.getValue().refreshToken(), Duration.ofDays(7).toSeconds());
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .header(HttpHeaders.AUTHORIZATION, jwts.getValue().accessToken())
+                .body(SuccessResponse.from("user", Map.of("id", jwts.getKey())))
+                ;
+    }
+
+    @Operation(summary = "일반 로그인")
+    @PostMapping("/sign-in")
+    @PreAuthorize("isAnonymous()")
+    public ResponseEntity<?> signIn(@RequestBody @Validated SignInReq.General request) {
+        Pair<Long, Jwts> jwts = authUseCase.signIn(request);
         ResponseCookie cookie = cookieUtil.createCookie("refreshToken", jwts.getValue().refreshToken(), Duration.ofDays(7).toSeconds());
 
         return ResponseEntity.ok()
