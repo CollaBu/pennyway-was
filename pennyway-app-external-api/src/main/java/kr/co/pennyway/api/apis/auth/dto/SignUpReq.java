@@ -70,10 +70,18 @@ public class SignUpReq {
             @Schema(description = "비밀번호", example = "pennyway1234")
             @NotBlank(message = "비밀번호를 입력해주세요")
             @Password(message = "8~16자의 영문 대/소문자, 숫자, 특수문자를 사용해주세요. (적어도 하나의 영문 소문자, 숫자 포함)")
-            String password
+            String password,
+            @Schema(description = "전화번호", example = "010-1234-5678")
+            @NotBlank(message = "전화번호를 입력해주세요")
+            @Pattern(regexp = "^01[01]-\\d{4}-\\d{4}$", message = "전화번호 형식이 올바르지 않습니다.")
+            String phone,
+            @Schema(description = "6자리 정수 인증번호", example = "123456")
+            @NotBlank(message = "인증번호는 필수입니다.")
+            @Pattern(regexp = "^\\d{6}$", message = "인증번호는 6자리 숫자여야 합니다.")
+            String code
     ) {
         public Info toInfo(String username, String name, String phone, String code) {
-            return new Info(null, null, password, null, null);
+            return new Info(null, null, password, phone, code);
         }
     }
 
