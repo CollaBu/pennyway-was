@@ -2,11 +2,11 @@ package kr.co.pennyway.domain.domains.user.service;
 
 import kr.co.pennyway.common.annotation.DomainService;
 import kr.co.pennyway.domain.domains.user.domain.User;
-import kr.co.pennyway.domain.domains.user.exception.UserErrorCode;
-import kr.co.pennyway.domain.domains.user.exception.UserErrorException;
 import kr.co.pennyway.domain.domains.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 @DomainService
 @RequiredArgsConstructor
@@ -19,18 +19,18 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public User readUser(Long id) {
-        return userRepository.findById(id).orElseThrow(() -> new UserErrorException(UserErrorCode.NOT_FOUND));
+    public Optional<User> readUser(Long id) {
+        return userRepository.findById(id);
     }
 
     @Transactional(readOnly = true)
-    public User readUserByPhone(String phone) {
-        return userRepository.findByPhone(phone).orElseThrow(() -> new UserErrorException(UserErrorCode.NOT_FOUND));
+    public Optional<User> readUserByPhone(String phone) {
+        return userRepository.findByPhone(phone);
     }
 
     @Transactional(readOnly = true)
-    public User readUserByUsername(String username) {
-        return userRepository.findByUsername(username).orElseThrow(() -> new UserErrorException(UserErrorCode.NOT_FOUND));
+    public Optional<User> readUserByUsername(String username) {
+        return userRepository.findByUsername(username);
     }
 
     @Transactional(readOnly = true)
