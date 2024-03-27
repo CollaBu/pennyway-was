@@ -15,6 +15,28 @@ import org.springframework.security.crypto.password.PasswordEncoder;
  * 일반 회원가입 시엔 General, 소셜 회원가입 시엔 Oauth를 사용합니다.
  */
 public class SignUpReq {
+    public record Info(String username, String name, String password, String phone, String code) {
+        public String password(PasswordEncoder passwordEncoder) {
+            return passwordEncoder.encode(password);
+        }
+
+        public User toEntity(PasswordEncoder bCryptPasswordEncoder) {
+            return User.builder()
+                    .username(username)
+                    .name(name)
+                    .password(bCryptPasswordEncoder.encode(password))
+                    .phone(phone)
+                    .role(Role.USER)
+                    .profileVisibility(ProfileVisibility.PUBLIC)
+                    .build();
+        }
+
+        @Override
+        public String password() {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+    }
+
     @Schema(title = "일반 회원가입 요청 DTO")
     public record General(
             @Schema(description = "아이디", example = "pennyway")
@@ -38,17 +60,21 @@ public class SignUpReq {
             @Pattern(regexp = "^\\d{6}$", message = "인증번호는 6자리 숫자여야 합니다.")
             String code
     ) {
-        public User toEntity(PasswordEncoder bCryptPasswordEncoder) {
-            return User.builder()
-                    .username(username)
-                    .name(name)
-                    .password(bCryptPasswordEncoder.encode(password))
-                    .phone(phone)
-                    .role(Role.USER)
-                    .profileVisibility(ProfileVisibility.PUBLIC)
-                    .build();
+        public Info toInfo() {
+            return new Info(username, name, password, phone, code);
         }
+    }
 
+    @Schema(title = "일반 회원가입(소셜 계정 존재) 요청 DTO")
+    public record SyncWithOauth(
+            @Schema(description = "비밀번호", example = "pennyway1234")
+            @NotBlank(message = "비밀번호를 입력해주세요")
+            @Password(message = "8~16자의 영문 대/소문자, 숫자, 특수문자를 사용해주세요. (적어도 하나의 영문 소문자, 숫자 포함)")
+            String password
+    ) {
+        public Info toInfo(String username, String name, String phone, String code) {
+            return new Info(null, null, password, null, null);
+        }
     }
 
     @Schema(title = "소셜 회원가입 요청 DTO")
