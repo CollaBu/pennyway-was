@@ -12,6 +12,7 @@ import kr.co.pennyway.common.annotation.UseCase;
 import kr.co.pennyway.domain.common.redis.phone.PhoneVerificationService;
 import kr.co.pennyway.domain.common.redis.phone.PhoneVerificationType;
 import kr.co.pennyway.domain.domains.user.domain.User;
+import kr.co.pennyway.domain.domains.user.exception.UserErrorCode;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -61,11 +62,13 @@ public class AuthUseCase {
     }
 
     private Pair<Boolean, String> checkOauthUserNotGeneralSignUp(String phone) {
-        try {
-            return userSyncMapper.isGeneralSignUpAllowed(phone);
-        } catch (UserErrorException e) {
+        Pair<Boolean, String> isGeneralSignUpAllowed = userSyncMapper.isGeneralSignUpAllowed(phone);
+
+        if (isGeneralSignUpAllowed == null) {
             phoneVerificationService.delete(phone, PhoneVerificationType.SIGN_UP);
-            throw e;
+            throw new UserErrorException(UserErrorCode.ALREADY_SIGNUP);
         }
+
+        return isGeneralSignUpAllowed;
     }
 }
