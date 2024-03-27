@@ -1,7 +1,6 @@
 package kr.co.pennyway.api.apis.auth.mapper;
 
 import kr.co.pennyway.common.annotation.Mapper;
-import kr.co.pennyway.common.exception.GlobalErrorException;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorCode;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorException;
@@ -9,6 +8,8 @@ import kr.co.pennyway.domain.domains.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
+
+import java.util.Optional;
 
 /**
  * 일반 회원가입, Oauth 회원가입 시나리오를 제어하여 유저 정보를 동기화하는 Helper
@@ -28,19 +29,18 @@ public class UserSyncMapper {
      * @throws UserErrorException : 이미 일반 회원가입을 한 유저인 경우
      */
     public Pair<Boolean, String> isGeneralSignUpAllowed(String phone) {
-        User user;
-        try {
-            user = userService.readUserByPhone(phone);
-        } catch (GlobalErrorException e) {
-            log.info("User not found. phone: {}", phone);
+        Optional<User> user = userService.readUserByPhone(phone);
+
+        if (user.isEmpty()) {
+            log.info("회원가입 이력이 없는 사용자입니다. phone: {}", phone);
             return Pair.of(Boolean.FALSE, null);
         }
 
-        if (user.getPassword() != null) {
-            log.warn("User already exists. phone: {}", phone);
+        if (user.get().getPassword() != null) {
+            log.warn("이미 회원가입된 사용자입니다. phone: {}", phone);
             throw new UserErrorException(UserErrorCode.ALREADY_SIGNUP);
         }
 
-        return Pair.of(Boolean.TRUE, user.getUsername());
+        return Pair.of(Boolean.TRUE, user.get().getUsername());
     }
 }
