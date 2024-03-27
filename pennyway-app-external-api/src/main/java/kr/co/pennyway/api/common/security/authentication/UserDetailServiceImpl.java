@@ -16,10 +16,8 @@ public class UserDetailServiceImpl implements UserDetailsService {
     @Override
     @Cacheable(value = "securityUser", key = "#userId", unless = "#result == null", cacheManager = "securityUserCacheManager")
     public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
-        try {
-            return SecurityUserDetails.from(userService.readUser(Long.parseLong(userId)));
-        } catch (Exception e) {
-            return null;
-        }
+        return userService.readUser(Long.parseLong(userId))
+                .map(SecurityUserDetails::from)
+                .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
     }
 }
