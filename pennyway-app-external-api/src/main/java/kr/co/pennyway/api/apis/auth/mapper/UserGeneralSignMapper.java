@@ -31,7 +31,7 @@ public class UserGeneralSignMapper {
      * @param request {@link SignUpReq.Info}
      */
     @Transactional
-    public User createUserWithEncryptedPassword(SignUpReq.Info request, Pair<Boolean, String> isOauthUser) {
+    public User saveUserWithEncryptedPassword(SignUpReq.Info request, Pair<Boolean, String> isOauthUser) {
         User user;
 
         if (isOauthUser.getLeft().equals(Boolean.TRUE)) {
