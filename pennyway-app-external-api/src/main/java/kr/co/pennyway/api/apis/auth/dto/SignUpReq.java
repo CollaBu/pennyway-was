@@ -83,7 +83,7 @@ public class SignUpReq {
             @Pattern(regexp = "^\\d{6}$", message = "인증번호는 6자리 숫자여야 합니다.")
             String code
     ) {
-        public Info toInfo(String username, String name, String phone, String code) {
+        public Info toInfo() {
             return new Info(null, null, password, phone, code);
         }
     }
