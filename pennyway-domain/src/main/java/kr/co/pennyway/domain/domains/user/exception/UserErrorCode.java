@@ -12,6 +12,7 @@ public enum UserErrorCode implements BaseErrorCode {
     ALREADY_SIGNUP(StatusCode.BAD_REQUEST, ReasonCode.INVALID_REQUEST, "이미 회원가입한 유저입니다."),
 
     /* 401 UNAUTHORIZED */
+    NOT_MATCHED_PASSWORD(StatusCode.UNAUTHORIZED, ReasonCode.MISSING_OR_INVALID_AUTHENTICATION_CREDENTIALS, "비밀번호가 일치하지 않습니다."),
     INVALID_USERNAME_OR_PASSWORD(StatusCode.UNAUTHORIZED, ReasonCode.MISSING_OR_INVALID_AUTHENTICATION_CREDENTIALS, "유효하지 않은 아이디 또는 비밀번호입니다."),
 
     /* 403 FORBIDDEN */
