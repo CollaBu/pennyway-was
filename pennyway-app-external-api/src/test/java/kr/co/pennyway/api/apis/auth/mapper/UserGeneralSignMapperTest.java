@@ -12,6 +12,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
@@ -34,7 +36,7 @@ public class UserGeneralSignMapperTest {
     void readUserIfValidReturnUser() {
         // given
         User user = User.builder().username("pennyway").password("password").build();
-        given(userService.readUserByUsername("pennyway")).willReturn(user);
+        given(userService.readUserByUsername("pennyway")).willReturn(Optional.of(user));
         given(passwordEncoder.matches("password", user.getPassword())).willReturn(true);
 
         // when
@@ -61,7 +63,7 @@ public class UserGeneralSignMapperTest {
     void readUserIfNotMatchedPassword() {
         // given
         User user = User.builder().username("pennyway").password("password").build();
-        given(userService.readUserByUsername("pennyway")).willReturn(user);
+        given(userService.readUserByUsername("pennyway")).willReturn(Optional.of(user));
         given(passwordEncoder.matches("password", user.getPassword())).willReturn(false);
 
         // when - then
