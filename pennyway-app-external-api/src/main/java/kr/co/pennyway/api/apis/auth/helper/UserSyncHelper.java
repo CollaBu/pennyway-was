@@ -9,16 +9,15 @@ import kr.co.pennyway.domain.domains.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * 일반 회원가입, Oauth 회원가입 시나리오를 제어하여 유저 정보를 동기화하는 Helper
+ */
 @Slf4j
 @Helper
 @RequiredArgsConstructor
 public class UserSyncHelper {
     private final UserService userService;
-
-    private final PasswordEncoder bCryptPasswordEncoder;
 
     /**
      * 일반 회원가입 시 이미 가입된 회원인지 확인
@@ -43,26 +42,5 @@ public class UserSyncHelper {
         }
 
         return Pair.of(Boolean.TRUE, user.getUsername());
-    }
-
-    /**
-     * 로그인 시 유저가 존재하고 비밀번호가 일치하는지 확인
-     */
-    @Transactional(readOnly = true)
-    public User readUserIfValid(String username, String password) {
-        User user;
-
-        try {
-            user = userService.readUserByUsername(username);
-
-            if (!bCryptPasswordEncoder.matches(password, user.getPassword())) {
-                throw new UserErrorException(UserErrorCode.NOT_MATCHED_PASSWORD);
-            }
-        } catch (UserErrorException e) {
-            log.warn("request not valid : {} : {}", username, e.getExplainError());
-            throw new UserErrorException(UserErrorCode.INVALID_USERNAME_OR_PASSWORD);
-        }
-
-        return user;
     }
 }
