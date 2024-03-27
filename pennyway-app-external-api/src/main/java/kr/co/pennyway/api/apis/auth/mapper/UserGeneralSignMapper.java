@@ -12,6 +12,8 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 /**
  * 일반 회원가입, 로그인 시나리오 도우미 클래스
  *
@@ -35,7 +37,8 @@ public class UserGeneralSignMapper {
         User user;
 
         if (isOauthUser.getLeft().equals(Boolean.TRUE)) {
-            user = userService.readUserByUsername(isOauthUser.getRight());
+            user = userService.readUserByUsername(isOauthUser.getRight())
+                    .orElseThrow(() -> new UserErrorException(UserErrorCode.NOT_FOUND));
             user.updatePassword(request.password(bCryptPasswordEncoder));
         } else {
             user = userService.createUser(request.toEntity(bCryptPasswordEncoder));
@@ -46,22 +49,23 @@ public class UserGeneralSignMapper {
 
     /**
      * 로그인 시 유저가 존재하고 비밀번호가 일치하는지 확인
+     *
+     * @throws UserErrorException : 유저가 존재하지 않거나 비밀번호가 일치하지 않는 경우
      */
     @Transactional(readOnly = true)
     public User readUserIfValid(String username, String password) {
-        User user;
+        Optional<User> user = userService.readUserByUsername(username);
 
-        try {
-            user = userService.readUserByUsername(username);
-
-            if (!bCryptPasswordEncoder.matches(password, user.getPassword())) {
-                throw new UserErrorException(UserErrorCode.NOT_MATCHED_PASSWORD);
-            }
-        } catch (UserErrorException e) {
-            log.warn("request not valid : {} : {}", username, e.getExplainError());
+        if (user.isEmpty()) {
+            log.warn("해당 유저가 존재하지 않습니다. username: {}", username);
             throw new UserErrorException(UserErrorCode.INVALID_USERNAME_OR_PASSWORD);
         }
 
-        return user;
+        if (!bCryptPasswordEncoder.matches(password, user.get().getPassword())) {
+            log.warn("비밀번호가 일치하지 않습니다. username: {}", username);
+            throw new UserErrorException(UserErrorCode.INVALID_USERNAME_OR_PASSWORD);
+        }
+
+        return user.get();
     }
 }
