@@ -1,6 +1,6 @@
-package kr.co.pennyway.api.apis.auth.helper;
+package kr.co.pennyway.api.apis.auth.mapper;
 
-import kr.co.pennyway.common.annotation.Helper;
+import kr.co.pennyway.common.annotation.Mapper;
 import kr.co.pennyway.common.exception.GlobalErrorException;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorCode;
@@ -14,9 +14,9 @@ import org.apache.commons.lang3.tuple.Pair;
  * 일반 회원가입, Oauth 회원가입 시나리오를 제어하여 유저 정보를 동기화하는 Helper
  */
 @Slf4j
-@Helper
+@Mapper
 @RequiredArgsConstructor
-public class UserSyncHelper {
+public class UserSyncMapper {
     private final UserService userService;
 
     /**

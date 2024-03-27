@@ -1,5 +1,6 @@
 package kr.co.pennyway.api.apis.auth.helper;
 
+import kr.co.pennyway.api.apis.auth.mapper.UserSyncMapper;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorCode;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorException;
@@ -17,9 +18,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
-public class UserSyncHelperTest {
+public class UserSyncMapperTest {
     private final String phone = "010-1234-5678";
-    private UserSyncHelper userSyncHelper;
+    private UserSyncMapper userSyncMapper;
     @Mock
     private UserService userService;
     @Mock
@@ -27,7 +28,7 @@ public class UserSyncHelperTest {
 
     @BeforeEach
     void setUp() {
-        userSyncHelper = new UserSyncHelper(userService, bCryptPasswordEncoder);
+        userSyncMapper = new UserSyncMapper(userService, bCryptPasswordEncoder);
     }
 
     @DisplayName("일반 회원가입 시, 회원 정보가 없으면 FALSE를 반환한다.")
@@ -38,7 +39,7 @@ public class UserSyncHelperTest {
                 new UserErrorException(UserErrorCode.NOT_FOUND));
 
         // when
-        Boolean result = userSyncHelper.isGeneralSignUpAllowed(phone).getKey();
+        Boolean result = userSyncMapper.isGeneralSignUpAllowed(phone).getKey();
 
         // then
         assertEquals(result, Boolean.FALSE);
@@ -51,7 +52,7 @@ public class UserSyncHelperTest {
         given(userService.readUserByPhone(phone)).willReturn(User.builder().password(null).build());
 
         // when
-        Boolean result = userSyncHelper.isGeneralSignUpAllowed(phone).getKey();
+        Boolean result = userSyncMapper.isGeneralSignUpAllowed(phone).getKey();
 
         // then
         assertEquals(result, Boolean.TRUE);
@@ -66,7 +67,7 @@ public class UserSyncHelperTest {
 
         // when - then
         UserErrorException exception = org.junit.jupiter.api.Assertions.assertThrows(
-                UserErrorException.class, () -> userSyncHelper.isGeneralSignUpAllowed(phone));
+                UserErrorException.class, () -> userSyncMapper.isGeneralSignUpAllowed(phone));
         System.out.println(exception.getExplainError());
     }
 
@@ -79,7 +80,7 @@ public class UserSyncHelperTest {
         given(bCryptPasswordEncoder.matches("password", user.getPassword())).willReturn(true);
 
         // when
-        User result = userSyncHelper.readUserIfValid("pennyway", "password");
+        User result = userSyncMapper.readUserIfValid("pennyway", "password");
 
         // then
         assertEquals(result, user);
@@ -94,7 +95,7 @@ public class UserSyncHelperTest {
                 new UserErrorException(UserErrorCode.NOT_FOUND));
 
         // when - then
-        UserErrorException exception = assertThrows(UserErrorException.class, () -> userSyncHelper.readUserIfValid("pennyway", "password"));
+        UserErrorException exception = assertThrows(UserErrorException.class, () -> userSyncMapper.readUserIfValid("pennyway", "password"));
         System.out.println(exception.getExplainError());
     }
 
@@ -107,7 +108,7 @@ public class UserSyncHelperTest {
         given(bCryptPasswordEncoder.matches("password", user.getPassword())).willReturn(false);
 
         // when - then
-        UserErrorException exception = assertThrows(UserErrorException.class, () -> userSyncHelper.readUserIfValid("pennyway", "password"));
+        UserErrorException exception = assertThrows(UserErrorException.class, () -> userSyncMapper.readUserIfValid("pennyway", "password"));
         System.out.println(exception.getExplainError());
     }
 }

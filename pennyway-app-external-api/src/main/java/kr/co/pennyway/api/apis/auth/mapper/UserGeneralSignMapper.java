@@ -1,7 +1,7 @@
-package kr.co.pennyway.api.apis.auth.helper;
+package kr.co.pennyway.api.apis.auth.mapper;
 
 import kr.co.pennyway.api.apis.auth.dto.SignUpReq;
-import kr.co.pennyway.common.annotation.Helper;
+import kr.co.pennyway.common.annotation.Mapper;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorCode;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorException;
@@ -18,9 +18,9 @@ import org.springframework.transaction.annotation.Transactional;
  * @author YANG JAESEO
  */
 @Slf4j
-@Helper
+@Mapper
 @RequiredArgsConstructor
-public class UserGeneralSignHelper {
+public class UserGeneralSignMapper {
     private final UserService userService;
 
     private final PasswordEncoder bCryptPasswordEncoder;
