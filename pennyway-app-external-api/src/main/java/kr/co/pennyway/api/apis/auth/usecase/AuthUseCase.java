@@ -1,6 +1,7 @@
 package kr.co.pennyway.api.apis.auth.usecase;
 
 import kr.co.pennyway.api.apis.auth.dto.PhoneVerificationDto;
+import kr.co.pennyway.api.apis.auth.dto.SignInReq;
 import kr.co.pennyway.api.apis.auth.dto.SignUpReq;
 import kr.co.pennyway.api.apis.auth.helper.UserSyncHelper;
 import kr.co.pennyway.api.apis.auth.mapper.JwtAuthMapper;
@@ -28,6 +29,7 @@ public class AuthUseCase {
     private final PhoneVerificationMapper phoneVerificationMapper;
     private final PhoneVerificationService phoneVerificationService;
 
+
     public PhoneVerificationDto.PushCodeRes sendCode(PhoneVerificationDto.PushCodeReq request) {
         return phoneVerificationMapper.sendCode(request, PhoneVerificationType.SIGN_UP);
     }
@@ -47,6 +49,13 @@ public class AuthUseCase {
         // phoneVerificationHelper.verify(request.phone(), request.code());
 
         User user = userService.createUser(request.toEntity());
+
+        return Pair.of(user.getId(), jwtAuthMapper.createToken(user));
+    }
+
+    @Transactional(readOnly = true)
+    public Pair<Long, Jwts> signIn(SignInReq.General request) {
+        User user = userSyncHelper.readUserIfValid(request.username(), request.password());
 
         return Pair.of(user.getId(), jwtAuthMapper.createToken(user));
     }
