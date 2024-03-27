@@ -7,6 +7,7 @@ import kr.co.pennyway.api.common.validator.Password;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.type.ProfileVisibility;
 import kr.co.pennyway.domain.domains.user.type.Role;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 /**
  * 회원가입 요청 Dto
@@ -37,11 +38,11 @@ public class SignUpReq {
             @Pattern(regexp = "^\\d{6}$", message = "인증번호는 6자리 숫자여야 합니다.")
             String code
     ) {
-        public User toEntity() {
+        public User toEntity(PasswordEncoder bCryptPasswordEncoder) {
             return User.builder()
                     .username(username)
                     .name(name)
-                    .password(password)
+                    .password(bCryptPasswordEncoder.encode(password))
                     .phone(phone)
                     .role(Role.USER)
                     .profileVisibility(ProfileVisibility.PUBLIC)
