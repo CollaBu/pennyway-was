@@ -9,6 +9,8 @@ import kr.co.pennyway.domain.domains.user.type.ProfileVisibility;
 import kr.co.pennyway.domain.domains.user.type.Role;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.time.LocalDateTime;
+
 /**
  * 회원가입 요청 Dto
  * <br/>
@@ -25,6 +27,7 @@ public class SignUpReq {
                     .username(username)
                     .name(name)
                     .password(bCryptPasswordEncoder.encode(password))
+                    .passwordUpdatedAt(LocalDateTime.now())
                     .phone(phone)
                     .role(Role.USER)
                     .profileVisibility(ProfileVisibility.PUBLIC)
