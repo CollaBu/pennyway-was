@@ -34,6 +34,7 @@ public enum JwtErrorCode implements BaseErrorCode {
      */
     FORBIDDEN_ACCESS_TOKEN(FORBIDDEN, ACCESS_TO_THE_REQUESTED_RESOURCE_IS_FORBIDDEN, "해당 토큰에는 엑세스 권한이 없습니다"),
     SUSPENDED_OR_BANNED_TOKEN(FORBIDDEN, USER_ACCOUNT_SUSPENDED_OR_BANNED, "사용자 계정이 정지되었습니다"),
+    TAKEN_AWAY_TOKEN(FORBIDDEN, TAMPERED_OR_MALFORMED_TOKEN, "탈취당한 토큰입니다. 다시 로그인 해주세요."),
 
     /**
      * 500 INTERNAL_SERVER_ERROR: 서버 내부 에러
