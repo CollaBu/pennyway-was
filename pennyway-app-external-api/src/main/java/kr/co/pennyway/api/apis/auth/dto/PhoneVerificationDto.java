@@ -56,6 +56,9 @@ public class PhoneVerificationDto {
             @Pattern(regexp = "^\\d{6}$", message = "인증번호는 6자리 숫자여야 합니다.")
             String code
     ) {
+        public static VerifyCodeReq from(SignUpReq.Info request) {
+            return new VerifyCodeReq(request.phone(), request.code());
+        }
     }
 
     @Schema(title = "인증번호 검증 응답 DTO")

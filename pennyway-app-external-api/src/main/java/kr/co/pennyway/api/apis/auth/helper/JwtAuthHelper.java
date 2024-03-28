@@ -1,11 +1,11 @@
-package kr.co.pennyway.api.apis.auth.mapper;
+package kr.co.pennyway.api.apis.auth.helper;
 
 import kr.co.pennyway.api.common.annotation.AccessTokenStrategy;
 import kr.co.pennyway.api.common.annotation.RefreshTokenStrategy;
 import kr.co.pennyway.api.common.security.jwt.Jwts;
 import kr.co.pennyway.api.common.security.jwt.access.AccessTokenClaim;
 import kr.co.pennyway.api.common.security.jwt.refresh.RefreshTokenClaim;
-import kr.co.pennyway.common.annotation.Mapper;
+import kr.co.pennyway.common.annotation.Helper;
 import kr.co.pennyway.domain.common.redis.refresh.RefreshToken;
 import kr.co.pennyway.domain.common.redis.refresh.RefreshTokenService;
 import kr.co.pennyway.domain.domains.user.domain.User;
@@ -16,13 +16,13 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 
 @Slf4j
-@Mapper
-public class JwtAuthMapper {
+@Helper
+public class JwtAuthHelper {
     private final JwtProvider accessTokenProvider;
     private final JwtProvider refreshTokenProvider;
     private final RefreshTokenService refreshTokenService;
 
-    public JwtAuthMapper(
+    public JwtAuthHelper(
             @AccessTokenStrategy JwtProvider accessTokenProvider,
             @RefreshTokenStrategy JwtProvider refreshTokenProvider,
             RefreshTokenService refreshTokenService

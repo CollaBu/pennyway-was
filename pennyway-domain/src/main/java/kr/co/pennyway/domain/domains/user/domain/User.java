@@ -29,7 +29,6 @@ public class User extends DateAuditable {
     private String name;
     @ColumnDefault("NULL")
     private String password;
-    @ColumnDefault("NULL")
     private LocalDateTime passwordUpdatedAt;
     @ColumnDefault("NULL")
     private String profileImageUrl;
@@ -58,5 +57,10 @@ public class User extends DateAuditable {
         this.notifySetting = notifySetting;
         this.locked = locked;
         this.deletedAt = deletedAt;
+    }
+
+    public void updatePassword(String password) {
+        this.password = password;
+        this.passwordUpdatedAt = LocalDateTime.now();
     }
 }
