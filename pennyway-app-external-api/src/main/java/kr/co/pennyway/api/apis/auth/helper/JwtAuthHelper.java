@@ -10,6 +10,8 @@ import kr.co.pennyway.common.annotation.Helper;
 import kr.co.pennyway.domain.common.redis.refresh.RefreshToken;
 import kr.co.pennyway.domain.common.redis.refresh.RefreshTokenService;
 import kr.co.pennyway.domain.domains.user.domain.User;
+import kr.co.pennyway.infra.common.exception.JwtErrorCode;
+import kr.co.pennyway.infra.common.exception.JwtErrorException;
 import kr.co.pennyway.infra.common.jwt.JwtProvider;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
@@ -57,7 +59,14 @@ public class JwtAuthHelper {
         String role = (String) claims.get(RefreshTokenClaimKeys.ROLE.getValue());
 
         String newAccessToken = accessTokenProvider.generateToken(AccessTokenClaim.of(userId, role));
-        RefreshToken newRefreshToken = refreshTokenService.refresh(userId, refreshToken, refreshTokenProvider.generateToken(RefreshTokenClaim.of(userId, role)));
+        RefreshToken newRefreshToken;
+        try {
+            newRefreshToken = refreshTokenService.refresh(userId, refreshToken, refreshTokenProvider.generateToken(RefreshTokenClaim.of(userId, role)));
+        } catch (IllegalArgumentException e) {
+            throw new JwtErrorException(JwtErrorCode.EXPIRED_TOKEN);
+        } catch (IllegalStateException e) {
+            throw new JwtErrorException(JwtErrorCode.TAKEN_AWAY_TOKEN);
+        }
 
         return Pair.of(userId, Jwts.of(newAccessToken, newRefreshToken.getToken()));
     }
