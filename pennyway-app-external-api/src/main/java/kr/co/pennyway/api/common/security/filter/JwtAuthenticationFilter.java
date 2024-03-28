@@ -4,7 +4,6 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import kr.co.pennyway.api.common.security.authentication.UserDetailServiceImpl;
 import kr.co.pennyway.api.common.security.jwt.access.AccessTokenClaimKeys;
 import kr.co.pennyway.domain.common.redis.forbidden.ForbiddenTokenService;
 import kr.co.pennyway.infra.common.exception.JwtErrorCode;
@@ -17,6 +16,7 @@ import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -43,7 +43,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 @Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-    private final UserDetailServiceImpl userDetailServiceImpl;
+    private final UserDetailsService userDetailService;
     private final ForbiddenTokenService forbiddenTokenService;
 
     private final JwtProvider accessTokenProvider;
@@ -100,7 +100,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
      */
     private UserDetails getUserDetails(final String accessToken) {
         Long userId = (Long) accessTokenProvider.getJwtClaimsFromToken(accessToken).getClaims().get(AccessTokenClaimKeys.USER_ID.getValue());
-        return userDetailServiceImpl.loadUserByUsername(userId.toString());
+        return userDetailService.loadUserByUsername(userId.toString());
     }
 
     /**
