@@ -62,6 +62,11 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.OPTIONS, "*").permitAll()
                                 .requestMatchers(HttpMethod.GET, publicReadOnlyPublicEndpoints).permitAll()
                                 .anyRequest().permitAll()
+                )
+                .exceptionHandling(
+                        exception -> exception
+                                .accessDeniedHandler(accessDeniedHandler())
+                                .authenticationEntryPoint(authenticationEntryPoint())
                 );
         return http.build();
     }
