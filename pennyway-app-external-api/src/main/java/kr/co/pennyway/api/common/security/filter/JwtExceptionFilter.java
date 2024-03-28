@@ -25,8 +25,8 @@ public class JwtExceptionFilter extends OncePerRequestFilter {
         try {
             filterChain.doFilter(request, response);
         } catch (Exception e) {
+            log.warn("Exception caught in JwtExceptionFilter: {}", e.getMessage());
             JwtErrorException exception = JwtErrorCodeUtil.determineAuthErrorException(e);
-            log.warn("Exception caught in JwtExceptionFilter: {}", exception.getMessage());
 
             sendAuthError(response, exception);
         }
