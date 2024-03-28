@@ -8,6 +8,6 @@ import java.lang.annotation.*;
         ElementType.TYPE, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@Qualifier("accessTokenStrategy")
+@Qualifier("refreshTokenStrategy")
 public @interface RefreshTokenStrategy {
 }

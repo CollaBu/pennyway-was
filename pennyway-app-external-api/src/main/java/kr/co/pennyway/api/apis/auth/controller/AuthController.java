@@ -2,6 +2,7 @@ package kr.co.pennyway.api.apis.auth.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import kr.co.pennyway.api.apis.auth.dto.PhoneVerificationDto;
 import kr.co.pennyway.api.apis.auth.dto.SignInReq;
 import kr.co.pennyway.api.apis.auth.dto.SignUpReq;
@@ -17,10 +18,7 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.Duration;
 import java.util.Map;
@@ -67,6 +65,13 @@ public class AuthController {
     @PreAuthorize("isAnonymous()")
     public ResponseEntity<?> signIn(@RequestBody @Validated SignInReq.General request) {
         return createAuthenticatedResponse(authUseCase.signIn(request));
+    }
+
+    @Operation(summary = "토큰 갱신", description = "리프레시 토큰을 이용해 액세스 토큰과 리프레시 토큰을 갱신합니다.")
+    @GetMapping("/refresh")
+    @PreAuthorize("isAnonymous()")
+    public ResponseEntity<?> refresh(@CookieValue("refreshToken") @Valid String refreshToken) {
+        return createAuthenticatedResponse(authUseCase.refresh(refreshToken));
     }
 
     private ResponseEntity<?> createAuthenticatedResponse(Pair<Long, Jwts> userInfo) {

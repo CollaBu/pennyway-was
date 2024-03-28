@@ -2,6 +2,7 @@ package kr.co.pennyway.api.common.response.handler;
 
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import kr.co.pennyway.api.common.response.ErrorResponse;
+import kr.co.pennyway.common.exception.CausedBy;
 import kr.co.pennyway.common.exception.GlobalErrorException;
 import kr.co.pennyway.common.exception.ReasonCode;
 import kr.co.pennyway.common.exception.StatusCode;
@@ -11,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.HttpMessageNotWritableException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingRequestHeaderException;
@@ -20,8 +22,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.NoHandlerFoundException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
-import java.nio.file.AccessDeniedException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -54,7 +56,9 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(AccessDeniedException.class)
     protected ErrorResponse handleAccessDeniedException(AccessDeniedException e) {
         log.warn("handleAccessDeniedException : {}", e.getMessage());
-        return ErrorResponse.of(String.valueOf(StatusCode.FORBIDDEN.getCode()), e.getMessage());
+        CausedBy causedBy = CausedBy.of(StatusCode.FORBIDDEN, ReasonCode.ACCESS_TO_THE_REQUESTED_RESOURCE_IS_FORBIDDEN);
+
+        return ErrorResponse.of(causedBy.getCode(), causedBy.getReason());
     }
 
     /**
@@ -151,6 +155,20 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(NoHandlerFoundException.class)
     protected ErrorResponse handleNoHandlerFoundException(NoHandlerFoundException e) {
         log.warn("handleNoHandlerFoundException : {}", e.getMessage());
+
+        String code = String.valueOf(StatusCode.NOT_FOUND.getCode() * 10 + ReasonCode.INVALID_URL_OR_ENDPOINT.getCode());
+        return ErrorResponse.of(code, e.getMessage());
+    }
+
+    /**
+     * 존재하지 않는 URL 호출 시
+     *
+     * @see NoHandlerFoundException
+     */
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(NoResourceFoundException.class)
+    protected ErrorResponse handleNoResourceFoundException(NoResourceFoundException e) {
+        log.warn("handleNoResourceFoundException : {}", e.getMessage());
 
         String code = String.valueOf(StatusCode.NOT_FOUND.getCode() * 10 + ReasonCode.INVALID_URL_OR_ENDPOINT.getCode());
         return ErrorResponse.of(code, e.getMessage());

@@ -81,4 +81,14 @@ public class SecurityUserDetails implements UserDetails {
     public boolean isEnabled() {
         throw new UnsupportedOperationException();
     }
+
+    @Override
+    public String toString() {
+        return "SecurityUserDetails{" +
+                "userId=" + userId +
+                ", username='" + username + '\'' +
+                ", authorities=" + authorities +
+                ", accountNonLocked=" + accountNonLocked +
+                '}';
+    }
 }
