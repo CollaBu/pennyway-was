@@ -99,7 +99,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     /**
      * UserDetailsService를 통해 SecurityUser를 가져오는 메서드
      */
-    private UserDetails getUserDetails(final String accessToken) {
+    private UserDetails getUserDetails(String accessToken) {
         JwtClaims claims = accessTokenProvider.getJwtClaimsFromToken(accessToken);
         String userId = (String) claims.getClaims().get(AccessTokenClaimKeys.USER_ID.getValue());
 
