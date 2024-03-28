@@ -8,6 +8,7 @@ import kr.co.pennyway.api.common.security.jwt.access.AccessTokenClaimKeys;
 import kr.co.pennyway.domain.common.redis.forbidden.ForbiddenTokenService;
 import kr.co.pennyway.infra.common.exception.JwtErrorCode;
 import kr.co.pennyway.infra.common.exception.JwtErrorException;
+import kr.co.pennyway.infra.common.jwt.JwtClaims;
 import kr.co.pennyway.infra.common.jwt.JwtProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -99,8 +100,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
      * UserDetailsService를 통해 SecurityUser를 가져오는 메서드
      */
     private UserDetails getUserDetails(final String accessToken) {
-        Long userId = (Long) accessTokenProvider.getJwtClaimsFromToken(accessToken).getClaims().get(AccessTokenClaimKeys.USER_ID.getValue());
-        return userDetailService.loadUserByUsername(userId.toString());
+        JwtClaims claims = accessTokenProvider.getJwtClaimsFromToken(accessToken);
+        String userId = (String) claims.getClaims().get(AccessTokenClaimKeys.USER_ID.getValue());
+
+        return userDetailService.loadUserByUsername(userId);
     }
 
     /**
