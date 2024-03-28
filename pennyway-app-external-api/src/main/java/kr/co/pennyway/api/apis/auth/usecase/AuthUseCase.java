@@ -61,6 +61,10 @@ public class AuthUseCase {
         return Pair.of(user.getId(), jwtAuthHelper.createToken(user));
     }
 
+    public Pair<Long, Jwts> refresh(String refreshToken) {
+        return jwtAuthHelper.refresh(refreshToken);
+    }
+
     private Pair<Boolean, String> checkOauthUserNotGeneralSignUp(String phone) {
         Pair<Boolean, String> isGeneralSignUpAllowed = userSyncMapper.isGeneralSignUpAllowed(phone);
 
