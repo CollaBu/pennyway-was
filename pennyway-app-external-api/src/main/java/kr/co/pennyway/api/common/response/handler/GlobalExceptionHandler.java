@@ -2,6 +2,7 @@ package kr.co.pennyway.api.common.response.handler;
 
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import kr.co.pennyway.api.common.response.ErrorResponse;
+import kr.co.pennyway.common.exception.CausedBy;
 import kr.co.pennyway.common.exception.GlobalErrorException;
 import kr.co.pennyway.common.exception.ReasonCode;
 import kr.co.pennyway.common.exception.StatusCode;
@@ -11,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.HttpMessageNotWritableException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingRequestHeaderException;
@@ -21,7 +23,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
-import java.nio.file.AccessDeniedException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -54,7 +55,9 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(AccessDeniedException.class)
     protected ErrorResponse handleAccessDeniedException(AccessDeniedException e) {
         log.warn("handleAccessDeniedException : {}", e.getMessage());
-        return ErrorResponse.of(String.valueOf(StatusCode.FORBIDDEN.getCode()), e.getMessage());
+        CausedBy causedBy = CausedBy.of(StatusCode.FORBIDDEN, ReasonCode.ACCESS_TO_THE_REQUESTED_RESOURCE_IS_FORBIDDEN);
+
+        return ErrorResponse.of(causedBy.getCode(), causedBy.getReason());
     }
 
     /**
