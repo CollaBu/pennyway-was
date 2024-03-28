@@ -1,5 +1,8 @@
 package kr.co.pennyway.api.config.security;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import kr.co.pennyway.api.common.security.handler.JwtAccessDeniedHandler;
+import kr.co.pennyway.api.common.security.handler.JwtAuthenticationEntryPoint;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
@@ -10,7 +13,9 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -26,10 +31,21 @@ public class SecurityConfig {
             // Swagger
             "/api-docs/**", "/v3/api-docs/**", "/swagger-ui/**", "/swagger",
     };
+    private final ObjectMapper objectMapper;
 
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public AccessDeniedHandler accessDeniedHandler() {
+        return new JwtAccessDeniedHandler(objectMapper);
+    }
+
+    @Bean
+    public AuthenticationEntryPoint authenticationEntryPoint() {
+        return new JwtAuthenticationEntryPoint(objectMapper);
     }
 
     @Bean
