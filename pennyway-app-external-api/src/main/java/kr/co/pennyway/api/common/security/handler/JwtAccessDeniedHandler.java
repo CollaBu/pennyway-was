@@ -22,7 +22,7 @@ public class JwtAccessDeniedHandler implements AccessDeniedHandler {
 
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
-        log.error("handle error: {}", accessDeniedException.getMessage());
+        log.warn("handle error: {}", accessDeniedException.getMessage());
         CausedBy causedBy = CausedBy.of(StatusCode.FORBIDDEN, ReasonCode.ACCESS_TO_THE_REQUESTED_RESOURCE_IS_FORBIDDEN);
 
         response.setContentType("application/json;charset=UTF-8");
