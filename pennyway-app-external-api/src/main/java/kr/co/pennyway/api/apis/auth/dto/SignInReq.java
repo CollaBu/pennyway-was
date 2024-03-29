@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class SignInReq {
+    @Schema(title = "로그인 요청")
     public record General(
             @Schema(description = "아이디", example = "pennyway")
             @NotBlank(message = "아이디를 입력해주세요")
