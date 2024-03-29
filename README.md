@@ -1,9 +1,11 @@
 ## 💰 Pennyway
+
 > 지출 관리 SNS 플랫폼
 
 | Version # | Revision Date | Description   | Author |
 |:---------:|:-------------:|:--------------|:------:|
-|  v0.0.1   |  2024.03.07   | 프로젝트 기본 설명 작성 | 양재서 |
+|  v0.0.1   |  2024.03.07   | 프로젝트 기본 설명 작성 |  양재서   |
+|  v0.0.2   |  2024.03.29   | ERD 추가        |  양재서   |
 
 <br/>
 
@@ -38,7 +40,9 @@
 <br/>
 
 ## 🌳 Branch Convention
+
 > 💡 Git-Flow 전략을 사용합니다.
+
 - main
     - 배포 가능한 상태의 코드만을 관리하는 프로덕션용 브랜치
     - PM(양재서)의 승인 후 병합 가능
@@ -55,7 +59,9 @@
 <br/>
 
 ## 🤝 Commit Convention
+
 > 💡 angular commit convention
+
 - feat: 신규 기능 추가
 - fix: 버그 수정
 - docs: 문서 수정
@@ -68,6 +74,7 @@
 <br/>
 
 ## 📌 Architecture
+
 ### 1️⃣ System Architecture
 
 <div align="center">
@@ -89,13 +96,15 @@
 ### 4️⃣ ERD
 
 <div align="center">
-  <img src="" width="600">
+  <img src="https://github.com/CollaBu/pennyway-was/assets/96044622/f053b24e-cc1b-4f71-9da6-669f03a98d58" width="600">
 </div>
 
 <br/>
 
 ## 📗 Tech Stack
+
 ### 1️⃣ Framework & Library
+
 - JDK 17
 - SpringBoot 3.2.3
 - SpringBoot Security 6.2.2
@@ -108,13 +117,16 @@
 - OpenFeign 4.0.6
 
 ### 2️⃣ Infrastructure Architecture
+
 - Gradle 7.6.4
 
 ### 3️⃣ Multi Module Architecture
+
 - MySQL 8
 - Redis 7.0
 
 ### 4️⃣ ERD
+
 - AWS EC2 (for Build Server)
 - AWS GW
 - AWS S3
