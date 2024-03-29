@@ -17,8 +17,8 @@ import org.springframework.web.filter.ForwardedHeaderFilter;
 @Configuration
 @OpenAPIDefinition(
         servers = {
-                @Server(url = "${pennyway.domain.local}", description = "Local Server"),
-                @Server(url = "${pennyway.domain.dev}", description = "Develop Server")
+                @Server(url = "${pennyway.server.domain.local}", description = "Local Server"),
+                @Server(url = "${pennyway.server.domain.dev}", description = "Develop Server")
         }
 )
 @RequiredArgsConstructor
