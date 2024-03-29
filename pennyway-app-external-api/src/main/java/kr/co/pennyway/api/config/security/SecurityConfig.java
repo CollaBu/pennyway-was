@@ -37,7 +37,7 @@ public class SecurityConfig {
     private final CorsConfigurationSource corsConfigurationSource;
     private final AccessDeniedHandler accessDeniedHandler;
     private final AuthenticationEntryPoint authenticationEntryPoint;
-    
+
     @Bean
     @Profile({"local", "dev", "test"})
     @Order(SecurityProperties.BASIC_AUTH_ORDER)
@@ -46,7 +46,7 @@ public class SecurityConfig {
                 .cors((cors) -> cors.configurationSource(corsConfigurationSource))
                 .authorizeHttpRequests(
                         auth -> defaultAuthorizeHttpRequests(auth)
-                                .requestMatchers(ANONYMOUS_ENDPOINTS).anonymous()
+                                .requestMatchers(READ_ONLY_PUBLIC_ENDPOINTS).permitAll()
                                 .anyRequest().authenticated()
                 ).build();
     }
@@ -81,6 +81,6 @@ public class SecurityConfig {
             AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry auth) {
         return auth.requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                 .requestMatchers(HttpMethod.OPTIONS, "*").permitAll()
-                .requestMatchers(HttpMethod.GET, READ_ONLY_PUBLIC_ENDPOINTS).permitAll();
+                .requestMatchers(ANONYMOUS_ENDPOINTS).anonymous();
     }
 }
