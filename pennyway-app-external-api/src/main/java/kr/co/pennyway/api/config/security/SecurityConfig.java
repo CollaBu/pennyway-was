@@ -9,12 +9,15 @@ import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.web.AbstractRequestMatcherRegistry;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -28,11 +31,13 @@ import org.springframework.web.cors.CorsConfigurationSource;
 @ConditionalOnDefaultWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-    private static final String[] publicReadOnlyPublicEndpoints = {
+    private static final String[] READ_ONLY_PUBLIC_ENDPOINTS = {
             "/favicon.ico",
             // Swagger
             "/api-docs/**", "/v3/api-docs/**", "/swagger-ui/**", "/swagger",
     };
+    private static final String[] ANONYMOUS_ENDPOINTS = {"/v1/auth/**"};
+    
     private final ObjectMapper objectMapper;
     private final SecurityAdapterConfig securityAdapterConfig;
     private final CorsConfigurationSource corsConfigurationSource;
@@ -53,28 +58,48 @@ public class SecurityConfig {
     }
 
     @Bean
+    @Profile({"local", "dev", "test"})
     @Order(SecurityProperties.BASIC_AUTH_ORDER)
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.csrf(AbstractHttpConfigurer::disable)
-                .httpBasic(AbstractHttpConfigurer::disable)
+    public SecurityFilterChain filterChainDev(HttpSecurity http) throws Exception {
+        return defaultSecurity(http)
                 .cors((cors) -> cors.configurationSource(corsConfigurationSource))
-                .formLogin(AbstractHttpConfigurer::disable)
-                .logout(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(
+                        auth -> defaultAuthorizeHttpRequests(auth)
+                                .requestMatchers(ANONYMOUS_ENDPOINTS).anonymous()
+                                .anyRequest().authenticated()
+                ).build();
+    }
+
+    @Bean
+    @Profile({"prod"})
+    @Order(SecurityProperties.BASIC_AUTH_ORDER)
+    public SecurityFilterChain filterChainProd(HttpSecurity http) throws Exception {
+        return defaultSecurity(http)
+                .cors(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(
+                        auth -> defaultAuthorizeHttpRequests(auth).anyRequest().authenticated()
+                ).build();
+    }
+
+    private HttpSecurity defaultSecurity(HttpSecurity http) throws Exception {
+        return http.httpBasic(AbstractHttpConfigurer::disable)
+                .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement((sessionManagement) ->
                         sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .formLogin(AbstractHttpConfigurer::disable)
+                .logout(AbstractHttpConfigurer::disable)
                 .with(securityAdapterConfig, Customizer.withDefaults())
-                .authorizeHttpRequests(
-                        auth -> auth.requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
-                                .requestMatchers(HttpMethod.OPTIONS, "*").permitAll()
-                                .requestMatchers(HttpMethod.GET, publicReadOnlyPublicEndpoints).permitAll()
-                                .anyRequest().permitAll()
-                )
                 .exceptionHandling(
                         exception -> exception
                                 .accessDeniedHandler(accessDeniedHandler())
                                 .authenticationEntryPoint(authenticationEntryPoint())
                 );
+    }
 
-        return http.build();
+    private AbstractRequestMatcherRegistry<AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizedUrl> defaultAuthorizeHttpRequests(
+            AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry auth) {
+        return auth.requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
+                .requestMatchers(HttpMethod.OPTIONS, "*").permitAll()
+                .requestMatchers(HttpMethod.GET, READ_ONLY_PUBLIC_ENDPOINTS).permitAll();
     }
 }
