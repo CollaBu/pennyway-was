@@ -1,8 +1,5 @@
 package kr.co.pennyway.api.config.security;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import kr.co.pennyway.api.common.security.handler.JwtAccessDeniedHandler;
-import kr.co.pennyway.api.common.security.handler.JwtAuthenticationEntryPoint;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.ConditionalOnDefaultWebSecurity;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
@@ -19,8 +16,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
@@ -37,26 +32,12 @@ public class SecurityConfig {
             "/api-docs/**", "/v3/api-docs/**", "/swagger-ui/**", "/swagger",
     };
     private static final String[] ANONYMOUS_ENDPOINTS = {"/v1/auth/**"};
-    
-    private final ObjectMapper objectMapper;
+
     private final SecurityAdapterConfig securityAdapterConfig;
     private final CorsConfigurationSource corsConfigurationSource;
-
-    @Bean
-    public PasswordEncoder bCryptPasswordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
-    @Bean
-    public AccessDeniedHandler accessDeniedHandler() {
-        return new JwtAccessDeniedHandler(objectMapper);
-    }
-
-    @Bean
-    public AuthenticationEntryPoint authenticationEntryPoint() {
-        return new JwtAuthenticationEntryPoint(objectMapper);
-    }
-
+    private final AccessDeniedHandler accessDeniedHandler;
+    private final AuthenticationEntryPoint authenticationEntryPoint;
+    
     @Bean
     @Profile({"local", "dev", "test"})
     @Order(SecurityProperties.BASIC_AUTH_ORDER)
@@ -91,8 +72,8 @@ public class SecurityConfig {
                 .with(securityAdapterConfig, Customizer.withDefaults())
                 .exceptionHandling(
                         exception -> exception
-                                .accessDeniedHandler(accessDeniedHandler())
-                                .authenticationEntryPoint(authenticationEntryPoint())
+                                .accessDeniedHandler(accessDeniedHandler)
+                                .authenticationEntryPoint(authenticationEntryPoint)
                 );
     }
 
