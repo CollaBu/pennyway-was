@@ -4,11 +4,6 @@ spring:
       local: common, domain, infra
       dev: common, domain, infra
 
-pennyway:
-  domain:
-    local: ${PENNYWAY_DOMAIN_LOCAL}
-    dev: ${PENNYWAY_DOMAIN_DEV}
-
 jwt:
   secret-key:
     access-token: ${JWT_ACCESS_SECRET_KEY}
