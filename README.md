@@ -96,7 +96,7 @@
 ### 4️⃣ ERD
 
 <div align="center">
-  <img src="https://github.com/CollaBu/pennyway-was/assets/96044622/f053b24e-cc1b-4f71-9da6-669f03a98d58" width="600">
+  <img src="https://github.com/CollaBu/pennyway-was/assets/96044622/f053b24e-cc1b-4f71-9da6-669f03a98d58" width="650">
 </div>
 
 <br/>
@@ -107,29 +107,34 @@
 
 - JDK 17
 - SpringBoot 3.2.3
-- SpringBoot Security 6.2.2
+- Spring Boot Starter Security 3.2.4
 - Spring Data JPA 3.2.3
-- Spring Doc Open API 2.3.0
+- QueryDsl 5.0.0
+- Spring Doc Open API 2.4.0
 - Lombok 1.18.30
 - [JUnit 5](https://junit.org/junit5/docs/current/user-guide/)
-- jjwt 0.11.5
+- jjwt 0.12.5
 - httpclient5 5.2.25.RELEASE
 - OpenFeign 4.0.6
 
-### 2️⃣ Infrastructure Architecture
+### 2️⃣ Build Tools
 
 - Gradle 7.6.4
 
-### 3️⃣ Multi Module Architecture
+### 3️⃣ Database
 
 - MySQL 8
-- Redis 7.0
+- Redis 7.2.4
 
-### 4️⃣ ERD
+### 4️⃣ Infra
 
-- AWS EC2 (for Build Server)
-- AWS GW
+- AWS EC2 (for Build Server, Bastion Server)
+- AWS NAT Gateway
 - AWS S3
+- AWS Route53
+- AWS VPC
+- AWS Elastic Load Balancer
+- AWS SNS
 - Docker & Docker-compose
 - Ngnix
 - GitHub Actions
