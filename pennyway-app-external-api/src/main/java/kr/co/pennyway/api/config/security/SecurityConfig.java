@@ -33,7 +33,7 @@ public class SecurityConfig {
             "/api-docs/**", "/v3/api-docs/**", "/swagger-ui/**", "/swagger",
     };
     private final ObjectMapper objectMapper;
-    private final JwtSecurityConfig jwtSecurityConfig;
+    private final SecurityAdapterConfig securityAdapterConfig;
     private final CorsConfigurationSource corsConfigurationSource;
 
     @Bean
@@ -61,7 +61,7 @@ public class SecurityConfig {
                 .logout(AbstractHttpConfigurer::disable)
                 .sessionManagement((sessionManagement) ->
                         sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .with(jwtSecurityConfig, Customizer.withDefaults())
+                .with(securityAdapterConfig, Customizer.withDefaults())
                 .authorizeHttpRequests(
                         auth -> auth.requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                                 .requestMatchers(HttpMethod.OPTIONS, "*").permitAll()
