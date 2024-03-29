@@ -5,9 +5,10 @@ spring:
       dev: common
 
 pennyway:
-  domain:
-    local: ${PENNYWAY_DOMAIN_LOCAL}
-    dev: ${PENNYWAY_DOMAIN_DEV}
+  server:
+    domain:
+      local: ${PENNYWAY_DOMAIN_LOCAL}
+      dev: ${PENNYWAY_DOMAIN_DEV}
 
 ---
 spring:
