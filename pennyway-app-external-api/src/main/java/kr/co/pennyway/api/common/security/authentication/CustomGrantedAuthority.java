@@ -3,7 +3,6 @@ package kr.co.pennyway.api.common.security.authentication;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.util.Assert;
 
 import java.io.Serial;
@@ -31,8 +30,8 @@ public final class CustomGrantedAuthority implements GrantedAuthority, Serializa
         if (this == obj) {
             return true;
         }
-        if (obj instanceof SimpleGrantedAuthority sga) {
-            return this.role.equals(sga.getAuthority());
+        if (obj instanceof CustomGrantedAuthority cga) {
+            return this.role.equals(cga.getAuthority());
         }
         return false;
     }
