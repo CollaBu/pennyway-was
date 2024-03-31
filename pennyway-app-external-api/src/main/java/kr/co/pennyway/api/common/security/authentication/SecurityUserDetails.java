@@ -2,21 +2,27 @@ package kr.co.pennyway.api.common.security.authentication;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import kr.co.pennyway.domain.domains.user.domain.User;
-import kr.co.pennyway.domain.domains.user.type.Role;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Arrays;
+import java.io.Serial;
 import java.util.Collection;
+import java.util.List;
 
 @Getter
-public class SecurityUserDetails implements UserDetails {
-    private final Long userId;
-    private final String username;
-    private final Collection<? extends GrantedAuthority> authorities;
-    private final boolean accountNonLocked;
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class SecurityUserDetails implements UserDetails {
+    @Serial
+    private static final long serialVersionUID = 1L;
+
+    private Long userId;
+    private String username;
+    private Collection<? extends GrantedAuthority> authorities;
+    private boolean accountNonLocked;
 
     @JsonIgnore
     private boolean enabled;
@@ -39,10 +45,7 @@ public class SecurityUserDetails implements UserDetails {
         return SecurityUserDetails.builder()
                 .userId(user.getId())
                 .username(user.getUsername())
-                .authorities(Arrays.stream(Role.values())
-                        .filter(roleType -> roleType == user.getRole())
-                        .map(roleType -> (GrantedAuthority) roleType::getType)
-                        .toList())
+                .authorities(List.of(new CustomGrantedAuthority(user.getRole().getType())))
                 .accountNonLocked(user.getLocked())
                 .build();
     }
@@ -91,4 +94,5 @@ public class SecurityUserDetails implements UserDetails {
                 ", accountNonLocked=" + accountNonLocked +
                 '}';
     }
+
 }

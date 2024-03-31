@@ -4,6 +4,12 @@ spring:
       local: common
       dev: common
 
+pennyway:
+  server:
+    domain:
+      local: ${PENNYWAY_DOMAIN_LOCAL}
+      dev: ${PENNYWAY_DOMAIN_DEV}
+
 ---
 spring:
   config:

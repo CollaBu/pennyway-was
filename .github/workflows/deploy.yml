@@ -55,8 +55,8 @@ jobs:
       - name: docker build and push
         run: |
           docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-          docker build -t jinlee1703/pennyway-was .
-          docker push jinlee1703/pennyway-was
+          docker build -t pennyway/pennyway-was .
+          docker push pennyway/pennyway-was
 
       # 5. AWS SSM을 통한 Run-Command (Docker 이미지 pull 후 docker-compose를 통한 실행)
       - name: AWS SSM Send-Command
@@ -71,5 +71,5 @@ jobs:
           command: |
             docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
             docker system prune -a -f
-            docker pull jinlee1703/pennyway-was
+            docker pull pennyway/pennyway-was
             docker-compose up -d

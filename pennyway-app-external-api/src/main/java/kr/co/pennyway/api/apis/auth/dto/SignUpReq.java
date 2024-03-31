@@ -40,7 +40,7 @@ public class SignUpReq {
         }
     }
 
-    @Schema(title = "일반 회원가입 요청 DTO")
+    @Schema(name = "signUpReqGeneral", title = "일반 회원가입 요청 DTO")
     public record General(
             @Schema(description = "아이디", example = "pennyway")
             @NotBlank(message = "아이디를 입력해주세요")
