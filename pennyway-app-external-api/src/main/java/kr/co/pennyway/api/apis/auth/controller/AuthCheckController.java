@@ -24,7 +24,7 @@ public class AuthCheckController {
 
     @Operation(summary = "닉네임 중복 검사")
     @GetMapping("/username")
-    @PreAuthorize("isAnonymous()")
+    @PreAuthorize("permitAll()")
     public ResponseEntity<?> checkUsername(@RequestParam @Validated String username) {
         return ResponseEntity.ok(SuccessResponse.from("isDuplicate", authCheckUseCase.checkUsernameDuplicate(username)));
     }
