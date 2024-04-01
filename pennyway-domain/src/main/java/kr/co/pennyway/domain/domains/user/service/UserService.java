@@ -37,4 +37,9 @@ public class UserService {
     public boolean isExistUser(Long id) {
         return userRepository.existsById(id);
     }
+
+    @Transactional(readOnly = true)
+    public boolean isExistNickname(String username) {
+        return userRepository.existsByUsername(username);
+    }
 }
