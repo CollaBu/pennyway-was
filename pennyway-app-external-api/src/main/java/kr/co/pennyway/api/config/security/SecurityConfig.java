@@ -31,7 +31,7 @@ public class SecurityConfig {
             // Swagger
             "/api-docs/**", "/v3/api-docs/**", "/swagger-ui/**", "/swagger",
     };
-    private static final String[] ANONYMOUS_ENDPOINTS = {"/v1/auth/**"};
+    private static final String[] ANONYMOUS_ENDPOINTS = {"/v1/auth/**", "/v1/duplicate/**"};
 
     private final SecurityAdapterConfig securityAdapterConfig;
     private final CorsConfigurationSource corsConfigurationSource;
