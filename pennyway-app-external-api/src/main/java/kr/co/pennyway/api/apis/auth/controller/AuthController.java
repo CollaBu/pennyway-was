@@ -32,14 +32,14 @@ public class AuthController {
     private final AuthUseCase authUseCase;
     private final CookieUtil cookieUtil;
 
-    @Operation(summary = "인증번호 전송")
+    @Operation(summary = "일반 회원가입 인증번호 전송")
     @PostMapping("/phone")
     @PreAuthorize("isAnonymous()")
     public ResponseEntity<?> sendCode(@RequestBody @Validated PhoneVerificationDto.PushCodeReq request) {
         return ResponseEntity.ok(SuccessResponse.from("sms", authUseCase.sendCode(request)));
     }
 
-    @Operation(summary = "인증번호 검증")
+    @Operation(summary = "일반 회원가입 인증번호 검증")
     @PostMapping("/phone/verification")
     @PreAuthorize("isAnonymous()")
     public ResponseEntity<?> verifyCode(@RequestBody @Validated PhoneVerificationDto.VerifyCodeReq request) {
