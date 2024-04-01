@@ -26,12 +26,9 @@ import org.springframework.web.cors.CorsConfigurationSource;
 @ConditionalOnDefaultWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-    private static final String[] READ_ONLY_PUBLIC_ENDPOINTS = {
-            "/favicon.ico",
-            // Swagger
-            "/api-docs/**", "/v3/api-docs/**", "/swagger-ui/**", "/swagger",
-    };
-    private static final String[] ANONYMOUS_ENDPOINTS = {"/v1/auth/**", "/v1/duplicate/**"};
+    private static final String[] READ_ONLY_PUBLIC_ENDPOINTS = {"/favicon.ico", "/v1/duplicate/**"};
+    private static final String[] ANONYMOUS_ENDPOINTS = {"/v1/auth/**"};
+    private static final String[] SWAGGER_ENDPOINTS = {"/api-docs/**", "/v3/api-docs/**", "/swagger-ui/**", "/swagger",};
 
     private final SecurityAdapterConfig securityAdapterConfig;
     private final CorsConfigurationSource corsConfigurationSource;
@@ -46,7 +43,7 @@ public class SecurityConfig {
                 .cors((cors) -> cors.configurationSource(corsConfigurationSource))
                 .authorizeHttpRequests(
                         auth -> defaultAuthorizeHttpRequests(auth)
-                                .requestMatchers(READ_ONLY_PUBLIC_ENDPOINTS).permitAll()
+                                .requestMatchers(SWAGGER_ENDPOINTS).permitAll()
                                 .anyRequest().authenticated()
                 ).build();
     }
@@ -81,6 +78,7 @@ public class SecurityConfig {
             AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry auth) {
         return auth.requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                 .requestMatchers(HttpMethod.OPTIONS, "*").permitAll()
+                .requestMatchers(HttpMethod.GET, READ_ONLY_PUBLIC_ENDPOINTS).permitAll()
                 .requestMatchers(ANONYMOUS_ENDPOINTS).anonymous();
     }
 }
