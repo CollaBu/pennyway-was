@@ -14,6 +14,6 @@ public class AuthCheckUseCase {
 
     @Transactional(readOnly = true)
     public boolean checkUsernameDuplicate(String nickname) {
-        return userService.isExistNickname(nickname);
+        return userService.isExistUsername(nickname);
     }
 }

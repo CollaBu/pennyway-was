@@ -39,7 +39,7 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public boolean isExistNickname(String username) {
+    public boolean isExistUsername(String username) {
         return userRepository.existsByUsername(username);
     }
 }
