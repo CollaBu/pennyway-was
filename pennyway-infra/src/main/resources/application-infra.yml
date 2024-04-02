@@ -10,6 +10,19 @@ pennyway:
       local: ${PENNYWAY_DOMAIN_LOCAL}
       dev: ${PENNYWAY_DOMAIN_DEV}
 
+oauth2:
+  client:
+    provider:
+      kakao:
+        jwks-uri: ${KAKAO_JWKS_URI}
+        secret: ${KAKAO_CLIENT_SECRET}
+      google:
+        jwks-uri: ${GOOGLE_JWKS_URI}
+        secret: ${GOOGLE_CLIENT_SECRET}
+      apple:
+        jwks-uri: ${APPLE_JWKS_URI}
+        secret: ${APPLE_CLIENT_SECRET}
+
 ---
 spring:
   config:
