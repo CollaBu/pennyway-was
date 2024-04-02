@@ -10,5 +10,5 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "oauth2.client.provider.apple")
 public class AppleOidcProperties implements OauthOidcClientProperties {
     private final String jwksUri;
-    private final String clientSecret;
+    private final String secret;
 }
