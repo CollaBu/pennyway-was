@@ -7,8 +7,8 @@ import java.util.List;
 
 @Getter
 @NoArgsConstructor
-public class OIDCPublicKeyResponse {
-    List<OIDCPublicKey> keys;
+public class OidcPublicKeyResponse {
+    List<OidcPublicKey> keys;
 
     @Override
     public String toString() {

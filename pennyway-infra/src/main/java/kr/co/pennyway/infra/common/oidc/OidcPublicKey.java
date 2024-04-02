@@ -1,6 +1,6 @@
 package kr.co.pennyway.infra.common.oidc;
 
-public record OIDCPublicKey(
+public record OidcPublicKey(
         String kid,
         String kty,
         String alg,

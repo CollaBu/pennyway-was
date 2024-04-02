@@ -1,6 +1,6 @@
 package kr.co.pennyway.infra.common.oidc;
 
-public record OIDCDecodePayload(
+public record OidcDecodePayload(
         /* issuer */
         String iss,
         /* client id */

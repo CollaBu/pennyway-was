@@ -1,6 +1,6 @@
 package kr.co.pennyway.infra.common.oidc;
 
-public interface OauthOIDCProvider {
+public interface OauthOidcProvider {
     /**
      * ID Token의 header에서 kid를 추출하는 메서드
      *
@@ -20,5 +20,5 @@ public interface OauthOIDCProvider {
      * @param exponent : 공개키 지수(e)
      * @return OIDCDecodePayload : ID Token의 payload
      */
-    OIDCDecodePayload getOIDCTokenBody(String token, String modulus, String exponent);
+    OidcDecodePayload getOIDCTokenBody(String token, String modulus, String exponent);
 }

@@ -17,7 +17,7 @@ import java.util.Base64;
 
 @Slf4j
 @Component
-public class OauthOIDCProviderImpl implements OauthOIDCProvider {
+public class OauthOidcProviderImpl implements OauthOidcProvider {
     private static final String KID = "kid";
     private static final String RSA = "RSA";
 
@@ -27,12 +27,12 @@ public class OauthOIDCProviderImpl implements OauthOIDCProvider {
     }
 
     @Override
-    public OIDCDecodePayload getOIDCTokenBody(String token, String modulus, String exponent) {
+    public OidcDecodePayload getOIDCTokenBody(String token, String modulus, String exponent) {
         Claims body = getOIDCTokenJws(token, modulus, exponent).getPayload();
         String aud = body.getAudience().iterator().next(); // TODO: 이전 버전과 다르게 aud가 Set<String>으로 변경되어 있음. 테스트 필요
         log.debug("aud : {}", aud);
 
-        return new OIDCDecodePayload(
+        return new OidcDecodePayload(
                 body.getIssuer(),
                 aud,
                 body.getSubject(),
