@@ -3,7 +3,9 @@ package kr.co.pennyway.api.apis.auth.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.co.pennyway.api.apis.auth.dto.PhoneVerificationDto;
 import kr.co.pennyway.api.apis.auth.dto.SignInReq;
@@ -39,13 +41,35 @@ public class OauthController {
     @Parameter(name = "provider", description = "소셜 제공자", examples = {
             @ExampleObject(name = "카카오", value = "kakao"), @ExampleObject(name = "애플", value = "apple"), @ExampleObject(name = "구글", value = "google")
     }, required = true, in = ParameterIn.QUERY)
+    @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", examples = {
+            @ExampleObject(name = "성공 - 기존 계정 있음", value = """
+                    {
+                        "code": "2000",
+                        "data": {
+                            "user": {
+                                "id": 1
+                            }
+                        }
+                    }
+                    """),
+            @ExampleObject(name = "성공 - 기존 계정 없음 (id -1인 경우) - [2]로 진행", value = """
+                    {
+                        "code": "2000",
+                        "data": {
+                            "user": {
+                                "id": -1
+                            }
+                        }
+                    }
+                    """)
+    }))
     @PostMapping("/sign-in")
     @PreAuthorize("isAnonymous()")
     public ResponseEntity<?> signIn(@RequestParam Provider provider, @RequestBody @Validated SignInReq.Oauth request) {
         Pair<Long, Jwts> userInfo = oauthUseCase.signIn(provider, request);
 
         if (userInfo.getLeft().equals(-1L)) {
-            return ResponseEntity.ok(SuccessResponse.from("message", "전화번호 인증 진행")); // TODO: 응답 수정
+            return ResponseEntity.ok(SuccessResponse.from("user", Map.of("id", -1)));
         }
         return createAuthenticatedResponse(userInfo);
     }
@@ -64,6 +88,27 @@ public class OauthController {
     @Parameter(name = "provider", description = "소셜 제공자", examples = {
             @ExampleObject(name = "카카오", value = "kakao"), @ExampleObject(name = "애플", value = "apple"), @ExampleObject(name = "구글", value = "google")
     }, required = true, in = ParameterIn.QUERY)
+    @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", examples = {
+            @ExampleObject(name = "성공 - 기존 계정 있음 - [4-1]로 진행", value = """
+                    {
+                        "code": "2000",
+                        "data": {
+                            "code": true,
+                            "existUser": true,
+                            "username": "pennyway"
+                        }
+                    }
+                    """),
+            @ExampleObject(name = "성공 - 기존 계정 없음 - [4-2]로 진행", value = """
+                    {
+                        "code": "2000",
+                        "data": {
+                            "code": true,
+                            "existUser": false
+                        }
+                    }
+                    """)
+    }))
     @PostMapping("/phone/verification")
     @PreAuthorize("isAnonymous()")
     public ResponseEntity<?> verifyCode(@RequestParam Provider provider, @RequestBody @Validated PhoneVerificationDto.VerifyCodeReq request) {
