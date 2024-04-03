@@ -59,6 +59,10 @@ public class PhoneVerificationDto {
         public static VerifyCodeReq from(SignUpReq.Info request) {
             return new VerifyCodeReq(request.phone(), request.code());
         }
+
+        public static VerifyCodeReq from(SignUpReq.OauthInfo request) {
+            return new VerifyCodeReq(request.phone(), request.code());
+        }
     }
 
     @Schema(title = "인증번호 검증 응답 DTO")
