@@ -16,7 +16,7 @@ public enum PhoneVerificationType {
 
     private final String prefix;
 
-    public PhoneVerificationType getOauthSignUpTypeByProvider(Provider provider) {
+    public static PhoneVerificationType getOauthSignUpTypeByProvider(Provider provider) {
         return switch (provider) {
             case KAKAO -> OAUTH_SIGN_UP_KAKAO;
             case GOOGLE -> OAUTH_SIGN_UP_GOOGLE;
