@@ -110,7 +110,7 @@ public interface OauthApi {
                                 "message": "만료되었거나 등록되지 않은 휴대폰 정보입니다."
                             }
                             """),
-                    @ExampleObject(name = "만료 혹은 등록되지 않은 휴대폰", value = """
+                    @ExampleObject(name = "인증코드 불일치", value = """
                             {
                                 "code": "4010",
                                 "message": "인증코드가 일치하지 않습니다."
