@@ -5,7 +5,9 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import kr.co.pennyway.api.apis.auth.dto.PhoneVerificationDto;
 import kr.co.pennyway.api.apis.auth.dto.SignInReq;
+import kr.co.pennyway.api.apis.auth.dto.SignUpReq;
 import kr.co.pennyway.api.apis.auth.usecase.OauthUseCase;
 import kr.co.pennyway.api.common.response.SuccessResponse;
 import kr.co.pennyway.api.common.security.jwt.Jwts;
@@ -46,18 +48,54 @@ public class OauthController {
         Pair<Long, Jwts> userInfo = oauthUseCase.signIn(provider, request);
 
         if (userInfo.getLeft().equals(-1L)) {
-            return ResponseEntity.ok(SuccessResponse.from("message", "회원가입 진행"));
+            return ResponseEntity.ok(SuccessResponse.from("message", "전화번호 인증 진행")); // TODO: 응답 수정
         }
         return createAuthenticatedResponse(userInfo);
     }
 
-    // [2] 전화번호 인증
+    // [2] 인증번호 발송
+    // 전화번호 입력 -> 인증번호 발송
+    @Operation(summary = "[2] 인증번호 발송", description = "전화번호 입력 후 인증번호 발송")
+    @Parameter(name = "provider", description = "소셜 제공자", examples = {
+            @ExampleObject(name = "카카오", value = "kakao"), @ExampleObject(name = "애플", value = "apple"), @ExampleObject(name = "구글", value = "google")
+    }, required = true, in = ParameterIn.QUERY)
+    @PostMapping("/phone")
+    @PreAuthorize("isAnonymous()")
+    public ResponseEntity<?> sendCode(@RequestParam Provider provider, @RequestBody @Validated PhoneVerificationDto.PushCodeReq request) {
+        return ResponseEntity.ok(SuccessResponse.from("sms", oauthUseCase.sendCode(provider, request)));
+    }
+
+    // [3] 전화번호 인증
     // 전화번호 인증 -> 계정 존재하면 연동 -> 로그인
     // 전화번호 인증 -> 계정 없으면 회원가입
+    @Operation(summary = "[3] 전화번호 인증", description = "전화번호 인증 후 이미 계정이 존재하면 연동, 없으면 회원가입")
+    @Parameter(name = "provider", description = "소셜 제공자", examples = {
+            @ExampleObject(name = "카카오", value = "kakao"), @ExampleObject(name = "애플", value = "apple"), @ExampleObject(name = "구글", value = "google")
+    }, required = true, in = ParameterIn.QUERY)
+    @PostMapping("/phone/verification")
+    @PreAuthorize("isAnonymous()")
+    public ResponseEntity<?> verifyCode(@RequestParam Provider provider, @RequestBody @Validated PhoneVerificationDto.VerifyCodeReq request) {
+        Pair<Long, Jwts> userInfo = oauthUseCase.verifyCode(provider, request);
 
-    // [3] 소셜 회원가입
+        if (userInfo.getLeft().equals(-1L)) {
+            return ResponseEntity.ok(SuccessResponse.from("message", "회원가입 진행")); // TODO: 응답 수정
+        }
+        return createAuthenticatedResponse(userInfo);
+    }
+
+    // [4] 소셜 회원가입
     // 회원 정보 입력(이름, 아이디) -> 회원가입 -> 로그인
+    @Operation(summary = "[4] 소셜 회원가입", description = "회원 정보 입력 후 회원가입")
+    @Parameter(name = "provider", description = "소셜 제공자", examples = {
+            @ExampleObject(name = "카카오", value = "kakao"), @ExampleObject(name = "애플", value = "apple"), @ExampleObject(name = "구글", value = "google")
+    }, required = true, in = ParameterIn.QUERY)
+    @PostMapping("/sign-up")
+    @PreAuthorize("isAnonymous()")
+    public ResponseEntity<?> signUp(@RequestParam Provider provider, @RequestBody @Validated SignUpReq.Oauth request) {
+        Pair<Long, Jwts> userInfo = oauthUseCase.signUp(provider, request);
 
+        return createAuthenticatedResponse(userInfo);
+    }
 
     private ResponseEntity<?> createAuthenticatedResponse(Pair<Long, Jwts> userInfo) {
         ResponseCookie cookie = cookieUtil.createCookie("refreshToken", userInfo.getValue().refreshToken(), Duration.ofDays(7).toSeconds());
