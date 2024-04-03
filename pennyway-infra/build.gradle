@@ -1,5 +1,5 @@
-bootJar {enabled = false}
-jar {enabled = true}
+bootJar { enabled = false }
+jar { enabled = true }
 
 dependencies {
     implementation project(':pennyway-common')
@@ -11,4 +11,9 @@ dependencies {
 
     /* redis */
     api 'org.springframework.boot:spring-boot-starter-data-redis'
+
+    /* feign */
+    implementation platform("org.springframework.cloud:spring-cloud-dependencies:2023.0.1")
+    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign:4.1.1'
+    implementation 'io.github.openfeign:feign-okhttp:13.2'
 }

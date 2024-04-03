@@ -100,7 +100,7 @@ public class CacheConfig {
 
     @Bean
     @OidcCacheManager
-    public CacheManager oidcCacheManger(@InfraRedisConnectionFactory RedisConnectionFactory cf) {
+    public CacheManager oidcCacheManager(@InfraRedisConnectionFactory RedisConnectionFactory cf) {
         RedisCacheConfiguration config = RedisCacheConfiguration.defaultCacheConfig()
                 .serializeKeysWith(
                         RedisSerializationContext.SerializationPair.fromSerializer(
