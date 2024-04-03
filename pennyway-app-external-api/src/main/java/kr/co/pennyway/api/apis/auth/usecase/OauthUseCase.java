@@ -14,7 +14,6 @@ import kr.co.pennyway.infra.common.oidc.OidcDecodePayload;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
-import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @UseCase
@@ -24,7 +23,6 @@ public class OauthUseCase {
     private final JwtAuthHelper jwtAuthHelper;
     private UserOauthSignMapper userOauthSignMapper;
 
-    @Transactional(readOnly = true)
     public Pair<Long, Jwts> signIn(Provider provider, SignInReq.Oauth request) {
         OidcDecodePayload payload = oauthOidcHelper.getPayload(provider, request.idToken());
         log.info("payload : {}", payload);

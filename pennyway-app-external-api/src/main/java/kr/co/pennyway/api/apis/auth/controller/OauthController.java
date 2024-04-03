@@ -19,10 +19,7 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.Duration;
 import java.util.Map;
@@ -39,11 +36,11 @@ public class OauthController {
     // [1] 소셜 로그인
     // 등록된 provier -> login
     // 등록되지 않은 provider -> 전화번호 인증
-    @Operation(summary = "소셜 로그인")
+    @Operation(summary = "[1] 소셜 로그인", description = "기존에 Provider로 가입한 사용자는 로그인, 가입하지 않은 사용자는 전화번호 인증으로 이동")
     @Parameter(name = "provider", description = "소셜 제공자", examples = {
             @ExampleObject(name = "카카오", value = "kakao"), @ExampleObject(name = "애플", value = "apple"), @ExampleObject(name = "구글", value = "google")
     }, required = true, in = ParameterIn.QUERY)
-    @RequestMapping("/sign-in")
+    @PostMapping("/sign-in")
     @PreAuthorize("isAnonymous()")
     public ResponseEntity<?> signIn(@RequestParam Provider provider, @RequestBody @Validated SignInReq.Oauth request) {
         Pair<Long, Jwts> userInfo = oauthUseCase.signIn(provider, request);
