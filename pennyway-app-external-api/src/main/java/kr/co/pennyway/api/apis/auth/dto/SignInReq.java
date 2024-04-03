@@ -14,4 +14,12 @@ public class SignInReq {
             String password
     ) {
     }
+
+    @Schema(name = "signInReqOauth", title = "소셜 로그인 요청")
+    public record Oauth(
+            @Schema(description = "OIDC 토큰")
+            @NotBlank(message = "OIDC 토큰은 필수 입력값입니다.")
+            String idToken
+    ) {
+    }
 }
