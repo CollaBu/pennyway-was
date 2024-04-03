@@ -35,9 +35,6 @@ public class OauthController {
     private final OauthUseCase oauthUseCase;
     private final CookieUtil cookieUtil;
 
-    // [1] 소셜 로그인
-    // 등록된 provier -> login
-    // 등록되지 않은 provider -> 전화번호 인증
     @Operation(summary = "[1] 소셜 로그인", description = "기존에 Provider로 가입한 사용자는 로그인, 가입하지 않은 사용자는 전화번호 인증으로 이동")
     @Parameter(name = "provider", description = "소셜 제공자", examples = {
             @ExampleObject(name = "카카오", value = "kakao"), @ExampleObject(name = "애플", value = "apple"), @ExampleObject(name = "구글", value = "google")
@@ -53,8 +50,6 @@ public class OauthController {
         return createAuthenticatedResponse(userInfo);
     }
 
-    // [2] 인증번호 발송
-    // 전화번호 입력 -> 인증번호 발송
     @Operation(summary = "[2] 인증번호 발송", description = "전화번호 입력 후 인증번호 발송")
     @Parameter(name = "provider", description = "소셜 제공자", examples = {
             @ExampleObject(name = "카카오", value = "kakao"), @ExampleObject(name = "애플", value = "apple"), @ExampleObject(name = "구글", value = "google")
@@ -65,9 +60,6 @@ public class OauthController {
         return ResponseEntity.ok(SuccessResponse.from("sms", oauthUseCase.sendCode(provider, request)));
     }
 
-    // [3] 전화번호 인증
-    // 전화번호 인증 -> 계정 존재하면 연동 -> 로그인
-    // 전화번호 인증 -> 계정 없으면 회원가입
     @Operation(summary = "[3] 전화번호 인증", description = "전화번호 인증 후 이미 계정이 존재하면 연동, 없으면 회원가입")
     @Parameter(name = "provider", description = "소셜 제공자", examples = {
             @ExampleObject(name = "카카오", value = "kakao"), @ExampleObject(name = "애플", value = "apple"), @ExampleObject(name = "구글", value = "google")
@@ -88,8 +80,6 @@ public class OauthController {
         return createAuthenticatedResponse(oauthUseCase.signUp(provider, request.toOauthInfo()));
     }
 
-    // [4] 소셜 회원가입
-    // 회원 정보 입력(이름, 아이디) -> 회원가입 -> 로그인
     @Operation(summary = "[4-2] 소셜 회원가입", description = "회원 정보 입력 후 회원가입")
     @Parameter(name = "provider", description = "소셜 제공자", examples = {
             @ExampleObject(name = "카카오", value = "kakao"), @ExampleObject(name = "애플", value = "apple"), @ExampleObject(name = "구글", value = "google")
