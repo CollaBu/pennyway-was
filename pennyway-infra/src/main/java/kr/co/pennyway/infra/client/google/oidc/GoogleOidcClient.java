@@ -18,5 +18,5 @@ public interface GoogleOidcClient extends OauthOidcClient {
     @Override
     @Cacheable(value = "GoogleOauth", cacheManager = "oidcCacheManager")
     @GetMapping("/oauth2/v3/certs")
-    OidcPublicKeyResponse getOIDCPublicKey();
+    OidcPublicKeyResponse getOidcPublicKey();
 }

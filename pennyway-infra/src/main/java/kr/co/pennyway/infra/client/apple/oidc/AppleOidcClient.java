@@ -18,5 +18,5 @@ public interface AppleOidcClient extends OauthOidcClient {
     @Override
     @Cacheable(value = "AppleOauth", cacheManager = "oidcCacheManager")
     @GetMapping("/auth/keys")
-    OidcPublicKeyResponse getOIDCPublicKey();
+    OidcPublicKeyResponse getOidcPublicKey();
 }
