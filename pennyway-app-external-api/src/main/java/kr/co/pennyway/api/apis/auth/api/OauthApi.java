@@ -87,9 +87,11 @@ public interface OauthApi {
                             {
                                 "code": "2000",
                                 "data": {
-                                    "code": true,
-                                    "existUser": true,
-                                    "username": "pennyway"
+                                    "sms": {
+                                        "code": true,
+                                        "existUser": true,
+                                        "username": "pennyway"
+                                    }
                                 }
                             }
                             """),
@@ -97,25 +99,29 @@ public interface OauthApi {
                             {
                                 "code": "2000",
                                 "data": {
-                                    "code": true,
-                                    "existUser": false
+                                    "sms": {
+                                        "code": true,
+                                        "existUser": false
+                                    }
                                 }
                             }
                             """)
             })),
             @ApiResponse(responseCode = "401", content = @Content(mediaType = "application/json", examples = {
-                    @ExampleObject(name = "만료 혹은 등록되지 않은 휴대폰", value = """
-                            {
-                                "code": "4010",
-                                "message": "만료되었거나 등록되지 않은 휴대폰 정보입니다."
-                            }
-                            """),
                     @ExampleObject(name = "인증코드 불일치", value = """
                             {
                                 "code": "4010",
                                 "message": "인증코드가 일치하지 않습니다."
                             }
                             """)
+            })),
+            @ApiResponse(responseCode = "404", content = @Content(mediaType = "application/json", examples = {
+                    @ExampleObject(name = "만료 혹은 등록되지 않은 휴대폰", value = """
+                            {
+                                "code": "4042",
+                                "message": "만료되었거나 등록되지 않은 휴대폰 정보입니다."
+                            }
+                            """),
             }))
     })
     ResponseEntity<?> verifyCode(@RequestParam Provider provider, @RequestBody @Validated PhoneVerificationDto.VerifyCodeReq request);
