@@ -17,6 +17,9 @@ public class SignInReq {
 
     @Schema(name = "signInReqOauth", title = "소셜 로그인 요청")
     public record Oauth(
+            @Schema(description = "OAuth id")
+            @NotBlank(message = "OAuth id는 필수 입력값입니다.")
+            String oauthId,
             @Schema(description = "OIDC 토큰")
             @NotBlank(message = "OIDC 토큰은 필수 입력값입니다.")
             String idToken
