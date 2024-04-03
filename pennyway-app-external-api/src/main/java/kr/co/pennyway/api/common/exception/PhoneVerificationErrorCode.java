@@ -11,8 +11,10 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum PhoneVerificationErrorCode implements BaseErrorCode {
     // 401 Unauthorized
-    EXPIRED_OR_INVALID_PHONE(StatusCode.UNAUTHORIZED, ReasonCode.MISSING_OR_INVALID_AUTHENTICATION_CREDENTIALS, "만료되었거나 등록되지 않은 휴대폰 정보입니다."),
     IS_NOT_VALID_CODE(StatusCode.UNAUTHORIZED, ReasonCode.MISSING_OR_INVALID_AUTHENTICATION_CREDENTIALS, "인증코드가 일치하지 않습니다."),
+
+    // 404 Not Found
+    EXPIRED_OR_INVALID_PHONE(StatusCode.NOT_FOUND, ReasonCode.RESOURCE_DELETED_OR_MOVED, "만료되었거나 등록되지 않은 휴대폰 정보입니다."),
     ;
 
     private final StatusCode statusCode;
