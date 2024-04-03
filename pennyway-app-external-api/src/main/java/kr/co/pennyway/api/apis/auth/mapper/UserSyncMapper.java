@@ -1,6 +1,7 @@
 package kr.co.pennyway.api.apis.auth.mapper;
 
 import kr.co.pennyway.common.annotation.Mapper;
+import kr.co.pennyway.domain.domains.oauth.service.OauthService;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserSyncMapper {
     private final UserService userService;
+    private final OauthService oauthService;
 
     /**
      * 일반 회원가입이 가능한 유저인지 확인
@@ -44,4 +46,7 @@ public class UserSyncMapper {
 
         return Pair.of(Boolean.TRUE, user.get().getUsername());
     }
+
+    @Transactional
+    public
 }
