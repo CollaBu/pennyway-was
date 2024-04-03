@@ -2,6 +2,7 @@ package kr.co.pennyway.api.apis.auth.mapper;
 
 import kr.co.pennyway.common.annotation.Mapper;
 import kr.co.pennyway.domain.domains.oauth.service.OauthService;
+import kr.co.pennyway.domain.domains.oauth.type.Provider;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +27,6 @@ public class UserSyncMapper {
     /**
      * 일반 회원가입이 가능한 유저인지 확인
      *
-     * @param phone String : 전화번호
      * @return Pair<Boolean, String> : 이미 가입된 회원인지 여부 (TRUE: 가입되지 않은 회원, FALSE: 가입된 회원), 가입된 회원인 경우 회원
      * ID 반환. 단, 이미 일반 회원가입을 한 유저인 경우에는 null을 반환한다.
      */
@@ -47,6 +47,29 @@ public class UserSyncMapper {
         return Pair.of(Boolean.TRUE, user.get().getUsername());
     }
 
-    @Transactional
-    public
+    /**
+     * Oauth 회원가입 시나리오를 결정한다.
+     *
+     * @return Pair<Boolean, String> : 이미 가입된 회원인지 여부 (TRUE: 계정 연동, FALSE: 소셜 회원가입)
+     * 단, 이미 동일한 Provider로 가입된 회원이 있는 경우에는 해당 회원의 ID를 반환한다.
+     */
+    @Transactional(readOnly = true)
+    public Pair<Boolean, String> isOauthSignUpAllowed(Provider provider, String phone) {
+        Optional<User> user = userService.readUserByPhone(phone);
+
+        // user 정보 없으면 Pair.of(Boolean.FALSE, null) 반환
+        if (user.isEmpty()) {
+            log.info("회원가입 이력이 없는 사용자입니다. phone: {}", phone);
+            return Pair.of(Boolean.FALSE, null);
+        }
+
+        // 같은 provider로 가입한 정보가 있는지 확인
+        if (oauthService.isExistOauthAccount(user.get().getId(), provider)) {
+            log.info("이미 동일한 Provider로 가입된 사용자입니다. phone: {}, provider: {}", phone, provider);
+            return null;
+        }
+
+        // user 정보 있으면 Pair.of(Boolean.TRUE, user.get().getUsername()) 반환
+        return Pair.of(Boolean.TRUE, user.get().getUsername());
+    }
 }
