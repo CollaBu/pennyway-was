@@ -40,7 +40,7 @@ public class SignUpReq {
         }
     }
 
-    public record OauthInfo(String idToken, String name, String username, String phone) {
+    public record OauthInfo(String idToken, String name, String username, String phone, String code) {
     }
 
     @Schema(name = "signUpReqGeneral", title = "일반 회원가입 요청 DTO")
@@ -107,10 +107,14 @@ public class SignUpReq {
             @Schema(description = "전화번호", example = "010-1234-5678")
             @NotBlank(message = "전화번호를 입력해주세요")
             @Pattern(regexp = "^01[01]-\\d{4}-\\d{4}$", message = "전화번호 형식이 올바르지 않습니다.")
-            String phone
+            String phone,
+            @Schema(description = "6자리 정수 인증번호", example = "123456")
+            @NotBlank(message = "인증번호는 필수입니다.")
+            @Pattern(regexp = "^\\d{6}$", message = "인증번호는 6자리 숫자여야 합니다.")
+            String code
     ) {
         public OauthInfo toOauthInfo() {
-            return new OauthInfo(idToken, name, username, phone);
+            return new OauthInfo(idToken, name, username, phone, code);
         }
     }
 
@@ -118,10 +122,18 @@ public class SignUpReq {
     public record SyncWithAuth(
             @Schema(description = "OIDC 토큰")
             @NotBlank(message = "OIDC 토큰은 필수 입력값입니다.")
-            String idToken
+            String idToken,
+            @Schema(description = "전화번호", example = "010-1234-5678")
+            @NotBlank(message = "전화번호를 입력해주세요")
+            @Pattern(regexp = "^01[01]-\\d{4}-\\d{4}$", message = "전화번호 형식이 올바르지 않습니다.")
+            String phone,
+            @Schema(description = "6자리 정수 인증번호", example = "123456")
+            @NotBlank(message = "인증번호는 필수입니다.")
+            @Pattern(regexp = "^\\d{6}$", message = "인증번호는 6자리 숫자여야 합니다.")
+            String code
     ) {
         public OauthInfo toOauthInfo() {
-            return new OauthInfo(idToken, null, null, null);
+            return new OauthInfo(idToken, null, null, phone, code);
         }
     }
 }
