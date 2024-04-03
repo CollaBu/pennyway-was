@@ -7,8 +7,10 @@ import kr.co.pennyway.api.apis.auth.helper.JwtAuthHelper;
 import kr.co.pennyway.api.apis.auth.helper.OauthOidcHelper;
 import kr.co.pennyway.api.apis.auth.mapper.PhoneVerificationMapper;
 import kr.co.pennyway.api.apis.auth.mapper.UserOauthSignMapper;
+import kr.co.pennyway.api.apis.auth.mapper.UserSyncMapper;
 import kr.co.pennyway.api.common.security.jwt.Jwts;
 import kr.co.pennyway.common.annotation.UseCase;
+import kr.co.pennyway.domain.common.redis.phone.PhoneVerificationService;
 import kr.co.pennyway.domain.common.redis.phone.PhoneVerificationType;
 import kr.co.pennyway.domain.domains.oauth.exception.OauthErrorCode;
 import kr.co.pennyway.domain.domains.oauth.exception.OauthException;
@@ -26,8 +28,10 @@ import org.springframework.transaction.annotation.Transactional;
 public class OauthUseCase {
     private final OauthOidcHelper oauthOidcHelper;
     private final PhoneVerificationMapper phoneVerificationMapper;
+    private final PhoneVerificationService phoneVerificationService;
     private final JwtAuthHelper jwtAuthHelper;
-    private UserOauthSignMapper userOauthSignMapper;
+    private final UserOauthSignMapper userOauthSignMapper;
+    private final UserSyncMapper userSyncMapper;
 
     public Pair<Long, Jwts> signIn(Provider provider, SignInReq.Oauth request) {
         OidcDecodePayload payload = oauthOidcHelper.getPayload(provider, request.idToken());
@@ -44,15 +48,38 @@ public class OauthUseCase {
         return phoneVerificationMapper.sendCode(request, PhoneVerificationType.getOauthSignUpTypeByProvider(provider));
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public PhoneVerificationDto.VerifyCodeRes verifyCode(Provider provider, PhoneVerificationDto.VerifyCodeReq request) {
         Boolean isValidCode = phoneVerificationMapper.isValidCode(request, PhoneVerificationType.getOauthSignUpTypeByProvider(provider));
+        Pair<Boolean, String> isSignUpUser = checkSignUpUserNotOauthByProvider(provider, request.phone());
 
-        return null;
+        phoneVerificationService.extendTimeToLeave(request.phone(), PhoneVerificationType.getOauthSignUpTypeByProvider(provider));
+
+        return PhoneVerificationDto.VerifyCodeRes.valueOfOauth(isValidCode, isSignUpUser.getLeft(), isSignUpUser.getRight());
     }
 
     @Transactional
     public Pair<Long, Jwts> signUp(Provider provider, SignUpReq.OauthInfo request) {
-        return null;
+        phoneVerificationMapper.isValidCode(PhoneVerificationDto.VerifyCodeReq.from(request), PhoneVerificationType.getOauthSignUpTypeByProvider(provider));
+        Pair<Boolean, String> isSignUpUser = checkSignUpUserNotOauthByProvider(provider, request.phone());
+
+        User user = userOauthSignMapper.saveUser(request, provider, isSignUpUser);
+        phoneVerificationService.delete(request.phone(), PhoneVerificationType.getOauthSignUpTypeByProvider(provider));
+
+        return Pair.of(user.getId(), jwtAuthHelper.createToken(user));
+    }
+
+    /**
+     * Oauth 회원가입 진행 도중, Provider로 가입한 사용자인지 지속적으로 검증하기 위한 메서드
+     */
+    private Pair<Boolean, String> checkSignUpUserNotOauthByProvider(Provider provider, String phone) {
+        Pair<Boolean, String> isOauthSignUpAllowed = userSyncMapper.isOauthSignUpAllowed(provider, phone);
+
+        if (isOauthSignUpAllowed == null) {
+            phoneVerificationService.delete(phone, PhoneVerificationType.getOauthSignUpTypeByProvider(provider));
+            throw new OauthException(OauthErrorCode.ALREADY_SIGNUP_OAUTH);
+        }
+
+        return isOauthSignUpAllowed;
     }
 }
