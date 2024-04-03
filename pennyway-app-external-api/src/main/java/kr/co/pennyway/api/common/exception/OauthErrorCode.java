@@ -9,9 +9,9 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum ProviderErrorCode implements BaseErrorCode {
+public enum OauthErrorCode implements BaseErrorCode {
     // 422 Unprocessable Entity
-    INVALID_PROVIDER(StatusCode.UNPROCESSABLE_CONTENT, ReasonCode.TYPE_MISMATCH_ERROR_IN_REQUEST_BODY, "유효하지 않은 제공자입니다.");;
+    INVALID_PROVIDER(StatusCode.UNPROCESSABLE_CONTENT, ReasonCode.TYPE_MISMATCH_ERROR_IN_REQUEST_BODY, "유효하지 않은 제공자입니다.");
 
     private final StatusCode statusCode;
     private final ReasonCode reasonCode;
