@@ -10,6 +10,9 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum OauthErrorCode implements BaseErrorCode {
+    /* 400 Bad Request */
+    ALREADY_SIGNUP_OAUTH(StatusCode.BAD_REQUEST, ReasonCode.INVALID_REQUEST, "이미 해당 제공자로 가입된 사용자입니다."),
+
     /* 401 Unauthorized */
     NOT_MATCHED_OAUTH_ID(StatusCode.UNAUTHORIZED, ReasonCode.MISSING_OR_INVALID_AUTHENTICATION_CREDENTIALS, "OAuth ID가 일치하지 않습니다."),
 
