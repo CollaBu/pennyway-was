@@ -65,14 +65,32 @@ public class PhoneVerificationDto {
     public record VerifyCodeRes(
             @Schema(description = "코드 일치 여부 : 일치하지 않으면 예외이므로 성공하면 언제나 true", example = "true")
             Boolean code,
-            @Schema(description = "oauth 사용자 여부", example = "true")
+            @Schema(description = "oauth 사용자 여부. true면 sync, false면 회원가입으로 진행 (일반 회원가입 시 필수값)", example = "true")
+            @JsonInclude(JsonInclude.Include.NON_NULL)
             Boolean oauth,
+            @Schema(description = "기존 계정 존재 여부. true면 sync, false면 회원가입 (oauth 회원가입 시 필수값)", example = "true")
+            @JsonInclude(JsonInclude.Include.NON_NULL)
+            Boolean existsUser,
             @Schema(description = "기존 사용자 아이디", example = "pennyway")
             @JsonInclude(JsonInclude.Include.NON_NULL)
             String username
     ) {
-        public static VerifyCodeRes valueOf(Boolean isValidCode, Boolean isOauthUser, String username) {
-            return new VerifyCodeRes(isValidCode, isOauthUser, username);
+        /**
+         * 일반 회원가입 시 인증 코드 응답 객체 생성
+         *
+         * @param isOauthUser Boolean : oauth 사용자 여부. true면 sync, false면 회원가입으로 진행
+         */
+        public static VerifyCodeRes valueOfGeneral(Boolean isValidCode, Boolean isOauthUser, String username) {
+            return new VerifyCodeRes(isValidCode, isOauthUser, null, username);
+        }
+
+        /**
+         * oauth 회원가입 시 인증 코드 응답 객체 생성
+         *
+         * @param existsUser Boolean : 기존 계정 존재 여부. true면 sync, false면 회원가입으로 진행
+         */
+        public static VerifyCodeRes valueOfOauth(Boolean isValidCode, Boolean existsUser, String username) {
+            return new VerifyCodeRes(isValidCode, null, existsUser, username);
         }
     }
 }
