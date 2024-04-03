@@ -75,26 +75,29 @@ public class OauthController {
     @PostMapping("/phone/verification")
     @PreAuthorize("isAnonymous()")
     public ResponseEntity<?> verifyCode(@RequestParam Provider provider, @RequestBody @Validated PhoneVerificationDto.VerifyCodeReq request) {
-        Pair<Long, Jwts> userInfo = oauthUseCase.verifyCode(provider, request);
+        return ResponseEntity.ok(SuccessResponse.from("sms", oauthUseCase.verifyCode(provider, request)));
+    }
 
-        if (userInfo.getLeft().equals(-1L)) {
-            return ResponseEntity.ok(SuccessResponse.from("message", "회원가입 진행")); // TODO: 응답 수정
-        }
-        return createAuthenticatedResponse(userInfo);
+    @Operation(summary = "[4-1] 계정 연동", description = "일반 혹은 소셜 계정이 존재하는 경우 연동")
+    @Parameter(name = "provider", description = "소셜 제공자", examples = {
+            @ExampleObject(name = "카카오", value = "kakao"), @ExampleObject(name = "애플", value = "apple"), @ExampleObject(name = "구글", value = "google")
+    }, required = true, in = ParameterIn.QUERY)
+    @PostMapping("/link-auth")
+    @PreAuthorize("isAnonymous()")
+    public ResponseEntity<?> linkAuth(@RequestParam Provider provider, @RequestBody @Validated SignUpReq.SyncWithAuth request) {
+        return createAuthenticatedResponse(oauthUseCase.signUp(provider, request.toOauthInfo()));
     }
 
     // [4] 소셜 회원가입
     // 회원 정보 입력(이름, 아이디) -> 회원가입 -> 로그인
-    @Operation(summary = "[4] 소셜 회원가입", description = "회원 정보 입력 후 회원가입")
+    @Operation(summary = "[4-2] 소셜 회원가입", description = "회원 정보 입력 후 회원가입")
     @Parameter(name = "provider", description = "소셜 제공자", examples = {
             @ExampleObject(name = "카카오", value = "kakao"), @ExampleObject(name = "애플", value = "apple"), @ExampleObject(name = "구글", value = "google")
     }, required = true, in = ParameterIn.QUERY)
     @PostMapping("/sign-up")
     @PreAuthorize("isAnonymous()")
     public ResponseEntity<?> signUp(@RequestParam Provider provider, @RequestBody @Validated SignUpReq.Oauth request) {
-        Pair<Long, Jwts> userInfo = oauthUseCase.signUp(provider, request);
-
-        return createAuthenticatedResponse(userInfo);
+        return createAuthenticatedResponse(oauthUseCase.signUp(provider, request.toOauthInfo()));
     }
 
     private ResponseEntity<?> createAuthenticatedResponse(Pair<Long, Jwts> userInfo) {
