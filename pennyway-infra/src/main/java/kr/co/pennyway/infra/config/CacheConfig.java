@@ -111,13 +111,11 @@ public class CacheConfig {
                                 new GenericJackson2JsonRedisSerializer()
                         ))
                 .entryTtl(Duration.ofDays(oidcCacheTtlDay));
-        Map<String, RedisCacheConfiguration> redisCacheConfigurationMap = Map.of("oidcConfig", config);
 
         return RedisCacheManager
                 .RedisCacheManagerBuilder
                 .fromConnectionFactory(cf)
                 .cacheDefaults(config)
-                .withInitialCacheConfigurations(redisCacheConfigurationMap)
                 .build();
     }
 }
