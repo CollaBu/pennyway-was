@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 public class PhoneVerificationDto {
     @Schema(title = "인증번호 요청 DTO", description = "전화번호로 인증번호 송신 요청을 위한 DTO")
     public record PushCodeReq(
-            @Schema(description = "전화번호", example = "01012345678")
+            @Schema(description = "전화번호", example = "010-1234-5678")
             @NotBlank(message = "전화번호는 필수입니다.")
             @Pattern(regexp = "^01[01]-\\d{4}-\\d{4}$", message = "전화번호 형식이 올바르지 않습니다.")
             String phone
