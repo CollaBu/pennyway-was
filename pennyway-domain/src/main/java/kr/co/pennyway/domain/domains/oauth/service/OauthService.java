@@ -15,7 +15,7 @@ public class OauthService {
     private final OauthRepository oauthRepository;
 
     @Transactional(readOnly = true)
-    public Optional<Oauth> getOauthByOauthIdAndProvider(String oauthId, Provider provider) {
+    public Optional<Oauth> readOauthByOauthIdAndProvider(String oauthId, Provider provider) {
         return oauthRepository.findByOauthIdAndProvider(oauthId, provider);
     }
 }
