@@ -40,6 +40,9 @@ public class SignUpReq {
         }
     }
 
+    public record OauthInfo(String idToken, String name, String username, String phone) {
+    }
+
     @Schema(name = "signUpReqGeneral", title = "일반 회원가입 요청 DTO")
     public record General(
             @Schema(description = "아이디", example = "pennyway")
@@ -106,6 +109,19 @@ public class SignUpReq {
             @Pattern(regexp = "^01[01]-\\d{4}-\\d{4}$", message = "전화번호 형식이 올바르지 않습니다.")
             String phone
     ) {
+        public OauthInfo toOauthInfo() {
+            return new OauthInfo(idToken, name, username, phone);
+        }
+    }
 
+    @Schema(title = "소셜 회원가입(기존 계정 존재) 요청 DTO")
+    public record SyncWithAuth(
+            @Schema(description = "OIDC 토큰")
+            @NotBlank(message = "OIDC 토큰은 필수 입력값입니다.")
+            String idToken
+    ) {
+        public OauthInfo toOauthInfo() {
+            return new OauthInfo(idToken, null, null, null);
+        }
     }
 }
