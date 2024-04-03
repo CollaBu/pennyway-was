@@ -1,4 +1,4 @@
-package kr.co.pennyway.api.common.exception;
+package kr.co.pennyway.domain.domains.oauth.exception;
 
 import kr.co.pennyway.common.exception.BaseErrorCode;
 import kr.co.pennyway.common.exception.CausedBy;
