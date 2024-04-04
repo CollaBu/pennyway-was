@@ -5,7 +5,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.MySQLContainer;
-import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
@@ -15,9 +14,7 @@ public abstract class ExternalApiDBTestConfig {
     private static final String REDIS_CONTAINER_IMAGE = "redis:7.2.4-alpine";
     private static final String MYSQL_CONTAINER_IMAGE = "mysql:8.0.26";
 
-    @Container
     private static final RedisContainer REDIS_CONTAINER;
-    @Container
     private static final MySQLContainer<?> MYSQL_CONTAINER;
 
     static {
