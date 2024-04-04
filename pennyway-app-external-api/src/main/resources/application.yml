@@ -48,3 +48,9 @@ springdoc:
   api-docs:
     groups:
       enabled: true
+
+---
+spring:
+  config:
+    activate:
+      on-profile: test

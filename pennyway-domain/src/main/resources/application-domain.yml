@@ -61,3 +61,20 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
+
+---
+spring:
+  config:
+    activate:
+      on-profile: test
+
+  jpa:
+    database: MySQL
+    open-in-view: false
+    generate-ddl: true
+    hibernate:
+      ddl-auto: create
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
