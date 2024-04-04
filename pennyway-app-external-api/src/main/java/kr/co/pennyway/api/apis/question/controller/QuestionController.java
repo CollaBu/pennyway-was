@@ -10,10 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @Tag(name = "[문의 API]")
@@ -24,7 +21,7 @@ public class QuestionController {
     private final QuestionUseCase questionUseCase;
 
     @Operation(summary = "문의 전송")
-    @GetMapping("/send")
+    @PostMapping("/send")
     @PreAuthorize("isAnonymous()")
     public ResponseEntity<?> sendQuestion(@RequestBody @Validated QuestionReq.General request){
         questionUseCase.sendQuestion(request);
