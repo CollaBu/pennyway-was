@@ -29,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(controllers = {AuthController.class})
-@ActiveProfiles("test")
+@ActiveProfiles("local")
 public class AuthControllerValidationTest {
 
     @Autowired
