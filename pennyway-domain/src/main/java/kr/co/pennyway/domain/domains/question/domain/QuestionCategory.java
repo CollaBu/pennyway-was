@@ -4,6 +4,12 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+/**
+ * 문의 요청 DTO
+ * <br/>
+ * 문의 요청시 사용됩니다.
+ */
+
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 public enum QuestionCategory {

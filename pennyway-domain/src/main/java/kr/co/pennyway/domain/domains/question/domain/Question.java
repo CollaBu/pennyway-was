@@ -3,6 +3,7 @@ package kr.co.pennyway.domain.domains.question.domain;
 import jakarta.persistence.*;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
@@ -31,4 +32,13 @@ public class Question {
 
     @ColumnDefault("NULL")
     private LocalDateTime deletedAt;
+
+    @Builder
+    private Question(String email, QuestionCategory category, String content, LocalDateTime createdAt, LocalDateTime deletedAt) {
+        this.email = email;
+        this.category = category;
+        this.content = content;
+        this.createdAt = createdAt;
+        this.deletedAt = deletedAt;
+    }
 }
