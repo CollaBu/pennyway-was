@@ -1,0 +1,50 @@
+spring:
+  config:
+    activate:
+      on-profile: test
+
+  profiles:
+    group:
+      test: common, domain, infra
+
+  main:
+    allow-bean-definition-overriding: true
+
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USER_NAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  data.redis:
+    host: ${REDIS_HOST}
+    port: ${REDIS_PORT}
+    password: ${REDIS_PASSWORD}
+
+oauth2:
+  client:
+    provider:
+      kakao:
+        jwks-uri: kakao
+        secret: kakao
+      google:
+        jwks-uri: google
+        secret: google
+      apple:
+        jwks-uri: apple
+        secret: apple
+
+jwt:
+  secret-key:
+    access-token: ${JWT_ACCESS_SECRET_KEY}
+    refresh-token: ${JWT_REFRESH_SECRET_KEY}
+  expiration-time:
+    # milliseconds 단위
+    access-token: ${JWT_ACCESS_EXPIRATION_TIME} # 30m (30 * 60 * 1000)
+    refresh-token: ${JWT_REFRESH_EXPIRATION_TIME} # 7d (7 * 24 * 60 * 60 * 1000)
+
+pennyway:
+  server:
+    domain:
+      local: ${PENNYWAY_DOMAIN_LOCAL}
+      dev: ${PENNYWAY_DOMAIN_DEV}
