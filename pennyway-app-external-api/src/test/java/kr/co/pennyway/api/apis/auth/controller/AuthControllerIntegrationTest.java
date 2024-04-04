@@ -4,9 +4,7 @@ import kr.co.pennyway.api.config.ExternalApiDBTestConfig;
 import kr.co.pennyway.api.config.ExternalApiIntegrationTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.test.context.ActiveProfiles;
 
-@ActiveProfiles("test")
 @ExternalApiIntegrationTest
 public class AuthControllerIntegrationTest extends ExternalApiDBTestConfig {
     @Test
