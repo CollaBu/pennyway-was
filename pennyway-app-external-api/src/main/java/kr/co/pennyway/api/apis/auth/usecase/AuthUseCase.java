@@ -40,7 +40,7 @@ public class AuthUseCase {
 
         phoneVerificationService.extendTimeToLeave(request.phone(), PhoneVerificationType.SIGN_UP);
 
-        return PhoneVerificationDto.VerifyCodeRes.valueOf(isValidCode, isOauthUser.getLeft(), isOauthUser.getRight());
+        return PhoneVerificationDto.VerifyCodeRes.valueOfGeneral(isValidCode, isOauthUser.getLeft(), isOauthUser.getRight());
     }
 
     @Transactional

@@ -29,6 +29,7 @@ public class User extends DateAuditable {
     private String name;
     @ColumnDefault("NULL")
     private String password;
+    @ColumnDefault("NULL")
     private LocalDateTime passwordUpdatedAt;
     @ColumnDefault("NULL")
     private String profileImageUrl;

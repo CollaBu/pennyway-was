@@ -17,5 +17,5 @@ public interface KakaoOidcClient extends OauthOidcClient {
     @Override
     @Cacheable(value = "KakaoOauth", cacheManager = "oidcCacheManager")
     @GetMapping("/.well-known/jwks.json")
-    OidcPublicKeyResponse getOIDCPublicKey();
+    OidcPublicKeyResponse getOidcPublicKey();
 }

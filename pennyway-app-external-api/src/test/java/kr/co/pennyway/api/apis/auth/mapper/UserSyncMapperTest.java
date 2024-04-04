@@ -1,5 +1,6 @@
 package kr.co.pennyway.api.apis.auth.mapper;
 
+import kr.co.pennyway.domain.domains.oauth.service.OauthService;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.service.UserService;
 import org.apache.commons.lang3.tuple.Pair;
@@ -22,10 +23,12 @@ public class UserSyncMapperTest {
     private UserSyncMapper userSyncMapper;
     @Mock
     private UserService userService;
+    @Mock
+    private OauthService oauthService;
 
     @BeforeEach
     void setUp() {
-        userSyncMapper = new UserSyncMapper(userService);
+        userSyncMapper = new UserSyncMapper(userService, oauthService);
     }
 
     @DisplayName("일반 회원가입 시, 회원 정보가 없으면 FALSE를 반환한다.")

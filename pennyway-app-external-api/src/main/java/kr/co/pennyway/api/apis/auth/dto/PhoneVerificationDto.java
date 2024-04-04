@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 public class PhoneVerificationDto {
     @Schema(title = "인증번호 요청 DTO", description = "전화번호로 인증번호 송신 요청을 위한 DTO")
     public record PushCodeReq(
-            @Schema(description = "전화번호", example = "01012345678")
+            @Schema(description = "전화번호", example = "010-1234-5678")
             @NotBlank(message = "전화번호는 필수입니다.")
             @Pattern(regexp = "^01[01]-\\d{4}-\\d{4}$", message = "전화번호 형식이 올바르지 않습니다.")
             String phone
@@ -59,20 +59,42 @@ public class PhoneVerificationDto {
         public static VerifyCodeReq from(SignUpReq.Info request) {
             return new VerifyCodeReq(request.phone(), request.code());
         }
+
+        public static VerifyCodeReq from(SignUpReq.OauthInfo request) {
+            return new VerifyCodeReq(request.phone(), request.code());
+        }
     }
 
     @Schema(title = "인증번호 검증 응답 DTO")
     public record VerifyCodeRes(
             @Schema(description = "코드 일치 여부 : 일치하지 않으면 예외이므로 성공하면 언제나 true", example = "true")
             Boolean code,
-            @Schema(description = "oauth 사용자 여부", example = "true")
+            @Schema(description = "oauth 사용자 여부. true면 sync, false면 회원가입으로 진행 (일반 회원가입 시 필수값)", example = "true")
+            @JsonInclude(JsonInclude.Include.NON_NULL)
             Boolean oauth,
+            @Schema(description = "기존 계정 존재 여부. true면 sync, false면 회원가입 (oauth 회원가입 시 필수값)", example = "true")
+            @JsonInclude(JsonInclude.Include.NON_NULL)
+            Boolean existsUser,
             @Schema(description = "기존 사용자 아이디", example = "pennyway")
             @JsonInclude(JsonInclude.Include.NON_NULL)
             String username
     ) {
-        public static VerifyCodeRes valueOf(Boolean isValidCode, Boolean isOauthUser, String username) {
-            return new VerifyCodeRes(isValidCode, isOauthUser, username);
+        /**
+         * 일반 회원가입 시 인증 코드 응답 객체 생성
+         *
+         * @param isOauthUser Boolean : oauth 사용자 여부. true면 sync, false면 회원가입으로 진행
+         */
+        public static VerifyCodeRes valueOfGeneral(Boolean isValidCode, Boolean isOauthUser, String username) {
+            return new VerifyCodeRes(isValidCode, isOauthUser, null, username);
+        }
+
+        /**
+         * oauth 회원가입 시 인증 코드 응답 객체 생성
+         *
+         * @param existsUser Boolean : 기존 계정 존재 여부. true면 sync, false면 회원가입으로 진행
+         */
+        public static VerifyCodeRes valueOfOauth(Boolean isValidCode, Boolean existsUser, String username) {
+            return new VerifyCodeRes(isValidCode, null, existsUser, username);
         }
     }
 }
