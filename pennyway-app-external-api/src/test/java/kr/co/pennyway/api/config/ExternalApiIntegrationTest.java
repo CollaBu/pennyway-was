@@ -8,7 +8,7 @@ import java.lang.annotation.*;
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @SpringBootTest(classes = ExternalApiIntegrationTestConfig.class)
-@ActiveProfiles(profiles = {"local"}, resolver = ExternalApiIntegrationProfileResolver.class)
+@ActiveProfiles(profiles = {"test"}, resolver = ExternalApiIntegrationProfileResolver.class)
 @Documented
 public @interface ExternalApiIntegrationTest {
 }

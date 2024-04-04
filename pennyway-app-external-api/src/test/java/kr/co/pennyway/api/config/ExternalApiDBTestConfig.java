@@ -9,7 +9,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
 @Testcontainers
-@ActiveProfiles("local")
+@ActiveProfiles("test")
 public abstract class ExternalApiDBTestConfig {
     private static final String REDIS_CONTAINER_IMAGE = "redis:7.2.4-alpine";
     private static final String MYSQL_CONTAINER_IMAGE = "mysql:8.0.26";
