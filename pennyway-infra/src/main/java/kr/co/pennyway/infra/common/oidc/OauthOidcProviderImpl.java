@@ -54,7 +54,7 @@ public class OauthOidcProviderImpl implements OauthOidcProvider {
         } catch (JwtException e) {
             final JwtErrorCode errorCode = JwtErrorCodeUtil.determineErrorCode(e, JwtErrorCode.FAILED_AUTHENTICATION);
 
-            log.warn("Error code : {}, Error - {},  {}", errorCode, e.getClass(), e.getMessage());
+            log.warn("getUnsignedTokenClaims : Error code : {}, Error - {},  {}", errorCode, e.getClass(), e.getMessage());
             throw new JwtErrorException(errorCode);
         }
     }
@@ -81,10 +81,10 @@ public class OauthOidcProviderImpl implements OauthOidcProvider {
         } catch (JwtException e) {
             final JwtErrorCode errorCode = JwtErrorCodeUtil.determineErrorCode(e, JwtErrorCode.FAILED_AUTHENTICATION);
 
-            log.warn("Error code : {}, Error - {},  {}", errorCode, e.getClass(), e.getMessage());
+            log.warn("getOIDCTokenJws : Error code : {}, Error - {},  {}", errorCode, e.getClass(), e.getMessage());
             throw new JwtErrorException(errorCode);
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-            log.warn("Error - {},  {}", e.getClass(), e.getMessage());
+            log.warn("getOIDCTokenJws : Error - {},  {}", e.getClass(), e.getMessage());
             throw new JwtErrorException(JwtErrorCode.MALFORMED_TOKEN);
         }
     }
