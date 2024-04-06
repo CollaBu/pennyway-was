@@ -53,7 +53,6 @@ public class OauthOidcProviderImpl implements OauthOidcProvider {
      * payload의 iss, aud, exp, nonce를 검증하고, 실패시 예외 처리
      */
     private Map<String, Map<String, String>> getUnsignedTokenClaims(String token, String iss, String aud, String nonce) {
-        log.info("getUnsignedTokenClaims : token : {}, iss : {}, aud : {}, nonce : {}", token, iss, aud, nonce);
         try {
             Base64.Decoder decoder = Base64.getUrlDecoder();
 
@@ -82,7 +81,7 @@ public class OauthOidcProviderImpl implements OauthOidcProvider {
     private String getUnsignedToken(String token) {
         String[] splitToken = token.split("\\.");
         if (splitToken.length != 3) throw new JwtErrorException(JwtErrorCode.MALFORMED_TOKEN);
-        return splitToken[0] + "." + splitToken[1] + ".";
+        return splitToken[0] + "." + splitToken[1];
     }
 
     /**
