@@ -1,11 +1,18 @@
 package kr.co.pennyway.infra.common.oidc;
 
-import io.jsonwebtoken.*;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.Jwts;
 import kr.co.pennyway.infra.common.exception.JwtErrorCode;
 import kr.co.pennyway.infra.common.exception.JwtErrorException;
 import kr.co.pennyway.infra.common.util.JwtErrorCodeUtil;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 
 import java.math.BigInteger;
 import java.security.KeyFactory;
@@ -14,16 +21,19 @@ import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPublicKeySpec;
 import java.util.Base64;
+import java.util.Map;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class OauthOidcProviderImpl implements OauthOidcProvider {
     private static final String KID = "kid";
     private static final String RSA = "RSA";
+    private final ObjectMapper objectMapper;
 
     @Override
     public String getKidFromUnsignedTokenHeader(String token, String iss, String aud, String nonce) {
-        return (String) getUnsignedTokenClaims(token, iss, aud, nonce).getHeader().get(KID);
+        return getUnsignedTokenClaims(token, iss, aud, nonce).get("header").get(KID);
     }
 
     @Override
@@ -43,19 +53,27 @@ public class OauthOidcProviderImpl implements OauthOidcProvider {
      * ID Token의 header와 body를 Base64 방식으로 디코딩하는 메서드 <br/>
      * payload의 iss, aud, exp, nonce를 검증하고, 실패시 예외 처리
      */
-    private Jwt<Header, Claims> getUnsignedTokenClaims(String token, String iss, String aud, String nonce) {
+    private Map<String, Map<String, String>> getUnsignedTokenClaims(String token, String iss, String aud, String nonce) {
+        log.info("getUnsignedTokenClaims : token : {}, iss : {}, aud : {}, nonce : {}", token, iss, aud, nonce);
         try {
-            return Jwts.parser()
-                    .requireAudience(aud)
-                    .requireIssuer(iss)
-//                    .require("nonce", nonce) // 현재는 nonce를 사용하지 않음
-                    .build()
-                    .parseUnsecuredClaims(getUnsignedToken(token)); // TODO: 기존 방식은 parseClaimsJwt(getUnsignedToken(token)); -> 변경한 코드 정상 동작 여부 확인 필요
-        } catch (JwtException e) {
-            final JwtErrorCode errorCode = JwtErrorCodeUtil.determineErrorCode(e, JwtErrorCode.FAILED_AUTHENTICATION);
+            Base64.Decoder decoder = Base64.getUrlDecoder();
 
-            log.warn("getUnsignedTokenClaims : Error code : {}, Error - {},  {}", errorCode, e.getClass(), e.getMessage());
-            throw new JwtErrorException(errorCode);
+            String unsignedToken = getUnsignedToken(token);
+            String headerJson = new String(decoder.decode(unsignedToken.split("\\.")[0]));
+            String payloadJson = new String(decoder.decode(unsignedToken.split("\\.")[1]));
+
+            @SuppressWarnings("unchecked")
+            Map<String, String> header = objectMapper.readValue(headerJson, Map.class);
+            @SuppressWarnings("unchecked")
+            Map<String, String> payload = objectMapper.readValue(payloadJson, Map.class);
+
+            Assert.isTrue(payload.get("aud").equals(aud), "aud is not matched. expected : " + aud + ", actual : " + payload.get("aud"));
+            Assert.isTrue(payload.get("iss").equals(iss), "iss is not matched. expected : " + iss + ", actual : " + payload.get("iss"));
+
+            return Map.of("header", header, "payload", payload);
+        } catch (JsonProcessingException e) {
+            log.warn("getUnsignedTokenClaims : Error - {},  {}", e.getClass(), e.getMessage());
+            throw new RuntimeException(e);
         }
     }
 
