@@ -1,32 +1,44 @@
 package kr.co.pennyway.api.apis.question.usecase;
 
 import kr.co.pennyway.api.apis.question.dto.QuestionReq;
+import kr.co.pennyway.api.apis.question.mapper.QuestionMapper;
 import kr.co.pennyway.common.annotation.UseCase;
+import kr.co.pennyway.domain.domains.question.domain.Question;
+import kr.co.pennyway.domain.domains.question.exception.QuestionErrorCode;
+import kr.co.pennyway.domain.domains.question.exception.QuestionErrorException;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import jakarta.mail.internet.MimeMessage;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 
 @Slf4j
 @UseCase
-@AllArgsConstructor
 public class QuestionUseCase {
     private final JavaMailSender javaMailSender;
+    private final QuestionMapper questionMapper;
+    private String adminAddress;
 
-    public void sendQuestion(QuestionReq.General request){
-        MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+    public QuestionUseCase(JavaMailSender javaMailSender, QuestionMapper questionMapper, @Value("${app.question-address}") String adminAddress){
+        this.javaMailSender = javaMailSender;
+        this.questionMapper = questionMapper;
+        this.adminAddress = adminAddress;
+    }
+
+    public Question sendQuestion(QuestionReq.General request){
+        MimeMessage mimeMessage = questionMapper.createMessage(request, adminAddress);
+        // TODO : 일단 DB에 저장되는 부분은 보류
+        // Question question = questionMapper.createQuestion(request);
+
+        Question question = request.toEntity();
 
         try{
-            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, false, "UTF-8");
-            helper.setTo(request.email());
-            helper.setSubject("테스트용 이메일");
-            helper.setText(request.content());
             javaMailSender.send(mimeMessage);
-
-        } catch(Exception e) {
-            throw new IllegalArgumentException("tset");
+            return question;
+        } catch(Exception e){
+            throw new QuestionErrorException(QuestionErrorCode.INTERNAL_MAILERROR);
         }
 
     }

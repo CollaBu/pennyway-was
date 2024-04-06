@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.co.pennyway.api.apis.question.dto.QuestionReq;
 import kr.co.pennyway.api.apis.question.usecase.QuestionUseCase;
 import kr.co.pennyway.api.common.response.SuccessResponse;
+import kr.co.pennyway.domain.domains.question.domain.Question;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +25,7 @@ public class QuestionController {
     @PostMapping("/send")
     @PreAuthorize("isAnonymous()")
     public ResponseEntity<?> sendQuestion(@RequestBody @Validated QuestionReq.General request){
-        questionUseCase.sendQuestion(request);
-        return ResponseEntity.ok(SuccessResponse.noContent());
+        Question question = questionUseCase.sendQuestion(request);
+        return ResponseEntity.ok(SuccessResponse.from(question));
     }
 }
