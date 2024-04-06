@@ -39,8 +39,7 @@ public class OauthOidcProviderImpl implements OauthOidcProvider {
     @Override
     public OidcDecodePayload getOIDCTokenBody(String token, String modulus, String exponent) {
         Claims body = getOIDCTokenJws(token, modulus, exponent).getPayload();
-        String aud = body.getAudience().iterator().next(); // TODO: 이전 버전과 다르게 aud가 Set<String>으로 변경되어 있음. 테스트 필요
-        log.debug("aud : {}", aud);
+        String aud = body.getAudience().iterator().next(); // aud가 여러개일 경우 첫 번째 aud를 사용
 
         return new OidcDecodePayload(
                 body.getIssuer(),
