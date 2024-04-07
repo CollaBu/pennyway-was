@@ -44,7 +44,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(
                         auth -> defaultAuthorizeHttpRequests(auth)
                                 .requestMatchers(SWAGGER_ENDPOINTS).permitAll()
-                                .anyRequest().authenticated()
+                                .anyRequest().permitAll()
                 ).build();
     }
 

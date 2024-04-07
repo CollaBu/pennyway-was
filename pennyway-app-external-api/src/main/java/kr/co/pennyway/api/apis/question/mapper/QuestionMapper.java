@@ -18,7 +18,7 @@ public class QuestionMapper {
     private final QuestionService questionService;
 
     /**
-     *
+     * MimeMessageHelper 객체에 필요한 값들을 채워넣고 반환한다.
      */
     public MimeMessage createMessage(QuestionReq.General request, String address){
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
@@ -26,8 +26,8 @@ public class QuestionMapper {
         try{
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, false, "UTF-8");
             helper.setTo(address);
-            helper.setSubject("테스트용 이메일");
-            helper.setText(request.content());
+            helper.setSubject(createSubject(request));
+            helper.setText(createContent(request), true);
 
             return mimeMessage;
         } catch(Exception e) {
@@ -46,4 +46,16 @@ public class QuestionMapper {
         return response;
     }
 
+    private String createSubject(QuestionReq.General request){
+
+        return request.email() + "님께서 문의사항을 남겨 주셨어요.";
+    }
+
+    private String createContent(QuestionReq.General request){
+        String from = "<h2>문의자 : " + request.email() + "</h2>";
+        String category = "<h2>카테고리 : " + request.category().getTitle() + "</h2><br>";
+        String content = "문의 내용 : " + request.content();
+
+        return from + category + content;
+    }
 }
