@@ -1,7 +1,6 @@
 package kr.co.pennyway.api.apis.question.controller;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import kr.co.pennyway.api.apis.question.api.QuestionApi;
 import kr.co.pennyway.api.apis.question.dto.QuestionReq;
 import kr.co.pennyway.api.apis.question.usecase.QuestionUseCase;
 import kr.co.pennyway.api.common.response.SuccessResponse;
@@ -14,14 +13,13 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
-@Tag(name = "[문의 API]")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/v1/question")
-public class QuestionController {
+public class QuestionController implements QuestionApi {
     private final QuestionUseCase questionUseCase;
 
-    @Operation(summary = "문의 전송")
+    @Override
     @PostMapping("/send")
     @PreAuthorize("isAnonymous()")
     public ResponseEntity<?> sendQuestion(@RequestBody @Validated QuestionReq.General request){
