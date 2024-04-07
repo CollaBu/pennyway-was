@@ -4,6 +4,22 @@ spring:
       local: common, domain, infra
       dev: common, domain, infra
 
+  mail:
+    host: smtp.gmail.com # 1
+    port: 587 # 2
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true # 5
+          timeout: 5000 # 6
+          starttls:
+            enable: true # 7
+
+app:
+  question-address: ${ADMIN_ADDRESS}
+
 jwt:
   secret-key:
     access-token: ${JWT_ACCESS_SECRET_KEY}
