@@ -10,19 +10,22 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/v1/question")
+@RequestMapping("/v1/questions")
 public class QuestionController implements QuestionApi {
     private final QuestionUseCase questionUseCase;
 
     @Override
     @PostMapping("/send")
     @PreAuthorize("isAnonymous()")
-    public ResponseEntity<?> sendQuestion(@RequestBody @Validated QuestionReq.General request){
+    public ResponseEntity<?> sendQuestion(@RequestBody @Validated QuestionReq.General request) {
         Question question = questionUseCase.sendQuestion(request);
         return ResponseEntity.ok(SuccessResponse.from(question));
     }
