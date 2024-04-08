@@ -3,6 +3,7 @@ package kr.co.pennyway.api.apis.question.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import kr.co.pennyway.domain.domains.question.domain.Question;
 import kr.co.pennyway.domain.domains.question.domain.QuestionCategory;
 
@@ -17,7 +18,7 @@ public class QuestionReq {
             @NotBlank(message = "문의 내용을 입력해주세요")
             String content,
             @Schema(description = "문의 카테고리", example = "UTILIZATION")
-            @NotBlank(message = "문의 카테고리를 입력해주세요")
+            @NotNull(message = "문의 카테고리를 입력해주세요")
             QuestionCategory category
     ) {
         public Question toEntity() {
