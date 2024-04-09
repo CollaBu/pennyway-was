@@ -16,6 +16,10 @@ public class SmsDto {
         public static To of(String phone) {
             return new To(phone);
         }
+
+        public String getPhoneForSms() {
+            return "+82" + phone.replaceAll("-", "");
+        }
     }
 
     @Builder
