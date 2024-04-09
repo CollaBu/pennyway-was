@@ -25,7 +25,7 @@ public class QuestionController implements QuestionApi {
     @Override
     @PostMapping("")
     @PreAuthorize("permitAll()")
-    public ResponseEntity<?> sendQuestion(@RequestBody @Validated QuestionReq.General request) {
+    public ResponseEntity<?> sendQuestion(@RequestBody @Validated QuestionReq request) {
         Question question = questionUseCase.sendQuestion(request);
         return ResponseEntity.ok(SuccessResponse.from(question));
     }

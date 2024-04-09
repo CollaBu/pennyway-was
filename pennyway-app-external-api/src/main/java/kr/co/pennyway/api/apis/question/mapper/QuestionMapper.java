@@ -22,7 +22,7 @@ public class QuestionMapper {
     /**
      * MimeMessageHelper 객체에 필요한 값들을 채워넣고 반환한다.
      */
-    public MimeMessage createMessage(QuestionReq.General request, String address) {
+    public MimeMessage createMessage(QuestionReq request, String address) {
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
 
         try {
@@ -42,19 +42,19 @@ public class QuestionMapper {
     /**
      * Question 객체를 생성해 반환하며, DB에 저장한다.
      */
-    public Question createQuestion(QuestionReq.General request) {
+    public Question createQuestion(QuestionReq request) {
         Question question = request.toEntity();
         Question response = questionService.createQuestion(question);
 
         return response;
     }
 
-    private String createSubject(QuestionReq.General request) {
+    private String createSubject(QuestionReq request) {
 
         return request.email() + "님께서 문의사항을 남겨 주셨어요.";
     }
 
-    private String createContent(QuestionReq.General request) {
+    private String createContent(QuestionReq request) {
         String from = "<h2>문의자 : " + request.email() + "</h2>";
         String category = "<h2>카테고리 : " + request.category().getTitle() + "</h2><br>";
         String content = "문의 내용 : " + request.content();

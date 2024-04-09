@@ -7,9 +7,7 @@ import jakarta.validation.constraints.NotNull;
 import kr.co.pennyway.domain.domains.question.domain.Question;
 import kr.co.pennyway.domain.domains.question.domain.QuestionCategory;
 
-public class QuestionReq {
-    @Schema(name = "QuestionReqGeneral", title = "문의 요청", allowableValues = {"UTILIZATION", "BUG_REPORT", "SUGGESTION", "ETC"})
-    public record General(
+public record QuestionReq (
             @Schema(description = "믄의자 이메일", example = "foobar@gmail.com")
             @NotBlank(message = "이메일을 입력해주세요")
             @Email(message = "이메일 형식이 올바르지 않습니다.")
@@ -20,7 +18,7 @@ public class QuestionReq {
             @Schema(description = "문의 카테고리", example = "UTILIZATION")
             @NotNull(message = "문의 카테고리를 입력해주세요")
             QuestionCategory category
-    ) {
+    ){
         public Question toEntity() {
             return Question.builder()
                     .email(email)
@@ -29,4 +27,4 @@ public class QuestionReq {
                     .build();
         }
     }
-}
+
