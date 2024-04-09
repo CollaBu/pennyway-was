@@ -11,13 +11,13 @@ public class SmsDto {
             String phone
     ) {
         /**
-         * @param phone String : SMS 인증 요청을 할 전화번호
+         * @param phone String : SMS 인증 요청을 할 전화번호 (ex. 010-1234-5678)
          */
         public static To of(String phone) {
             return new To(phone);
         }
 
-        public String getPhoneForSms() {
+        public String parsePhone() {
             return "+82" + phone.replaceAll("-", "");
         }
     }
