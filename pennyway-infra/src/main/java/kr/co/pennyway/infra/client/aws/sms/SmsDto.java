@@ -1,6 +1,6 @@
 package kr.co.pennyway.infra.client.aws.sms;
 
-import kr.co.pennyway.infra.common.event.PhoneVerificationEvent;
+import kr.co.pennyway.infra.common.event.PushCodeEvent;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
@@ -11,7 +11,7 @@ public class SmsDto {
             String phone,
             String code
     ) {
-        public static Request from(PhoneVerificationEvent e) {
+        public static Request from(PushCodeEvent e) {
             return new Request(e.phone(), e.code());
         }
 
