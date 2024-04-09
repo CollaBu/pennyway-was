@@ -9,6 +9,15 @@ spring:
     port: ${REDIS_PORT:6379}
     password: ${REDIS_PASSWORD:}
 
+  cloud:
+    aws:
+      sns:
+        credentials:
+          access-key: ${AWS_SNS_ACCESS_KEY:access-key}
+          secret-key: ${AWS_SNS_SECRET_KEY:secret-key}
+        region:
+          static: ${AWS_SNS_REGION:republic-of-korea-1}
+
 pennyway:
   server:
     domain:

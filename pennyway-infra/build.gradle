@@ -21,4 +21,8 @@ dependencies {
     implementation platform("org.springframework.cloud:spring-cloud-dependencies:2023.0.1")
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign:4.1.1'
     implementation 'io.github.openfeign:feign-okhttp:13.2'
+
+    /* aws */
+    implementation platform("software.amazon.awssdk:bom:2.25.26")
+    implementation 'software.amazon.awssdk:sns:2.25.26'
 }
