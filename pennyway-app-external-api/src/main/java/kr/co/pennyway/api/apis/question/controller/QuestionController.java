@@ -23,7 +23,7 @@ public class QuestionController implements QuestionApi {
     private final QuestionUseCase questionUseCase;
 
     @Override
-    @PostMapping("/send")
+    @PostMapping("")
     @PreAuthorize("permitAll()")
     public ResponseEntity<?> sendQuestion(@RequestBody @Validated QuestionReq.General request) {
         Question question = questionUseCase.sendQuestion(request);
