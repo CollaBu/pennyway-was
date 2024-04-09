@@ -1,12 +1,12 @@
 package kr.co.pennyway.domain.domains.question.service;
 
-import jakarta.transaction.Transactional;
+import kr.co.pennyway.common.annotation.DomainService;
 import kr.co.pennyway.domain.domains.question.domain.Question;
 import kr.co.pennyway.domain.domains.question.repository.QuestionRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-@Service
+@DomainService
 @RequiredArgsConstructor
 public class QuestionService {
     private final QuestionRepository questionRepository;
