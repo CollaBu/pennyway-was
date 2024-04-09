@@ -1,20 +1,18 @@
 package kr.co.pennyway.infra.client.aws.sms;
 
+import kr.co.pennyway.infra.common.event.PhoneVerificationEvent;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-// FIXME: Naver Cloud Platform Snes 기준 DTO. AWS SNS 요청, 응답 포맷에 맞게 수정 필요
 public class SmsDto {
-    public record To(
-            String phone
+    public record Request(
+            String phone,
+            String code
     ) {
-        /**
-         * @param phone String : SMS 인증 요청을 할 전화번호 (ex. 010-1234-5678)
-         */
-        public static To of(String phone) {
-            return new To(phone);
+        public static Request from(PhoneVerificationEvent e) {
+            return new Request(e.phone(), e.code());
         }
 
         public String parsePhone() {
