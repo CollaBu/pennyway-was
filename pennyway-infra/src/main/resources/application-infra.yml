@@ -13,10 +13,10 @@ spring:
     aws:
       sns:
         credentials:
-          access-key: ${AWS_SNS_ACCESS_KEY:}
-          secret-key: ${AWS_SNS_SECRET_KEY:}
+          access-key: ${AWS_SNS_ACCESS_KEY:access-key}
+          secret-key: ${AWS_SNS_SECRET_KEY:secret-key}
         region:
-          static: ${AWS_SNS_REGION:}
+          static: ${AWS_SNS_REGION:republic-of-korea-1}
 
 pennyway:
   server:
