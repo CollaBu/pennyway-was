@@ -39,7 +39,7 @@ public interface AuthApi {
     @Operation(summary = "[2] 일반 회원가입 인증번호 검증", description = "인증번호를 검증합니다. 미인증 사용자만 가능합니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", examples = {
-                    @ExampleObject(name = "검증 성공 - 기존에 등록한 소셜 계정 없음", value = """
+                    @ExampleObject(name = "검증 성공 - 기존에 등록한 소셜 계정 없음 - [3-1]로 진행", value = """
                             {
                                 "code": "2000",
                                 "data": {
@@ -50,7 +50,7 @@ public interface AuthApi {
                                 }
                             }
                             """),
-                    @ExampleObject(name = "검증 성공 - 기존에 등록한 소셜 계정 있음", value = """
+                    @ExampleObject(name = "검증 성공 - 기존에 등록한 소셜 계정 있음 - [3-2]로 진행", value = """
                             {
                                 "code": "2000",
                                 "data": {
