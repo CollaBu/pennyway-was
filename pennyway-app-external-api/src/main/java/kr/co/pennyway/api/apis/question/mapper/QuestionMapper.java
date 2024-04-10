@@ -11,6 +11,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.transaction.annotation.Transactional;
 
 @Mapper
 @AllArgsConstructor
@@ -42,6 +43,7 @@ public class QuestionMapper {
     /**
      * Question 객체를 생성해 반환하며, DB에 저장한다.
      */
+    @Transactional
     public Question createQuestion(QuestionReq request) {
         Question question = request.toEntity();
         Question response = questionService.createQuestion(question);
