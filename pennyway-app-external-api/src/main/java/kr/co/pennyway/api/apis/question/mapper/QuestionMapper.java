@@ -34,7 +34,7 @@ public class QuestionMapper {
             return mimeMessage;
         } catch (Exception e) {
             log.warn(e.getMessage());
-            throw new QuestionErrorException(QuestionErrorCode.INTERNAL_MAILERROR);
+            throw new QuestionErrorException(QuestionErrorCode.INTERNAL_MAIL_ERROR);
         }
 
     }

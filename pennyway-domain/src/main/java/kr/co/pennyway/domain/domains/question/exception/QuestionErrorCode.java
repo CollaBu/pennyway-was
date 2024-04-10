@@ -8,7 +8,7 @@ import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 public enum QuestionErrorCode implements BaseErrorCode {
-    INTERNAL_MAILERROR(StatusCode.INTERNAL_SERVER_ERROR, ReasonCode.UNEXPECTED_ERROR, "메일 발송에 실패했습니다.");
+    INTERNAL_MAIL_ERROR(StatusCode.INTERNAL_SERVER_ERROR, ReasonCode.UNEXPECTED_ERROR, "메일 발송에 실패했습니다.");
 
     private final StatusCode statusCode;
     private final ReasonCode reasonCode;
