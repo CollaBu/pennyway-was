@@ -1,7 +1,9 @@
 package kr.co.pennyway.api.common.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.v3.oas.annotations.media.Schema;
+import kr.co.pennyway.api.common.swagger.CustomJsonView;
 import kr.co.pennyway.common.exception.ReasonCode;
 import kr.co.pennyway.common.exception.StatusCode;
 import lombok.AccessLevel;
@@ -15,15 +17,18 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Getter
-@Schema(description = "API 응답 - 실패 및 에러")
+@Schema(title = "API 응답 - 실패 및 에러")
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ErrorResponse {
-    @Schema(description = "응답 코드", defaultValue = "4000")
+    @Schema(description = "응답 코드", example = "4자리 정수형 문자열 (상태 코드(3자리) + 에러 코드(1자리))", pattern = "\\d{4}")
+    @JsonView(CustomJsonView.Common.class)
     private String code;
     @Schema(description = "응답 메시지", example = "에러 이유")
+    @JsonView(CustomJsonView.Common.class)
     private String message;
     @Schema(description = "에러 상세", example = "{\"field\":\"reason\"}")
     @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonView(CustomJsonView.Hidden.class)
     private Object fieldErrors;
 
     @Builder
