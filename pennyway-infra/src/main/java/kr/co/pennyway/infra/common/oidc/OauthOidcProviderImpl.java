@@ -89,7 +89,6 @@ public class OauthOidcProviderImpl implements OauthOidcProvider {
      */
     private Jws<Claims> getOIDCTokenJws(String token, String modulus, String exponent) {
         try {
-            log.info("token : {}", token);
             return Jwts.parser()
                     .verifyWith(getRSAPublicKey(modulus, exponent))
                     .build()

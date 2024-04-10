@@ -28,13 +28,14 @@ oauth2:
   client:
     provider:
       kakao:
-        jwks-uri: ${KAKAO_JWKS_URI:https://kauth.kakao.com}
+        jwks-uri: ${KAKAO_JWKS_URI:https://kakao.com}
         secret: ${KAKAO_CLIENT_SECRET:liuhil5068l2j5o0912}
       google:
-        jwks-uri: ${GOOGLE_JWKS_URI:https://www.googleapis.com}
+        jwks-uri: ${GOOGLE_JWKS_URI:https://google.com}
         secret: ${GOOGLE_CLIENT_SECRET:123456789012-67hm9vokrt6ukmiwtvd8ak67oflecm.apps.googleusercontent.com}
+        issuer: ${GOOGLE_ISSUER:https://google.com}
       apple:
-        jwks-uri: ${APPLE_JWKS_URI:https://appleid.apple.com}
+        jwks-uri: ${APPLE_JWKS_URI:https://apple.com}
         secret: ${APPLE_CLIENT_SECRET:pennyway-jayang-was}
 
 ---

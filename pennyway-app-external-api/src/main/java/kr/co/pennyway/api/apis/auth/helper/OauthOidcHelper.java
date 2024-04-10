@@ -48,7 +48,7 @@ public class OauthOidcHelper {
         OauthOidcClientProperties properties = oauthOidcClients.get(provider).values().iterator().next();
         OidcPublicKeyResponse response = client.getOidcPublicKey();
 
-        return getPayloadFromIdToken(idToken, properties.getJwksUri(), properties.getSecret(), null, response);
+        return getPayloadFromIdToken(idToken, properties.getIssuer(), properties.getSecret(), null, response);
     }
 
     /**
