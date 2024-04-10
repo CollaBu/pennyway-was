@@ -89,7 +89,7 @@ public interface OauthApi {
                                 "data": {
                                     "sms": {
                                         "code": true,
-                                        "existUser": true,
+                                        "existsUser": true,
                                         "username": "pennyway"
                                     }
                                 }
@@ -101,7 +101,7 @@ public interface OauthApi {
                                 "data": {
                                     "sms": {
                                         "code": true,
-                                        "existUser": false
+                                        "existsUser": false
                                     }
                                 }
                             }
