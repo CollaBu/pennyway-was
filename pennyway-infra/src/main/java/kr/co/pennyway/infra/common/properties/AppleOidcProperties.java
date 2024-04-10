@@ -11,4 +11,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class AppleOidcProperties implements OauthOidcClientProperties {
     private final String jwksUri;
     private final String secret;
+
+    @Override
+    public String getIssuer() {
+        throw new UnsupportedOperationException("Not supported");
+    }
 }
