@@ -26,10 +26,7 @@ public class QuestionUseCase {
 
     public Question sendQuestion(QuestionReq request) {
         MimeMessage mimeMessage = questionMapper.createMessage(request, adminAddress);
-        // TODO : 일단 DB에 저장되는 부분은 보류
-        // Question question = questionMapper.createQuestion(request);
-
-        Question question = request.toEntity();
+        Question question = questionMapper.createQuestion(request);
 
         try {
             javaMailSender.send(mimeMessage);
