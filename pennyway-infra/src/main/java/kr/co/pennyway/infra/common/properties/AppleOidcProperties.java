@@ -14,6 +14,6 @@ public class AppleOidcProperties implements OauthOidcClientProperties {
 
     @Override
     public String getIssuer() {
-        throw new UnsupportedOperationException("Not supported");
+        return jwksUri;
     }
 }
