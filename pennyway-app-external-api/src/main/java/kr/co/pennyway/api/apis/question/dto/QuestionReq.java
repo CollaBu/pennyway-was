@@ -8,7 +8,7 @@ import kr.co.pennyway.domain.domains.question.domain.Question;
 import kr.co.pennyway.domain.domains.question.domain.QuestionCategory;
 
 public record QuestionReq(
-        @Schema(description = "믄의자 이메일", example = "foobar@gmail.com")
+        @Schema(description = "문의자 이메일", example = "foobar@gmail.com")
         @NotBlank(message = "이메일을 입력해주세요")
         @Email(message = "이메일 형식이 올바르지 않습니다.")
         String email,

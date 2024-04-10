@@ -12,6 +12,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 public interface QuestionApi {
 
     @Operation(summary = "문의 전송", description = "사용자는 관리자에게 문의 메일을 발송한다.")
-    @Schema(name = "QuestionReqGeneral", title = "문의 요청", allowableValues = {"UTILIZATION", "BUG_REPORT", "SUGGESTION", "ETC"})
+    @Schema(name = "QuestionReqGeneral", title = "문의 요청")
     ResponseEntity<?> sendQuestion(@RequestBody @Validated QuestionReq request);
 }
