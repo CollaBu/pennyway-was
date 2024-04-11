@@ -23,7 +23,7 @@ import java.time.LocalDateTime;
 @EntityListeners(AuditingEntityListener.class)
 @DynamicInsert
 @SQLRestriction("deleted_at IS NULL")
-@SQLDelete(sql = "UPDATE user SET deleted_at = NOW() WHERE id = ?")
+@SQLDelete(sql = "UPDATE oauth SET deleted_at = NOW() WHERE id = ?")
 public class Oauth {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
