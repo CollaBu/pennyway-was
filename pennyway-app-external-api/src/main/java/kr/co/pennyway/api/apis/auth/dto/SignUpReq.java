@@ -51,7 +51,7 @@ public class SignUpReq {
             String username,
             @Schema(description = "이름", example = "페니웨이")
             @NotBlank(message = "이름을 입력해주세요")
-            @Pattern(regexp = "^[가-힣a-zA-Z]{2,20}$", message = "2~20자의 한글, 영문 대/소문자만 사용 가능합니다.")
+            @Pattern(regexp = "^[가-힣]{1,6}|[a-zA-Z]{1,10}$", message = "2~20자의 한글, 영문 대/소문자만 사용 가능합니다.")
             String name,
             @Schema(description = "비밀번호", example = "pennyway1234")
             @NotBlank(message = "비밀번호를 입력해주세요")
@@ -98,7 +98,7 @@ public class SignUpReq {
             String idToken,
             @Schema(description = "이름", example = "페니웨이")
             @NotBlank(message = "이름을 입력해주세요")
-            @Pattern(regexp = "^[가-힣a-zA-Z]{2,20}$", message = "2~20자의 한글, 영문 대/소문자만 사용 가능합니다.")
+            @Pattern(regexp = "^[가-힣]{1,6}|[a-zA-Z]{1,10}$", message = "2~20자의 한글, 영문 대/소문자만 사용 가능합니다.")
             String name,
             @Schema(description = "아이디", example = "pennyway")
             @NotBlank(message = "아이디를 입력해주세요")
