@@ -19,7 +19,10 @@ dependencies {
 
     /* Redis */
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
-    testImplementation group: 'org.testcontainers', name: 'testcontainers', version: '1.17.2'
+    testImplementation "org.testcontainers:junit-jupiter:1.19.7"
+    testImplementation "org.testcontainers:testcontainers:1.19.7"
+    testImplementation "org.testcontainers:mysql:1.19.7"
+    testImplementation "com.redis.testcontainers:testcontainers-redis-junit:1.6.4"
 }
 
 def querydslDir = 'src/main/generated'
