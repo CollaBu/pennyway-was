@@ -68,4 +68,15 @@ public class User extends DateAuditable {
         this.password = password;
         this.passwordUpdatedAt = LocalDateTime.now();
     }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                ", name='" + name + '\'' +
+                ", role=" + role +
+                ", deletedAt=" + deletedAt +
+                '}';
+    }
 }
