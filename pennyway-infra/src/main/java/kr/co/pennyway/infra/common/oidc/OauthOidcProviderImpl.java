@@ -69,6 +69,9 @@ public class OauthOidcProviderImpl implements OauthOidcProvider {
             Assert.isTrue(payload.get("iss").equals(iss), "iss is not matched. expected : " + iss + ", actual : " + payload.get("iss"));
 
             return Map.of("header", header, "payload", payload);
+        } catch (IllegalArgumentException e) {
+            log.warn("getUnsignedTokenClaims : Error - {},  {}", e.getClass(), e.getMessage());
+            throw new JwtErrorException(JwtErrorCode.FAILED_AUTHENTICATION);
         } catch (JsonProcessingException e) {
             log.warn("getUnsignedTokenClaims : Error - {},  {}", e.getClass(), e.getMessage());
             throw new RuntimeException(e);
