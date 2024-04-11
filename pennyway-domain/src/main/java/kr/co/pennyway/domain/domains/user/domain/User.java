@@ -12,6 +12,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDateTime;
 
@@ -20,6 +22,8 @@ import java.time.LocalDateTime;
 @Table(name = "user")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @DynamicInsert
+@SQLRestriction("deleted_at IS NULL")
+@SQLDelete(sql = "UPDATE user SET deleted_at = NOW() WHERE id = ?")
 public class User extends DateAuditable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
