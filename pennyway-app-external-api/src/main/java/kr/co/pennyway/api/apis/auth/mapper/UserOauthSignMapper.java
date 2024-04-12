@@ -42,7 +42,6 @@ public class UserOauthSignMapper {
         if (isSignUpUser.getLeft().equals(Boolean.TRUE)) {
             user = userService.readUserByUsername(isSignUpUser.getRight())
                     .orElseThrow(() -> new UserErrorException(UserErrorCode.NOT_FOUND));
-            Oauth.of(provider, oauthId, user);
         } else {
             user = User.builder()
                     .username(request.username())
@@ -51,8 +50,10 @@ public class UserOauthSignMapper {
                     .role(Role.USER)
                     .profileVisibility(ProfileVisibility.PUBLIC).build();
             userService.createUser(user);
-            Oauth.of(provider, oauthId, user);
         }
+
+        Oauth oauth = Oauth.of(provider, oauthId, user);
+        oauthService.createOauth(oauth);
 
         return user;
     }
