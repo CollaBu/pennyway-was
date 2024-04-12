@@ -1,16 +1,25 @@
 package kr.co.pennyway.api.apis.auth.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import kr.co.pennyway.api.apis.auth.dto.PhoneVerificationDto;
 import kr.co.pennyway.api.apis.auth.dto.SignUpReq;
 import kr.co.pennyway.api.config.ExternalApiDBTestConfig;
 import kr.co.pennyway.api.config.ExternalApiIntegrationTest;
 import kr.co.pennyway.domain.common.redis.phone.PhoneVerificationService;
 import kr.co.pennyway.domain.common.redis.phone.PhoneVerificationType;
+import kr.co.pennyway.domain.domains.oauth.domain.Oauth;
+import kr.co.pennyway.domain.domains.oauth.type.Provider;
+import kr.co.pennyway.domain.domains.user.domain.User;
+import kr.co.pennyway.domain.domains.user.exception.UserErrorCode;
+import kr.co.pennyway.domain.domains.user.service.UserService;
+import kr.co.pennyway.domain.domains.user.type.ProfileVisibility;
+import kr.co.pennyway.domain.domains.user.type.Role;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -18,6 +27,10 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.BDDMockito.given;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -26,14 +39,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExternalApiIntegrationTest
 @AutoConfigureMockMvc
 public class AuthControllerIntegrationTest extends ExternalApiDBTestConfig {
+    private final String expectedUsername = "jayang";
+    private final String expectedPhone = "010-1234-5678";
+    private final String expectedCode = "123456";
     @Autowired
     private MockMvc mockMvc;
-
     @Autowired
     private ObjectMapper objectMapper;
-
-    @Autowired
+    @SpyBean
     private PhoneVerificationService phoneVerificationService;
+    @SpyBean
+    private UserService userService;
 
     @BeforeEach
     void setUp(WebApplicationContext webApplicationContext) {
@@ -44,9 +60,77 @@ public class AuthControllerIntegrationTest extends ExternalApiDBTestConfig {
     }
 
     @Test
-    @DisplayName("컨테이너 실행 테스트")
-    void containerTest() {
-        System.out.println("컨테이너 실행 테스트");
+    @WithAnonymousUser
+    @DisplayName("[2] 일반 회원가입 이력이 있는 경우 400 BAD_REQUEST를 반환하고, 인증 코드 캐시 데이터가 제거된다.")
+    void generalSignUpFailBecauseAlreadyGeneralSignUp() throws Exception {
+        // given
+        PhoneVerificationDto.VerifyCodeReq request = new PhoneVerificationDto.VerifyCodeReq(expectedPhone, expectedCode);
+        phoneVerificationService.create(expectedPhone, expectedCode, PhoneVerificationType.SIGN_UP);
+        given(userService.readUserByPhone(expectedPhone)).willReturn(Optional.of(createGeneralSignedUser()));
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                post("/v1/auth/phone/verification")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request))
+        );
+
+        // then
+        resultActions
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value(UserErrorCode.ALREADY_SIGNUP.causedBy().getCode()))
+                .andExpect(jsonPath("$.message").value(UserErrorCode.ALREADY_SIGNUP.getExplainError()))
+                .andDo(print());
+        assertThrows(IllegalArgumentException.class, () -> phoneVerificationService.readByPhone(expectedPhone, PhoneVerificationType.SIGN_UP));
+    }
+
+    @Test
+    @WithAnonymousUser
+    @DisplayName("[2] 소셜 로그인 이력이 없는 경우, 200 OK를 반환하고 oauth 필드가 false이다.")
+    void generalSignUpSuccess() throws Exception {
+        // given
+        PhoneVerificationDto.VerifyCodeReq request = new PhoneVerificationDto.VerifyCodeReq(expectedPhone, expectedCode);
+        phoneVerificationService.create(expectedPhone, expectedCode, PhoneVerificationType.SIGN_UP);
+        given(userService.readUserByPhone(expectedPhone)).willReturn(Optional.empty());
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                post("/v1/auth/phone/verification")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request))
+        );
+
+        // then
+        resultActions
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.sms.code").value(true))
+                .andExpect(jsonPath("$.data.sms.oauth").value(false))
+                .andDo(print());
+    }
+
+    @Test
+    @WithAnonymousUser
+    @DisplayName("[2] 소셜 로그인 이력이 있는 경우, 200 OK를 반환하고 oauth 필드가 true고 username 필드가 존재한다.")
+    void generalSignUpSuccessWithOauth() throws Exception {
+        // given
+        PhoneVerificationDto.VerifyCodeReq request = new PhoneVerificationDto.VerifyCodeReq(expectedPhone, expectedCode);
+        phoneVerificationService.create(expectedPhone, expectedCode, PhoneVerificationType.SIGN_UP);
+        given(userService.readUserByPhone(expectedPhone)).willReturn(Optional.of(createOauthSignedUser()));
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                post("/v1/auth/phone/verification")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request))
+        );
+
+        // then
+        resultActions
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.sms.code").value(true))
+                .andExpect(jsonPath("$.data.sms.oauth").value(true))
+                .andExpect(jsonPath("$.data.sms.username").value(expectedUsername))
+                .andDo(print());
     }
 
     @Test
@@ -71,5 +155,39 @@ public class AuthControllerIntegrationTest extends ExternalApiDBTestConfig {
                 .andExpect(header().exists("Authorization"))
                 .andExpect(jsonPath("$.data.user.id").value(1))
                 .andDo(print());
+    }
+
+    /**
+     * 일반 회원가입 유저 생성
+     */
+    private User createGeneralSignedUser() {
+        return User.builder()
+                .name("페니웨이")
+                .username(expectedUsername)
+                .password("dkssudgktpdy1")
+                .phone("010-1234-5678")
+                .role(Role.USER)
+                .profileVisibility(ProfileVisibility.PUBLIC)
+                .build();
+    }
+
+    /**
+     * OAuth로 가입한 유저 생성 (password가 NULL)
+     */
+    private User createOauthSignedUser() {
+        return User.builder()
+                .name("페니웨이")
+                .username(expectedUsername)
+                .phone("010-1234-5678")
+                .role(Role.USER)
+                .profileVisibility(ProfileVisibility.PUBLIC)
+                .build();
+    }
+
+    /**
+     * User에 연결된 Oauth 생성
+     */
+    private Oauth createOauthAccount(User user) {
+        return Oauth.of(Provider.KAKAO, "oauthId", user);
     }
 }
