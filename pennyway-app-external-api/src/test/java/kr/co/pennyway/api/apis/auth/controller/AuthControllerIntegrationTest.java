@@ -148,6 +148,44 @@ public class AuthControllerIntegrationTest extends ExternalApiDBTestConfig {
 
         @Test
         @WithAnonymousUser
+        @DisplayName("인증 번호가 일치하지 않는 경우 401 UNAUTHORIZED를 반환한다.")
+        void generalSignUpFailBecauseInvalidCode() throws Exception {
+            // given
+            phoneVerificationService.create(expectedPhone, expectedCode, PhoneVerificationType.SIGN_UP);
+            given(userService.readUserByPhone(expectedPhone)).willReturn(Optional.empty());
+            String invalidCode = "111111";
+
+            // when
+            ResultActions resultActions = performPhoneVerificationRequest(invalidCode);
+
+            // then
+            resultActions
+                    .andExpect(status().isUnauthorized())
+                    .andExpect(jsonPath("$.code").value(PhoneVerificationErrorCode.IS_NOT_VALID_CODE.causedBy().getCode()))
+                    .andExpect(jsonPath("$.message").value(PhoneVerificationErrorCode.IS_NOT_VALID_CODE.getExplainError()))
+                    .andDo(print());
+        }
+
+        @Test
+        @WithAnonymousUser
+        @DisplayName("일치하는 전화번호 혹은 인증 번호가 없는 경우 404 NOT_FOUND를 반환한다.")
+        void generalSignUpFailBecauseNotFound() throws Exception {
+            // given
+            given(userService.readUserByPhone(expectedPhone)).willReturn(Optional.empty());
+
+            // when
+            ResultActions resultActions = performPhoneVerificationRequest(expectedCode);
+
+            // then
+            resultActions
+                    .andExpect(status().isNotFound())
+                    .andExpect(jsonPath("$.code").value(PhoneVerificationErrorCode.EXPIRED_OR_INVALID_PHONE.causedBy().getCode()))
+                    .andExpect(jsonPath("$.message").value(PhoneVerificationErrorCode.EXPIRED_OR_INVALID_PHONE.getExplainError()))
+                    .andDo(print());
+        }
+
+        @Test
+        @WithAnonymousUser
         @DisplayName("소셜 로그인 이력이 없는 경우, 200 OK를 반환하고 oauth 필드가 false이다.")
         void generalSignUpSuccess() throws Exception {
             // given
@@ -155,7 +193,7 @@ public class AuthControllerIntegrationTest extends ExternalApiDBTestConfig {
             given(userService.readUserByPhone(expectedPhone)).willReturn(Optional.empty());
 
             // when
-            ResultActions resultActions = performPhoneVerificationRequest();
+            ResultActions resultActions = performPhoneVerificationRequest(expectedCode);
 
             // then
             resultActions
@@ -174,7 +212,7 @@ public class AuthControllerIntegrationTest extends ExternalApiDBTestConfig {
             given(userService.readUserByPhone(expectedPhone)).willReturn(Optional.of(createOauthSignedUser()));
 
             // when
-            ResultActions resultActions = performPhoneVerificationRequest();
+            ResultActions resultActions = performPhoneVerificationRequest(expectedCode);
 
             // then
             resultActions
@@ -190,7 +228,7 @@ public class AuthControllerIntegrationTest extends ExternalApiDBTestConfig {
             phoneVerificationService.delete(expectedPhone, PhoneVerificationType.SIGN_UP);
         }
 
-        private ResultActions performPhoneVerificationRequest() throws Exception {
+        private ResultActions performPhoneVerificationRequest(String expectedCode) throws Exception {
             PhoneVerificationDto.VerifyCodeReq request = new PhoneVerificationDto.VerifyCodeReq(expectedPhone, expectedCode);
             return mockMvc.perform(
                     post("/v1/auth/phone/verification")
