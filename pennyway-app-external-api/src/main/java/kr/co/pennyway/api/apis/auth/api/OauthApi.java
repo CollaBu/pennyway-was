@@ -107,6 +107,14 @@ public interface OauthApi {
                             }
                             """)
             })),
+            @ApiResponse(responseCode = "400", content = @Content(mediaType = "application/json", examples = {
+                    @ExampleObject(name = "해당 provider로 로그인한 이력이 이미 존재함", value = """
+                            {
+                                "code": "4004",
+                                "message": "이미 해당 제공자로 가입된 사용자입니다."
+                            }
+                            """)
+            })),
             @ApiResponse(responseCode = "401", content = @Content(mediaType = "application/json", examples = {
                     @ExampleObject(name = "인증코드 불일치", value = """
                             {
