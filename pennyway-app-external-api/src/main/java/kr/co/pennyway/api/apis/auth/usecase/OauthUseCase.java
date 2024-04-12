@@ -35,7 +35,7 @@ public class OauthUseCase {
 
     public Pair<Long, Jwts> signIn(Provider provider, SignInReq.Oauth request) {
         OidcDecodePayload payload = oauthOidcHelper.getPayload(provider, request.idToken());
-        log.info("payload : {}", payload);
+        log.debug("payload : {}", payload);
 
         if (!request.oauthId().equals(payload.sub()))
             throw new OauthException(OauthErrorCode.NOT_MATCHED_OAUTH_ID);
