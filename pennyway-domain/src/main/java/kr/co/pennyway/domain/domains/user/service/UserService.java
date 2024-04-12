@@ -42,4 +42,9 @@ public class UserService {
     public boolean isExistUsername(String username) {
         return userRepository.existsByUsername(username);
     }
+
+    @Transactional
+    public void deleteUser(User user) {
+        userRepository.delete(user);
+    }
 }
