@@ -9,6 +9,7 @@ import kr.co.pennyway.api.config.ExternalApiIntegrationTest;
 import kr.co.pennyway.domain.common.redis.phone.PhoneVerificationService;
 import kr.co.pennyway.domain.common.redis.phone.PhoneVerificationType;
 import kr.co.pennyway.domain.domains.oauth.domain.Oauth;
+import kr.co.pennyway.domain.domains.oauth.service.OauthService;
 import kr.co.pennyway.domain.domains.oauth.type.Provider;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorCode;
@@ -28,8 +29,10 @@ import org.springframework.web.context.WebApplicationContext;
 
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -41,6 +44,8 @@ public class AuthControllerIntegrationTest extends ExternalApiDBTestConfig {
     private final String expectedUsername = "jayang";
     private final String expectedPhone = "010-1234-5678";
     private final String expectedCode = "123456";
+    private final String expectedOauthId = "oauthId";
+
     @Autowired
     private MockMvc mockMvc;
     @Autowired
@@ -49,6 +54,8 @@ public class AuthControllerIntegrationTest extends ExternalApiDBTestConfig {
     private PhoneVerificationService phoneVerificationService;
     @SpyBean
     private UserService userService;
+    @Autowired
+    private OauthService oauthService;
 
     @BeforeEach
     void setUp(WebApplicationContext webApplicationContext) {
@@ -113,7 +120,7 @@ public class AuthControllerIntegrationTest extends ExternalApiDBTestConfig {
      * User에 연결된 Oauth 생성
      */
     private Oauth createOauthAccount(User user) {
-        return Oauth.of(Provider.KAKAO, "oauthId", user);
+        return Oauth.of(Provider.KAKAO, expectedOauthId, user);
     }
 
     @Nested
@@ -241,6 +248,62 @@ public class AuthControllerIntegrationTest extends ExternalApiDBTestConfig {
             SignUpReq.General request = new SignUpReq.General("페니웨이", expectedUsername, "dkssudgktpdy1", expectedPhone, code);
             return mockMvc.perform(
                     post("/v1/auth/sign-up")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request))
+            );
+        }
+    }
+
+    @Nested
+    @DisplayName("[3-2] 소셜 계정 연동 회원가입 테스트")
+    class SyncWithOauthSignUpTest {
+        @Test
+        @WithAnonymousUser
+        @DisplayName("인증번호가 일치하지 않는 경우 401 UNAUTHORIZED를 반환한다.")
+        void syncWithOauthSignUpFailBecauseInvalidCode() throws Exception {
+            // given
+            phoneVerificationService.create(expectedPhone, expectedCode, PhoneVerificationType.SIGN_UP);
+            given(userService.readUserByPhone(expectedPhone)).willReturn(Optional.empty());
+            String invalidCode = "111111";
+
+            // when
+            ResultActions resultActions = performSyncWithOauthSignUpRequest(invalidCode);
+
+            // then
+            resultActions
+                    .andExpect(status().isUnauthorized())
+                    .andExpect(jsonPath("$.code").value(PhoneVerificationErrorCode.IS_NOT_VALID_CODE.causedBy().getCode()))
+                    .andExpect(jsonPath("$.message").value(PhoneVerificationErrorCode.IS_NOT_VALID_CODE.getExplainError())
+                    )
+                    .andDo(print());
+            then(phoneVerificationService).should().delete(expectedPhone, PhoneVerificationType.SIGN_UP);
+        }
+
+        @Test
+        @WithAnonymousUser
+        @DisplayName("인증번호가 일치하는 경우 200 OK를 반환하고, 기존의 소셜 계정과 연동된 회원가입이 완료된다.")
+        void syncWithOauthSignUpSuccess() throws Exception {
+            // given
+            phoneVerificationService.create(expectedPhone, expectedCode, PhoneVerificationType.SIGN_UP);
+            given(userService.readUserByPhone(expectedPhone)).willReturn(Optional.empty());
+
+            // when
+            ResultActions resultActions = performSyncWithOauthSignUpRequest(expectedCode);
+
+            // then
+            resultActions
+                    .andExpect(status().isOk())
+                    .andExpect(header().exists("Set-Cookie"))
+                    .andExpect(header().exists("Authorization"))
+                    .andExpect(jsonPath("$.data.user.id").value(1))
+                    .andDo(print());
+            assertNotNull(oauthService.readOauthByOauthIdAndProvider("oauthId", Provider.KAKAO));
+        }
+
+        private ResultActions performSyncWithOauthSignUpRequest(String code) throws Exception {
+            SignUpReq.SyncWithOauth request = new SignUpReq.SyncWithOauth("페니웨이", expectedPhone, code);
+            return mockMvc.perform(
+                    post("/v1/auth/link-oauth")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request))
             );
