@@ -25,6 +25,7 @@ import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.util.Optional;
@@ -39,6 +40,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @ExternalApiIntegrationTest
 @AutoConfigureMockMvc
+@TestClassOrder(ClassOrderer.OrderAnnotation.class)
 public class AuthControllerIntegrationTest extends ExternalApiDBTestConfig {
     private final String expectedUsername = "jayang";
     private final String expectedPhone = "010-1234-5678";
@@ -99,6 +101,7 @@ public class AuthControllerIntegrationTest extends ExternalApiDBTestConfig {
     }
 
     @Nested
+    @Order(1)
     @DisplayName("[2] 전화번호 검증 테스트")
     class GeneralSignUpPhoneVerifyTest {
         @Test
@@ -214,6 +217,7 @@ public class AuthControllerIntegrationTest extends ExternalApiDBTestConfig {
     }
 
     @Nested
+    @Order(2)
     @DisplayName("[3-1] 일반 회원가입 테스트")
     class GeneralSignUpTest {
         @Test
@@ -222,7 +226,6 @@ public class AuthControllerIntegrationTest extends ExternalApiDBTestConfig {
         void generalSignUpFailBecauseInvalidCode() throws Exception {
             // given
             phoneVerificationService.create(expectedPhone, expectedCode, PhoneVerificationType.SIGN_UP);
-            given(userService.readUserByPhone(expectedPhone)).willReturn(Optional.empty());
             String invalidCode = "111111";
 
             // when
@@ -238,6 +241,7 @@ public class AuthControllerIntegrationTest extends ExternalApiDBTestConfig {
 
         @Test
         @WithAnonymousUser
+        @Transactional
         @DisplayName("인증번호가 일치하는 경우 200 OK를 반환하고, 회원가입이 완료된다.")
         void generalSignUpSuccess() throws Exception {
             // given
@@ -252,7 +256,7 @@ public class AuthControllerIntegrationTest extends ExternalApiDBTestConfig {
                     .andExpect(status().isOk())
                     .andExpect(header().exists("Set-Cookie"))
                     .andExpect(header().exists("Authorization"))
-                    .andExpect(jsonPath("$.data.user.id").value(2))
+                    .andExpect(jsonPath("$.data.user.id").value(1))
                     .andDo(print());
         }
 
@@ -272,6 +276,7 @@ public class AuthControllerIntegrationTest extends ExternalApiDBTestConfig {
     }
 
     @Nested
+    @Order(3)
     @DisplayName("[3-2] 소셜 계정 연동 회원가입 테스트")
     class SyncWithOauthSignUpTest {
         @Test
@@ -280,7 +285,6 @@ public class AuthControllerIntegrationTest extends ExternalApiDBTestConfig {
         void syncWithOauthSignUpFailBecauseInvalidCode() throws Exception {
             // given
             phoneVerificationService.create(expectedPhone, expectedCode, PhoneVerificationType.SIGN_UP);
-            given(userService.readUserByPhone(expectedPhone)).willReturn(Optional.empty());
             String invalidCode = "111111";
 
             // when
@@ -296,11 +300,14 @@ public class AuthControllerIntegrationTest extends ExternalApiDBTestConfig {
 
         @Test
         @WithAnonymousUser
+        @Transactional
         @DisplayName("인증번호가 일치하는 경우 200 OK를 반환하고, 기존의 소셜 계정과 연동된 회원가입이 완료된다.")
         void syncWithOauthSignUpSuccess() throws Exception {
             // given
             phoneVerificationService.create(expectedPhone, expectedCode, PhoneVerificationType.SIGN_UP);
-            given(userService.readUserByPhone(expectedPhone)).willReturn(Optional.empty());
+            User user = createOauthSignedUser();
+            userService.createUser(user);
+            oauthService.createOauth(createOauthAccount(user));
 
             // when
             ResultActions resultActions = performSyncWithOauthSignUpRequest(expectedCode);
@@ -310,9 +317,10 @@ public class AuthControllerIntegrationTest extends ExternalApiDBTestConfig {
                     .andExpect(status().isOk())
                     .andExpect(header().exists("Set-Cookie"))
                     .andExpect(header().exists("Authorization"))
-                    .andExpect(jsonPath("$.data.user.id").value(1))
+                    .andExpect(jsonPath("$.data.user.id").value(user.getId()))
                     .andDo(print());
             assertNotNull(oauthService.readOauthByOauthIdAndProvider("oauthId", Provider.KAKAO));
+            assertNotNull(user.getPassword());
         }
 
         private ResultActions performSyncWithOauthSignUpRequest(String code) throws Exception {
