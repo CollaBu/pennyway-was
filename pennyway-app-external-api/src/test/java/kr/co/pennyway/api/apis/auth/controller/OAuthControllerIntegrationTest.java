@@ -524,6 +524,85 @@ public class OAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
     @Order(4)
     @DisplayName("[4-2] 소셜 회원가입")
     class OauthSignUpTest {
+        @Test
+        @WithAnonymousUser
+        @Transactional
+        @DisplayName("기존의 회원가입 이력이 없으면 새로운 회원가입이 성공하고 로그인 응답을 반환한다.")
+        void signUpWithNoSignedUser() throws Exception {
+            // given
+            Provider provider = Provider.KAKAO;
+            phoneVerificationService.create(expectedPhone, expectedCode, PhoneVerificationType.getOauthSignUpTypeByProvider(provider));
+            given(oauthOidcHelper.getPayload(provider, expectedIdToken)).willReturn(new OidcDecodePayload("iss", "aud", expectedOauthId, "email"));
 
+            // when
+            ResultActions result = performOauthSignUp(provider, expectedCode);
+
+            // then
+            result
+                    .andExpect(status().isOk())
+                    .andExpect(header().exists("Set-Cookie"))
+                    .andExpect(header().exists("Authorization"))
+                    .andExpect(jsonPath("$.data.user.id").isNumber())
+                    .andDo(print());
+            System.out.println("oauth : " + oauthService.readOauthByOauthIdAndProvider(expectedOauthId, provider).get());
+        }
+
+        @Test
+        @WithAnonymousUser
+        @Transactional
+        @DisplayName("기존의 일반 회원가입 이력이 있으면, 400 BAD_REQUEST 응답을 반환한다.")
+        void signUpWithGeneralSignedUser() throws Exception {
+            // given
+            Provider provider = Provider.KAKAO;
+            User user = createGeneralSignedUser();
+
+            userService.createUser(user);
+            phoneVerificationService.create(expectedPhone, expectedCode, PhoneVerificationType.getOauthSignUpTypeByProvider(provider));
+            given(oauthOidcHelper.getPayload(provider, expectedIdToken)).willReturn(new OidcDecodePayload("iss", "aud", expectedOauthId, "email"));
+
+            // when
+            ResultActions result = performOauthSignUp(provider, expectedCode);
+
+            // then
+            result
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.code").value(OauthErrorCode.INVALID_OAUTH_SYNC_REQUEST.causedBy().getCode()))
+                    .andExpect(jsonPath("$.message").value(OauthErrorCode.INVALID_OAUTH_SYNC_REQUEST.getExplainError()))
+                    .andDo(print());
+        }
+
+        @Test
+        @WithAnonymousUser
+        @Transactional
+        @DisplayName("OAuth로 가입한 유저가 이미 존재하면 400 에러가 발생한다.")
+        void signUpWithOauthSignedUser() throws Exception {
+            // given
+            Provider provider = Provider.KAKAO;
+            User user = createOauthSignedUser();
+            Oauth oauth = createOauthAccount(user, Provider.GOOGLE);
+
+            userService.createUser(user);
+            oauthService.createOauth(oauth);
+            phoneVerificationService.create(expectedPhone, expectedCode, PhoneVerificationType.getOauthSignUpTypeByProvider(provider));
+            given(oauthOidcHelper.getPayload(provider, expectedIdToken)).willReturn(new OidcDecodePayload("iss", "aud", expectedOauthId, "email"));
+
+            // when
+            ResultActions result = performOauthSignUp(provider, expectedCode);
+
+            // then
+            result
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.code").value(OauthErrorCode.INVALID_OAUTH_SYNC_REQUEST.causedBy().getCode()))
+                    .andExpect(jsonPath("$.message").value(OauthErrorCode.INVALID_OAUTH_SYNC_REQUEST.getExplainError()))
+                    .andDo(print());
+        }
+
+        private ResultActions performOauthSignUp(Provider provider, String code) throws Exception {
+            SignUpReq.Oauth request = new SignUpReq.Oauth(expectedIdToken, "jayang", expectedUsername, expectedPhone, code);
+            return mockMvc.perform(post("/v1/auth/oauth/sign-up")
+                    .param("provider", provider.name())
+                    .contentType("application/json")
+                    .content(objectMapper.writeValueAsString(request)));
+        }
     }
 }
