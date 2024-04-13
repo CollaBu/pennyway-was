@@ -6,6 +6,7 @@ import kr.co.pennyway.api.apis.auth.helper.OauthOidcHelper;
 import kr.co.pennyway.api.config.ExternalApiDBTestConfig;
 import kr.co.pennyway.api.config.ExternalApiIntegrationTest;
 import kr.co.pennyway.domain.domains.oauth.domain.Oauth;
+import kr.co.pennyway.domain.domains.oauth.exception.OauthErrorCode;
 import kr.co.pennyway.domain.domains.oauth.service.OauthService;
 import kr.co.pennyway.domain.domains.oauth.type.Provider;
 import kr.co.pennyway.domain.domains.user.domain.User;
@@ -139,7 +140,96 @@ public class OAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
                     .andExpect(status().isOk())
                     .andExpect(header().exists("Set-Cookie"))
                     .andExpect(header().exists("Authorization"))
-                    .andExpect(jsonPath("$.data.user.id").value(1))
+                    .andExpect(jsonPath("$.data.user.id").value(user.getId()))
+                    .andDo(print());
+        }
+
+        @Test
+        @WithAnonymousUser
+        @Transactional
+        @DisplayName("다른 provider로 로그인한 소셜 계정이 있으면 user id가 -1로 반환된다.")
+        void signInWithDifferentProvider() throws Exception {
+            // given
+            Provider provider = Provider.KAKAO;
+            User user = createOauthSignedUser();
+
+            given(oauthOidcHelper.getPayload(provider, expectedIdToken)).willReturn(new OidcDecodePayload("iss", "aud", expectedOauthId, "email"));
+            userService.createUser(user);
+            oauthService.createOauth(createOauthAccount(user, Provider.GOOGLE));
+
+            // when
+            ResultActions result = performOauthSignIn(provider, expectedOauthId, expectedIdToken);
+
+            // then
+            result
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.data.user.id").value(-1))
+                    .andDo(print());
+        }
+
+        @Test
+        @WithAnonymousUser
+        @Transactional
+        @DisplayName("일반 회원가입 이력만 존재하는 경우에는 user id가 -1로 반환된다.")
+        void signInWithGeneralSignedUser() throws Exception {
+            // given
+            Provider provider = Provider.KAKAO;
+            User user = createGeneralSignedUser();
+
+            given(oauthOidcHelper.getPayload(provider, expectedIdToken)).willReturn(new OidcDecodePayload("iss", "aud", expectedOauthId, "email"));
+            userService.createUser(user);
+
+            // when
+            ResultActions result = performOauthSignIn(provider, expectedOauthId, expectedIdToken);
+
+            // then
+            result
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.data.user.id").value(-1))
+                    .andDo(print());
+        }
+
+        @Test
+        @WithAnonymousUser
+        @Transactional
+        @DisplayName("회원 가입 이력이 없는 사용자의 경우에 user id가 -1로 반환된다.")
+        void signInWithNoSignedUser() throws Exception {
+            // given
+            Provider provider = Provider.KAKAO;
+
+            given(oauthOidcHelper.getPayload(provider, expectedIdToken)).willReturn(new OidcDecodePayload("iss", "aud", expectedOauthId, "email"));
+
+            // when
+            ResultActions result = performOauthSignIn(provider, expectedOauthId, expectedIdToken);
+
+            // then
+            result
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.data.user.id").value(-1))
+                    .andDo(print());
+        }
+
+        @Test
+        @WithAnonymousUser
+        @Transactional
+        @DisplayName("OAuth id와 payload의 sub가 다른 경우에는 NOT_MATCHED_OAUTH_ID 에러가 발생한다.")
+        void signInWithNotMatchedOauthId() throws Exception {
+            // given
+            Provider provider = Provider.KAKAO;
+            User user = createOauthSignedUser();
+
+            given(oauthOidcHelper.getPayload(provider, expectedIdToken)).willReturn(new OidcDecodePayload("iss", "aud", "differentOauthId", "email"));
+            userService.createUser(user);
+            oauthService.createOauth(createOauthAccount(user, provider));
+
+            // when
+            ResultActions result = performOauthSignIn(provider, expectedOauthId, expectedIdToken);
+
+            // then
+            result
+                    .andExpect(status().isUnauthorized())
+                    .andExpect(jsonPath("$.code").value(OauthErrorCode.NOT_MATCHED_OAUTH_ID.causedBy().getCode()))
+                    .andExpect(jsonPath("$.message").value(OauthErrorCode.NOT_MATCHED_OAUTH_ID.getExplainError()))
                     .andDo(print());
         }
 
