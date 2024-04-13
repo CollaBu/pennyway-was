@@ -63,6 +63,14 @@ public interface AuthApi {
                             }
                             """)
             })),
+            @ApiResponse(responseCode = "400", content = @Content(mediaType = "application/json", examples = {
+                    @ExampleObject(name = "일반 회원가입 계정이 이미 존재함", value = """
+                            {
+                                "code": "4004",
+                                "message": "이미 회원가입한 유저입니다."
+                            }
+                            """)
+            })),
             @ApiResponse(responseCode = "401", content = @Content(mediaType = "application/json", examples = {
                     @ExampleObject(name = "검증 실패", value = """
                             {
