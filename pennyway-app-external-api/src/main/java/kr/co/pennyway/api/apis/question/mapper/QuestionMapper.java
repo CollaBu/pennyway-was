@@ -44,11 +44,9 @@ public class QuestionMapper {
      * Question 객체를 생성해 반환하며, DB에 저장한다.
      */
     @Transactional
-    public Question createQuestion(QuestionReq request) {
+    public void createQuestion(QuestionReq request) {
         Question question = request.toEntity();
-        Question response = questionService.createQuestion(question);
-
-        return response;
+        questionService.createQuestion(question);
     }
 
     private String createSubject(QuestionReq request) {

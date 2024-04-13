@@ -4,7 +4,6 @@ import kr.co.pennyway.api.apis.question.api.QuestionApi;
 import kr.co.pennyway.api.apis.question.dto.QuestionReq;
 import kr.co.pennyway.api.apis.question.usecase.QuestionUseCase;
 import kr.co.pennyway.api.common.response.SuccessResponse;
-import kr.co.pennyway.domain.domains.question.domain.Question;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +25,7 @@ public class QuestionController implements QuestionApi {
     @PostMapping("")
     @PreAuthorize("permitAll()")
     public ResponseEntity<?> sendQuestion(@RequestBody @Validated QuestionReq request) {
-        Question question = questionUseCase.sendQuestion(request);
-        return ResponseEntity.ok(SuccessResponse.from(question));
+        questionUseCase.sendQuestion(request);
+        return ResponseEntity.ok(SuccessResponse.noContent());
     }
 }
