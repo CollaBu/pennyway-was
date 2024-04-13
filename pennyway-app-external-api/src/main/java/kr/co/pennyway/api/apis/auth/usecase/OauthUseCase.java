@@ -65,6 +65,8 @@ public class OauthUseCase {
 
         if (isSignUpUser.getLeft().equals(Boolean.FALSE) && request.username() == null)
             throw new OauthException(OauthErrorCode.INVALID_OAUTH_SYNC_REQUEST);
+        if (isSignUpUser.getLeft().equals(Boolean.TRUE) && request.username() != null)
+            throw new OauthException(OauthErrorCode.INVALID_OAUTH_SYNC_REQUEST);
 
         OidcDecodePayload payload = oauthOidcHelper.getPayload(provider, request.idToken());
         User user = userOauthSignMapper.saveUser(request, isSignUpUser, provider, payload.sub());
