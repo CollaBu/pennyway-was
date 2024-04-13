@@ -59,4 +59,16 @@ public class Oauth {
                 .user(user)
                 .build();
     }
+
+    @Override
+    public String toString() {
+        return "Oauth{" +
+                "id=" + id +
+                ", provider=" + provider +
+                ", oauthId='" + oauthId + '\'' +
+                ", createdAt=" + createdAt +
+                ", deletedAt=" + deletedAt +
+                ", user=" + user +
+                '}';
+    }
 }
