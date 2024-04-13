@@ -1,6 +1,7 @@
 package kr.co.pennyway.domain.domains.question.domain;
 
 import jakarta.persistence.*;
+import kr.co.pennyway.domain.common.converter.QuestionCategoryConverter;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,13 +20,15 @@ public class Question {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(nullable = false)
     private String email;
+    @Convert(converter = QuestionCategoryConverter.class)
+    @Column(nullable = false)
     private QuestionCategory category;
     private String content;
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
-
     private LocalDateTime deletedAt;
 
     @Builder
