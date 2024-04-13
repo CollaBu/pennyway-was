@@ -42,6 +42,7 @@ import java.nio.file.Path;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -433,7 +434,9 @@ public class OAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
                     .andExpect(header().exists("Authorization"))
                     .andExpect(jsonPath("$.data.user.id").value(user.getId()))
                     .andDo(print());
-            assertEquals(oauthService.readOauthByOauthIdAndProvider(expectedOauthId, provider).get().getUser().getId(), user.getId());
+            Oauth savedOauth = oauthService.readOauthByOauthIdAndProvider(expectedOauthId, provider).get();
+            assertEquals(savedOauth.getUser().getId(), user.getId());
+            System.out.println("oauth : " + savedOauth);
         }
 
         @Test
@@ -461,7 +464,9 @@ public class OAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
                     .andExpect(header().exists("Authorization"))
                     .andExpect(jsonPath("$.data.user.id").value(user.getId()))
                     .andDo(print());
-            assertEquals(oauthService.readOauthByOauthIdAndProvider(expectedOauthId, provider).get().getUser().getId(), user.getId());
+            Oauth savedOauth = oauthService.readOauthByOauthIdAndProvider(expectedOauthId, provider).get();
+            assertEquals(savedOauth.getUser().getId(), user.getId());
+            System.out.println("oauth : " + savedOauth);
         }
 
         @Test
@@ -544,7 +549,9 @@ public class OAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
                     .andExpect(header().exists("Authorization"))
                     .andExpect(jsonPath("$.data.user.id").isNumber())
                     .andDo(print());
-            System.out.println("oauth : " + oauthService.readOauthByOauthIdAndProvider(expectedOauthId, provider).get());
+            Oauth savedOauth = oauthService.readOauthByOauthIdAndProvider(expectedOauthId, provider).get();
+            assertNotNull(savedOauth.getUser().getId());
+            System.out.println("oauth : " + savedOauth);
         }
 
         @Test
