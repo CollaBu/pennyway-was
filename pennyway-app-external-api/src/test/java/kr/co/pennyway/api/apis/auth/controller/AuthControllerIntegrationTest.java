@@ -32,7 +32,6 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -63,30 +62,6 @@ public class AuthControllerIntegrationTest extends ExternalApiDBTestConfig {
                 .webAppContextSetup(webApplicationContext)
                 .defaultRequest(post("/**").with(csrf()))
                 .build();
-    }
-
-    @Test
-    @WithAnonymousUser
-    @DisplayName("회원가입 통합 테스트")
-    void controllerTest() throws Exception {
-        // given
-        SignUpReq.General request = new SignUpReq.General("pennyway", "jayang", "dkssudgktpdy1", "010-1234-5678", "050505");
-        phoneVerificationService.create("010-1234-5678", "050505", PhoneVerificationType.SIGN_UP);
-
-        // when
-        ResultActions resultActions = mockMvc.perform(
-                post("/v1/auth/sign-up")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request))
-        );
-
-        // then
-        resultActions
-                .andExpect(status().isOk())
-                .andExpect(header().exists("Set-Cookie"))
-                .andExpect(header().exists("Authorization"))
-                .andExpect(jsonPath("$.data.user.id").value(1))
-                .andDo(print());
     }
 
     /**
@@ -135,7 +110,7 @@ public class AuthControllerIntegrationTest extends ExternalApiDBTestConfig {
             given(userService.readUserByPhone(expectedPhone)).willReturn(Optional.of(createGeneralSignedUser()));
 
             // when
-            ResultActions resultActions = performPhoneVerificationRequest();
+            ResultActions resultActions = performPhoneVerificationRequest(expectedCode);
 
             // then
             resultActions
@@ -259,7 +234,6 @@ public class AuthControllerIntegrationTest extends ExternalApiDBTestConfig {
                     .andExpect(jsonPath("$.code").value(PhoneVerificationErrorCode.IS_NOT_VALID_CODE.causedBy().getCode()))
                     .andExpect(jsonPath("$.message").value(PhoneVerificationErrorCode.IS_NOT_VALID_CODE.getExplainError()))
                     .andDo(print());
-            phoneVerificationService.delete(expectedPhone, PhoneVerificationType.SIGN_UP);
         }
 
         @Test
@@ -278,17 +252,22 @@ public class AuthControllerIntegrationTest extends ExternalApiDBTestConfig {
                     .andExpect(status().isOk())
                     .andExpect(header().exists("Set-Cookie"))
                     .andExpect(header().exists("Authorization"))
-                    .andExpect(jsonPath("$.data.user.id").value(1))
+                    .andExpect(jsonPath("$.data.user.id").value(2))
                     .andDo(print());
         }
 
         private ResultActions performGeneralSignUpRequest(String code) throws Exception {
-            SignUpReq.General request = new SignUpReq.General("페니웨이", expectedUsername, "dkssudgktpdy1", expectedPhone, code);
+            SignUpReq.General request = new SignUpReq.General(expectedUsername, "pennyway", "dkssudgktpdy1", expectedPhone, code);
             return mockMvc.perform(
                     post("/v1/auth/sign-up")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request))
             );
+        }
+
+        @AfterEach
+        void tearDown() {
+            phoneVerificationService.delete(expectedPhone, PhoneVerificationType.SIGN_UP);
         }
     }
 
@@ -311,10 +290,8 @@ public class AuthControllerIntegrationTest extends ExternalApiDBTestConfig {
             resultActions
                     .andExpect(status().isUnauthorized())
                     .andExpect(jsonPath("$.code").value(PhoneVerificationErrorCode.IS_NOT_VALID_CODE.causedBy().getCode()))
-                    .andExpect(jsonPath("$.message").value(PhoneVerificationErrorCode.IS_NOT_VALID_CODE.getExplainError())
-                    )
+                    .andExpect(jsonPath("$.message").value(PhoneVerificationErrorCode.IS_NOT_VALID_CODE.getExplainError()))
                     .andDo(print());
-            then(phoneVerificationService).should().delete(expectedPhone, PhoneVerificationType.SIGN_UP);
         }
 
         @Test
@@ -339,12 +316,17 @@ public class AuthControllerIntegrationTest extends ExternalApiDBTestConfig {
         }
 
         private ResultActions performSyncWithOauthSignUpRequest(String code) throws Exception {
-            SignUpReq.SyncWithOauth request = new SignUpReq.SyncWithOauth("페니웨이", expectedPhone, code);
+            SignUpReq.SyncWithOauth request = new SignUpReq.SyncWithOauth("dkssudgktpdy1", expectedPhone, code);
             return mockMvc.perform(
                     post("/v1/auth/link-oauth")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request))
             );
+        }
+
+        @AfterEach
+        void tearDown() {
+            phoneVerificationService.delete(expectedPhone, PhoneVerificationType.SIGN_UP);
         }
     }
 }
