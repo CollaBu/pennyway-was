@@ -63,6 +63,9 @@ public class OauthUseCase {
         phoneVerificationMapper.isValidCode(PhoneVerificationDto.VerifyCodeReq.from(request), PhoneVerificationType.getOauthSignUpTypeByProvider(provider));
         Pair<Boolean, String> isSignUpUser = checkSignUpUserNotOauthByProvider(provider, request.phone());
 
+        if (isSignUpUser.getLeft().equals(Boolean.FALSE) && request.username() == null)
+            throw new OauthException(OauthErrorCode.INVALID_OAUTH_SYNC_REQUEST);
+
         OidcDecodePayload payload = oauthOidcHelper.getPayload(provider, request.idToken());
         User user = userOauthSignMapper.saveUser(request, isSignUpUser, provider, payload.sub());
         phoneVerificationService.delete(request.phone(), PhoneVerificationType.getOauthSignUpTypeByProvider(provider));
