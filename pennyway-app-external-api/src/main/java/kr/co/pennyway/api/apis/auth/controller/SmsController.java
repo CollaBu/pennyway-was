@@ -3,6 +3,8 @@ package kr.co.pennyway.api.apis.auth.controller;
 import kr.co.pennyway.api.apis.auth.api.SmsApi;
 import kr.co.pennyway.api.apis.auth.dto.PhoneVerificationDto;
 import kr.co.pennyway.api.apis.auth.mapper.PhoneVerificationMapper;
+import kr.co.pennyway.api.common.exception.PhoneVerificationErrorCode;
+import kr.co.pennyway.api.common.exception.PhoneVerificationException;
 import kr.co.pennyway.api.common.query.VerificationType;
 import kr.co.pennyway.api.common.response.SuccessResponse;
 import kr.co.pennyway.domain.domains.oauth.type.Provider;
@@ -24,6 +26,9 @@ public class SmsController implements SmsApi {
     @PostMapping("")
     @PreAuthorize("isAnonymous()")
     public ResponseEntity<?> sendCode(@RequestParam(value = "name") VerificationType type, @RequestParam(name = "provider", required = false) Provider provider, @RequestBody @Validated PhoneVerificationDto.PushCodeReq request) {
+        if (type.equals(VerificationType.OAUTH) && provider == null) {
+            throw new PhoneVerificationException(PhoneVerificationErrorCode.PROVIDER_IS_REQUIRED);
+        }
         return ResponseEntity.ok(SuccessResponse.from("sms", phoneVerificationMapper.sendCode(request, type.toPhoneVerificationType(provider))));
     }
 }
