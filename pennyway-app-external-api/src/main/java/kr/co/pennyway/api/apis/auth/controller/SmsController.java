@@ -25,7 +25,7 @@ public class SmsController implements SmsApi {
     @Override
     @PostMapping("")
     @PreAuthorize("isAnonymous()")
-    public ResponseEntity<?> sendCode(@RequestParam(value = "name") VerificationType type, @RequestParam(name = "provider", required = false) Provider provider, @RequestBody @Validated PhoneVerificationDto.PushCodeReq request) {
+    public ResponseEntity<?> sendCode(@RequestParam(value = "type") VerificationType type, @RequestParam(name = "provider", required = false) Provider provider, @RequestBody @Validated PhoneVerificationDto.PushCodeReq request) {
         if (type.equals(VerificationType.OAUTH) && provider == null) {
             throw new PhoneVerificationException(PhoneVerificationErrorCode.PROVIDER_IS_REQUIRED);
         }
