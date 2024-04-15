@@ -1,5 +1,6 @@
 package kr.co.pennyway.api.apis.auth.controller;
 
+import kr.co.pennyway.api.apis.auth.api.SmsApi;
 import kr.co.pennyway.api.apis.auth.dto.PhoneVerificationDto;
 import kr.co.pennyway.api.apis.auth.mapper.PhoneVerificationMapper;
 import kr.co.pennyway.api.common.query.VerificationType;
@@ -16,13 +17,13 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/v1/phone")
-public class SmsController {
+public class SmsController implements SmsApi {
     private final PhoneVerificationMapper phoneVerificationMapper;
 
     @Override
-    @PostMapping("/phone")
+    @PostMapping("")
     @PreAuthorize("isAnonymous()")
-    public ResponseEntity<?> sendCode(@RequestParam VerificationType type, @RequestParam(required = false) Provider provider, @RequestBody @Validated PhoneVerificationDto.PushCodeReq request) {
+    public ResponseEntity<?> sendCode(@RequestParam(value = "name") VerificationType type, @RequestParam(name = "provider", required = false) Provider provider, @RequestBody @Validated PhoneVerificationDto.PushCodeReq request) {
         return ResponseEntity.ok(SuccessResponse.from("sms", phoneVerificationMapper.sendCode(request, type.toPhoneVerificationType(provider))));
     }
 }
