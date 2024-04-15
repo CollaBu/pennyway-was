@@ -18,14 +18,16 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "[계정 검사 API]")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/v1/duplicate")
+@RequestMapping("/v1")
 public class AuthCheckController {
+
     private final AuthCheckUseCase authCheckUseCase;
 
     @Operation(summary = "닉네임 중복 검사")
-    @GetMapping("/username")
+    @GetMapping("/duplicate/username")
     @PreAuthorize("permitAll()")
     public ResponseEntity<?> checkUsername(@RequestParam @Validated String username) {
-        return ResponseEntity.ok(SuccessResponse.from("isDuplicate", authCheckUseCase.checkUsernameDuplicate(username)));
+        return ResponseEntity.ok(
+            SuccessResponse.from("isDuplicate", authCheckUseCase.checkUsernameDuplicate(username)));
     }
 }
