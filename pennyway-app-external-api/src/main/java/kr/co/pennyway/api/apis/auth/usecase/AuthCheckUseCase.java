@@ -19,7 +19,6 @@ public class AuthCheckUseCase {
 
     @Transactional(readOnly = true)
     public String findUsername(String phone) {
-        System.out.println("phone: " + userService.readUserByPhone("010-2629-4624"));
         return userService.readUserByPhone(phone)
                 .map(user -> user.getUsername())
                 .orElse(null);

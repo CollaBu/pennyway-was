@@ -33,6 +33,6 @@ public class AuthCheckController implements AuthCheckApi {
     public ResponseEntity<?> findUsername(@RequestParam @Validated String phone) {
         return ResponseEntity.ok(
                 SuccessResponse.from("username",
-                        authCheckUseCase.findUsername("010-2629-4624")));
+                        authCheckUseCase.findUsername(phone)));
     }
 }
