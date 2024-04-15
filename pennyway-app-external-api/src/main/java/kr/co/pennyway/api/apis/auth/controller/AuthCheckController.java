@@ -29,7 +29,7 @@ public class AuthCheckController implements AuthCheckApi {
     }
 
     @GetMapping("/find/username")
-    @PreAuthorize("permitAll()")
+    @PreAuthorize("isAnonymous()")
     public ResponseEntity<?> findUsername(@RequestParam @Validated String phone) {
         return ResponseEntity.ok(
                 SuccessResponse.from("username",
