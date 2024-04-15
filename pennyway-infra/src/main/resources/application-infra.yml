@@ -9,6 +9,23 @@ spring:
     port: ${REDIS_PORT}
     password: ${REDIS_PASSWORD}
 
+  mail:
+    host: smtp.gmail.com # 1
+    port: 587 # 2
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true # 5
+          timeout: 5000 # 6
+          starttls:
+            enable: true # 7
+
+app:
+  question-address: ${ADMIN_ADDRESS}
+
+
 pennyway:
   server:
     domain:
