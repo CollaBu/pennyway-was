@@ -1,5 +1,6 @@
 package kr.co.pennyway.api.apis.users.controller;
 
+import kr.co.pennyway.api.apis.users.api.UserAuthApi;
 import kr.co.pennyway.api.apis.users.usecase.UserAuthUseCase;
 import kr.co.pennyway.api.common.response.SuccessResponse;
 import kr.co.pennyway.api.common.security.authentication.SecurityUserDetails;
@@ -13,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/v1/users")
-public class UserAuthController {
+public class UserAuthController implements UserAuthApi {
     private final UserAuthUseCase userAuthUseCase;
 
     @GetMapping("/sign-out")

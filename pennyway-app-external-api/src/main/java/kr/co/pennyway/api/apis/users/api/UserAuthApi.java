@@ -1,0 +1,25 @@
+package kr.co.pennyway.api.apis.users.api;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import kr.co.pennyway.api.common.security.authentication.SecurityUserDetails;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.RequestHeader;
+
+@Tag(name = "[사용자 인증 관리 API]", description = "사용자의 인증과 관련된 UseCase(로그아웃, 소셜 계정 연동/해지 등)를 제공하는 API")
+public interface UserAuthApi {
+    @Operation(summary = "로그아웃", description = "사용자의 로그아웃을 수행한다. Access Token과 Refresh Token을 받아서 Access Token을 만료시키고, Refresh Token을 삭제한다.")
+    @Parameters({
+            @Parameter(name = "Authorization", description = "Access Token", required = true),
+            @Parameter(name = "refreshToken", description = "Refresh Token", required = false)
+    }
+    ResponseEntity<?> signOut(
+            @RequestHeader("Authorization") String accessToken,
+            @CookieValue(value = "refreshToken", required = false) String refreshToken,
+            @AuthenticationPrincipal SecurityUserDetails user
+    );
+}
