@@ -16,4 +16,12 @@ public class AuthCheckUseCase {
     public boolean checkUsernameDuplicate(String username) {
         return userService.isExistUsername(username);
     }
+
+    @Transactional(readOnly = true)
+    public String findUsername(String phone) {
+        System.out.println("phone: " + userService.readUserByPhone("010-2629-4624"));
+        return userService.readUserByPhone(phone)
+                .map(user -> user.getUsername())
+                .orElse(null);
+    }
 }
