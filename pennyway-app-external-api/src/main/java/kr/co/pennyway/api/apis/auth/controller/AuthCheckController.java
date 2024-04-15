@@ -1,7 +1,6 @@
 package kr.co.pennyway.api.apis.auth.controller;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import kr.co.pennyway.api.apis.auth.api.AuthCheckApi;
 import kr.co.pennyway.api.apis.auth.usecase.AuthCheckUseCase;
 import kr.co.pennyway.api.common.response.SuccessResponse;
 import lombok.RequiredArgsConstructor;
@@ -15,19 +14,17 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
-@Tag(name = "[계정 검사 API]")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/v1")
-public class AuthCheckController {
-
+public class AuthCheckController implements AuthCheckApi {
     private final AuthCheckUseCase authCheckUseCase;
 
-    @Operation(summary = "닉네임 중복 검사")
     @GetMapping("/duplicate/username")
     @PreAuthorize("permitAll()")
     public ResponseEntity<?> checkUsername(@RequestParam @Validated String username) {
         return ResponseEntity.ok(
-            SuccessResponse.from("isDuplicate", authCheckUseCase.checkUsernameDuplicate(username)));
+                SuccessResponse.from("isDuplicate",
+                        authCheckUseCase.checkUsernameDuplicate(username)));
     }
 }
