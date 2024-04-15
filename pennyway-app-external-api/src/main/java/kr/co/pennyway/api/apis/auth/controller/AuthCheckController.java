@@ -1,6 +1,7 @@
 package kr.co.pennyway.api.apis.auth.controller;
 
 import kr.co.pennyway.api.apis.auth.api.AuthCheckApi;
+import kr.co.pennyway.api.apis.auth.dto.AuthFindDto;
 import kr.co.pennyway.api.apis.auth.usecase.AuthCheckUseCase;
 import kr.co.pennyway.api.common.response.SuccessResponse;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +33,8 @@ public class AuthCheckController implements AuthCheckApi {
     @PreAuthorize("isAnonymous()")
     public ResponseEntity<?> findUsername(@RequestParam @Validated String phone) {
         return ResponseEntity.ok(
-                SuccessResponse.from("username",
-                        authCheckUseCase.findUsername(phone)));
+                SuccessResponse.from("user",
+                        AuthFindDto.FindUsernameRes.of(
+                                authCheckUseCase.findUsername(phone))));
     }
 }
