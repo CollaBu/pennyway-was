@@ -13,18 +13,18 @@
 pennyway-common
 ├── src
 │   ├── main
-│   │   ├── java.kr.co.pennyway.domain
-│   │   │   └── api
-│   │   │       ├── apis
-│   │   │       │   ├── auth # 기능 관심사 별로 패키지를 나누어 구성한다.
-│   │   │       │   │   ├── controller
-│   │   │       │   │   ├── dto
-│   │   │       │   │   ├── usecase
-│   │   │       │   │   └── …
-│   │   │       │   └── …
-│   │   │       ├── common
-│   │   │       ├── config
-│   │   │       └── PennywayExternalApiApplication.java
+│   │   ├── java.kr.co.pennyway
+│   │   │   ├── api
+│   │   │   │   ├── apis
+│   │   │   │   │   ├── auth # 기능 관심사 별로 패키지를 나누어 구성한다.
+│   │   │   │   │   │   ├── controller
+│   │   │   │   │   │   ├── dto
+│   │   │   │   │   │   ├── usecase
+│   │   │   │   │   │   └── …
+│   │   │   │   │   └── …
+│   │   │   │   ├── common
+│   │   │   │   └── config
+│   │   │   └── PennywayExternalApiApplication.java
 │   │   └── resources
 │   │       └── application.yml
 │   └── test
