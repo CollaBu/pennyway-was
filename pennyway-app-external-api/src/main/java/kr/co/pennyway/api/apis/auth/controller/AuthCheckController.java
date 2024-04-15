@@ -27,4 +27,10 @@ public class AuthCheckController implements AuthCheckApi {
                 SuccessResponse.from("isDuplicate",
                         authCheckUseCase.checkUsernameDuplicate(username)));
     }
+
+    @GetMapping("/find/username")
+    @PreAuthorize("permitAll()")
+    public ResponseEntity<?> findUsername(String phone) {
+        return null;
+    }
 }

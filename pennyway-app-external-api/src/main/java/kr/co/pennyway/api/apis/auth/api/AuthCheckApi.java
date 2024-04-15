@@ -10,4 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 public interface AuthCheckApi {
     @Operation(summary = "닉네임 중복 검사")
     ResponseEntity<?> checkUsername(@RequestParam @Validated String username);
+
+    @Operation(summary = "일반 회원 아이디 찾기")
+    ResponseEntity<?> findUsername(@RequestParam @Validated String phone);
 }
