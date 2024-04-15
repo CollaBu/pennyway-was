@@ -19,7 +19,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 @Tag(name = "[인증 API]")
 public interface AuthApi {
-    @Operation(summary = "[1] 일반 회원가입 인증번호 전송", description = "전화번호로 인증번호를 전송합니다. 미인증 사용자만 가능합니다.")
+    @Deprecated
+    @Operation(summary = "[1] 일반 회원가입 인증번호 전송", description = "deprecated된 API입니다. [인증코드 SMS 요청]의 /v1/phone API를 사용해주세요.", deprecated = true)
     @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", examples = {
             @ExampleObject(name = "발신 성공", value = """
                     {

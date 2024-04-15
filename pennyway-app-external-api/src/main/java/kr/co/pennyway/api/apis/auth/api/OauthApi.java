@@ -59,7 +59,8 @@ public interface OauthApi {
     })
     ResponseEntity<?> signIn(@RequestParam Provider provider, @RequestBody @Validated SignInReq.Oauth request);
 
-    @Operation(summary = "[2] 인증번호 발송", description = "전화번호 입력 후 인증번호 발송")
+    @Deprecated
+    @Operation(summary = "[2] 인증번호 발송", description = "deprecated된 API입니다. [인증코드 SMS 요청]의 /v1/phone API를 사용해주세요.", deprecated = true)
     @Parameter(name = "provider", description = "소셜 제공자", examples = {
             @ExampleObject(name = "카카오", value = "kakao"), @ExampleObject(name = "애플", value = "apple"), @ExampleObject(name = "구글", value = "google")
     }, required = true, in = ParameterIn.QUERY)
