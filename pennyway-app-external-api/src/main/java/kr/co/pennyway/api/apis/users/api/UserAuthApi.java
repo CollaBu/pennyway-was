@@ -16,7 +16,7 @@ public interface UserAuthApi {
     @Parameters({
             @Parameter(name = "Authorization", description = "Access Token", required = true),
             @Parameter(name = "refreshToken", description = "Refresh Token", required = false)
-    }
+    })
     ResponseEntity<?> signOut(
             @RequestHeader("Authorization") String accessToken,
             @CookieValue(value = "refreshToken", required = false) String refreshToken,
