@@ -21,4 +21,7 @@ dependencies {
     implementation platform("org.springframework.cloud:spring-cloud-dependencies:2023.0.1")
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign:4.1.1'
     implementation 'io.github.openfeign:feign-okhttp:13.2'
+
+    /* mail */
+    implementation 'org.springframework.boot:spring-boot-starter-mail:3.2.3'
 }
