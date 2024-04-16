@@ -1,7 +1,5 @@
 package kr.co.pennyway.api.apis.users.controller;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import kr.co.pennyway.api.apis.users.api.UserAuthApi;
 import kr.co.pennyway.api.apis.users.usecase.UserAuthUseCase;
 import kr.co.pennyway.api.common.response.SuccessResponse;
@@ -28,8 +26,7 @@ public class UserAuthController implements UserAuthApi {
     public ResponseEntity<?> signOut(
             @RequestHeader("Authorization") String authHeader,
             @CookieValue(value = "refreshToken", required = false) String refreshToken,
-            @AuthenticationPrincipal SecurityUserDetails user,
-            HttpServletRequest request, HttpServletResponse response
+            @AuthenticationPrincipal SecurityUserDetails user
     ) {
         String accessToken = authHeader.split(" ")[1];
         userAuthUseCase.signOut(user.getUserId(), accessToken, refreshToken);
