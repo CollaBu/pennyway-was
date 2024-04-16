@@ -25,7 +25,8 @@ public class UserAuthController implements UserAuthApi {
             @CookieValue(value = "refreshToken", required = false) String refreshToken,
             @AuthenticationPrincipal SecurityUserDetails user
     ) {
-        userAuthUseCase.signOut(user.getUserId(), authHeader, refreshToken);
+        String accessToken = authHeader.split(" ")[1];
+        userAuthUseCase.signOut(user.getUserId(), accessToken, refreshToken);
         return ResponseEntity.ok(SuccessResponse.noContent());
     }
 }
