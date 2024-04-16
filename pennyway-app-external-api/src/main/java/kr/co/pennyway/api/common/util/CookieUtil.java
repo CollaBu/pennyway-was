@@ -2,7 +2,6 @@ package kr.co.pennyway.api.common.util;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
 
@@ -50,21 +49,10 @@ public class CookieUtil {
     /**
      * cookieName에 해당하는 쿠키를 제거합니다.
      *
-     * @param request    HttpServletRequest : 쿠키를 제거할 request
-     * @param response   HttpServletResponse : 쿠키를 제거할 response
-     * @param cookieName String : 제거할 쿠키의 이름
      * @return Optional<ResponseCookie> : 쿠키가 존재하면 제거된 쿠키를, 존재하지 않으면 Optional.empty()를 반환합니다.
      */
-    public Optional<ResponseCookie> deleteCookie(HttpServletRequest request, HttpServletResponse response, String cookieName) {
-        Cookie[] cookies = request.getCookies();
-        if (cookies == null) {
-            return Optional.empty();
-        }
-
-        return Arrays.stream(cookies)
-                .filter(cookie -> cookieName.equals(cookie.getName()))
-                .findAny()
-                .map(cookie -> createCookie(cookieName, "", 0));
+    public ResponseCookie deleteCookie(String cookieName) {
+        return createCookie(cookieName, "", 0);
     }
 }
 

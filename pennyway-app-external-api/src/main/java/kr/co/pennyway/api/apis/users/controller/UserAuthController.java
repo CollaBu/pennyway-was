@@ -34,7 +34,7 @@ public class UserAuthController implements UserAuthApi {
         String accessToken = authHeader.split(" ")[1];
         userAuthUseCase.signOut(user.getUserId(), accessToken, refreshToken);
         return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, cookieUtil.deleteCookie(request, response, "refreshToken").toString())
+                .header(HttpHeaders.SET_COOKIE, cookieUtil.deleteCookie("refreshToken").toString())
                 .body(SuccessResponse.noContent());
     }
 }
