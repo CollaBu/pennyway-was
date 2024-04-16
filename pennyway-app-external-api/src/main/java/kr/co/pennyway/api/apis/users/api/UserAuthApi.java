@@ -3,10 +3,16 @@ package kr.co.pennyway.api.apis.users.api;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.co.pennyway.api.common.security.authentication.SecurityUserDetails;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.RequestHeader;
 
@@ -16,6 +22,22 @@ public interface UserAuthApi {
     @Parameters({
             @Parameter(name = "Authorization", description = "Access Token", required = true),
             @Parameter(name = "refreshToken", description = "Refresh Token", required = false)
+    })
+    @ApiResponses({
+            @ApiResponse(responseCode = "401", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class), examples = {
+                    @ExampleObject(name = "유효하지 않은 refresh token", value = """
+                            {
+                                "code": "4013",
+                                "message": "비정상적인 토큰입니다"
+                            }
+                            """),
+                    @ExampleObject(name = "소유권이 없는 refresh token 삭제 요청", value = """
+                            {
+                                "code": "4014",
+                                "message": "소유권이 없는 리프레시 토큰입니다"
+                            }
+                            """)
+            }))
     })
     ResponseEntity<?> signOut(
             @RequestHeader("Authorization") String accessToken,
