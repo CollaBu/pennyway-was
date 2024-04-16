@@ -98,21 +98,30 @@ public class JwtAuthHelper {
         }
 
         if (jwtClaims != null) {
-            Long refreshTokenUserId = Long.parseLong((String) jwtClaims.getClaims().get(RefreshTokenClaimKeys.USER_ID.getValue()));
-            log.info("로그아웃 요청 refresh token userId : {}", refreshTokenUserId);
-
-            if (!userId.equals(refreshTokenUserId)) {
-                throw new JwtErrorException(JwtErrorCode.WITHOUT_OWNERSHIP_REFRESH_TOKEN);
-            }
-
-            try {
-                refreshTokenService.delete(refreshTokenUserId, refreshToken);
-            } catch (IllegalArgumentException e) {
-                log.warn("refresh token not found. userId : {}", userId);
-            }
+            deleteRefreshToken(userId, jwtClaims, refreshToken);
         }
 
+        deleteAccessToken(userId, accessToken);
+    }
+
+    private void deleteRefreshToken(Long userId, JwtClaims jwtClaims, String refreshToken) {
+        Long refreshTokenUserId = Long.parseLong((String) jwtClaims.getClaims().get(RefreshTokenClaimKeys.USER_ID.getValue()));
+        log.info("로그아웃 요청 refresh token userId : {}", refreshTokenUserId);
+
+        if (!userId.equals(refreshTokenUserId)) {
+            throw new JwtErrorException(JwtErrorCode.WITHOUT_OWNERSHIP_REFRESH_TOKEN);
+        }
+
+        try {
+            refreshTokenService.delete(refreshTokenUserId, refreshToken);
+        } catch (IllegalArgumentException e) {
+            log.warn("refresh token not found. userId : {}", userId);
+        }
+    }
+
+    private void deleteAccessToken(Long userId, String accessToken) {
         LocalDateTime expiresAt = accessTokenProvider.getExpiryDate(accessToken);
+        log.info("로그아웃 요청 access token expiresAt : {}", expiresAt);
         forbiddenTokenService.createForbiddenToken(accessToken, userId, expiresAt);
     }
 
