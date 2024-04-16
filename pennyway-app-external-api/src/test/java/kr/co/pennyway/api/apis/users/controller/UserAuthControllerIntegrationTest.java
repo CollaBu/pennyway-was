@@ -21,6 +21,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 import java.time.ZoneOffset;
 
@@ -50,16 +51,16 @@ public class UserAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
     @Autowired
     private UserService userService;
 
-    private String expectedAccessToken;
-    private String expectedRefreshToken;
-    private Long userId;
-
 
     @Nested
     @Order(1)
     @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
     @DisplayName("로그아웃")
     class SignOut {
+        private String expectedAccessToken;
+        private String expectedRefreshToken;
+        private Long userId;
+
         @BeforeEach
         void setUp() {
             User user = User.builder()
@@ -79,21 +80,67 @@ public class UserAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
         @Test
         @WithMockUser
         @DisplayName("Scenario #1 유효한 accessToken과 refreshToken이 있다면, accessToken은 forbiddenToken으로, refreshToken은 삭제한다.")
-        void signOut() throws Exception {
+        void validAccessTokenAndValidRefreshToken() throws Exception {
             // given
             refreshTokenService.save(RefreshToken.of(userId, expectedRefreshToken, refreshTokenProvider.getExpiryDate(expectedRefreshToken).toEpochSecond(ZoneOffset.UTC)));
 
             // when
-            ResultActions result = mockMvc.perform(get("/v1/users/sign-out")
+            ResultActions result = mockMvc.perform(performSignOut()
                     .header("Authorization", "Bearer " + expectedAccessToken)
-                    .cookie(new Cookie("refreshToken", expectedRefreshToken))
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .accept(MediaType.APPLICATION_JSON));
+                    .cookie(new Cookie("refreshToken", expectedRefreshToken)));
 
             // then
             result.andExpect(status().isOk()).andDo(print());
             assertTrue(forbiddenTokenService.isForbidden(expectedAccessToken));
             assertThrows(IllegalArgumentException.class, () -> refreshTokenService.delete(userId, expectedRefreshToken));
+        }
+
+        @Order(2)
+        @Test
+        @WithMockUser
+        @DisplayName("Scenario #2 유효한 accessToken만 존재한다면, accessToken만 forbiddenToken으로 만든다.")
+        void validAccessTokenAndInvalidRefreshToken() throws Exception {
+            // when
+            ResultActions result = mockMvc.perform(performSignOut().header("Authorization", "Bearer " + expectedAccessToken));
+
+            // then
+            result.andExpect(status().isOk()).andDo(print());
+            assertTrue(forbiddenTokenService.isForbidden(expectedAccessToken));
+        }
+
+        @Order(3)
+        @Test
+        @WithMockUser
+        @DisplayName("Scenario #3 유효하지 않은 accessToken과 유효한 refreshToken이 있다면 401 에러를 반환한다.")
+        void invalidAccessTokenAndValidRefreshToken() throws Exception {
+            // given
+            refreshTokenService.save(RefreshToken.of(userId, expectedRefreshToken, refreshTokenProvider.getExpiryDate(expectedRefreshToken).toEpochSecond(ZoneOffset.UTC)));
+
+            // when
+            ResultActions result = mockMvc.perform(performSignOut()
+                    .header("Authorization", "Bearer invalidToken")
+                    .cookie(new Cookie("refreshToken", expectedRefreshToken)));
+
+            // then
+            result.andExpect(status().isUnauthorized()).andDo(print());
+        }
+
+        @Order(4)
+        @Test
+        @WithMockUser
+        @DisplayName("Scenario #4 유효하지 않은 accessToken과 유효하지 않은 refreshToken이 있다면 401 에러를 반환한다.")
+        void invalidAccessTokenAndInvalidRefreshToken() throws Exception {
+            // when
+            ResultActions result = mockMvc.perform(performSignOut().header("Authorization", "Bearer invalidToken"));
+
+            // then
+            result.andExpect(status().isUnauthorized()).andDo(print());
+        }
+
+        private MockHttpServletRequestBuilder performSignOut() {
+            return get("/v1/users/sign-out")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON);
         }
     }
 }
