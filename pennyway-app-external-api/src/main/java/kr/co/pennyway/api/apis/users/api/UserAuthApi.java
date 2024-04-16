@@ -18,7 +18,12 @@ import org.springframework.web.bind.annotation.RequestHeader;
 
 @Tag(name = "[사용자 인증 관리 API]", description = "사용자의 인증과 관련된 UseCase(로그아웃, 소셜 계정 연동/해지 등)를 제공하는 API")
 public interface UserAuthApi {
-    @Operation(summary = "로그아웃", description = "사용자의 로그아웃을 수행한다. Access Token과 Refresh Token을 받아서 Access Token을 만료시키고, Refresh Token을 삭제한다.")
+    @Operation(summary = "로그아웃", description = """
+            사용자의 로그아웃을 수행한다. Access Token과 Refresh Token을 받아서 Access Token을 만료시키고, Refresh Token을 삭제한다. <br>
+            Refresh Token이 없는 경우에는 Access Token만 만료시킨다. (만료된 refesh token이면 access token 만료만 수행) <br>
+            만약, Refresh Token이 유효하지 않거나 소유권이 없는 경우에는 401 에러를 반환한다. <br>
+            access token이 인가 과정 중에 성공했어도, 삭제 등록 시 만료되면 refresh token만 제거하고 401_EXPIRED_TOKEN 응답을 반환한다.
+            """)
     @Parameters({
             @Parameter(name = "Authorization", description = "Access Token", required = true),
             @Parameter(name = "refreshToken", description = "Refresh Token", required = false)
