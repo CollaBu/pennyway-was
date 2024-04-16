@@ -13,6 +13,7 @@ import kr.co.pennyway.domain.common.redis.refresh.RefreshTokenService;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.infra.common.exception.JwtErrorCode;
 import kr.co.pennyway.infra.common.exception.JwtErrorException;
+import kr.co.pennyway.infra.common.jwt.JwtClaims;
 import kr.co.pennyway.infra.common.jwt.JwtProvider;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
@@ -81,16 +82,34 @@ public class JwtAuthHelper {
      * @param refreshToken : 삭제할 refreshToken. null이거나, 기존에 refreshToken이 없을 경우 삭제 과정을 생략한다.
      */
     public void removeAccessTokenAndRefreshToken(Long userId, String accessToken, String refreshToken) {
-        LocalDateTime expiresAt = accessTokenProvider.getExpiryDate(accessToken);
-        forbiddenTokenService.createForbiddenToken(accessToken, userId, expiresAt);
-
+        JwtClaims jwtClaims = null;
         if (refreshToken != null) {
             try {
-                refreshTokenService.delete(userId, refreshToken);
+                jwtClaims = refreshTokenProvider.getJwtClaimsFromToken(refreshToken);
+            } catch (JwtErrorException e) {
+                if (!e.getErrorCode().equals(JwtErrorCode.EXPIRED_TOKEN)) {
+                    throw e;
+                }
+            }
+        }
+
+        if (jwtClaims != null) {
+            Long refreshTokenUserId = Long.parseLong((String) jwtClaims.getClaims().get(RefreshTokenClaimKeys.USER_ID.getValue()));
+            log.info("로그아웃 요청 refresh token userId : {}", refreshTokenUserId);
+
+            if (!userId.equals(refreshTokenUserId)) {
+                throw new JwtErrorException(JwtErrorCode.WITHOUT_OWNERSHIP_REFRESH_TOKEN);
+            }
+
+            try {
+                refreshTokenService.delete(refreshTokenUserId, refreshToken);
             } catch (IllegalArgumentException e) {
                 log.warn("refresh token not found. userId : {}", userId);
             }
         }
+
+        LocalDateTime expiresAt = accessTokenProvider.getExpiryDate(accessToken);
+        forbiddenTokenService.createForbiddenToken(accessToken, userId, expiresAt);
     }
 
     private long toSeconds(LocalDateTime expiryTime) {
