@@ -14,6 +14,7 @@ import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.service.UserService;
 import kr.co.pennyway.domain.domains.user.type.ProfileVisibility;
 import kr.co.pennyway.domain.domains.user.type.Role;
+import kr.co.pennyway.infra.common.exception.JwtErrorCode;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -23,11 +24,12 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
-import java.time.ZoneOffset;
+import java.time.ZoneId;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExternalApiIntegrationTest
@@ -81,7 +83,7 @@ public class UserAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
         @DisplayName("Scenario #1 유효한 accessToken과 refreshToken이 있다면, accessToken은 forbiddenToken으로, refreshToken은 삭제한다.")
         void validAccessTokenAndValidRefreshToken() throws Exception {
             // given
-            refreshTokenService.save(RefreshToken.of(userId, expectedRefreshToken, refreshTokenProvider.getExpiryDate(expectedRefreshToken).toEpochSecond(ZoneOffset.UTC)));
+            refreshTokenService.save(RefreshToken.of(userId, expectedRefreshToken, refreshTokenProvider.getExpiryDate(expectedRefreshToken).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()));
 
             // when
             ResultActions result = mockMvc.perform(performSignOut()
@@ -98,7 +100,7 @@ public class UserAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
         @Test
         @WithMockUser
         @DisplayName("Scenario #2 유효한 accessToken만 존재한다면, accessToken만 forbiddenToken으로 만든다.")
-        void validAccessTokenAndInvalidRefreshToken() throws Exception {
+        void validAccessTokenWithoutRefreshToken() throws Exception {
             // when
             ResultActions result = mockMvc.perform(performSignOut().header("Authorization", "Bearer " + expectedAccessToken));
 
@@ -110,12 +112,12 @@ public class UserAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
         @Order(3)
         @Test
         @WithMockUser
-        @DisplayName("Scenario #2-1 유효한 accessToken과 다른 사용자의 유효한 refreshToken이 있다면, accessToken만 forbiddenToken으로 만든다.")
-        void validAccessTokenAndNotCachedRefreshToken() throws Exception {
+        @DisplayName("Scenario #2-1 유효한 accessToken과 다른 사용자의 유효한 refreshToken이 있다면, 401 에러를 반환한다. accessToken이 forbidden 처리되지 않으며, 사용자와 다른 사용자의 refreshToken 정보 모두 삭제되지 않는다.")
+        void validAccessTokenAndWithOutOwnershipRefreshToken() throws Exception {
             // given
             String unexpectedRefreshToken = refreshTokenProvider.generateToken(RefreshTokenClaim.of(1000L, Role.USER.getType()));
-            refreshTokenService.save(RefreshToken.of(userId, expectedRefreshToken, refreshTokenProvider.getExpiryDate(expectedRefreshToken).toEpochSecond(ZoneOffset.UTC)));
-            refreshTokenService.save(RefreshToken.of(1000L, unexpectedRefreshToken, refreshTokenProvider.getExpiryDate(unexpectedRefreshToken).toEpochSecond(ZoneOffset.UTC)));
+            refreshTokenService.save(RefreshToken.of(userId, expectedRefreshToken, refreshTokenProvider.getExpiryDate(expectedRefreshToken).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()));
+            refreshTokenService.save(RefreshToken.of(1000L, unexpectedRefreshToken, refreshTokenProvider.getExpiryDate(unexpectedRefreshToken).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()));
 
             // when
             ResultActions result = mockMvc
@@ -123,18 +125,45 @@ public class UserAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
                             .cookie(new Cookie("refreshToken", unexpectedRefreshToken)));
 
             // then
-            result.andExpect(status().isOk()).andDo(print());
+            result.andExpect(status().isUnauthorized())
+                    .andExpect(jsonPath("$.code").value(JwtErrorCode.WITHOUT_OWNERSHIP_REFRESH_TOKEN.causedBy().getCode()))
+                    .andExpect(jsonPath("$.message").value(JwtErrorCode.WITHOUT_OWNERSHIP_REFRESH_TOKEN.getExplainError()))
+                    .andDo(print());
+            assertDoesNotThrow(() -> refreshTokenService.delete(userId, expectedRefreshToken));
+            assertDoesNotThrow(() -> refreshTokenService.delete(1000L, unexpectedRefreshToken));
             assertFalse(forbiddenTokenService.isForbidden(expectedAccessToken));
-            assertFalse(forbiddenTokenService.isForbidden(unexpectedRefreshToken));
         }
 
         @Order(4)
         @Test
         @WithMockUser
+        @DisplayName("Scenario #2-2 유효한 accessToken과 유효하지 않은 refreshToken이 있다면, 401 에러를 반환한다. accessToken이 forbidden 처리되지 않으며, refreshToken 정보는 삭제되지 않는다.")
+        void validAccessTokenAndInvalidRefreshToken() throws Exception {
+            // given
+            refreshTokenService.save(RefreshToken.of(userId, expectedRefreshToken, refreshTokenProvider.getExpiryDate(expectedRefreshToken).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()));
+
+            // when
+            ResultActions result = mockMvc.perform(performSignOut()
+                    .header("Authorization", "Bearer " + expectedAccessToken)
+                    .cookie(new Cookie("refreshToken", "invalidToken")));
+
+            // then
+            result
+                    .andExpect(status().isUnauthorized())
+                    .andExpect(jsonPath("$.code").value(JwtErrorCode.MALFORMED_TOKEN.causedBy().getCode()))
+                    .andExpect(jsonPath("$.message").value(JwtErrorCode.MALFORMED_TOKEN.getExplainError()))
+                    .andDo(print());
+            assertDoesNotThrow(() -> refreshTokenService.delete(userId, expectedRefreshToken));
+            assertFalse(forbiddenTokenService.isForbidden(expectedAccessToken));
+        }
+
+        @Order(5)
+        @Test
+        @WithMockUser
         @DisplayName("Scenario #3 유효하지 않은 accessToken과 유효한 refreshToken이 있다면 401 에러를 반환한다.")
         void invalidAccessTokenAndValidRefreshToken() throws Exception {
             // given
-            refreshTokenService.save(RefreshToken.of(userId, expectedRefreshToken, refreshTokenProvider.getExpiryDate(expectedRefreshToken).toEpochSecond(ZoneOffset.UTC)));
+            refreshTokenService.save(RefreshToken.of(userId, expectedRefreshToken, refreshTokenProvider.getExpiryDate(expectedRefreshToken).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()));
 
             // when
             ResultActions result = mockMvc.perform(performSignOut()
@@ -145,7 +174,7 @@ public class UserAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
             result.andExpect(status().isUnauthorized()).andDo(print());
         }
 
-        @Order(5)
+        @Order(6)
         @Test
         @WithMockUser
         @DisplayName("Scenario #4 유효하지 않은 accessToken과 유효하지 않은 refreshToken이 있다면 401 에러를 반환한다.")
