@@ -160,7 +160,6 @@ public class UserAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
             // given
             String oldRefreshToken = refreshTokenProvider.generateToken(RefreshTokenClaim.of(userId, Role.USER.getType()));
             refreshTokenService.save(RefreshToken.of(userId, expectedRefreshToken, refreshTokenProvider.getExpiryDate(expectedRefreshToken).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()));
-            refreshTokenService.save(RefreshToken.of(userId, oldRefreshToken, refreshTokenProvider.getExpiryDate(oldRefreshToken).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()));
 
             // when
             ResultActions result = mockMvc.perform(performSignOut()
