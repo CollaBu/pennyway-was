@@ -80,6 +80,10 @@ public class JwtAuthHelper {
      * access token과 refresh token을 삭제하여 로그아웃 처리하는 메서드
      *
      * @param refreshToken : 삭제할 refreshToken. null이거나, 기존에 refreshToken이 없을 경우 삭제 과정을 생략한다.
+     * @throws JwtErrorException <br/>
+     *                           • {@link JwtErrorCode#EXPIRED_TOKEN} : 만료된 access token 삭제하려고 할 경우 <br/>
+     *                           • {@link JwtErrorCode#WITHOUT_OWNERSHIP_REFRESH_TOKEN} : 다른 사용자의 refresh token을 삭제하려고 할 경우 <br/>
+     *                           • {@link JwtErrorCode#MALFORMED_TOKEN} : refresh token이 유효하지 않을 경우
      */
     public void removeAccessTokenAndRefreshToken(Long userId, String accessToken, String refreshToken) {
         JwtClaims jwtClaims = null;
