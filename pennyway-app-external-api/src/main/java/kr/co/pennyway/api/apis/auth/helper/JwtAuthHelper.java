@@ -7,6 +7,7 @@ import kr.co.pennyway.api.common.security.jwt.access.AccessTokenClaim;
 import kr.co.pennyway.api.common.security.jwt.refresh.RefreshTokenClaim;
 import kr.co.pennyway.api.common.security.jwt.refresh.RefreshTokenClaimKeys;
 import kr.co.pennyway.common.annotation.Helper;
+import kr.co.pennyway.domain.common.redis.forbidden.ForbiddenTokenService;
 import kr.co.pennyway.domain.common.redis.refresh.RefreshToken;
 import kr.co.pennyway.domain.common.redis.refresh.RefreshTokenService;
 import kr.co.pennyway.domain.domains.user.domain.User;
@@ -26,15 +27,18 @@ public class JwtAuthHelper {
     private final JwtProvider accessTokenProvider;
     private final JwtProvider refreshTokenProvider;
     private final RefreshTokenService refreshTokenService;
+    private final ForbiddenTokenService forbiddenTokenService;
 
     public JwtAuthHelper(
             @AccessTokenStrategy JwtProvider accessTokenProvider,
             @RefreshTokenStrategy JwtProvider refreshTokenProvider,
-            RefreshTokenService refreshTokenService
+            RefreshTokenService refreshTokenService,
+            ForbiddenTokenService forbiddenTokenService
     ) {
         this.accessTokenProvider = accessTokenProvider;
         this.refreshTokenProvider = refreshTokenProvider;
         this.refreshTokenService = refreshTokenService;
+        this.forbiddenTokenService = forbiddenTokenService;
     }
 
     /**
@@ -69,6 +73,24 @@ public class JwtAuthHelper {
         }
 
         return Pair.of(userId, Jwts.of(newAccessToken, newRefreshToken.getToken()));
+    }
+
+    /**
+     * access token과 refresh token을 삭제하여 로그아웃 처리하는 메서드
+     *
+     * @param refreshToken : 삭제할 refreshToken. null이거나, 기존에 refreshToken이 없을 경우 삭제 과정을 생략한다.
+     */
+    public void removeAccessTokenAndRefreshToken(Long userId, String accessToken, String refreshToken) {
+        LocalDateTime expiresAt = accessTokenProvider.getExpiryDate(accessToken);
+        forbiddenTokenService.createForbiddenToken(accessToken, userId, expiresAt);
+
+        if (refreshToken != null) {
+            try {
+                refreshTokenService.delete(userId, refreshToken);
+            } catch (IllegalArgumentException e) {
+                log.warn("refresh token not found. userId : {}", userId);
+            }
+        }
     }
 
     private long toSeconds(LocalDateTime expiryTime) {
