@@ -19,7 +19,6 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
@@ -79,7 +78,6 @@ public class UserAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
 
         @Order(1)
         @Test
-        @WithMockUser
         @DisplayName("Scenario #1 유효한 accessToken과 refreshToken이 있다면, accessToken은 forbiddenToken으로, refreshToken은 삭제한다.")
         void validAccessTokenAndValidRefreshToken() throws Exception {
             // given
@@ -98,7 +96,6 @@ public class UserAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
 
         @Order(2)
         @Test
-        @WithMockUser
         @DisplayName("Scenario #2 유효한 accessToken만 존재한다면, accessToken만 forbiddenToken으로 만든다.")
         void validAccessTokenWithoutRefreshToken() throws Exception {
             // when
@@ -111,7 +108,6 @@ public class UserAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
 
         @Order(3)
         @Test
-        @WithMockUser
         @DisplayName("Scenario #2-1 유효한 accessToken과 다른 사용자의 유효한 refreshToken이 있다면, 401 에러를 반환한다. accessToken이 forbidden 처리되지 않으며, 사용자와 다른 사용자의 refreshToken 정보 모두 삭제되지 않는다.")
         void validAccessTokenAndWithOutOwnershipRefreshToken() throws Exception {
             // given
@@ -136,7 +132,6 @@ public class UserAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
 
         @Order(4)
         @Test
-        @WithMockUser
         @DisplayName("Scenario #2-2 유효한 accessToken과 유효하지 않은 refreshToken이 있다면, 401 에러를 반환한다. accessToken이 forbidden 처리되지 않으며, refreshToken 정보는 삭제되지 않는다.")
         void validAccessTokenAndInvalidRefreshToken() throws Exception {
             // given
@@ -159,7 +154,6 @@ public class UserAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
 
         @Order(5)
         @Test
-        @WithMockUser
         @DisplayName("Scenario #3 유효하지 않은 accessToken과 유효한 refreshToken이 있다면 401 에러를 반환한다.")
         void invalidAccessTokenAndValidRefreshToken() throws Exception {
             // given
@@ -176,7 +170,6 @@ public class UserAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
 
         @Order(6)
         @Test
-        @WithMockUser
         @DisplayName("Scenario #4 유효하지 않은 accessToken과 유효하지 않은 refreshToken이 있다면 401 에러를 반환한다.")
         void invalidAccessTokenAndInvalidRefreshToken() throws Exception {
             // when
