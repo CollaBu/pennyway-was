@@ -25,8 +25,7 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 
 import java.time.ZoneOffset;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -111,6 +110,27 @@ public class UserAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
         @Order(3)
         @Test
         @WithMockUser
+        @DisplayName("Scenario #2-1 유효한 accessToken과 다른 사용자의 유효한 refreshToken이 있다면, accessToken만 forbiddenToken으로 만든다.")
+        void validAccessTokenAndNotCachedRefreshToken() throws Exception {
+            // given
+            String unexpectedRefreshToken = refreshTokenProvider.generateToken(RefreshTokenClaim.of(1000L, Role.USER.getType()));
+            refreshTokenService.save(RefreshToken.of(userId, expectedRefreshToken, refreshTokenProvider.getExpiryDate(expectedRefreshToken).toEpochSecond(ZoneOffset.UTC)));
+            refreshTokenService.save(RefreshToken.of(1000L, unexpectedRefreshToken, refreshTokenProvider.getExpiryDate(unexpectedRefreshToken).toEpochSecond(ZoneOffset.UTC)));
+
+            // when
+            ResultActions result = mockMvc
+                    .perform(performSignOut().header("Authorization", "Bearer " + expectedAccessToken)
+                            .cookie(new Cookie("refreshToken", unexpectedRefreshToken)));
+
+            // then
+            result.andExpect(status().isOk()).andDo(print());
+            assertFalse(forbiddenTokenService.isForbidden(expectedAccessToken));
+            assertFalse(forbiddenTokenService.isForbidden(unexpectedRefreshToken));
+        }
+
+        @Order(4)
+        @Test
+        @WithMockUser
         @DisplayName("Scenario #3 유효하지 않은 accessToken과 유효한 refreshToken이 있다면 401 에러를 반환한다.")
         void invalidAccessTokenAndValidRefreshToken() throws Exception {
             // given
@@ -125,7 +145,7 @@ public class UserAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
             result.andExpect(status().isUnauthorized()).andDo(print());
         }
 
-        @Order(4)
+        @Order(5)
         @Test
         @WithMockUser
         @DisplayName("Scenario #4 유효하지 않은 accessToken과 유효하지 않은 refreshToken이 있다면 401 에러를 반환한다.")
