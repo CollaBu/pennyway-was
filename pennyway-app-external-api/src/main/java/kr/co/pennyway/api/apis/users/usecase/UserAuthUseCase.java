@@ -17,7 +17,8 @@ public class UserAuthUseCase {
     private final ForbiddenTokenService forbiddenTokenService;
     private final RefreshTokenService refreshTokenService;
 
-    public void signOut(Long userId, String accessToken, String refreshToken) {
+    public void signOut(Long userId, String authHeader, String refreshToken) {
+        String accessToken = accessTokenProvider.resolveToken(authHeader);
         LocalDateTime expiresAt = accessTokenProvider.getExpiryDate(accessToken);
         forbiddenTokenService.createForbiddenToken(accessToken, userId, expiresAt);
         refreshTokenService.delete(userId, refreshToken);

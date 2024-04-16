@@ -21,11 +21,11 @@ public class UserAuthController implements UserAuthApi {
     @GetMapping("/sign-out")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> signOut(
-            @RequestHeader("Authorization") String accessToken,
+            @RequestHeader("Authorization") String authHeader,
             @CookieValue(value = "refreshToken", required = false) String refreshToken,
             @AuthenticationPrincipal SecurityUserDetails user
     ) {
-        userAuthUseCase.signOut(user.getUserId(), accessToken, refreshToken);
+        userAuthUseCase.signOut(user.getUserId(), authHeader, refreshToken);
         return ResponseEntity.ok(SuccessResponse.noContent());
     }
 }
