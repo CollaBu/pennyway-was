@@ -19,7 +19,6 @@ public class GoogleMailSender {
     }
 
     public void sendMail(String email, String content, String category) {
-        log.info("야 이까지 잘실행된다야");
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
 
         try {
