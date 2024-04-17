@@ -22,31 +22,37 @@ public class UserAccountUseCase {
     private final DeviceService deviceService;
 
     @Transactional
-    public Long registerDevice(Long userId, DeviceDto.RegisterReq request) {
+    public DeviceDto.RegisterRes registerDevice(Long userId, DeviceDto.RegisterReq request) {
         User user = userService.readUser(userId).orElseThrow(
                 () -> new UserErrorException(UserErrorCode.NOT_FOUND)
         );
+        Long deviceId;
 
         // 디바이스 토큰이 같은 경우, 신규 등록이라 판단하고 등록
         if (request.isSameToken()) {
+            log.info("신규 디바이스 등록: 사용자 {} - model {} - os {}", userId, request.model(), request.os());
             Device device = deviceService.createDevice(request.toEntity(user));
-            return device.getId();
+            return DeviceDto.RegisterRes.of(device.getId(), request.newToken());
         }
 
         Optional<Device> device = deviceService.readDeviceByUserIdAndToken(userId, request.originToken());
 
         if (device.isPresent()) { // 기존 디바이스 토큰이 존재하는 경우, 토큰 갱신
+            log.info("디바이스 토큰 갱신: 사용자 {} - model {} - os {}", userId, request.model(), request.os());
             device.get().updateToken(request.newToken());
-            return device.get().getId();
+            deviceId = device.get().getId();
         } else { // 기존 디바이스 토큰이 존재하지 않는 경우, 신규 등록
+            log.warn("기존 디바이스 토큰 비활성화: 사용자 {} - model {} - os {}", userId, request.model(), request.os());
             Device newDevice = request.toEntity(user);
             deviceService.createDevice(newDevice);
-            return newDevice.getId();
+            deviceId = newDevice.getId();
         }
+
+        return DeviceDto.RegisterRes.of(deviceId, request.newToken());
     }
 
     @Transactional
     public void unregisterDevice(Long userId, Long deviceId) {
-        
+
     }
 }

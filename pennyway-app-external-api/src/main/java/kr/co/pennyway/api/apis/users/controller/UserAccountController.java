@@ -22,8 +22,7 @@ public class UserAccountController {
     @PutMapping("/devices")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> registerDevice(@RequestBody @Validated DeviceDto.RegisterReq request, @AuthenticationPrincipal SecurityUserDetails user) {
-        DeviceDto.RegisterRes response = DeviceDto.RegisterRes.of(userAccountUseCase.registerDevice(user.getUserId(), request), request.newToken());
-        return ResponseEntity.ok(SuccessResponse.from("device", response)); // response -> {"id": ..}
+        return ResponseEntity.ok(SuccessResponse.from("device", userAccountUseCase.registerDevice(user.getUserId(), request)));
     }
 
     @DeleteMapping("/devices/{deviceId}")
