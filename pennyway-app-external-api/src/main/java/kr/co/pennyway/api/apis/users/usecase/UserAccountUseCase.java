@@ -43,7 +43,7 @@ public class UserAccountUseCase {
             Device oldDevice = device.get();
 
             if (!oldDevice.getOs().equals(request.os()) || !oldDevice.getModel().equals(request.model())) {
-                log.warn("유효하지 않은 요청자", userId, request.model(), request.os());
+                log.warn("유효하지 않은 요청: 사용자 {} - model {} - os {}", userId, request.model(), request.os());
                 // 어떻게?
                 throw new DeviceErrorException(DeviceErrorCode.NOT_MATCH_DEVICE);
             }
