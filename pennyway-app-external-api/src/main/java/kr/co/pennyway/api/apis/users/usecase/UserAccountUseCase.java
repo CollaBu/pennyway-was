@@ -12,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Slf4j
 @UseCase
 @RequiredArgsConstructor
@@ -25,27 +27,22 @@ public class UserAccountUseCase {
                 () -> new UserErrorException(UserErrorCode.NOT_FOUND)
         );
 
-
+        // 디바이스 토큰이 같은 경우, 신규 등록이라 판단하고 등록
         if (request.isSameToken()) {
             Device device = deviceService.createDevice(request.toEntity(user));
             return device.getId();
         }
 
-        boolean flag = deviceService.isExistDeviceByToken(request.originToken()); // true: newToken으로 업데이트, false: 새로 저장
+        Optional<Device> device = deviceService.readDeviceByUserIdAndToken(userId, request.originToken());
 
-        if (flag) { // newToken으로 업데이트
-            Device device = deviceService.readDevicesByUserId(userId).stream()
-                    .filter(d -> d.getToken().equals(request.originToken()))
-                    .findFirst()
-                    .orElseThrow();
-            device.updateToken(request.newToken());
-            return device.getId();
-        } else { // newToken으로 새로 저장
-            Device device = request.toEntity(user);
-            deviceService.createDevice(device);
-            return device.getId();
+        if (device.isPresent()) { // 기존 디바이스 토큰이 존재하는 경우, 토큰 갱신
+            device.get().updateToken(request.newToken());
+            return device.get().getId();
+        } else { // 기존 디바이스 토큰이 존재하지 않는 경우, 신규 등록
+            Device newDevice = request.toEntity(user);
+            deviceService.createDevice(newDevice);
+            return newDevice.getId();
         }
     }
-
 
 }
