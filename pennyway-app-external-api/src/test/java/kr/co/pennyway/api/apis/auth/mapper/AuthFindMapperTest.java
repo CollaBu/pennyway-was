@@ -13,6 +13,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import kr.co.pennyway.api.common.exception.AuthFindException;
+import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.service.UserService;
 
 @ExtendWith(MockitoExtension.class)
@@ -38,4 +39,19 @@ class AuthFindMapperTest {
 		System.out.println(exception.getExplainError());
 	}
 
+	@DisplayName("휴대폰 번호로 유저를 찾았으나 OAuth 유저일 때 AuthFinderException을 발생시킨다.")
+	@Test
+	void findUsernameIfUserIsOAuth() {
+		// given
+		String phone = "010-2629-4624";
+		User user = User.builder()
+				.username("pennyway")
+				.password(null)
+				.build();
+		given(userService.readUserByPhone(phone)).willReturn(Optional.of(user));
+
+		// when - then
+		AuthFindException exception = assertThrows(AuthFindException.class, () -> authFindMapper.findUsername(phone));
+		System.out.println(exception.getExplainError());
+	}
 }
