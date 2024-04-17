@@ -16,8 +16,8 @@ public class DeviceService {
     private final DeviceRepository deviceRepository;
 
     @Transactional
-    public void createDevice(Device device) {
-        deviceRepository.save(device);
+    public Device createDevice(Device device) {
+        return deviceRepository.save(device);
     }
 
     @Transactional(readOnly = true)
