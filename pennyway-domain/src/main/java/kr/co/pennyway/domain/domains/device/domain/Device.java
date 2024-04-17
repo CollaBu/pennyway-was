@@ -24,6 +24,24 @@ public class Device extends DateAuditable {
     @JoinColumn(name = "user_id")
     private User user;
 
+    public Device(String token, String model, String os) {
+        this.token = token;
+        this.model = model;
+        this.os = os;
+    }
+
+    public void updateUser(User user) {
+        if (this.user != null) {
+            this.user.getDevices().remove(this);
+        }
+
+        this.user = user;
+
+        if (user != null) {
+            user.getDevices().add(this);
+        }
+    }
+
     @Override
     public String toString() {
         return "Device{" +
