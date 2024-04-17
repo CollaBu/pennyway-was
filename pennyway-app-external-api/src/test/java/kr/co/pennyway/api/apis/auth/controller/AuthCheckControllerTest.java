@@ -18,6 +18,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import kr.co.pennyway.api.apis.auth.dto.AuthFindDto;
 import kr.co.pennyway.api.apis.auth.mapper.AuthFindMapper;
+import kr.co.pennyway.api.common.exception.AuthFindErrorCode;
+import kr.co.pennyway.api.common.exception.AuthFindException;
 import kr.co.pennyway.api.config.ExternalApiDBTestConfig;
 import kr.co.pennyway.api.config.ExternalApiIntegrationTest;
 
@@ -46,12 +48,27 @@ class AuthCheckControllerTest extends ExternalApiDBTestConfig {
 		// when
 		ResultActions resultActions = findUsernameRequest(inputPhone);
 
-		System.out.println(resultActions.andReturn().getResponse().getContentAsString());
-
 		// then
 		resultActions
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.data.user.username").value(expectedUsername));
+	}
+
+	@Test
+	@DisplayName("일반 회원이 아닌 휴대폰 번호로 아이디를 찾을 때 404 응답을 반환한다.")
+	void findUsernameIfUserNotFound() throws Exception {
+		// given
+		String phone = "010-1111-1111";
+		given(authFindMapper.findUsername(phone)).willThrow(new AuthFindException(AuthFindErrorCode.EXPIRED_OR_INVALID_PHONE));
+
+		// when
+		ResultActions resultActions = findUsernameRequest(phone);
+
+		// then
+		resultActions
+				.andExpect(status().isNotFound())
+				.andExpect(jsonPath("$.code").value(AuthFindErrorCode.EXPIRED_OR_INVALID_PHONE.causedBy().getCode()))
+				.andExpect(jsonPath("$.message").value(AuthFindErrorCode.EXPIRED_OR_INVALID_PHONE.getExplainError()));
 	}
 
 	private ResultActions findUsernameRequest(String phone) throws Exception {
