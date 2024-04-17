@@ -40,7 +40,7 @@ class AuthCheckControllerTest extends ExternalApiDBTestConfig {
 	private AuthFindMapper authFindMapper;
 
 	@Test
-	@DisplayName("[x] 아이디 찾기 검증 테스트")
+	@DisplayName("일반 회원의 휴대폰 번호로 아이디를 찾을 때 200 응답을 반환한다.")
 	void findUsername() throws Exception {
 		// given
 		given(authFindMapper.findUsername(inputPhone)).willReturn(new AuthFindDto.FindUsernameRes(expectedUsername));
