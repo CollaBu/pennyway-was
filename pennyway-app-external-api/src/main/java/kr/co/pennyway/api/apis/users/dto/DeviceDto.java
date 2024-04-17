@@ -3,6 +3,7 @@ package kr.co.pennyway.api.apis.users.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import kr.co.pennyway.domain.domains.device.domain.Device;
+import kr.co.pennyway.domain.domains.user.domain.User;
 
 public class DeviceDto {
     @Schema(title = "디바이스 등록 요청")
@@ -24,8 +25,8 @@ public class DeviceDto {
             return originToken.equals(newToken);
         }
 
-        public Device toEntity() {
-            return new Device(newToken, model, os);
+        public Device toEntity(User user) {
+            return new Device(newToken, model, os, user);
         }
     }
 
