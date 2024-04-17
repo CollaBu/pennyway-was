@@ -45,4 +45,8 @@ public class UserAccountUseCase {
         }
     }
 
+    @Transactional
+    public void unregisterDevice(Long userId, Long deviceId) {
+        
+    }
 }
