@@ -1,5 +1,7 @@
 package kr.co.pennyway.api.apis.users.controller;
 
+import kr.co.pennyway.api.apis.users.dto.DeviceDto;
+import kr.co.pennyway.api.apis.users.usecase.UserAccountUseCase;
 import kr.co.pennyway.api.common.response.SuccessResponse;
 import kr.co.pennyway.api.common.security.authentication.SecurityUserDetails;
 import lombok.RequiredArgsConstructor;
@@ -20,14 +22,14 @@ public class UserAccountController {
     @PutMapping("/devices")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> registerDevice(@RequestBody @Validated DeviceDto.RegisterReq request, @AuthenticationPrincipal SecurityUserDetails user) {
-        DeviceDto.RegisterRes response = DeviceDto.RegisterRes.of(userAuthUseCase.registerDevice(user.getUserId(), request));
+        DeviceDto.RegisterRes response = DeviceDto.RegisterRes.of(userAccountUseCase.registerDevice(user.getUserId(), request), request.newToken());
         return ResponseEntity.ok(SuccessResponse.from("device", response)); // response -> {"id": ..}
     }
 
     @DeleteMapping("/devices/{deviceId}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> unregisterDevice(@PathVariable Long deviceId, @AuthenticationPrincipal SecurityUserDetails user) {
-        userAuthUseCase.unregisterDevice(user.getUserId(), deviceId);
+        userAccountUseCase.unregisterDevice(user.getUserId(), deviceId);
         return ResponseEntity.ok(SuccessResponse.noContent());
     }
 }
