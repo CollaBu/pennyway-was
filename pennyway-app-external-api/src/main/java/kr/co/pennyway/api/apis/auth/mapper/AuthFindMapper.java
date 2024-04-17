@@ -21,12 +21,12 @@ public class AuthFindMapper {
 	public AuthFindDto.FindUsernameRes findUsername(String phone) {
 		User user = userService.readUserByPhone(phone).orElseThrow(() -> {
 			log.error("User not found by phone: {}", phone);
-			return new AuthFindException(AuthFindErrorCode.EXPIRED_OR_INVALID_PHONE);
+			return new AuthFindException(AuthFindErrorCode.NOT_FOUND_USER);
 		});
 
 		if (user.getPassword() == null) {
 			log.error("User not found by phone: {}", phone);
-			throw new AuthFindException(AuthFindErrorCode.EXPIRED_OR_INVALID_PHONE);
+			throw new AuthFindException(AuthFindErrorCode.NOT_FOUND_USER);
 		}
 
 		return AuthFindDto.FindUsernameRes.of(user);

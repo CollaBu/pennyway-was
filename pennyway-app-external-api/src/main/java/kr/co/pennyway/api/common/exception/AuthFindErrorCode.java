@@ -11,7 +11,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum AuthFindErrorCode implements BaseErrorCode {
 	// 404 Not Found
-	EXPIRED_OR_INVALID_PHONE(StatusCode.NOT_FOUND, ReasonCode.REQUESTED_RESOURCE_NOT_FOUND, "일반 회원으로 가입되지 않은 휴대폰 정보입니다.");
+	NOT_FOUND_USER(StatusCode.NOT_FOUND, ReasonCode.REQUESTED_RESOURCE_NOT_FOUND, "일반 회원으로 가입되지 않은 휴대폰 정보입니다.");
 
 	private final StatusCode statusCode;
 	private final ReasonCode reasonCode;

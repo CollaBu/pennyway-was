@@ -59,7 +59,7 @@ class AuthCheckControllerTest extends ExternalApiDBTestConfig {
 	void findUsernameIfUserNotFound() throws Exception {
 		// given
 		String phone = "010-1111-1111";
-		given(authFindMapper.findUsername(phone)).willThrow(new AuthFindException(AuthFindErrorCode.EXPIRED_OR_INVALID_PHONE));
+		given(authFindMapper.findUsername(phone)).willThrow(new AuthFindException(AuthFindErrorCode.NOT_FOUND_USER));
 
 		// when
 		ResultActions resultActions = findUsernameRequest(phone);
@@ -67,8 +67,8 @@ class AuthCheckControllerTest extends ExternalApiDBTestConfig {
 		// then
 		resultActions
 				.andExpect(status().isNotFound())
-				.andExpect(jsonPath("$.code").value(AuthFindErrorCode.EXPIRED_OR_INVALID_PHONE.causedBy().getCode()))
-				.andExpect(jsonPath("$.message").value(AuthFindErrorCode.EXPIRED_OR_INVALID_PHONE.getExplainError()));
+				.andExpect(jsonPath("$.code").value(AuthFindErrorCode.NOT_FOUND_USER.causedBy().getCode()))
+				.andExpect(jsonPath("$.message").value(AuthFindErrorCode.NOT_FOUND_USER.getExplainError()));
 	}
 
 	private ResultActions findUsernameRequest(String phone) throws Exception {
