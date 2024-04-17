@@ -2,12 +2,14 @@ package kr.co.pennyway.api.apis.question.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.pennyway.api.apis.question.dto.QuestionReq;
-import kr.co.pennyway.api.config.ExternalApiIntegrationTest;
+import kr.co.pennyway.api.apis.question.usecase.QuestionUseCase;
 import kr.co.pennyway.domain.domains.question.domain.QuestionCategory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -20,8 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-//@WebMvcTest(controllers = QuestionController.class)
-@ExternalApiIntegrationTest
+@WebMvcTest(controllers = QuestionController.class)
 @ActiveProfiles("local")
 public class QuestionControllerTest {
 
@@ -32,6 +33,8 @@ public class QuestionControllerTest {
     private MockMvc mockMvc;
     @Autowired
     private ObjectMapper objectMapper;
+    @MockBean
+    private QuestionUseCase questionUseCase;
 
     @BeforeEach
     void setUp(WebApplicationContext webApplicationContext) {
