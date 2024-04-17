@@ -12,6 +12,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import kr.co.pennyway.api.apis.auth.dto.AuthFindDto;
 import kr.co.pennyway.api.common.exception.AuthFindException;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.service.UserService;
@@ -53,5 +54,24 @@ class AuthFindMapperTest {
 		// when - then
 		AuthFindException exception = assertThrows(AuthFindException.class, () -> authFindMapper.findUsername(phone));
 		System.out.println(exception.getExplainError());
+	}
+
+	@DisplayName("휴대폰 번호를 통해 유저를 찾아 User를 반환한다.")
+	@Test
+	void findUsernameIfUserFound() {
+		// given
+		String phone = "010-2629-4624";
+		String username = "pennyway";
+		User user = User.builder()
+				.username("pennyway")
+				.password("password")
+				.build();
+		given(userService.readUserByPhone(phone)).willReturn(Optional.of(user));
+
+		// when
+		AuthFindDto.FindUsernameRes result = authFindMapper.findUsername(phone);
+
+		// then
+		assertEquals(result, new AuthFindDto.FindUsernameRes(username));
 	}
 }
