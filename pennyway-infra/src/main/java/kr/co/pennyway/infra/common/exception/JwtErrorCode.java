@@ -28,6 +28,7 @@ public enum JwtErrorCode implements BaseErrorCode {
     TAMPERED_TOKEN(UNAUTHORIZED, TAMPERED_OR_MALFORMED_TOKEN, "서명이 조작된 토큰입니다"),
     MALFORMED_TOKEN(UNAUTHORIZED, TAMPERED_OR_MALFORMED_TOKEN, "비정상적인 토큰입니다"),
     UNSUPPORTED_JWT_TOKEN(UNAUTHORIZED, TAMPERED_OR_MALFORMED_TOKEN, "지원하지 않는 토큰입니다"),
+    WITHOUT_OWNERSHIP_REFRESH_TOKEN(UNAUTHORIZED, WITHOUT_OWNERSHIP, "소유권이 없는 리프레시 토큰입니다"),
 
     /**
      * 403 FORBIDDEN: 인증된 클라이언트가 권한이 없는 자원에 접근
