@@ -24,6 +24,6 @@ public enum AuthFindErrorCode implements BaseErrorCode {
 
 	@Override
 	public String getExplainError() throws NoSuchFieldError {
-		return null;
+		return message;
 	}
 }
