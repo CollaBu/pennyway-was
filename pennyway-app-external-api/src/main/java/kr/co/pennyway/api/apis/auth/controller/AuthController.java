@@ -1,8 +1,7 @@
 package kr.co.pennyway.api.apis.auth.controller;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import kr.co.pennyway.api.apis.auth.api.AuthApi;
 import kr.co.pennyway.api.apis.auth.dto.PhoneVerificationDto;
 import kr.co.pennyway.api.apis.auth.dto.SignInReq;
 import kr.co.pennyway.api.apis.auth.dto.SignUpReq;
@@ -24,50 +23,43 @@ import java.time.Duration;
 import java.util.Map;
 
 @Slf4j
-@Tag(name = "[인증 API]")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/v1/auth")
-public class AuthController {
+public class AuthController implements AuthApi {
     private final AuthUseCase authUseCase;
     private final CookieUtil cookieUtil;
 
-    @Operation(summary = "일반 회원가입 인증번호 전송")
     @PostMapping("/phone")
     @PreAuthorize("isAnonymous()")
     public ResponseEntity<?> sendCode(@RequestBody @Validated PhoneVerificationDto.PushCodeReq request) {
         return ResponseEntity.ok(SuccessResponse.from("sms", authUseCase.sendCode(request)));
     }
 
-    @Operation(summary = "일반 회원가입 인증번호 검증")
     @PostMapping("/phone/verification")
     @PreAuthorize("isAnonymous()")
     public ResponseEntity<?> verifyCode(@RequestBody @Validated PhoneVerificationDto.VerifyCodeReq request) {
         return ResponseEntity.ok(SuccessResponse.from("sms", authUseCase.verifyCode(request)));
     }
 
-    @Operation(summary = "일반 회원가입")
     @PostMapping("/sign-up")
     @PreAuthorize("isAnonymous()")
     public ResponseEntity<?> signUp(@RequestBody @Validated SignUpReq.General request) {
         return createAuthenticatedResponse(authUseCase.signUp(request.toInfo()));
     }
 
-    @Operation(summary = "기존 소셜 계정에 일반 계정을 연동하는 회원가입")
     @PostMapping("/link-oauth")
     @PreAuthorize("isAnonymous()")
     public ResponseEntity<?> linkOauth(@RequestBody @Validated SignUpReq.SyncWithOauth request) {
         return createAuthenticatedResponse(authUseCase.signUp(request.toInfo()));
     }
 
-    @Operation(summary = "일반 로그인")
     @PostMapping("/sign-in")
     @PreAuthorize("isAnonymous()")
     public ResponseEntity<?> signIn(@RequestBody @Validated SignInReq.General request) {
         return createAuthenticatedResponse(authUseCase.signIn(request));
     }
 
-    @Operation(summary = "토큰 갱신", description = "리프레시 토큰을 이용해 액세스 토큰과 리프레시 토큰을 갱신합니다.")
     @GetMapping("/refresh")
     @PreAuthorize("isAnonymous()")
     public ResponseEntity<?> refresh(@CookieValue("refreshToken") @Valid String refreshToken) {

@@ -11,4 +11,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class KakaoOidcProperties implements OauthOidcClientProperties {
     private final String jwksUri;
     private final String secret;
+
+    @Override
+    public String getIssuer() {
+        return jwksUri;
+    }
 }

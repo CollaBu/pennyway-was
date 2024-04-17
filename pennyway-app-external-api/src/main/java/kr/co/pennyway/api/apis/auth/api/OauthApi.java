@@ -3,8 +3,10 @@ package kr.co.pennyway.api.apis.auth.api;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -57,7 +59,8 @@ public interface OauthApi {
     })
     ResponseEntity<?> signIn(@RequestParam Provider provider, @RequestBody @Validated SignInReq.Oauth request);
 
-    @Operation(summary = "[2] 인증번호 발송", description = "전화번호 입력 후 인증번호 발송")
+    @Deprecated
+    @Operation(summary = "[2] 인증번호 발송", description = "deprecated된 API입니다. [인증코드 SMS 요청]의 /v1/phone API를 사용해주세요.", deprecated = true)
     @Parameter(name = "provider", description = "소셜 제공자", examples = {
             @ExampleObject(name = "카카오", value = "kakao"), @ExampleObject(name = "애플", value = "apple"), @ExampleObject(name = "구글", value = "google")
     }, required = true, in = ParameterIn.QUERY)
@@ -89,7 +92,7 @@ public interface OauthApi {
                                 "data": {
                                     "sms": {
                                         "code": true,
-                                        "existUser": true,
+                                        "existsUser": true,
                                         "username": "pennyway"
                                     }
                                 }
@@ -101,9 +104,17 @@ public interface OauthApi {
                                 "data": {
                                     "sms": {
                                         "code": true,
-                                        "existUser": false
+                                        "existsUser": false
                                     }
                                 }
+                            }
+                            """)
+            })),
+            @ApiResponse(responseCode = "400", content = @Content(mediaType = "application/json", examples = {
+                    @ExampleObject(name = "해당 provider로 로그인한 이력이 이미 존재함", value = """
+                            {
+                                "code": "4004",
+                                "message": "이미 해당 제공자로 가입된 사용자입니다."
                             }
                             """)
             })),
@@ -130,11 +141,45 @@ public interface OauthApi {
     @Parameter(name = "provider", description = "소셜 제공자", examples = {
             @ExampleObject(name = "카카오", value = "kakao"), @ExampleObject(name = "애플", value = "apple"), @ExampleObject(name = "구글", value = "google")
     }, required = true, in = ParameterIn.QUERY)
+    @ApiResponse(responseCode = "200", description = "로그인 성공",
+            headers = {
+                    @Header(name = "Set-Cookie", description = "리프레시 토큰", schema = @Schema(type = "string"), required = true),
+                    @Header(name = "Authorization", description = "액세스 토큰", schema = @Schema(type = "string", format = "jwt"), required = true)
+            },
+            content = @Content(mediaType = "application/json", examples = {
+                    @ExampleObject(name = "성공", value = """
+                            {
+                                "code": "2000",
+                                "data": {
+                                    "user": {
+                                        "id": 1
+                                    }
+                                }
+                            }
+                            """)
+            }))
     ResponseEntity<?> linkAuth(@RequestParam Provider provider, @RequestBody @Validated SignUpReq.SyncWithAuth request);
 
     @Operation(summary = "[4-2] 소셜 회원가입", description = "회원 정보 입력 후 회원가입")
     @Parameter(name = "provider", description = "소셜 제공자", examples = {
             @ExampleObject(name = "카카오", value = "kakao"), @ExampleObject(name = "애플", value = "apple"), @ExampleObject(name = "구글", value = "google")
     }, required = true, in = ParameterIn.QUERY)
+    @ApiResponse(responseCode = "200", description = "로그인 성공",
+            headers = {
+                    @Header(name = "Set-Cookie", description = "리프레시 토큰", schema = @Schema(type = "string"), required = true),
+                    @Header(name = "Authorization", description = "액세스 토큰", schema = @Schema(type = "string", format = "jwt"), required = true)
+            },
+            content = @Content(mediaType = "application/json", examples = {
+                    @ExampleObject(name = "성공", value = """
+                            {
+                                "code": "2000",
+                                "data": {
+                                    "user": {
+                                        "id": 1
+                                    }
+                                }
+                            }
+                            """)
+            }))
     ResponseEntity<?> signUp(@RequestParam Provider provider, @RequestBody @Validated SignUpReq.Oauth request);
 }

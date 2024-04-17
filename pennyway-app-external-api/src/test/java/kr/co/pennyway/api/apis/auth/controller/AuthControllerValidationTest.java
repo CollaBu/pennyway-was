@@ -97,7 +97,7 @@ public class AuthControllerValidationTest {
                 .andDo(print());
     }
 
-    @DisplayName("[3] 이름은 2~20자의 한글, 영문 대/소문자만 사용 가능합니다.")
+    @DisplayName("[3] 이름은 2~8자의 한글, 영문 소문자만 사용 가능합니다.")
     @Test
     void nameValidError() throws Exception {
         // given
@@ -114,7 +114,7 @@ public class AuthControllerValidationTest {
         // then
         resultActions
                 .andExpect(status().isUnprocessableEntity())
-                .andExpect(jsonPath("$.fieldErrors.name").value("2~20자의 한글, 영문 대/소문자만 사용 가능합니다."))
+                .andExpect(jsonPath("$.fieldErrors.name").value("2~8자의 한글, 영문 소문자만 사용 가능합니다."))
                 .andDo(print());
     }
 

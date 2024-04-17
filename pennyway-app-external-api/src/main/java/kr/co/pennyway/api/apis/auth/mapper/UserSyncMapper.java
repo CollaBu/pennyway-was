@@ -57,19 +57,16 @@ public class UserSyncMapper {
     public Pair<Boolean, String> isOauthSignUpAllowed(Provider provider, String phone) {
         Optional<User> user = userService.readUserByPhone(phone);
 
-        // user 정보 없으면 Pair.of(Boolean.FALSE, null) 반환
         if (user.isEmpty()) {
             log.info("회원가입 이력이 없는 사용자입니다. phone: {}", phone);
             return Pair.of(Boolean.FALSE, null);
         }
 
-        // 같은 provider로 가입한 정보가 있는지 확인
         if (oauthService.isExistOauthAccount(user.get().getId(), provider)) {
             log.info("이미 동일한 Provider로 가입된 사용자입니다. phone: {}, provider: {}", phone, provider);
             return null;
         }
 
-        // user 정보 있으면 Pair.of(Boolean.TRUE, user.get().getUsername()) 반환
         return Pair.of(Boolean.TRUE, user.get().getUsername());
     }
 }

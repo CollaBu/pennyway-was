@@ -35,7 +35,7 @@ public class OauthUseCase {
 
     public Pair<Long, Jwts> signIn(Provider provider, SignInReq.Oauth request) {
         OidcDecodePayload payload = oauthOidcHelper.getPayload(provider, request.idToken());
-        log.info("payload : {}", payload);
+        log.debug("payload : {}", payload);
 
         if (!request.oauthId().equals(payload.sub()))
             throw new OauthException(OauthErrorCode.NOT_MATCHED_OAUTH_ID);
@@ -62,6 +62,11 @@ public class OauthUseCase {
     public Pair<Long, Jwts> signUp(Provider provider, SignUpReq.OauthInfo request) {
         phoneVerificationMapper.isValidCode(PhoneVerificationDto.VerifyCodeReq.from(request), PhoneVerificationType.getOauthSignUpTypeByProvider(provider));
         Pair<Boolean, String> isSignUpUser = checkSignUpUserNotOauthByProvider(provider, request.phone());
+
+        if (isSignUpUser.getLeft().equals(Boolean.FALSE) && request.username() == null)
+            throw new OauthException(OauthErrorCode.INVALID_OAUTH_SYNC_REQUEST);
+        if (isSignUpUser.getLeft().equals(Boolean.TRUE) && request.username() != null)
+            throw new OauthException(OauthErrorCode.INVALID_OAUTH_SYNC_REQUEST);
 
         OidcDecodePayload payload = oauthOidcHelper.getPayload(provider, request.idToken());
         User user = userOauthSignMapper.saveUser(request, isSignUpUser, provider, payload.sub());

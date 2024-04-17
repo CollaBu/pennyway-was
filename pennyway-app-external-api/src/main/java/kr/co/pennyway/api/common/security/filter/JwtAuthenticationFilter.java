@@ -68,9 +68,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
      */
     private boolean isAnonymousRequest(HttpServletRequest request) {
         String accessToken = request.getHeader(HttpHeaders.AUTHORIZATION);
-        String refreshToken = request.getHeader(HttpHeaders.SET_COOKIE);
 
-        return accessToken == null && refreshToken == null;
+        return accessToken == null;
     }
 
     /**

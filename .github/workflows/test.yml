@@ -48,4 +48,4 @@ jobs:
       - name: Test with Gradle
         run: |
           chmod +x ./gradlew
-          ./gradlew --info test
+          ./gradlew --info --parallel test

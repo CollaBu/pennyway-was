@@ -6,19 +6,20 @@ import kr.co.pennyway.api.common.exception.PhoneVerificationException;
 import kr.co.pennyway.common.annotation.Mapper;
 import kr.co.pennyway.domain.common.redis.phone.PhoneVerificationService;
 import kr.co.pennyway.domain.common.redis.phone.PhoneVerificationType;
-import kr.co.pennyway.infra.client.aws.sms.SmsDto;
-import kr.co.pennyway.infra.client.aws.sms.SmsProvider;
+import kr.co.pennyway.infra.common.event.PushCodeEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 
 import java.time.LocalDateTime;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Slf4j
 @Mapper
 @RequiredArgsConstructor
 public class PhoneVerificationMapper {
     private final PhoneVerificationService phoneVerificationService;
-    private final SmsProvider smsProvider;
+    private final ApplicationEventPublisher eventPublisher;
 
     /**
      * 휴대폰 번호로 인증 코드를 발송하고 캐싱한다. (5분간 유효)
@@ -28,9 +29,12 @@ public class PhoneVerificationMapper {
      * @return {@link PhoneVerificationDto.PushCodeRes}
      */
     public PhoneVerificationDto.PushCodeRes sendCode(PhoneVerificationDto.PushCodeReq request, PhoneVerificationType codeType) {
-        SmsDto.Info info = smsProvider.sendCode(SmsDto.To.of(request.phone()));
-        LocalDateTime expiresAt = phoneVerificationService.create(request.phone(), info.code(), codeType);
-        return PhoneVerificationDto.PushCodeRes.of(request.phone(), info.requestAt(), expiresAt);
+        String code = issueVerificationCode();
+        LocalDateTime expiresAt = phoneVerificationService.create(request.phone(), code, codeType);
+
+        eventPublisher.publishEvent(PushCodeEvent.of(request.phone(), code));
+
+        return PhoneVerificationDto.PushCodeRes.of(request.phone(), LocalDateTime.now(), expiresAt);
     }
 
     /**
@@ -52,5 +56,14 @@ public class PhoneVerificationMapper {
         if (!expectedCode.equals(request.code()))
             throw new PhoneVerificationException(PhoneVerificationErrorCode.IS_NOT_VALID_CODE);
         return Boolean.TRUE;
+    }
+
+    private String issueVerificationCode() {
+        StringBuilder sb = new StringBuilder();
+
+        for (int i = 0; i < 6; i++) {
+            sb.append(ThreadLocalRandom.current().nextInt(0, 10));
+        }
+        return sb.toString();
     }
 }

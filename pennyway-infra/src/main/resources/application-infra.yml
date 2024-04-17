@@ -5,9 +5,18 @@ spring:
       dev: common
 
   data.redis:
-    host: ${REDIS_HOST}
-    port: ${REDIS_PORT}
-    password: ${REDIS_PASSWORD}
+    host: ${REDIS_HOST:localhost}
+    port: ${REDIS_PORT:6379}
+    password: ${REDIS_PASSWORD:}
+
+  cloud:
+    aws:
+      sns:
+        credentials:
+          access-key: ${AWS_SNS_ACCESS_KEY:access-key}
+          secret-key: ${AWS_SNS_SECRET_KEY:secret-key}
+        region:
+          static: ${AWS_SNS_REGION:republic-of-korea-1}
 
 app:
   question-address: ${ADMIN_ADDRESS}
@@ -20,21 +29,22 @@ app:
 pennyway:
   server:
     domain:
-      local: ${PENNYWAY_DOMAIN_LOCAL}
-      dev: ${PENNYWAY_DOMAIN_DEV}
+      local: ${PENNYWAY_DOMAIN_LOCAL:127.0.0.1:8080}
+      dev: ${PENNYWAY_DOMAIN_DEV:127.0.0.1:8080}
 
 oauth2:
   client:
     provider:
       kakao:
-        jwks-uri: ${KAKAO_JWKS_URI}
-        secret: ${KAKAO_CLIENT_SECRET}
+        jwks-uri: ${KAKAO_JWKS_URI:http://localhost}
+        secret: ${KAKAO_CLIENT_SECRET:liuhil5068l2j5o0912}
       google:
-        jwks-uri: ${GOOGLE_JWKS_URI}
-        secret: ${GOOGLE_CLIENT_SECRET}
+        jwks-uri: ${GOOGLE_JWKS_URI:http://localhost}
+        secret: ${GOOGLE_CLIENT_SECRET:123456789012-67hm9vokrt6ukmiwtvd8ak67oflecm.apps.googleusercontent.com}
+        issuer: ${GOOGLE_ISSUER:https://google.com}
       apple:
-        jwks-uri: ${APPLE_JWKS_URI}
-        secret: ${APPLE_CLIENT_SECRET}
+        jwks-uri: ${APPLE_JWKS_URI:http://localhost}
+        secret: ${APPLE_CLIENT_SECRET:pennyway-jayang-was}
 
 ---
 spring:
@@ -47,3 +57,9 @@ spring:
   config:
     activate:
       on-profile: dev
+
+---
+spring:
+  config:
+    activate:
+      on-profile: test

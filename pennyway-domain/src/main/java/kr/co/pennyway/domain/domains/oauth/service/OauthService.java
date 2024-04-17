@@ -14,6 +14,11 @@ import java.util.Optional;
 public class OauthService {
     private final OauthRepository oauthRepository;
 
+    @Transactional
+    public void createOauth(Oauth oauth) {
+        oauthRepository.save(oauth);
+    }
+
     @Transactional(readOnly = true)
     public Optional<Oauth> readOauthByOauthIdAndProvider(String oauthId, Provider provider) {
         return oauthRepository.findByOauthIdAndProvider(oauthId, provider);

@@ -4,4 +4,6 @@ public interface OauthOidcClientProperties {
     String getJwksUri();
 
     String getSecret();
+
+    String getIssuer();
 }
