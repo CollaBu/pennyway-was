@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @DomainService
@@ -18,6 +19,11 @@ public class DeviceService {
     @Transactional
     public Device createDevice(Device device) {
         return deviceRepository.save(device);
+    }
+
+    @Transactional
+    public Optional<Device> readDeviceByUserIdAndToken(Long userId, String token) {
+        return deviceRepository.findByUser_IdAndToken(userId, token);
     }
 
     @Transactional(readOnly = true)
