@@ -3,6 +3,7 @@ package kr.co.pennyway.api.apis.users.api;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import kr.co.pennyway.api.apis.users.dto.DeviceDto;
 import kr.co.pennyway.api.common.security.authentication.SecurityUserDetails;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
