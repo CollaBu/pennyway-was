@@ -3,6 +3,8 @@ package kr.co.pennyway.api.apis.users.usecase;
 import kr.co.pennyway.api.apis.users.dto.DeviceDto;
 import kr.co.pennyway.common.annotation.UseCase;
 import kr.co.pennyway.domain.domains.device.domain.Device;
+import kr.co.pennyway.domain.domains.device.exception.DeviceErrorCode;
+import kr.co.pennyway.domain.domains.device.exception.DeviceErrorException;
 import kr.co.pennyway.domain.domains.device.service.DeviceService;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorCode;
@@ -38,9 +40,17 @@ public class UserAccountUseCase {
         Optional<Device> device = deviceService.readDeviceByUserIdAndToken(userId, request.originToken());
 
         if (device.isPresent()) { // 기존 디바이스 토큰이 존재하는 경우, 토큰 갱신
+            Device oldDevice = device.get();
+
+            if (!oldDevice.getOs().equals(request.os()) || !oldDevice.getModel().equals(request.model())) {
+                log.warn("유효하지 않은 요청자", userId, request.model(), request.os());
+                // 어떻게?
+                throw new DeviceErrorException(DeviceErrorCode.NOT_MATCH_DEVICE);
+            }
+
             log.info("디바이스 토큰 갱신: 사용자 {} - model {} - os {}", userId, request.model(), request.os());
-            device.get().updateToken(request.newToken());
-            deviceId = device.get().getId();
+            oldDevice.updateToken(request.newToken());
+            deviceId = oldDevice.getId();
         } else { // 기존 디바이스 토큰이 존재하지 않는 경우, 신규 등록
             log.warn("기존 디바이스 토큰 비활성화: 사용자 {} - model {} - os {}", userId, request.model(), request.os());
             Device newDevice = request.toEntity(user);
