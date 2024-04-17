@@ -68,5 +68,19 @@ class UserAccountUseCaseTest extends ExternalApiDBTestConfig {
         );
     }
 
+    @Test
+    @Transactional
+    @DisplayName("[2] 기존에 등록된 디바이스 토큰이 있는 경우, 디바이스 토큰을 갱신한다.")
+    void updateDeviceToken() {
+        // given
+        DeviceDto.RegisterReq request = new DeviceDto.RegisterReq("newToken", "newToken", "modelA", "Windows");
+
+        // when
+
+
+        // then
+
+    }
+
 
 }
