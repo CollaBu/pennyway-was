@@ -27,7 +27,7 @@ public class GoogleMailSender {
             helper.setSubject(createSubject(email));
             helper.setText(createContent(email, content, category), true);
 
-            // javaMailSender.send(mimeMessage);
+            javaMailSender.send(mimeMessage);
         } catch (Exception e) {
             log.warn(e.getMessage());
 
