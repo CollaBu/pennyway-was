@@ -51,6 +51,11 @@ public class Device extends DateAuditable {
         this.token = token;
     }
 
+    public void updateDeviceInfo(String model, String os) {
+        this.model = model;
+        this.os = os;
+    }
+
     @Override
     public String toString() {
         return "Device{" +
