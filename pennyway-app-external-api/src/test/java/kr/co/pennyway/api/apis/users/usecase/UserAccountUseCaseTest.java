@@ -82,7 +82,7 @@ class UserAccountUseCaseTest extends ExternalApiDBTestConfig {
 
     @Test
     @Transactional
-    @DisplayName("[1-1] originToken에 대한 디바이스가 이미 존재하는 경우, 디바이스 정보 변경 사항만 업데이트하고 기존 디바이스 정보를 반환한다.")
+    @DisplayName("[1-1] 저장 요청에서 originToken에 대한 디바이스가 이미 존재하는 경우, 디바이스 정보 변경 사항만 업데이트하고 기존 디바이스 정보를 반환한다.")
     void registerNewDeviceWhenDeviceIsAlreadyExists() {
         // given
         Device oldDevice = Device.of("originToken", "modelA", "Windows", requestUser);
