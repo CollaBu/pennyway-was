@@ -113,7 +113,10 @@ class UserAccountUseCaseTest extends ExternalApiDBTestConfig {
         // given
         Device oldDevice = Device.of("originToken", "modelA", "Windows", requestUser);
         deviceService.createDevice(oldDevice);
-        em.createQuery("UPDATE Device d SET d.activated = false WHERE d.token = :token").executeUpdate(); // 비활성화 처리
+        em.createQuery("UPDATE Device d SET d.activated = false WHERE d.id = :id AND d.token = :token")
+                .setParameter("id", oldDevice.getId())
+                .setParameter("token", oldDevice.getToken())
+                .executeUpdate(); // 비활성화 처리
 
         System.out.println("oldDevice = " + oldDevice);
         DeviceDto.RegisterReq request = new DeviceDto.RegisterReq("originToken", "newToken", "modelA", "Windows");
@@ -161,10 +164,7 @@ class UserAccountUseCaseTest extends ExternalApiDBTestConfig {
         // given
         DeviceDto.RegisterReq request = new DeviceDto.RegisterReq("originToken", "newToken", "modelA", "Windows");
 
-        // when
-        DeviceDto.RegisterRes response = userAccountUseCase.registerDevice(requestUser.getId(), request);
-
-        // then
+        // when - then
         DeviceErrorException ex = assertThrows(DeviceErrorException.class, () -> userAccountUseCase.registerDevice(requestUser.getId(), request));
         assertEquals("디바이스 토큰이 존재하지 않으면 Not Found를 반환한다.", DeviceErrorCode.NOT_FOUND_DEVICE, ex.getBaseErrorCode());
     }
