@@ -14,7 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Mapper
 @RequiredArgsConstructor
-public class AuthFindMapper {
+public class AuthFindService {
 	private final UserService userService;
 
 	@Transactional(readOnly = true)

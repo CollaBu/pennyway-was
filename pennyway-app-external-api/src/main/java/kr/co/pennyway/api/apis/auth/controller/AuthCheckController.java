@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.constraints.NotNull;
 import kr.co.pennyway.api.apis.auth.api.AuthCheckApi;
-import kr.co.pennyway.api.apis.auth.mapper.AuthFindMapper;
 import kr.co.pennyway.api.apis.auth.usecase.AuthCheckUseCase;
 import kr.co.pennyway.api.common.response.SuccessResponse;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +21,6 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/v1")
 public class AuthCheckController implements AuthCheckApi {
 	private final AuthCheckUseCase authCheckUseCase;
-	private final AuthFindMapper authFindMapper;
 
 	@GetMapping("/duplicate/username")
 	@PreAuthorize("permitAll()")
@@ -35,6 +33,6 @@ public class AuthCheckController implements AuthCheckApi {
 	@GetMapping("/find/username")
 	@PreAuthorize("isAnonymous()")
 	public ResponseEntity<?> findUsername(@RequestParam @NotNull String phone) {
-		return ResponseEntity.ok(SuccessResponse.from("user", authFindMapper.findUsername(phone)));
+		return ResponseEntity.ok(SuccessResponse.from("user", authCheckUseCase.findUsername(phone)));
 	}
 }
