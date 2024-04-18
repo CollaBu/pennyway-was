@@ -39,8 +39,8 @@ public class DeviceRegisterService {
         Device device = readDeviceOrThrow(user.getId(), request.originToken());
 
         if (!isMatchOriginDeviceInfo(device, request)) {
-            log.warn("유효하지 않은 요청: 사용자 {} - model {} - os {}", user, request.model(), request.os());
-            throw new DeviceErrorException(DeviceErrorCode.NOT_MATCH_DEVICE);
+            log.warn("사용자 디바이스 정보 변경됨 : 사용자 {} - model {} - os {}", user, request.model(), request.os());
+            device.updateDeviceInfo(request.model(), request.os());
         }
 
         log.info("디바이스 토큰 갱신: 사용자 {} - model {} - os {}", user, request.model(), request.os());
