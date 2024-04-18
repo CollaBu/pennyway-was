@@ -43,6 +43,10 @@ public class Device extends DateAuditable {
         this.token = token;
     }
 
+    public Boolean isActivated() {
+        return activated;
+    }
+
     @Override
     public String toString() {
         return "Device{" +
