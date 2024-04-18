@@ -25,7 +25,7 @@ public class UserAccountUseCase {
                 () -> new UserErrorException(UserErrorCode.NOT_FOUND)
         );
 
-        Device device = deviceRegisterService.createOrUpdateDevice(request, user);
+        Device device = deviceRegisterService.createOrUpdateDevice(user, request);
 
         return DeviceDto.RegisterRes.of(device.getId(), request.newToken());
     }

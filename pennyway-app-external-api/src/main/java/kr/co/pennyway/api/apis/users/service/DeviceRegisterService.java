@@ -20,7 +20,7 @@ public class DeviceRegisterService {
     private final DeviceService deviceService;
 
     @Transactional
-    public Device createOrUpdateDevice(DeviceDto.RegisterReq request, User user) {
+    public Device createOrUpdateDevice(User user, DeviceDto.RegisterReq request) {
         Long userId = user.getId();
         Long deviceId;
 
@@ -48,12 +48,10 @@ public class DeviceRegisterService {
                 oldDevice.activate();
             }
 
-            deviceId = oldDevice.getId();
+            return oldDevice;
         } else { // 기존 디바이스 토큰이 존재하지 않는 경우, 신규 등록
             log.warn("{}번 사용자의 요청 디바이스 토큰을 찾을 수 없습니다. 요청 토큰 : {}", userId, request.originToken());
             throw new DeviceErrorException(DeviceErrorCode.NOT_FOUND_DEVICE);
         }
-
-        return device;
     }
 }
