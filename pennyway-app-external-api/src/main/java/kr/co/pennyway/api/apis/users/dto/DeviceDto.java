@@ -21,7 +21,7 @@ public class DeviceDto {
             @NotBlank(message = "os는 필수입니다.")
             String os
     ) {
-        public boolean isSameToken() {
+        public boolean isInitRequest() {
             return originToken.equals(newToken);
         }
 

@@ -25,7 +25,7 @@ public class DeviceRegisterService {
         Long deviceId;
 
         // 디바이스 토큰이 같은 경우, 신규 등록이라 판단하고 등록
-        if (request.isSameToken()) {
+        if (request.isInitRequest()) {
             log.info("신규 디바이스 등록: 사용자 {} - model {} - os {}", userId, request.model(), request.os());
             Device device = deviceService.createDevice(request.toEntity(user));
             return device;
