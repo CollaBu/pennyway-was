@@ -4,6 +4,8 @@ import kr.co.pennyway.api.apis.users.dto.DeviceDto;
 import kr.co.pennyway.api.config.ExternalApiDBTestConfig;
 import kr.co.pennyway.domain.config.JpaConfig;
 import kr.co.pennyway.domain.domains.device.domain.Device;
+import kr.co.pennyway.domain.domains.device.exception.DeviceErrorCode;
+import kr.co.pennyway.domain.domains.device.exception.DeviceErrorException;
 import kr.co.pennyway.domain.domains.device.service.DeviceService;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.service.UserService;
@@ -21,6 +23,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.util.AssertionErrors.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -95,6 +98,21 @@ class UserAccountUseCaseTest extends ExternalApiDBTestConfig {
                 },
                 () -> fail("디바이스 토큰이 갱신되어 있어야 한다.")
         );
+    }
+
+    @Test
+    @Transactional
+    @DisplayName("[2-1] 사용자가 유효한 토큰을 가지고 있지만 모델명이나 OS가 다른 경우 DEVICE_NOT_MATCH 에러를 반환한다.")
+    void notMatchDevice() {
+        // given
+        Device oldDevice = new Device("originToken", "modelA", "Windows", requestUser);
+        deviceService.createDevice(oldDevice);
+        System.out.println("oldDevice = " + oldDevice);
+        DeviceDto.RegisterReq request = new DeviceDto.RegisterReq("originToken", "newToken", "modelB", "MacOS");
+
+        // when
+        DeviceErrorException ex = assertThrows(DeviceErrorException.class, () -> userAccountUseCase.registerDevice(requestUser.getId(), request));
+        assertEquals("디바이스 모델명이나 OS가 일치하지 않으면 400 Bad Request를 반환한다.", DeviceErrorCode.NOT_MATCH_DEVICE, ex.getBaseErrorCode());
     }
 
     @Test
