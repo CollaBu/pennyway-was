@@ -187,4 +187,17 @@ class UserAccountUseCaseTest extends ExternalApiDBTestConfig {
         Optional<Device> deletedDevice = deviceService.readDeviceByUserIdAndToken(requestUser.getId(), device.getToken());
         assertNull("디바이스가 삭제되어 있어야 한다.", deletedDevice.orElse(null));
     }
+
+    @Test
+    @Transactional
+    @DisplayName("[5] 사용자 ID와 token에 매칭되는 디바이스가 존재하지 않는 경우 NOT_FOUND_DEVICE 에러를 반환한다.")
+    void unregisterDeviceWhenDeviceIsNotExists() {
+        // given
+        Device device = Device.of("originToken", "modelA", "Windows", requestUser);
+        deviceService.createDevice(device);
+
+        // when - then
+        DeviceErrorException ex = assertThrows(DeviceErrorException.class, () -> userAccountUseCase.unregisterDevice(requestUser.getId(), "notExistsToken"));
+        assertEquals("디바이스 토큰이 존재하지 않으면 Not Found를 반환한다.", DeviceErrorCode.NOT_FOUND_DEVICE, ex.getBaseErrorCode());
+    }
 }
