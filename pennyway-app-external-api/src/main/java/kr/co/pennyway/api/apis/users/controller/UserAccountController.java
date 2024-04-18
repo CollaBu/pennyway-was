@@ -1,5 +1,7 @@
 package kr.co.pennyway.api.apis.users.controller;
 
+import jakarta.validation.constraints.NotBlank;
+import kr.co.pennyway.api.apis.users.api.UserAccountApi;
 import kr.co.pennyway.api.apis.users.dto.DeviceDto;
 import kr.co.pennyway.api.apis.users.usecase.UserAccountUseCase;
 import kr.co.pennyway.api.common.response.SuccessResponse;
@@ -16,19 +18,19 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/v2/users/me")
-public class UserAccountController {
+public class UserAccountController implements UserAccountApi {
     private final UserAccountUseCase userAccountUseCase;
 
     @PutMapping("/devices")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> registerDevice(@RequestBody @Validated DeviceDto.RegisterReq request, @AuthenticationPrincipal SecurityUserDetails user) {
+    public ResponseEntity<?> putDevice(@RequestBody @Validated DeviceDto.RegisterReq request, @AuthenticationPrincipal SecurityUserDetails user) {
         return ResponseEntity.ok(SuccessResponse.from("device", userAccountUseCase.registerDevice(user.getUserId(), request)));
     }
 
-    @DeleteMapping("/devices/{deviceId}")
+    @DeleteMapping("/devices")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> unregisterDevice(@PathVariable Long deviceId, @AuthenticationPrincipal SecurityUserDetails user) {
-        userAccountUseCase.unregisterDevice(user.getUserId(), deviceId);
+    public ResponseEntity<?> deleteDevice(@RequestParam("token") @Validated @NotBlank String token, @AuthenticationPrincipal SecurityUserDetails user) {
+        userAccountUseCase.unregisterDevice(user.getUserId(), token);
         return ResponseEntity.ok(SuccessResponse.noContent());
     }
 }
