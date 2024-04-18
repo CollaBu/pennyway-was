@@ -40,6 +40,15 @@ public class DeviceRegisterService {
     }
 
     /**
+     * 사용자 ID와 토큰으로 디바이스 정보를 조회한다.
+     *
+     * @throws DeviceErrorException 사용자 id와 originToken과 매칭되는 디바이스 정보가 없는 경우
+     */
+    private Device getDeviceOrThrow(Optional<Device> device) {
+        return device.orElseThrow(() -> new DeviceErrorException(DeviceErrorCode.NOT_FOUND_DEVICE));
+    }
+
+    /**
      * 기존에 등록된 사용자의 디바이스 토큰을 갱신한다.
      */
     private Device updateExistingDevice(Device device, DeviceDto.RegisterReq request) {
@@ -49,15 +58,6 @@ public class DeviceRegisterService {
         }
 
         return updateDeviceToken(device, request.newToken());
-    }
-
-    /**
-     * 사용자 ID와 토큰으로 디바이스 정보를 조회한다.
-     *
-     * @throws DeviceErrorException 사용자 id와 originToken과 매칭되는 디바이스 정보가 없는 경우
-     */
-    private Device getDeviceOrThrow(Optional<Device> device) {
-        return device.orElseThrow(() -> new DeviceErrorException(DeviceErrorCode.NOT_FOUND_DEVICE));
     }
 
     /**
