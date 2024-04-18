@@ -11,6 +11,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -19,11 +21,16 @@ public class DeviceRegisterService {
 
     @Transactional
     public Device createOrUpdateDevice(User user, DeviceDto.RegisterReq request) {
-        if (request.isInitRequest()) {
+        Optional<Device> device = deviceService.readDeviceByUserIdAndToken(user.getId(), request.originToken());
+
+        if (request.isInitRequest() && device.isEmpty()) {
             return createDevice(user, request);
-        } else {
-            return updateExistingDevice(user, request);
         }
+
+        Device originDevice = getDeviceOrThrow(device);
+
+        log.info("디바이스 토큰 갱신: 사용자 {} - model {} - os {}", user, request.model(), request.os());
+        return updateExistingDevice(originDevice, request);
     }
 
     private Device createDevice(User user, DeviceDto.RegisterReq request) {
@@ -35,15 +42,12 @@ public class DeviceRegisterService {
     /**
      * 기존에 등록된 사용자의 디바이스 토큰을 갱신한다.
      */
-    private Device updateExistingDevice(User user, DeviceDto.RegisterReq request) {
-        Device device = readDeviceOrThrow(user.getId(), request.originToken());
-
+    private Device updateExistingDevice(Device device, DeviceDto.RegisterReq request) {
         if (!isMatchOriginDeviceInfo(device, request)) {
-            log.warn("사용자 디바이스 정보 변경됨 : 사용자 {} - model {} - os {}", user, request.model(), request.os());
+            log.warn("사용자 디바이스 정보 변경됨 : model {} - os {}", request.model(), request.os());
             device.updateDeviceInfo(request.model(), request.os());
         }
 
-        log.info("디바이스 토큰 갱신: 사용자 {} - model {} - os {}", user, request.model(), request.os());
         return updateDeviceToken(device, request.newToken());
     }
 
@@ -52,9 +56,8 @@ public class DeviceRegisterService {
      *
      * @throws DeviceErrorException 사용자 id와 originToken과 매칭되는 디바이스 정보가 없는 경우
      */
-    private Device readDeviceOrThrow(Long userId, String token) {
-        return deviceService.readDeviceByUserIdAndToken(userId, token)
-                .orElseThrow(() -> new DeviceErrorException(DeviceErrorCode.NOT_FOUND_DEVICE));
+    private Device getDeviceOrThrow(Optional<Device> device) {
+        return device.orElseThrow(() -> new DeviceErrorException(DeviceErrorCode.NOT_FOUND_DEVICE));
     }
 
     /**
