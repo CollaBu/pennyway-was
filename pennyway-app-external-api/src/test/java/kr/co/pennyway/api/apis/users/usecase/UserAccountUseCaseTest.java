@@ -25,6 +25,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.util.AssertionErrors.*;
 
@@ -168,5 +170,21 @@ class UserAccountUseCaseTest extends ExternalApiDBTestConfig {
         // when - then
         DeviceErrorException ex = assertThrows(DeviceErrorException.class, () -> userAccountUseCase.registerDevice(requestUser.getId(), request));
         assertEquals("디바이스 토큰이 존재하지 않으면 Not Found를 반환한다.", DeviceErrorCode.NOT_FOUND_DEVICE, ex.getBaseErrorCode());
+    }
+
+    @Test
+    @Transactional
+    @DisplayName("[4] 사용자 ID와 origin token에 매칭되는 활성 디바이스가 존재하는 경우 디바이스를 삭제한다.")
+    void unregisterDevice() {
+        // given
+        Device device = Device.of("originToken", "modelA", "Windows", requestUser);
+        deviceService.createDevice(device);
+
+        // when
+        userAccountUseCase.unregisterDevice(requestUser.getId(), device.getToken());
+
+        // then
+        Optional<Device> deletedDevice = deviceService.readDeviceByUserIdAndToken(requestUser.getId(), device.getToken());
+        assertNull("디바이스가 삭제되어 있어야 한다.", deletedDevice.orElse(null));
     }
 }
