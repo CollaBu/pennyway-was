@@ -10,7 +10,9 @@ import lombok.RequiredArgsConstructor;
 public enum DeviceErrorCode implements BaseErrorCode {
     /* 400 BAD_REQUEST */
     NOT_MATCH_DEVICE(StatusCode.BAD_REQUEST, ReasonCode.INVALID_REQUEST, "토큰의 디바이스 정보와 일치하지 않습니다."),
-    ;
+
+    /* 404 NOT_FOUND */
+    NOT_FOUND_DEVICE(StatusCode.NOT_FOUND, ReasonCode.REQUESTED_RESOURCE_NOT_FOUND, "디바이스를 찾을 수 없습니다.");
 
     private final StatusCode statusCode;
     private final ReasonCode reasonCode;
