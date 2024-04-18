@@ -3,6 +3,7 @@ package kr.co.pennyway.api.apis.users.usecase;
 import kr.co.pennyway.api.apis.users.dto.DeviceDto;
 import kr.co.pennyway.api.config.ExternalApiDBTestConfig;
 import kr.co.pennyway.domain.config.JpaConfig;
+import kr.co.pennyway.domain.domains.device.domain.Device;
 import kr.co.pennyway.domain.domains.device.service.DeviceService;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.service.UserService;
@@ -37,12 +38,12 @@ class UserAccountUseCaseTest extends ExternalApiDBTestConfig {
     @Autowired
     private UserAccountUseCase userAccountUseCase;
 
-    private Long requestUserId;
+    private User requestUser;
 
     @BeforeEach
     void setUp() {
         User user = User.builder().role(Role.USER).profileVisibility(ProfileVisibility.PUBLIC).build();
-        requestUserId = userService.createUser(user).getId();
+        requestUser = userService.createUser(user);
     }
 
     @Test
@@ -53,16 +54,16 @@ class UserAccountUseCaseTest extends ExternalApiDBTestConfig {
         DeviceDto.RegisterReq request = new DeviceDto.RegisterReq("newToken", "newToken", "modelA", "Windows");
 
         // when
-        Long actualDeviceId = userAccountUseCase.registerDevice(requestUserId, request);
+        DeviceDto.RegisterRes response = userAccountUseCase.registerDevice(requestUser.getId(), request);
 
         // then
-        deviceService.readDeviceByUserIdAndToken(requestUserId, request.newToken()).ifPresentOrElse(
+        deviceService.readDeviceByUserIdAndToken(requestUser.getId(), request.newToken()).ifPresentOrElse(
                 device -> {
-                    assertEquals("요청한 디바이스 토큰과 동일해야 한다.", request.newToken(), device.getToken());
+                    assertEquals("요청한 디바이스 토큰과 동일해야 한다.", response.token(), device.getToken());
                     assertEquals("요청한 디바이스 모델과 동일해야 한다.", request.model(), device.getModel());
                     assertEquals("요청한 디바이스 OS와 동일해야 한다.", request.os(), device.getOs());
-                    assertEquals("디바이스 ID가 일치해야 한다.", actualDeviceId, device.getId());
-                    assertTrue("디바이스가 사용자 ID와 연결되어 있어야 한다.", device.getUser().getId().equals(requestUserId));
+                    assertEquals("디바이스 ID가 일치해야 한다.", response.id(), device.getId());
+                    assertTrue("디바이스가 사용자 ID와 연결되어 있어야 한다.", device.getUser().getId().equals(requestUser.getId()));
                 },
                 () -> fail("신규 디바이스가 등록되어 있어야 한다.")
         );
@@ -73,14 +74,24 @@ class UserAccountUseCaseTest extends ExternalApiDBTestConfig {
     @DisplayName("[2] 기존에 등록된 디바이스 토큰이 있는 경우, 디바이스 토큰을 갱신한다.")
     void updateDeviceToken() {
         // given
-        DeviceDto.RegisterReq request = new DeviceDto.RegisterReq("newToken", "newToken", "modelA", "Windows");
+        Device oldDevice = new Device("oldToken", "modelA", "Windows", requestUser);
+        deviceService.createDevice(oldDevice);
+        DeviceDto.RegisterReq request = new DeviceDto.RegisterReq("originToken", "newToken", "modelA", "Windows");
 
         // when
-
+        DeviceDto.RegisterRes response = userAccountUseCase.registerDevice(requestUser.getId(), request);
 
         // then
-
+        deviceService.readDeviceByUserIdAndToken(requestUser.getId(), request.newToken()).ifPresentOrElse(
+                device -> {
+                    assertEquals("요청한 디바이스 토큰과 동일해야 한다.", response.token(), device.getToken());
+                    assertEquals("요청한 디바이스 모델과 동일해야 한다.", request.model(), device.getModel());
+                    assertEquals("요청한 디바이스 OS와 동일해야 한다.", request.os(), device.getOs());
+                    assertEquals("디바이스 ID가 일치해야 한다.", response.id(), device.getId());
+                    assertTrue("디바이스가 사용자 ID와 연결되어 있어야 한다.", device.getUser().getId().equals(requestUser.getId()));
+                },
+                () -> fail("디바이스 토큰이 갱신되어 있어야 한다.")
+        );
     }
-
 
 }
