@@ -33,14 +33,6 @@ public interface UserAccountApi {
                             }
                             """)
             })),
-            @ApiResponse(responseCode = "400", content = @Content(mediaType = "application/json", examples = {
-                    @ExampleObject(name = "originToken에 해당하는 Device 정보 불일치", value = """
-                            {
-                                "code": "4004",
-                                "message": "토큰의 디바이스 정보와 일치하지 않습니다."
-                            }
-                            """)
-            })),
             @ApiResponse(responseCode = "404", content = @Content(mediaType = "application/json", examples = {
                     @ExampleObject(name = "수정 요청 시, token에 매칭하는 디바이스 정보가 없는 경우", value = """
                             {
