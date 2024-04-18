@@ -82,6 +82,33 @@ class UserAccountUseCaseTest extends ExternalApiDBTestConfig {
 
     @Test
     @Transactional
+    @DisplayName("[1-1] originToken에 대한 디바이스가 이미 존재하는 경우, 디바이스 정보 변경 사항만 업데이트하고 기존 디바이스 정보를 반환한다.")
+    void registerNewDeviceWhenDeviceIsAlreadyExists() {
+        // given
+        Device oldDevice = Device.of("originToken", "modelA", "Windows", requestUser);
+        deviceService.createDevice(oldDevice);
+        DeviceDto.RegisterReq request = new DeviceDto.RegisterReq("originToken", "newToken", "modelA", "Windows");
+
+        // when
+        DeviceDto.RegisterRes response = userAccountUseCase.registerDevice(requestUser.getId(), request);
+
+        // then
+        deviceService.readDeviceByUserIdAndToken(requestUser.getId(), request.newToken()).ifPresentOrElse(
+                device -> {
+                    assertEquals("요청한 디바이스 토큰과 동일해야 한다.", response.token(), device.getToken());
+                    assertEquals("요청한 디바이스 모델과 동일해야 한다.", request.model(), device.getModel());
+                    assertEquals("요청한 디바이스 OS와 동일해야 한다.", request.os(), device.getOs());
+                    assertEquals("디바이스 ID가 일치해야 한다.", oldDevice.getId(), device.getId());
+                    assertTrue("디바이스가 사용자 ID와 연결되어 있어야 한다.", device.getUser().getId().equals(requestUser.getId()));
+                    assertTrue("디바이스가 활성화 상태여야 한다.", device.getActivated());
+                    System.out.println("device = " + device);
+                },
+                () -> fail("신규 디바이스가 등록되어 있어야 한다.")
+        );
+    }
+
+    @Test
+    @Transactional
     @DisplayName("[2] 기존에 등록된 활성화 디바이스 토큰이 있고 디바이스 정보가 일치한다면, 디바이스 토큰을 갱신한다.")
     void updateActivateDeviceToken() {
         // given
