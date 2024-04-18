@@ -18,10 +18,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import kr.co.pennyway.api.apis.auth.dto.AuthFindDto;
 import kr.co.pennyway.api.apis.auth.mapper.AuthFindMapper;
-import kr.co.pennyway.api.common.exception.AuthFindErrorCode;
-import kr.co.pennyway.api.common.exception.AuthFindException;
 import kr.co.pennyway.api.config.ExternalApiDBTestConfig;
 import kr.co.pennyway.api.config.ExternalApiIntegrationTest;
+import kr.co.pennyway.domain.domains.user.exception.UserErrorCode;
+import kr.co.pennyway.domain.domains.user.exception.UserErrorException;
 
 @ExternalApiIntegrationTest
 @AutoConfigureMockMvc
@@ -59,7 +59,7 @@ class AuthCheckControllerTest extends ExternalApiDBTestConfig {
 	void findUsernameIfUserNotFound() throws Exception {
 		// given
 		String phone = "010-1111-1111";
-		given(authFindMapper.findUsername(phone)).willThrow(new AuthFindException(AuthFindErrorCode.NOT_FOUND_USER));
+		given(authFindMapper.findUsername(phone)).willThrow(new UserErrorException(UserErrorCode.NOT_FOUND));
 
 		// when
 		ResultActions resultActions = findUsernameRequest(phone);
