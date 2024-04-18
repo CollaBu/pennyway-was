@@ -26,7 +26,7 @@ public class DeviceDto {
         }
 
         public Device toEntity(User user) {
-            return new Device(newToken, model, os, user);
+            return Device.of(newToken, model, os, user);
         }
     }
 

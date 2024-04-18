@@ -78,7 +78,7 @@ class UserAccountUseCaseTest extends ExternalApiDBTestConfig {
     @DisplayName("[2] 기존에 등록된 디바이스 토큰이 있는 경우, 디바이스 토큰을 갱신한다.")
     void updateDeviceToken() {
         // given
-        Device oldDevice = new Device("originToken", "modelA", "Windows", requestUser);
+        Device oldDevice = Device.of("originToken", "modelA", "Windows", requestUser);
         deviceService.createDevice(oldDevice);
         System.out.println("oldDevice = " + oldDevice);
         DeviceDto.RegisterReq request = new DeviceDto.RegisterReq("originToken", "newToken", "modelA", "Windows");
@@ -105,7 +105,7 @@ class UserAccountUseCaseTest extends ExternalApiDBTestConfig {
     @DisplayName("[2-1] 사용자가 유효한 토큰을 가지고 있지만 모델명이나 OS가 다른 경우 DEVICE_NOT_MATCH 에러를 반환한다.")
     void notMatchDevice() {
         // given
-        Device oldDevice = new Device("originToken", "modelA", "Windows", requestUser);
+        Device oldDevice = Device.of("originToken", "modelA", "Windows", requestUser);
         deviceService.createDevice(oldDevice);
         System.out.println("oldDevice = " + oldDevice);
         DeviceDto.RegisterReq request = new DeviceDto.RegisterReq("originToken", "newToken", "modelB", "MacOS");
