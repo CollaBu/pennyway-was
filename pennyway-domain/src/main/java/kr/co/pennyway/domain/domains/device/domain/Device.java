@@ -27,7 +27,7 @@ public class Device extends DateAuditable {
     @JoinColumn(name = "user_id")
     private User user;
 
-    public Device(String token, String model, String os, Boolean activated, User user) {
+    private Device(String token, String model, String os, Boolean activated, User user) {
         this.token = token;
         this.model = model;
         this.os = os;
