@@ -24,6 +24,7 @@ public class DeviceDto {
         /**
          * oldToken과 newToken이 같은 경우, 신규 등록 요청으로 판단
          */
+        @Schema(hidden = true)
         public boolean isInitRequest() {
             return originToken.equals(newToken);
         }
