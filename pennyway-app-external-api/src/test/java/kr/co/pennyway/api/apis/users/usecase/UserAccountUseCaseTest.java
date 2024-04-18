@@ -151,7 +151,7 @@ class UserAccountUseCaseTest extends ExternalApiDBTestConfig {
         Device oldDevice = Device.of("originToken", "modelA", "Windows", requestUser);
         deviceService.createDevice(oldDevice);
         System.out.println("oldDevice = " + oldDevice);
-        DeviceDto.RegisterReq request = new DeviceDto.RegisterReq("originToken", "newToken", "modelB", "MacOS");
+        DeviceDto.RegisterReq request = new DeviceDto.RegisterReq("originToken", "newToken", "modelA", "MacOS");
 
         // when
         userAccountUseCase.registerDevice(requestUser.getId(), request);

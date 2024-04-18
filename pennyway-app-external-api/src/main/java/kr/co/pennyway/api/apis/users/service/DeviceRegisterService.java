@@ -72,7 +72,7 @@ public class DeviceRegisterService {
 
         device.updateToken(newToken);
 
-        if (device.getActivated().equals(Boolean.FALSE)) {
+        if (!device.isActivated()) {
             device.activate();
         }
 
