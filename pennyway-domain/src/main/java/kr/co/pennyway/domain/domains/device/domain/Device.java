@@ -39,12 +39,16 @@ public class Device extends DateAuditable {
         return new Device(token, model, os, Boolean.TRUE, user);
     }
 
-    public void updateToken(String token) {
-        this.token = token;
-    }
-
     public Boolean isActivated() {
         return activated;
+    }
+
+    public void activate() {
+        this.activated = Boolean.TRUE;
+    }
+
+    public void updateToken(String token) {
+        this.token = token;
     }
 
     @Override
