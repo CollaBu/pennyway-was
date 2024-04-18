@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.validation.constraints.NotNull;
 import kr.co.pennyway.api.apis.auth.api.AuthCheckApi;
 import kr.co.pennyway.api.apis.auth.mapper.AuthFindMapper;
 import kr.co.pennyway.api.apis.auth.usecase.AuthCheckUseCase;
@@ -33,7 +34,7 @@ public class AuthCheckController implements AuthCheckApi {
 
 	@GetMapping("/find/username")
 	@PreAuthorize("isAnonymous()")
-	public ResponseEntity<?> findUsername(@RequestParam @Validated String phone) {
+	public ResponseEntity<?> findUsername(@RequestParam @NotNull String phone) {
 		return ResponseEntity.ok(SuccessResponse.from("user", authFindMapper.findUsername(phone)));
 	}
 }

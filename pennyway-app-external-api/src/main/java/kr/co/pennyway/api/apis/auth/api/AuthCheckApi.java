@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.NotNull;
 
 @Tag(name = "[계정 검사 API]")
 public interface AuthCheckApi {
@@ -42,5 +43,5 @@ public interface AuthCheckApi {
 							""")
 			})),
 	})
-	ResponseEntity<?> findUsername(@RequestParam @Validated String phone);
+	ResponseEntity<?> findUsername(@RequestParam @NotNull String phone);
 }
