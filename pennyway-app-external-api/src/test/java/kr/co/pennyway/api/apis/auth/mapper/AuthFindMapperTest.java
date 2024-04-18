@@ -19,13 +19,13 @@ import kr.co.pennyway.domain.domains.user.service.UserService;
 
 @ExtendWith(MockitoExtension.class)
 class AuthFindMapperTest {
-	private AuthFindMapper authFindMapper;
+	private AuthFindService authFindMapper;
 	@Mock
 	private UserService userService;
 
 	@BeforeEach
 	void setUp() {
-		authFindMapper = new AuthFindMapper(userService);
+		authFindMapper = new AuthFindService(userService);
 	}
 
 	@DisplayName("휴대폰 번호로 유저를 찾을 수 없을 때 AuthFinderException을 발생시킨다.")

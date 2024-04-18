@@ -14,10 +14,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import kr.co.pennyway.api.apis.auth.dto.AuthFindDto;
-import kr.co.pennyway.api.apis.auth.mapper.AuthFindMapper;
+import kr.co.pennyway.api.apis.auth.mapper.AuthFindService;
 import kr.co.pennyway.api.config.ExternalApiDBTestConfig;
 import kr.co.pennyway.api.config.ExternalApiIntegrationTest;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorCode;
@@ -33,11 +31,8 @@ class AuthCheckControllerTest extends ExternalApiDBTestConfig {
 	@Autowired
 	private MockMvc mockMvc;
 
-	@Autowired
-	private ObjectMapper objectMapper;
-
 	@MockBean
-	private AuthFindMapper authFindMapper;
+	private AuthFindService authFindMapper;
 
 	@Test
 	@DisplayName("일반 회원의 휴대폰 번호로 아이디를 찾을 때 200 응답을 반환한다.")
@@ -67,8 +62,8 @@ class AuthCheckControllerTest extends ExternalApiDBTestConfig {
 		// then
 		resultActions
 				.andExpect(status().isNotFound())
-				.andExpect(jsonPath("$.code").value(AuthFindErrorCode.NOT_FOUND_USER.causedBy().getCode()))
-				.andExpect(jsonPath("$.message").value(AuthFindErrorCode.NOT_FOUND_USER.getExplainError()));
+				.andExpect(jsonPath("$.code").value(UserErrorCode.NOT_FOUND.causedBy().getCode()))
+				.andExpect(jsonPath("$.message").value(UserErrorCode.NOT_FOUND.getExplainError()));
 	}
 
 	private ResultActions findUsernameRequest(String phone) throws Exception {
