@@ -6,6 +6,7 @@ import kr.co.pennyway.domain.domains.user.domain.User;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
 
 @Entity
 @Getter
@@ -19,16 +20,23 @@ public class Device extends DateAuditable {
     private String token;
     private String model;
     private String os;
+    @ColumnDefault("true")
+    private Boolean activated;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
-    public Device(String token, String model, String os, User user) {
+    public Device(String token, String model, String os, Boolean activated, User user) {
         this.token = token;
         this.model = model;
         this.os = os;
+        this.activated = activated;
         this.user = user;
+    }
+
+    public static Device of(String token, String model, String os, User user) {
+        return new Device(token, model, os, Boolean.TRUE, user);
     }
 
     public void updateToken(String token) {
