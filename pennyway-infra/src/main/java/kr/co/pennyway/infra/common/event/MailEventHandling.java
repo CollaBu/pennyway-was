@@ -22,7 +22,7 @@ public class MailEventHandling {
      */
     @TransactionalEventListener
     public void handleMailEvent(MailEvent event) {
-        log.debug("handleMailEvent: {}", event);
+        log.info("handleMailEvent: {}", event);
         googleMailSender.sendMail(event.email(), event.content(), event.category());
     }
 }
