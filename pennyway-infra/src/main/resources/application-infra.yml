@@ -19,7 +19,7 @@ spring:
           static: ${AWS_SNS_REGION:republic-of-korea-1}
 
 app:
-  question-address: ${ADMIN_ADDRESS}
+  question-address: ${ADMIN_ADDRESS:team.collabu@gmail.com}
   mail:
     host: smtp.gmail.com
     port: 587
