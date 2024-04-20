@@ -64,10 +64,10 @@ public class OauthUseCase {
 
         UserSyncDto userSync = checkSignUpUserNotOauthByProvider(provider, request.phone());
 
-        if (!userSync.isExistAccount() && !isOauthSyncRequest(request))
+        if (isValidRequestScenario(userSync, request)) {
+            log.warn("유효한 소셜 회원가입 요청 플로우가 아닙니다.");
             throw new OauthException(OauthErrorCode.INVALID_OAUTH_SYNC_REQUEST);
-        if (userSync.isExistAccount() && isOauthSyncRequest(request))
-            throw new OauthException(OauthErrorCode.INVALID_OAUTH_SYNC_REQUEST);
+        }
 
         OidcDecodePayload payload = oauthOidcHelper.getPayload(provider, request.idToken());
         User user = userOauthSignService.saveUser(request, userSync, provider, payload.sub());
@@ -87,6 +87,16 @@ public class OauthUseCase {
         }
 
         return userSync;
+    }
+
+    /**
+     * Oauth 회원가입 요청 시나리오가 유효한지 확인하는 메서드 <br/>
+     * - 회원가입 이력이 없는 사용자는 Oauth 회원가입 요청만 가능하다. <br/>
+     * - 이미 회원가입된 사용자(같은 Provider 소셜 회원가입이 이력이 없어야 함)는 계정 연동 요청만 가능하다.
+     */
+    private boolean isValidRequestScenario(UserSyncDto userSync, SignUpReq.OauthInfo request) {
+        return (!userSync.isExistAccount() && !isOauthSyncRequest(request)) ||
+                (userSync.isExistAccount() && isOauthSyncRequest(request));
     }
 
     private boolean isOauthSyncRequest(SignUpReq.OauthInfo request) {
