@@ -28,6 +28,29 @@ public class UserGeneralSignService {
     private final PasswordEncoder bCryptPasswordEncoder;
 
     /**
+     * 일반 회원가입이 가능한 유저인지 확인
+     *
+     * @return Pair<Boolean, String> : 이미 가입된 회원인지 여부 (TRUE: 가입되지 않은 회원, FALSE: 가입된 회원), 가입된 회원인 경우 회원
+     * ID 반환. 단, 이미 일반 회원가입을 한 유저인 경우에는 null을 반환한다.
+     */
+    @Transactional(readOnly = true)
+    public Pair<Boolean, String> isSignUpAllowed(String phone) {
+        Optional<User> user = userService.readUserByPhone(phone);
+
+        if (user.isEmpty()) {
+            log.info("회원가입 이력이 없는 사용자입니다. phone: {}", phone);
+            return Pair.of(Boolean.FALSE, null);
+        }
+
+        if (user.get().getPassword() != null) {
+            log.warn("이미 회원가입된 사용자입니다. phone: {}", phone);
+            return null;
+        }
+
+        return Pair.of(Boolean.TRUE, user.get().getUsername());
+    }
+
+    /**
      * 일반 회원가입이라면 새롭게 유저를 생성하고, 기존 Oauth 유저라면 비밀번호를 업데이트한다.
      *
      * @param request {@link SignUpReq.Info}

@@ -5,7 +5,6 @@ import kr.co.pennyway.api.apis.auth.dto.SignInReq;
 import kr.co.pennyway.api.apis.auth.dto.SignUpReq;
 import kr.co.pennyway.api.apis.auth.helper.JwtAuthHelper;
 import kr.co.pennyway.api.apis.auth.mapper.PhoneVerificationMapper;
-import kr.co.pennyway.api.apis.auth.mapper.UserSyncMapper;
 import kr.co.pennyway.api.apis.auth.service.UserGeneralSignService;
 import kr.co.pennyway.api.common.security.jwt.Jwts;
 import kr.co.pennyway.common.annotation.UseCase;
@@ -23,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 @UseCase
 @RequiredArgsConstructor
 public class AuthUseCase {
-    private final UserSyncMapper userSyncMapper;
     private final UserGeneralSignService userGeneralSignService;
 
     private final JwtAuthHelper jwtAuthHelper;
@@ -66,7 +64,7 @@ public class AuthUseCase {
     }
 
     private Pair<Boolean, String> checkOauthUserNotGeneralSignUp(String phone) {
-        Pair<Boolean, String> isGeneralSignUpAllowed = userSyncMapper.isGeneralSignUpAllowed(phone);
+        Pair<Boolean, String> isGeneralSignUpAllowed = userGeneralSignService.isSignUpAllowed(phone);
 
         if (isGeneralSignUpAllowed == null) {
             phoneVerificationService.delete(phone, PhoneVerificationType.SIGN_UP);
