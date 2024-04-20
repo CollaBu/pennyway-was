@@ -1,6 +1,7 @@
 package kr.co.pennyway.domain.domains.oauth.domain;
 
 import jakarta.persistence.*;
+import kr.co.pennyway.domain.common.converter.ProviderConverter;
 import kr.co.pennyway.domain.domains.oauth.type.Provider;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import lombok.AccessLevel;
@@ -29,6 +30,7 @@ public class Oauth {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Convert(converter = ProviderConverter.class)
     private Provider provider;
     private String oauthId;
 
