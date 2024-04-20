@@ -3,6 +3,7 @@ package kr.co.pennyway.api.apis.auth.usecase;
 import kr.co.pennyway.api.apis.auth.dto.PhoneVerificationDto;
 import kr.co.pennyway.api.apis.auth.dto.SignInReq;
 import kr.co.pennyway.api.apis.auth.dto.SignUpReq;
+import kr.co.pennyway.api.apis.auth.dto.UserSyncDto;
 import kr.co.pennyway.api.apis.auth.helper.JwtAuthHelper;
 import kr.co.pennyway.api.apis.auth.service.PhoneVerificationService;
 import kr.co.pennyway.api.apis.auth.service.UserGeneralSignService;
@@ -34,11 +35,11 @@ public class AuthUseCase {
 
     public PhoneVerificationDto.VerifyCodeRes verifyCode(PhoneVerificationDto.VerifyCodeReq request) {
         Boolean isValidCode = phoneVerificationService.isValidCode(request, PhoneCodeKeyType.SIGN_UP);
-        Pair<Boolean, String> isOauthUser = checkOauthUserNotGeneralSignUp(request.phone());
+        UserSyncDto userSync = checkOauthUserNotGeneralSignUp(request.phone());
 
         phoneCodeService.extendTimeToLeave(request.phone(), PhoneCodeKeyType.SIGN_UP);
 
-        return PhoneVerificationDto.VerifyCodeRes.valueOfGeneral(isValidCode, isOauthUser.getLeft(), isOauthUser.getRight());
+        return PhoneVerificationDto.VerifyCodeRes.valueOfGeneral(isValidCode, userSync.isExistAccount(), userSync.username());
     }
 
     @Transactional
@@ -46,8 +47,8 @@ public class AuthUseCase {
         phoneVerificationService.isValidCode(PhoneVerificationDto.VerifyCodeReq.from(request), PhoneCodeKeyType.SIGN_UP);
         phoneCodeService.delete(request.phone(), PhoneCodeKeyType.SIGN_UP);
 
-        Pair<Boolean, String> isOauthUser = checkOauthUserNotGeneralSignUp(request.phone());
-        User user = userGeneralSignService.saveUserWithEncryptedPassword(request, isOauthUser);
+        UserSyncDto userSync = checkOauthUserNotGeneralSignUp(request.phone());
+        User user = userGeneralSignService.saveUserWithEncryptedPassword(request, userSync);
 
         return Pair.of(user.getId(), jwtAuthHelper.createToken(user));
     }
@@ -63,14 +64,14 @@ public class AuthUseCase {
         return jwtAuthHelper.refresh(refreshToken);
     }
 
-    private Pair<Boolean, String> checkOauthUserNotGeneralSignUp(String phone) {
-        Pair<Boolean, String> isGeneralSignUpAllowed = userGeneralSignService.isSignUpAllowed(phone);
+    private UserSyncDto checkOauthUserNotGeneralSignUp(String phone) {
+        UserSyncDto userSync = userGeneralSignService.isSignUpAllowed(phone);
 
-        if (isGeneralSignUpAllowed == null) {
+        if (!userSync.isSignUpAllowed()) {
             phoneCodeService.delete(phone, PhoneCodeKeyType.SIGN_UP);
             throw new UserErrorException(UserErrorCode.ALREADY_SIGNUP);
         }
 
-        return isGeneralSignUpAllowed;
+        return userSync;
     }
 }
