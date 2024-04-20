@@ -61,10 +61,12 @@ public class UserGeneralSignService {
         User user;
 
         if (isOauthUser.getLeft().equals(Boolean.TRUE)) {
+            log.info("기존 Oauth 회원입니다. username: {}", isOauthUser.getRight());
             user = userService.readUserByUsername(isOauthUser.getRight())
                     .orElseThrow(() -> new UserErrorException(UserErrorCode.NOT_FOUND));
             user.updatePassword(request.password(bCryptPasswordEncoder));
         } else {
+            log.info("새로운 회원입니다. username: {}", request.username());
             user = userService.createUser(request.toEntity(bCryptPasswordEncoder));
         }
 
