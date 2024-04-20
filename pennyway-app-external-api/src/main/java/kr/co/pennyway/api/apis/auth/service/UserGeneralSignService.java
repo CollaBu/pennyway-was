@@ -38,16 +38,16 @@ public class UserGeneralSignService {
 
         if (!isExistUser(user)) {
             log.info("회원가입 이력이 없는 사용자입니다. phone: {}", phone);
-            return UserSyncDto.of(true, false, null);
+            return UserSyncDto.of(true, false, null, null);
         }
 
         if (isGeneralSignUpUser(user.get())) {
             log.warn("이미 회원가입된 사용자입니다. user: {}", user.get());
-            return UserSyncDto.abort(user.get().getUsername());
+            return UserSyncDto.abort(user.get().getId(), user.get().getUsername());
         }
 
         log.info("소셜 회원가입 사용자입니다. user: {}", user.get());
-        return UserSyncDto.of(true, true, user.get().getUsername());
+        return UserSyncDto.of(true, true, user.get().getId(), user.get().getUsername());
     }
 
     /**
@@ -61,7 +61,7 @@ public class UserGeneralSignService {
 
         if (userSync.isExistAccount()) {
             log.info("기존 Oauth 회원입니다. username: {}", userSync.username());
-            user = userService.readUserByUsername(userSync.username())
+            user = userService.readUser(userSync.userId())
                     .orElseThrow(() -> new UserErrorException(UserErrorCode.NOT_FOUND));
             user.updatePassword(request.password(bCryptPasswordEncoder));
         } else {

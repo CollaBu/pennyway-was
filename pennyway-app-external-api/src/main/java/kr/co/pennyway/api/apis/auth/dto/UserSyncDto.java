@@ -7,6 +7,7 @@ public record UserSyncDto(
         /* isSignUpAllowed가 false인 경우, 반드시 예외를 던지도록 처리해야 한다. */
         boolean isSignUpAllowed,
         boolean isExistAccount,
+        Long userId,
         String username
 ) {
     /**
@@ -14,17 +15,17 @@ public record UserSyncDto(
      * @param isExistAccount  boolean : 이미 존재하는 계정 여부
      * @param username        boolean : 사용자명 (isExistAccount이 true인 경우에만 존재)
      */
-    public static UserSyncDto of(boolean isSignUpAllowed, boolean isExistAccount, String username) {
-        return new UserSyncDto(isSignUpAllowed, isExistAccount, username);
+    public static UserSyncDto of(boolean isSignUpAllowed, boolean isExistAccount, Long userId, String username) {
+        return new UserSyncDto(isSignUpAllowed, isExistAccount, userId, username);
     }
 
     /**
      * 이미 회원이 존재하는 경우 사용하는 편의용 메서드. <br/>
-     * 내부에서 {@link UserSyncDto#of(boolean, boolean, String)}를 호출한다.
+     * 내부에서 {@link UserSyncDto#of(boolean, boolean, Long, String)}를 호출한다.
      *
      * @param username String : 사용자명
      */
-    public static UserSyncDto abort(String username) {
-        return UserSyncDto.of(false, true, username);
+    public static UserSyncDto abort(Long userId, String username) {
+        return UserSyncDto.of(false, true, userId, username);
     }
 }
