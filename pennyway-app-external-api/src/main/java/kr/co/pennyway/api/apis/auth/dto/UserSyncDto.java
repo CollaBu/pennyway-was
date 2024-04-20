@@ -4,6 +4,7 @@ package kr.co.pennyway.api.apis.auth.dto;
  * 전화번호 검증 후, 시나리오 분기 정보를 위한 DTO
  */
 public record UserSyncDto(
+        /* isSignUpAllowed가 false인 경우, 반드시 예외를 던지도록 처리해야 한다. */
         boolean isSignUpAllowed,
         boolean isExistAccount,
         String username
