@@ -3,6 +3,7 @@ package kr.co.pennyway.api.apis.auth.usecase;
 import kr.co.pennyway.api.apis.auth.dto.PhoneVerificationDto;
 import kr.co.pennyway.api.apis.auth.dto.SignInReq;
 import kr.co.pennyway.api.apis.auth.dto.SignUpReq;
+import kr.co.pennyway.api.apis.auth.dto.UserSyncDto;
 import kr.co.pennyway.api.apis.auth.helper.JwtAuthHelper;
 import kr.co.pennyway.api.apis.auth.helper.OauthOidcHelper;
 import kr.co.pennyway.api.apis.auth.service.PhoneVerificationService;
@@ -49,11 +50,11 @@ public class OauthUseCase {
     @Transactional(readOnly = true)
     public PhoneVerificationDto.VerifyCodeRes verifyCode(Provider provider, PhoneVerificationDto.VerifyCodeReq request) {
         Boolean isValidCode = phoneVerificationService.isValidCode(request, PhoneCodeKeyType.getOauthSignUpTypeByProvider(provider));
-        Pair<Boolean, String> isSignUpUser = checkSignUpUserNotOauthByProvider(provider, request.phone());
+        UserSyncDto userSync = checkSignUpUserNotOauthByProvider(provider, request.phone());
 
         phoneCodeService.extendTimeToLeave(request.phone(), PhoneCodeKeyType.getOauthSignUpTypeByProvider(provider));
 
-        return PhoneVerificationDto.VerifyCodeRes.valueOfOauth(isValidCode, isSignUpUser.getLeft(), isSignUpUser.getRight());
+        return PhoneVerificationDto.VerifyCodeRes.valueOfOauth(isValidCode, userSync.isExistAccount(), userSync.username());
     }
 
     @Transactional
@@ -61,15 +62,15 @@ public class OauthUseCase {
         phoneVerificationService.isValidCode(PhoneVerificationDto.VerifyCodeReq.from(request), PhoneCodeKeyType.getOauthSignUpTypeByProvider(provider));
         phoneCodeService.delete(request.phone(), PhoneCodeKeyType.getOauthSignUpTypeByProvider(provider));
 
-        Pair<Boolean, String> isSignUpUser = checkSignUpUserNotOauthByProvider(provider, request.phone());
+        UserSyncDto userSync = checkSignUpUserNotOauthByProvider(provider, request.phone());
 
-        if (isSignUpUser.getLeft().equals(Boolean.FALSE) && !isOauthSyncRequest(request))
+        if (!userSync.isExistAccount() && !isOauthSyncRequest(request))
             throw new OauthException(OauthErrorCode.INVALID_OAUTH_SYNC_REQUEST);
-        if (isSignUpUser.getLeft().equals(Boolean.TRUE) && isOauthSyncRequest(request))
+        if (userSync.isExistAccount() && isOauthSyncRequest(request))
             throw new OauthException(OauthErrorCode.INVALID_OAUTH_SYNC_REQUEST);
 
         OidcDecodePayload payload = oauthOidcHelper.getPayload(provider, request.idToken());
-        User user = userOauthSignService.saveUser(request, isSignUpUser, provider, payload.sub());
+        User user = userOauthSignService.saveUser(request, userSync, provider, payload.sub());
 
         return Pair.of(user.getId(), jwtAuthHelper.createToken(user));
     }
@@ -77,17 +78,17 @@ public class OauthUseCase {
     /**
      * Oauth 회원가입 진행 도중, Provider로 가입한 사용자인지 지속적으로 검증하기 위한 메서드
      */
-    private Pair<Boolean, String> checkSignUpUserNotOauthByProvider(Provider provider, String phone) {
-        Pair<Boolean, String> isOauthSignUpAllowed = userOauthSignService.isSignUpAllowed(provider, phone);
+    private UserSyncDto checkSignUpUserNotOauthByProvider(Provider provider, String phone) {
+        UserSyncDto userSync = userOauthSignService.isSignUpAllowed(provider, phone);
 
-        if (isOauthSignUpAllowed == null) {
+        if (!userSync.isSignUpAllowed()) {
             phoneCodeService.delete(phone, PhoneCodeKeyType.getOauthSignUpTypeByProvider(provider));
             throw new OauthException(OauthErrorCode.ALREADY_SIGNUP_OAUTH);
         }
 
-        return isOauthSignUpAllowed;
+        return userSync;
     }
-    
+
     private boolean isOauthSyncRequest(SignUpReq.OauthInfo request) {
         return request.username() != null;
     }
