@@ -60,12 +60,12 @@ public class OauthUseCase {
     public Pair<Long, Jwts> signUp(Provider provider, SignUpReq.OauthInfo request) {
         phoneVerificationService.isValidCode(PhoneVerificationDto.VerifyCodeReq.from(request), PhoneCodeKeyType.getOauthSignUpTypeByProvider(provider));
         phoneCodeService.delete(request.phone(), PhoneCodeKeyType.getOauthSignUpTypeByProvider(provider));
-        
+
         Pair<Boolean, String> isSignUpUser = checkSignUpUserNotOauthByProvider(provider, request.phone());
 
-        if (isSignUpUser.getLeft().equals(Boolean.FALSE) && request.username() == null)
+        if (isSignUpUser.getLeft().equals(Boolean.FALSE) && !isOauthSyncRequest(request))
             throw new OauthException(OauthErrorCode.INVALID_OAUTH_SYNC_REQUEST);
-        if (isSignUpUser.getLeft().equals(Boolean.TRUE) && request.username() != null)
+        if (isSignUpUser.getLeft().equals(Boolean.TRUE) && isOauthSyncRequest(request))
             throw new OauthException(OauthErrorCode.INVALID_OAUTH_SYNC_REQUEST);
 
         OidcDecodePayload payload = oauthOidcHelper.getPayload(provider, request.idToken());
@@ -86,5 +86,9 @@ public class OauthUseCase {
         }
 
         return isOauthSignUpAllowed;
+    }
+    
+    private boolean isOauthSyncRequest(SignUpReq.OauthInfo request) {
+        return request.username() != null;
     }
 }
