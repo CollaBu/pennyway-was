@@ -1,10 +1,10 @@
 package kr.co.pennyway.api.apis.auth.service;
 
+import kr.co.pennyway.api.apis.auth.dto.UserSyncDto;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorCode;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorException;
 import kr.co.pennyway.domain.domains.user.service.UserService;
-import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -32,42 +32,50 @@ public class UserGeneralSignServiceTest {
         userGeneralSignService = new UserGeneralSignService(userService, passwordEncoder);
     }
 
-    @DisplayName("일반 회원가입 시, 회원 정보가 없으면 FALSE를 반환한다.")
+    @DisplayName("일반 회원가입 시, 회원 정보가 없으면 {회원 가입 가능, 기존 계정 없음} 응답을 반환한다.")
     @Test
     void isSignedUserWhenGeneralReturnFalse() {
         // given
         given(userService.readUserByPhone(phone)).willReturn(Optional.empty());
 
         // when
-        Boolean result = userGeneralSignService.isSignUpAllowed(phone).getKey();
+        UserSyncDto userSync = userGeneralSignService.isSignUpAllowed(phone);
 
         // then
-        assertEquals(result, Boolean.FALSE);
+        assertTrue(userSync.isSignUpAllowed());
+        assertFalse(userSync.isExistAccount());
+        assertNull(userSync.username());
     }
 
-    @DisplayName("일반 회원가입 시, oauth 회원 정보가 있으면 TRUE를 반환한다.")
+    @DisplayName("일반 회원가입 시, oauth 회원 정보만 있으면 {회원 가입 가능, 기존 계정 있음, 기존 계정 아이디} 응답을 반환한다.")
     @Test
     void isSignedUserWhenGeneralReturnTrue() {
         // given
         given(userService.readUserByPhone(phone)).willReturn(Optional.of(User.builder().username("pennyway").password(null).build()));
 
         // when
-        Pair<Boolean, String> result = userGeneralSignService.isSignUpAllowed(phone);
+        UserSyncDto userSync = userGeneralSignService.isSignUpAllowed(phone);
 
         // then
-        assertEquals(result.getLeft(), Boolean.TRUE);
-        assertEquals(result.getRight(), "pennyway");
+        assertTrue(userSync.isSignUpAllowed());
+        assertTrue(userSync.isExistAccount());
+        assertEquals("pennyway", userSync.username());
     }
 
-    @DisplayName("일반 회원가입 시, 이미 일반회원 가입된 회원인 경우 null을 반환한다.")
+    @DisplayName("일반 회원가입 시, 이미 일반회원 가입된 회원인 경우 계정 생성 불가 응답을 반환한다.")
     @Test
     void isSignedUserWhenGeneralThrowUserErrorException() {
         // given
         given(userService.readUserByPhone(phone)).willReturn(
-                Optional.of(User.builder().password("password").build()));
+                Optional.of(User.builder().username("pennyway").password("password").build()));
 
-        // when - then
-        assertNull(userGeneralSignService.isSignUpAllowed(phone));
+        // when
+        UserSyncDto userSync = userGeneralSignService.isSignUpAllowed(phone);
+
+        // then
+        assertFalse(userSync.isSignUpAllowed());
+        assertTrue(userSync.isExistAccount());
+        assertEquals("pennyway", userSync.username());
     }
 
     @DisplayName("로그인 시, 유저가 존재하고 비밀번호가 일치하면 User를 반환한다.")
