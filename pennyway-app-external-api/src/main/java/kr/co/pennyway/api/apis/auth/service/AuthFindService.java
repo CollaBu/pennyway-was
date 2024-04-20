@@ -4,6 +4,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import kr.co.pennyway.api.apis.auth.dto.AuthFindDto;
+import kr.co.pennyway.api.common.exception.PhoneVerificationErrorCode;
+import kr.co.pennyway.api.common.exception.PhoneVerificationException;
 import kr.co.pennyway.domain.common.redis.phone.PhoneVerificationService;
 import kr.co.pennyway.domain.common.redis.phone.PhoneVerificationType;
 import kr.co.pennyway.domain.domains.user.domain.User;
@@ -26,7 +28,7 @@ public class AuthFindService {
 			phoneVerificationService.readByPhone(phone, PhoneVerificationType.FIND_USERNAME);
 		} catch (IllegalArgumentException e) {
 			log.info("Phone verification code not found by phone: {}", phone);
-			throw new UserErrorException(UserErrorCode.NOT_FOUND);
+			throw new PhoneVerificationException(PhoneVerificationErrorCode.EXPIRED_OR_INVALID_PHONE);
 		}
 
 		User user = userService.readUserByPhone(phone).orElseThrow(() -> {
