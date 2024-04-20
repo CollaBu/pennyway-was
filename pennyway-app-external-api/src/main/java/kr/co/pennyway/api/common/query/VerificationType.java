@@ -1,6 +1,6 @@
 package kr.co.pennyway.api.common.query;
 
-import kr.co.pennyway.domain.common.redis.phone.PhoneVerificationType;
+import kr.co.pennyway.domain.common.redis.phone.PhoneCodeKeyType;
 import kr.co.pennyway.domain.domains.oauth.type.Provider;
 
 public enum VerificationType {
@@ -15,12 +15,12 @@ public enum VerificationType {
         this.type = type;
     }
 
-    public PhoneVerificationType toPhoneVerificationType(Provider provider) {
+    public PhoneCodeKeyType toPhoneVerificationType(Provider provider) {
         return switch (this) {
-            case OAUTH -> PhoneVerificationType.getOauthSignUpTypeByProvider(provider);
-            case USERNAME -> PhoneVerificationType.FIND_USERNAME;
-            case PASSWORD -> PhoneVerificationType.FIND_PASSWORD;
-            default -> PhoneVerificationType.SIGN_UP;
+            case OAUTH -> PhoneCodeKeyType.getOauthSignUpTypeByProvider(provider);
+            case USERNAME -> PhoneCodeKeyType.FIND_USERNAME;
+            case PASSWORD -> PhoneCodeKeyType.FIND_PASSWORD;
+            default -> PhoneCodeKeyType.SIGN_UP;
         };
     }
 }

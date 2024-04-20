@@ -8,8 +8,8 @@ import kr.co.pennyway.api.apis.auth.mapper.PhoneVerificationMapper;
 import kr.co.pennyway.api.apis.auth.service.UserGeneralSignService;
 import kr.co.pennyway.api.common.security.jwt.Jwts;
 import kr.co.pennyway.common.annotation.UseCase;
-import kr.co.pennyway.domain.common.redis.phone.PhoneVerificationService;
-import kr.co.pennyway.domain.common.redis.phone.PhoneVerificationType;
+import kr.co.pennyway.domain.common.redis.phone.PhoneCodeKeyType;
+import kr.co.pennyway.domain.common.redis.phone.PhoneCodeService;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorCode;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorException;
@@ -26,28 +26,28 @@ public class AuthUseCase {
 
     private final JwtAuthHelper jwtAuthHelper;
     private final PhoneVerificationMapper phoneVerificationMapper;
-    private final PhoneVerificationService phoneVerificationService;
+    private final PhoneCodeService phoneCodeService;
 
     public PhoneVerificationDto.PushCodeRes sendCode(PhoneVerificationDto.PushCodeReq request) {
-        return phoneVerificationMapper.sendCode(request, PhoneVerificationType.SIGN_UP);
+        return phoneVerificationMapper.sendCode(request, PhoneCodeKeyType.SIGN_UP);
     }
 
     public PhoneVerificationDto.VerifyCodeRes verifyCode(PhoneVerificationDto.VerifyCodeReq request) {
-        Boolean isValidCode = phoneVerificationMapper.isValidCode(request, PhoneVerificationType.SIGN_UP);
+        Boolean isValidCode = phoneVerificationMapper.isValidCode(request, PhoneCodeKeyType.SIGN_UP);
         Pair<Boolean, String> isOauthUser = checkOauthUserNotGeneralSignUp(request.phone());
 
-        phoneVerificationService.extendTimeToLeave(request.phone(), PhoneVerificationType.SIGN_UP);
+        phoneCodeService.extendTimeToLeave(request.phone(), PhoneCodeKeyType.SIGN_UP);
 
         return PhoneVerificationDto.VerifyCodeRes.valueOfGeneral(isValidCode, isOauthUser.getLeft(), isOauthUser.getRight());
     }
 
     @Transactional
     public Pair<Long, Jwts> signUp(SignUpReq.Info request) {
-        phoneVerificationMapper.isValidCode(PhoneVerificationDto.VerifyCodeReq.from(request), PhoneVerificationType.SIGN_UP);
+        phoneVerificationMapper.isValidCode(PhoneVerificationDto.VerifyCodeReq.from(request), PhoneCodeKeyType.SIGN_UP);
         Pair<Boolean, String> isOauthUser = checkOauthUserNotGeneralSignUp(request.phone());
 
         User user = userGeneralSignService.saveUserWithEncryptedPassword(request, isOauthUser);
-        phoneVerificationService.delete(request.phone(), PhoneVerificationType.SIGN_UP);
+        phoneCodeService.delete(request.phone(), PhoneCodeKeyType.SIGN_UP);
 
         return Pair.of(user.getId(), jwtAuthHelper.createToken(user));
     }
@@ -67,7 +67,7 @@ public class AuthUseCase {
         Pair<Boolean, String> isGeneralSignUpAllowed = userGeneralSignService.isSignUpAllowed(phone);
 
         if (isGeneralSignUpAllowed == null) {
-            phoneVerificationService.delete(phone, PhoneVerificationType.SIGN_UP);
+            phoneCodeService.delete(phone, PhoneCodeKeyType.SIGN_UP);
             throw new UserErrorException(UserErrorCode.ALREADY_SIGNUP);
         }
 

@@ -14,35 +14,35 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DisplayName("휴대폰 검증 Redis 서비스 테스트")
-@SpringBootTest(classes = {PhoneVerificationRepository.class, RedisConfig.class})
+@SpringBootTest(classes = {PhoneCodeRepository.class, RedisConfig.class})
 @ActiveProfiles("local")
 public class PhoneValidationDaoTest extends ContainerRedisTestConfig {
     @Autowired
-    private PhoneVerificationRepository phoneVerificationRepository;
+    private PhoneCodeRepository phoneCodeRepository;
     private String phone;
     private String code;
-    private PhoneVerificationType codeType;
+    private PhoneCodeKeyType codeType;
 
     @BeforeEach
     void setUp() {
         phone = "01012345678";
         code = "123456";
-        codeType = PhoneVerificationType.SIGN_UP;
+        codeType = PhoneCodeKeyType.SIGN_UP;
     }
 
     @AfterEach
     void tearDown() {
-        phoneVerificationRepository.delete(phone, codeType);
+        phoneCodeRepository.delete(phone, codeType);
     }
 
     @Test
     @DisplayName("Redis에 데이터를 저장하면 {'codeType:phone':code}로 데이터가 저장된다.")
     void codeSaveTest() {
         // given
-        phoneVerificationRepository.save(phone, code, codeType);
+        phoneCodeRepository.save(phone, code, codeType);
 
         // when
-        String savedCode = phoneVerificationRepository.findCodeByPhone(phone, codeType);
+        String savedCode = phoneCodeRepository.findCodeByPhone(phone, codeType);
 
         // then
         assertEquals(code, savedCode);
@@ -53,31 +53,31 @@ public class PhoneValidationDaoTest extends ContainerRedisTestConfig {
     @DisplayName("Redis에 'codeType:phone'에 해당하는 값이 없으면 NullPointerException이 발생한다.")
     void codeReadError() {
         // given
-        phoneVerificationRepository.delete(phone, codeType);
+        phoneCodeRepository.delete(phone, codeType);
         String wrongPhone = "01087654321";
 
         // when - then
-        assertThrows(NullPointerException.class, () -> phoneVerificationRepository.findCodeByPhone(wrongPhone, codeType));
+        assertThrows(NullPointerException.class, () -> phoneCodeRepository.findCodeByPhone(wrongPhone, codeType));
     }
 
     @Test
     @DisplayName("Redis에 저장된 데이터를 삭제하면 해당 데이터가 삭제된다.")
     void codeRemoveTest() {
         // given
-        phoneVerificationRepository.save(phone, code, codeType);
+        phoneCodeRepository.save(phone, code, codeType);
 
         // when
-        phoneVerificationRepository.delete(phone, codeType);
+        phoneCodeRepository.delete(phone, codeType);
 
         // then
-        assertThrows(NullPointerException.class, () -> phoneVerificationRepository.findCodeByPhone(phone, codeType));
+        assertThrows(NullPointerException.class, () -> phoneCodeRepository.findCodeByPhone(phone, codeType));
     }
 
     @Test
     @DisplayName("저장되지 않은 데이터를 삭제해도 에러가 발생하지 않는다.")
     void codeRemoveError() {
         // when - thengi
-        assertThrows(NullPointerException.class, () -> phoneVerificationRepository.findCodeByPhone(phone, codeType));
-        phoneVerificationRepository.delete(phone, codeType);
+        assertThrows(NullPointerException.class, () -> phoneCodeRepository.findCodeByPhone(phone, codeType));
+        phoneCodeRepository.delete(phone, codeType);
     }
 }

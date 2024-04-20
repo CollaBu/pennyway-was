@@ -9,8 +9,8 @@ import kr.co.pennyway.api.apis.auth.mapper.PhoneVerificationMapper;
 import kr.co.pennyway.api.apis.auth.service.UserOauthSignService;
 import kr.co.pennyway.api.common.security.jwt.Jwts;
 import kr.co.pennyway.common.annotation.UseCase;
-import kr.co.pennyway.domain.common.redis.phone.PhoneVerificationService;
-import kr.co.pennyway.domain.common.redis.phone.PhoneVerificationType;
+import kr.co.pennyway.domain.common.redis.phone.PhoneCodeKeyType;
+import kr.co.pennyway.domain.common.redis.phone.PhoneCodeService;
 import kr.co.pennyway.domain.domains.oauth.exception.OauthErrorCode;
 import kr.co.pennyway.domain.domains.oauth.exception.OauthException;
 import kr.co.pennyway.domain.domains.oauth.type.Provider;
@@ -27,7 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class OauthUseCase {
     private final OauthOidcHelper oauthOidcHelper;
     private final PhoneVerificationMapper phoneVerificationMapper;
-    private final PhoneVerificationService phoneVerificationService;
+    private final PhoneCodeService phoneCodeService;
     private final JwtAuthHelper jwtAuthHelper;
     private final UserOauthSignService userOauthSignService;
 
@@ -43,22 +43,22 @@ public class OauthUseCase {
     }
 
     public PhoneVerificationDto.PushCodeRes sendCode(Provider provider, PhoneVerificationDto.PushCodeReq request) {
-        return phoneVerificationMapper.sendCode(request, PhoneVerificationType.getOauthSignUpTypeByProvider(provider));
+        return phoneVerificationMapper.sendCode(request, PhoneCodeKeyType.getOauthSignUpTypeByProvider(provider));
     }
 
     @Transactional(readOnly = true)
     public PhoneVerificationDto.VerifyCodeRes verifyCode(Provider provider, PhoneVerificationDto.VerifyCodeReq request) {
-        Boolean isValidCode = phoneVerificationMapper.isValidCode(request, PhoneVerificationType.getOauthSignUpTypeByProvider(provider));
+        Boolean isValidCode = phoneVerificationMapper.isValidCode(request, PhoneCodeKeyType.getOauthSignUpTypeByProvider(provider));
         Pair<Boolean, String> isSignUpUser = checkSignUpUserNotOauthByProvider(provider, request.phone());
 
-        phoneVerificationService.extendTimeToLeave(request.phone(), PhoneVerificationType.getOauthSignUpTypeByProvider(provider));
+        phoneCodeService.extendTimeToLeave(request.phone(), PhoneCodeKeyType.getOauthSignUpTypeByProvider(provider));
 
         return PhoneVerificationDto.VerifyCodeRes.valueOfOauth(isValidCode, isSignUpUser.getLeft(), isSignUpUser.getRight());
     }
 
     @Transactional
     public Pair<Long, Jwts> signUp(Provider provider, SignUpReq.OauthInfo request) {
-        phoneVerificationMapper.isValidCode(PhoneVerificationDto.VerifyCodeReq.from(request), PhoneVerificationType.getOauthSignUpTypeByProvider(provider));
+        phoneVerificationMapper.isValidCode(PhoneVerificationDto.VerifyCodeReq.from(request), PhoneCodeKeyType.getOauthSignUpTypeByProvider(provider));
         Pair<Boolean, String> isSignUpUser = checkSignUpUserNotOauthByProvider(provider, request.phone());
 
         if (isSignUpUser.getLeft().equals(Boolean.FALSE) && request.username() == null)
@@ -68,7 +68,7 @@ public class OauthUseCase {
 
         OidcDecodePayload payload = oauthOidcHelper.getPayload(provider, request.idToken());
         User user = userOauthSignService.saveUser(request, isSignUpUser, provider, payload.sub());
-        phoneVerificationService.delete(request.phone(), PhoneVerificationType.getOauthSignUpTypeByProvider(provider));
+        phoneCodeService.delete(request.phone(), PhoneCodeKeyType.getOauthSignUpTypeByProvider(provider));
 
         return Pair.of(user.getId(), jwtAuthHelper.createToken(user));
     }
@@ -80,7 +80,7 @@ public class OauthUseCase {
         Pair<Boolean, String> isOauthSignUpAllowed = userOauthSignService.isSignUpAllowed(provider, phone);
 
         if (isOauthSignUpAllowed == null) {
-            phoneVerificationService.delete(phone, PhoneVerificationType.getOauthSignUpTypeByProvider(provider));
+            phoneCodeService.delete(phone, PhoneCodeKeyType.getOauthSignUpTypeByProvider(provider));
             throw new OauthException(OauthErrorCode.ALREADY_SIGNUP_OAUTH);
         }
 

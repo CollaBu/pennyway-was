@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum PhoneVerificationType {
+public enum PhoneCodeKeyType {
     SIGN_UP("signUp"),
     OAUTH_SIGN_UP_KAKAO("oauthSignUp:kakao"),
     OAUTH_SIGN_UP_GOOGLE("oauthSignUp:google"),
@@ -16,7 +16,7 @@ public enum PhoneVerificationType {
 
     private final String prefix;
 
-    public static PhoneVerificationType getOauthSignUpTypeByProvider(Provider provider) {
+    public static PhoneCodeKeyType getOauthSignUpTypeByProvider(Provider provider) {
         return switch (provider) {
             case KAKAO -> OAUTH_SIGN_UP_KAKAO;
             case GOOGLE -> OAUTH_SIGN_UP_GOOGLE;
