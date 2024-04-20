@@ -4,7 +4,7 @@ import kr.co.pennyway.api.apis.auth.dto.PhoneVerificationDto;
 import kr.co.pennyway.api.apis.auth.dto.SignInReq;
 import kr.co.pennyway.api.apis.auth.dto.SignUpReq;
 import kr.co.pennyway.api.apis.auth.helper.JwtAuthHelper;
-import kr.co.pennyway.api.apis.auth.mapper.PhoneVerificationMapper;
+import kr.co.pennyway.api.apis.auth.service.PhoneVerificationService;
 import kr.co.pennyway.api.apis.auth.service.UserGeneralSignService;
 import kr.co.pennyway.api.common.security.jwt.Jwts;
 import kr.co.pennyway.common.annotation.UseCase;
@@ -25,15 +25,15 @@ public class AuthUseCase {
     private final UserGeneralSignService userGeneralSignService;
 
     private final JwtAuthHelper jwtAuthHelper;
-    private final PhoneVerificationMapper phoneVerificationMapper;
+    private final PhoneVerificationService phoneVerificationService;
     private final PhoneCodeService phoneCodeService;
 
     public PhoneVerificationDto.PushCodeRes sendCode(PhoneVerificationDto.PushCodeReq request) {
-        return phoneVerificationMapper.sendCode(request, PhoneCodeKeyType.SIGN_UP);
+        return phoneVerificationService.sendCode(request, PhoneCodeKeyType.SIGN_UP);
     }
 
     public PhoneVerificationDto.VerifyCodeRes verifyCode(PhoneVerificationDto.VerifyCodeReq request) {
-        Boolean isValidCode = phoneVerificationMapper.isValidCode(request, PhoneCodeKeyType.SIGN_UP);
+        Boolean isValidCode = phoneVerificationService.isValidCode(request, PhoneCodeKeyType.SIGN_UP);
         Pair<Boolean, String> isOauthUser = checkOauthUserNotGeneralSignUp(request.phone());
 
         phoneCodeService.extendTimeToLeave(request.phone(), PhoneCodeKeyType.SIGN_UP);
@@ -43,7 +43,7 @@ public class AuthUseCase {
 
     @Transactional
     public Pair<Long, Jwts> signUp(SignUpReq.Info request) {
-        phoneVerificationMapper.isValidCode(PhoneVerificationDto.VerifyCodeReq.from(request), PhoneCodeKeyType.SIGN_UP);
+        phoneVerificationService.isValidCode(PhoneVerificationDto.VerifyCodeReq.from(request), PhoneCodeKeyType.SIGN_UP);
         Pair<Boolean, String> isOauthUser = checkOauthUserNotGeneralSignUp(request.phone());
 
         User user = userGeneralSignService.saveUserWithEncryptedPassword(request, isOauthUser);

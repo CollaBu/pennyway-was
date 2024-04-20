@@ -5,7 +5,7 @@ import kr.co.pennyway.api.apis.auth.dto.SignInReq;
 import kr.co.pennyway.api.apis.auth.dto.SignUpReq;
 import kr.co.pennyway.api.apis.auth.helper.JwtAuthHelper;
 import kr.co.pennyway.api.apis.auth.helper.OauthOidcHelper;
-import kr.co.pennyway.api.apis.auth.mapper.PhoneVerificationMapper;
+import kr.co.pennyway.api.apis.auth.service.PhoneVerificationService;
 import kr.co.pennyway.api.apis.auth.service.UserOauthSignService;
 import kr.co.pennyway.api.common.security.jwt.Jwts;
 import kr.co.pennyway.common.annotation.UseCase;
@@ -26,7 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class OauthUseCase {
     private final OauthOidcHelper oauthOidcHelper;
-    private final PhoneVerificationMapper phoneVerificationMapper;
+    private final PhoneVerificationService phoneVerificationService;
     private final PhoneCodeService phoneCodeService;
     private final JwtAuthHelper jwtAuthHelper;
     private final UserOauthSignService userOauthSignService;
@@ -43,12 +43,12 @@ public class OauthUseCase {
     }
 
     public PhoneVerificationDto.PushCodeRes sendCode(Provider provider, PhoneVerificationDto.PushCodeReq request) {
-        return phoneVerificationMapper.sendCode(request, PhoneCodeKeyType.getOauthSignUpTypeByProvider(provider));
+        return phoneVerificationService.sendCode(request, PhoneCodeKeyType.getOauthSignUpTypeByProvider(provider));
     }
 
     @Transactional(readOnly = true)
     public PhoneVerificationDto.VerifyCodeRes verifyCode(Provider provider, PhoneVerificationDto.VerifyCodeReq request) {
-        Boolean isValidCode = phoneVerificationMapper.isValidCode(request, PhoneCodeKeyType.getOauthSignUpTypeByProvider(provider));
+        Boolean isValidCode = phoneVerificationService.isValidCode(request, PhoneCodeKeyType.getOauthSignUpTypeByProvider(provider));
         Pair<Boolean, String> isSignUpUser = checkSignUpUserNotOauthByProvider(provider, request.phone());
 
         phoneCodeService.extendTimeToLeave(request.phone(), PhoneCodeKeyType.getOauthSignUpTypeByProvider(provider));
@@ -58,7 +58,7 @@ public class OauthUseCase {
 
     @Transactional
     public Pair<Long, Jwts> signUp(Provider provider, SignUpReq.OauthInfo request) {
-        phoneVerificationMapper.isValidCode(PhoneVerificationDto.VerifyCodeReq.from(request), PhoneCodeKeyType.getOauthSignUpTypeByProvider(provider));
+        phoneVerificationService.isValidCode(PhoneVerificationDto.VerifyCodeReq.from(request), PhoneCodeKeyType.getOauthSignUpTypeByProvider(provider));
         Pair<Boolean, String> isSignUpUser = checkSignUpUserNotOauthByProvider(provider, request.phone());
 
         if (isSignUpUser.getLeft().equals(Boolean.FALSE) && request.username() == null)

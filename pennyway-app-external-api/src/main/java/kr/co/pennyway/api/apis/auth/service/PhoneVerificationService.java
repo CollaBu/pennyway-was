@@ -1,23 +1,23 @@
-package kr.co.pennyway.api.apis.auth.mapper;
+package kr.co.pennyway.api.apis.auth.service;
 
 import kr.co.pennyway.api.apis.auth.dto.PhoneVerificationDto;
 import kr.co.pennyway.api.common.exception.PhoneVerificationErrorCode;
 import kr.co.pennyway.api.common.exception.PhoneVerificationException;
-import kr.co.pennyway.common.annotation.Mapper;
 import kr.co.pennyway.domain.common.redis.phone.PhoneCodeKeyType;
 import kr.co.pennyway.domain.common.redis.phone.PhoneCodeService;
 import kr.co.pennyway.infra.common.event.PushCodeEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.concurrent.ThreadLocalRandom;
 
 @Slf4j
-@Mapper
+@Service
 @RequiredArgsConstructor
-public class PhoneVerificationMapper {
+public class PhoneVerificationService {
     private final PhoneCodeService phoneCodeService;
     private final ApplicationEventPublisher eventPublisher;
 
