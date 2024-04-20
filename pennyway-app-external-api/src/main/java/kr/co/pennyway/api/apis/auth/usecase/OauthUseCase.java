@@ -59,6 +59,8 @@ public class OauthUseCase {
     @Transactional
     public Pair<Long, Jwts> signUp(Provider provider, SignUpReq.OauthInfo request) {
         phoneVerificationService.isValidCode(PhoneVerificationDto.VerifyCodeReq.from(request), PhoneCodeKeyType.getOauthSignUpTypeByProvider(provider));
+        phoneCodeService.delete(request.phone(), PhoneCodeKeyType.getOauthSignUpTypeByProvider(provider));
+        
         Pair<Boolean, String> isSignUpUser = checkSignUpUserNotOauthByProvider(provider, request.phone());
 
         if (isSignUpUser.getLeft().equals(Boolean.FALSE) && request.username() == null)
@@ -68,7 +70,6 @@ public class OauthUseCase {
 
         OidcDecodePayload payload = oauthOidcHelper.getPayload(provider, request.idToken());
         User user = userOauthSignService.saveUser(request, isSignUpUser, provider, payload.sub());
-        phoneCodeService.delete(request.phone(), PhoneCodeKeyType.getOauthSignUpTypeByProvider(provider));
 
         return Pair.of(user.getId(), jwtAuthHelper.createToken(user));
     }
