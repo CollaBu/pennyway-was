@@ -41,6 +41,15 @@ public class SignUpReq {
     }
 
     public record OauthInfo(String idToken, String name, String username, String phone, String code) {
+        public User toUser() {
+            return User.builder()
+                    .username(username)
+                    .name(name)
+                    .phone(phone)
+                    .role(Role.USER)
+                    .profileVisibility(ProfileVisibility.PUBLIC)
+                    .build();
+        }
     }
 
     @Schema(name = "signUpReqGeneral", title = "일반 회원가입 요청 DTO")

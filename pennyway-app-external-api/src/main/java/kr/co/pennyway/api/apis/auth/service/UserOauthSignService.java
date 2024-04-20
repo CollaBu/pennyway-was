@@ -8,8 +8,6 @@ import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorCode;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorException;
 import kr.co.pennyway.domain.domains.user.service.UserService;
-import kr.co.pennyway.domain.domains.user.type.ProfileVisibility;
-import kr.co.pennyway.domain.domains.user.type.Role;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
@@ -68,12 +66,7 @@ public class UserOauthSignService {
             user = userService.readUserByUsername(isSignUpUser.getRight())
                     .orElseThrow(() -> new UserErrorException(UserErrorCode.NOT_FOUND));
         } else {
-            user = User.builder()
-                    .username(request.username())
-                    .name(request.name())
-                    .phone(request.phone())
-                    .role(Role.USER)
-                    .profileVisibility(ProfileVisibility.PUBLIC).build();
+            user = request.toUser();
             userService.createUser(user);
         }
 
