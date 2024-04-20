@@ -63,13 +63,13 @@ public class UserOauthSignService {
         User user;
 
         if (isSignUpUser.getLeft().equals(Boolean.TRUE)) {
+            log.info("기존 계정에 연동합니다. username: {}", isSignUpUser.getRight());
             user = userService.readUserByUsername(isSignUpUser.getRight())
                     .orElseThrow(() -> new UserErrorException(UserErrorCode.NOT_FOUND));
-            log.info("기존 계정에 연동합니다. user: {}", user);
         } else {
+            log.info("새로운 계정을 생성합니다. username: {}", request.username());
             user = request.toUser();
             userService.createUser(user);
-            log.info("새로운 계정을 생성합니다. user: {}", user);
         }
 
         Oauth oauth = Oauth.of(provider, oauthId, user);
