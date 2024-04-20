@@ -72,10 +72,14 @@ public class UserOauthSignService {
             userService.createUser(user);
         }
 
-        Oauth oauth = Oauth.of(provider, oauthId, user);
-        oauthService.createOauth(oauth);
-
+        Oauth oauth = mappingOauthToUser(user, provider, oauthId);
         log.info("연동된 Oauth 정보 : {}", oauth);
+
         return user;
+    }
+
+    private Oauth mappingOauthToUser(User user, Provider provider, String oauthId) {
+        Oauth oauth = Oauth.of(provider, oauthId, user);
+        return oauthService.createOauth(oauth);
     }
 }
