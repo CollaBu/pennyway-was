@@ -1,6 +1,7 @@
 package kr.co.pennyway.api.apis.auth.service;
 
 import kr.co.pennyway.api.apis.auth.dto.SignUpReq;
+import kr.co.pennyway.api.apis.auth.dto.UserSyncDto;
 import kr.co.pennyway.domain.domains.oauth.domain.Oauth;
 import kr.co.pennyway.domain.domains.oauth.service.OauthService;
 import kr.co.pennyway.domain.domains.oauth.type.Provider;
@@ -10,7 +11,6 @@ import kr.co.pennyway.domain.domains.user.exception.UserErrorException;
 import kr.co.pennyway.domain.domains.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,20 +37,20 @@ public class UserOauthSignService {
      * 단, 이미 동일한 Provider로 가입된 회원이 있는 경우에는 해당 회원의 ID를 반환한다.
      */
     @Transactional(readOnly = true)
-    public Pair<Boolean, String> isSignUpAllowed(Provider provider, String phone) {
+    public UserSyncDto isSignUpAllowed(Provider provider, String phone) {
         Optional<User> user = userService.readUserByPhone(phone);
 
         if (user.isEmpty()) {
             log.info("회원가입 이력이 없는 사용자입니다. phone: {}", phone);
-            return Pair.of(Boolean.FALSE, null);
+            return UserSyncDto.of(true, false, null);
         }
 
         if (oauthService.isExistOauthAccount(user.get().getId(), provider)) {
             log.info("이미 동일한 Provider로 가입된 사용자입니다. phone: {}, provider: {}", phone, provider);
-            return null;
+            return UserSyncDto.abort(user.get().getUsername());
         }
 
-        return Pair.of(Boolean.TRUE, user.get().getUsername());
+        return UserSyncDto.of(true, true, user.get().getUsername());
     }
 
     /**
@@ -59,12 +59,12 @@ public class UserOauthSignService {
      * @param request {@link SignUpReq.OauthInfo}
      */
     @Transactional
-    public User saveUser(SignUpReq.OauthInfo request, Pair<Boolean, String> isSignUpUser, Provider provider, String oauthId) {
+    public User saveUser(SignUpReq.OauthInfo request, UserSyncDto userSync, Provider provider, String oauthId) {
         User user;
 
-        if (isSignUpUser.getLeft().equals(Boolean.TRUE)) {
-            log.info("기존 계정에 연동합니다. username: {}", isSignUpUser.getRight());
-            user = userService.readUserByUsername(isSignUpUser.getRight())
+        if (userSync.isExistAccount()) {
+            log.info("기존 계정에 연동합니다. username: {}", userSync.username());
+            user = userService.readUserByUsername(userSync.username())
                     .orElseThrow(() -> new UserErrorException(UserErrorCode.NOT_FOUND));
         } else {
             log.info("새로운 계정을 생성합니다. username: {}", request.username());
