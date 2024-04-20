@@ -44,10 +44,10 @@ public class AuthUseCase {
     @Transactional
     public Pair<Long, Jwts> signUp(SignUpReq.Info request) {
         phoneVerificationService.isValidCode(PhoneVerificationDto.VerifyCodeReq.from(request), PhoneCodeKeyType.SIGN_UP);
-        Pair<Boolean, String> isOauthUser = checkOauthUserNotGeneralSignUp(request.phone());
-
-        User user = userGeneralSignService.saveUserWithEncryptedPassword(request, isOauthUser);
         phoneCodeService.delete(request.phone(), PhoneCodeKeyType.SIGN_UP);
+
+        Pair<Boolean, String> isOauthUser = checkOauthUserNotGeneralSignUp(request.phone());
+        User user = userGeneralSignService.saveUserWithEncryptedPassword(request, isOauthUser);
 
         return Pair.of(user.getId(), jwtAuthHelper.createToken(user));
     }
