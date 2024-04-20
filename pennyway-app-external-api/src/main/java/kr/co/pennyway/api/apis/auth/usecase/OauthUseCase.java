@@ -6,8 +6,8 @@ import kr.co.pennyway.api.apis.auth.dto.SignUpReq;
 import kr.co.pennyway.api.apis.auth.helper.JwtAuthHelper;
 import kr.co.pennyway.api.apis.auth.helper.OauthOidcHelper;
 import kr.co.pennyway.api.apis.auth.mapper.PhoneVerificationMapper;
-import kr.co.pennyway.api.apis.auth.mapper.UserOauthSignMapper;
 import kr.co.pennyway.api.apis.auth.mapper.UserSyncMapper;
+import kr.co.pennyway.api.apis.auth.service.UserOauthSignService;
 import kr.co.pennyway.api.common.security.jwt.Jwts;
 import kr.co.pennyway.common.annotation.UseCase;
 import kr.co.pennyway.domain.common.redis.phone.PhoneVerificationService;
@@ -30,7 +30,7 @@ public class OauthUseCase {
     private final PhoneVerificationMapper phoneVerificationMapper;
     private final PhoneVerificationService phoneVerificationService;
     private final JwtAuthHelper jwtAuthHelper;
-    private final UserOauthSignMapper userOauthSignMapper;
+    private final UserOauthSignService userOauthSignService;
     private final UserSyncMapper userSyncMapper;
 
     public Pair<Long, Jwts> signIn(Provider provider, SignInReq.Oauth request) {
@@ -39,7 +39,7 @@ public class OauthUseCase {
 
         if (!request.oauthId().equals(payload.sub()))
             throw new OauthException(OauthErrorCode.NOT_MATCHED_OAUTH_ID);
-        User user = userOauthSignMapper.readUser(request.oauthId(), provider);
+        User user = userOauthSignService.readUser(request.oauthId(), provider);
 
         return (user != null) ? Pair.of(user.getId(), jwtAuthHelper.createToken(user)) : Pair.of(-1L, null);
     }
@@ -69,7 +69,7 @@ public class OauthUseCase {
             throw new OauthException(OauthErrorCode.INVALID_OAUTH_SYNC_REQUEST);
 
         OidcDecodePayload payload = oauthOidcHelper.getPayload(provider, request.idToken());
-        User user = userOauthSignMapper.saveUser(request, isSignUpUser, provider, payload.sub());
+        User user = userOauthSignService.saveUser(request, isSignUpUser, provider, payload.sub());
         phoneVerificationService.delete(request.phone(), PhoneVerificationType.getOauthSignUpTypeByProvider(provider));
 
         return Pair.of(user.getId(), jwtAuthHelper.createToken(user));
