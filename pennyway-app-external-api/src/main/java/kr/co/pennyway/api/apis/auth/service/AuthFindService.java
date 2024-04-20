@@ -1,9 +1,9 @@
 package kr.co.pennyway.api.apis.auth.service;
 
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import kr.co.pennyway.api.apis.auth.dto.AuthFindDto;
-import kr.co.pennyway.common.annotation.Mapper;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorCode;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorException;
@@ -12,7 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@Mapper
+@Service
 @RequiredArgsConstructor
 public class AuthFindService {
 	private final UserService userService;
