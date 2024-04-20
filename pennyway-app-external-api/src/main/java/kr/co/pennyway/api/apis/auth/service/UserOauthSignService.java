@@ -50,6 +50,7 @@ public class UserOauthSignService {
             return UserSyncDto.abort(user.get().getUsername());
         }
 
+        log.info("소셜 회원가입 사용자입니다. user: {}", user.get());
         return UserSyncDto.of(true, true, user.get().getUsername());
     }
 
