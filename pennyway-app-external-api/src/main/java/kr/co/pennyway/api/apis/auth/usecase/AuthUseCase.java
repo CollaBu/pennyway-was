@@ -5,8 +5,8 @@ import kr.co.pennyway.api.apis.auth.dto.SignInReq;
 import kr.co.pennyway.api.apis.auth.dto.SignUpReq;
 import kr.co.pennyway.api.apis.auth.helper.JwtAuthHelper;
 import kr.co.pennyway.api.apis.auth.mapper.PhoneVerificationMapper;
-import kr.co.pennyway.api.apis.auth.mapper.UserGeneralSignMapper;
 import kr.co.pennyway.api.apis.auth.mapper.UserSyncMapper;
+import kr.co.pennyway.api.apis.auth.service.UserGeneralSignService;
 import kr.co.pennyway.api.common.security.jwt.Jwts;
 import kr.co.pennyway.common.annotation.UseCase;
 import kr.co.pennyway.domain.common.redis.phone.PhoneVerificationService;
@@ -24,7 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class AuthUseCase {
     private final UserSyncMapper userSyncMapper;
-    private final UserGeneralSignMapper userGeneralSignMapper;
+    private final UserGeneralSignService userGeneralSignService;
 
     private final JwtAuthHelper jwtAuthHelper;
     private final PhoneVerificationMapper phoneVerificationMapper;
@@ -48,7 +48,7 @@ public class AuthUseCase {
         phoneVerificationMapper.isValidCode(PhoneVerificationDto.VerifyCodeReq.from(request), PhoneVerificationType.SIGN_UP);
         Pair<Boolean, String> isOauthUser = checkOauthUserNotGeneralSignUp(request.phone());
 
-        User user = userGeneralSignMapper.saveUserWithEncryptedPassword(request, isOauthUser);
+        User user = userGeneralSignService.saveUserWithEncryptedPassword(request, isOauthUser);
         phoneVerificationService.delete(request.phone(), PhoneVerificationType.SIGN_UP);
 
         return Pair.of(user.getId(), jwtAuthHelper.createToken(user));
@@ -56,7 +56,7 @@ public class AuthUseCase {
 
     @Transactional(readOnly = true)
     public Pair<Long, Jwts> signIn(SignInReq.General request) {
-        User user = userGeneralSignMapper.readUserIfValid(request.username(), request.password());
+        User user = userGeneralSignService.readUserIfValid(request.username(), request.password());
 
         return Pair.of(user.getId(), jwtAuthHelper.createToken(user));
     }

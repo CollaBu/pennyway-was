@@ -1,7 +1,6 @@
-package kr.co.pennyway.api.apis.auth.mapper;
+package kr.co.pennyway.api.apis.auth.service;
 
 import kr.co.pennyway.api.apis.auth.dto.SignUpReq;
-import kr.co.pennyway.common.annotation.Mapper;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorCode;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorException;
@@ -10,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
@@ -20,9 +20,9 @@ import java.util.Optional;
  * @author YANG JAESEO
  */
 @Slf4j
-@Mapper
+@Service
 @RequiredArgsConstructor
-public class UserGeneralSignMapper {
+public class UserGeneralSignService {
     private final UserService userService;
 
     private final PasswordEncoder bCryptPasswordEncoder;

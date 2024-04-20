@@ -1,5 +1,6 @@
 package kr.co.pennyway.api.apis.auth.mapper;
 
+import kr.co.pennyway.api.apis.auth.service.UserGeneralSignService;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorCode;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorException;
@@ -19,8 +20,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
-public class UserGeneralSignMapperTest {
-    private UserGeneralSignMapper userGeneralSignMapper;
+public class UserGeneralSignServiceTest {
+    private UserGeneralSignService userGeneralSignService;
     @Mock
     private UserService userService;
     @Mock
@@ -28,7 +29,7 @@ public class UserGeneralSignMapperTest {
 
     @BeforeEach
     void setUp() {
-        userGeneralSignMapper = new UserGeneralSignMapper(userService, passwordEncoder);
+        userGeneralSignService = new UserGeneralSignService(userService, passwordEncoder);
     }
 
     @DisplayName("로그인 시, 유저가 존재하고 비밀번호가 일치하면 User를 반환한다.")
@@ -40,7 +41,7 @@ public class UserGeneralSignMapperTest {
         given(passwordEncoder.matches("password", user.getPassword())).willReturn(true);
 
         // when
-        User result = userGeneralSignMapper.readUserIfValid("pennyway", "password");
+        User result = userGeneralSignService.readUserIfValid("pennyway", "password");
 
         // then
         assertEquals(result, user);
@@ -54,7 +55,7 @@ public class UserGeneralSignMapperTest {
                 new UserErrorException(UserErrorCode.NOT_FOUND));
 
         // when - then
-        UserErrorException exception = assertThrows(UserErrorException.class, () -> userGeneralSignMapper.readUserIfValid("pennyway", "password"));
+        UserErrorException exception = assertThrows(UserErrorException.class, () -> userGeneralSignService.readUserIfValid("pennyway", "password"));
         System.out.println(exception.getExplainError());
     }
 
@@ -67,7 +68,7 @@ public class UserGeneralSignMapperTest {
         given(passwordEncoder.matches("password", user.getPassword())).willReturn(false);
 
         // when - then
-        UserErrorException exception = assertThrows(UserErrorException.class, () -> userGeneralSignMapper.readUserIfValid("pennyway", "password"));
+        UserErrorException exception = assertThrows(UserErrorException.class, () -> userGeneralSignService.readUserIfValid("pennyway", "password"));
         System.out.println(exception.getExplainError());
     }
 }
