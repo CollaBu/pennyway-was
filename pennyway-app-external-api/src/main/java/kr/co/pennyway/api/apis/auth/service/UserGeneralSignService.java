@@ -1,13 +1,13 @@
 package kr.co.pennyway.api.apis.auth.service;
 
 import kr.co.pennyway.api.apis.auth.dto.SignUpReq;
+import kr.co.pennyway.api.apis.auth.dto.UserSyncDto;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorCode;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorException;
 import kr.co.pennyway.domain.domains.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,25 +30,24 @@ public class UserGeneralSignService {
     /**
      * 일반 회원가입이 가능한 유저인지 확인
      *
-     * @return Pair<Boolean, String> : 이미 가입된 회원인지 여부 (TRUE: 가입되지 않은 회원, FALSE: 가입된 회원), 가입된 회원인 경우 회원
-     * ID 반환. 단, 이미 일반 회원가입을 한 유저인 경우에는 null을 반환한다.
+     * @return {@link UserSyncDto}
      */
     @Transactional(readOnly = true)
-    public Pair<Boolean, String> isSignUpAllowed(String phone) {
+    public UserSyncDto isSignUpAllowed(String phone) {
         Optional<User> user = userService.readUserByPhone(phone);
 
         if (!isExistUser(user)) {
             log.info("회원가입 이력이 없는 사용자입니다. phone: {}", phone);
-            return Pair.of(Boolean.FALSE, null);
+            return UserSyncDto.of(true, false, null);
         }
 
         if (isGeneralSignUpUser(user.get())) {
             log.warn("이미 회원가입된 사용자입니다. user: {}", user.get());
-            return null;
+            return UserSyncDto.abort(user.get().getUsername());
         }
 
         log.info("소셜 회원가입 사용자입니다. user: {}", user.get());
-        return Pair.of(Boolean.TRUE, user.get().getUsername());
+        return UserSyncDto.of(true, true, user.get().getUsername());
     }
 
     /**
@@ -57,12 +56,12 @@ public class UserGeneralSignService {
      * @param request {@link SignUpReq.Info}
      */
     @Transactional
-    public User saveUserWithEncryptedPassword(SignUpReq.Info request, Pair<Boolean, String> isOauthUser) {
+    public User saveUserWithEncryptedPassword(SignUpReq.Info request, UserSyncDto userSync) {
         User user;
 
-        if (isOauthUser.getLeft().equals(Boolean.TRUE)) {
-            log.info("기존 Oauth 회원입니다. username: {}", isOauthUser.getRight());
-            user = userService.readUserByUsername(isOauthUser.getRight())
+        if (userSync.isExistAccount()) {
+            log.info("기존 Oauth 회원입니다. username: {}", userSync.username());
+            user = userService.readUserByUsername(userSync.username())
                     .orElseThrow(() -> new UserErrorException(UserErrorCode.NOT_FOUND));
             user.updatePassword(request.password(bCryptPasswordEncoder));
         } else {

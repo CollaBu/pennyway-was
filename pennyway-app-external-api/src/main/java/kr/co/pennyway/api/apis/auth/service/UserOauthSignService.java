@@ -33,7 +33,7 @@ public class UserOauthSignService {
     /**
      * Oauth 회원가입 시나리오를 결정한다.
      *
-     * @return Pair<Boolean, String> : 이미 가입된 회원인지 여부 (TRUE: 계정 연동, FALSE: 소셜 회원가입)
+     * @return {@link UserSyncDto} : 이미 가입된 회원인지 여부를 담은 DTO.
      * 단, 이미 동일한 Provider로 가입된 회원이 있는 경우에는 해당 회원의 ID를 반환한다.
      */
     @Transactional(readOnly = true)
