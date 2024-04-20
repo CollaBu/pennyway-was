@@ -2,7 +2,7 @@ package kr.co.pennyway.api.apis.auth.controller;
 
 import kr.co.pennyway.api.apis.auth.api.SmsApi;
 import kr.co.pennyway.api.apis.auth.dto.PhoneVerificationDto;
-import kr.co.pennyway.api.apis.auth.service.PhoneVerificationService;
+import kr.co.pennyway.api.apis.auth.usecase.SmsUseCase;
 import kr.co.pennyway.api.common.exception.PhoneVerificationErrorCode;
 import kr.co.pennyway.api.common.exception.PhoneVerificationException;
 import kr.co.pennyway.api.common.query.VerificationType;
@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RequestMapping("/v1/phone")
 public class SmsController implements SmsApi {
-    private final PhoneVerificationService phoneVerificationService;
+    private final SmsUseCase smsUseCase;
 
     @Override
     @PostMapping("")
@@ -29,6 +29,6 @@ public class SmsController implements SmsApi {
         if (type.equals(VerificationType.OAUTH) && provider == null) {
             throw new PhoneVerificationException(PhoneVerificationErrorCode.PROVIDER_IS_REQUIRED);
         }
-        return ResponseEntity.ok(SuccessResponse.from("sms", phoneVerificationService.sendCode(request, type.toPhoneVerificationType(provider))));
+        return ResponseEntity.ok(SuccessResponse.from("sms", smsUseCase.sendCode(request, type, provider)));
     }
 }
