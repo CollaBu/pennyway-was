@@ -42,6 +42,14 @@ public interface AuthCheckApi {
 							    }
 							""")
 			})),
+			@ApiResponse(responseCode = "404", description = "인증번호 만료 또는 유효하지 않은 경우", content = @Content(mediaType = "application/json", examples = {
+					@ExampleObject(name = "인증번호 만료 또는 유효하지 않은 경우", value = """
+							    {
+							        "code": "4042",
+							        "message": "인증번호가 만료되었거나 유효하지 않습니다."
+							    }
+							""")
+			})),
 	})
 	ResponseEntity<?> findUsername(@RequestParam @NotBlank String phone);
 }
