@@ -37,16 +37,17 @@ public class UserGeneralSignService {
     public Pair<Boolean, String> isSignUpAllowed(String phone) {
         Optional<User> user = userService.readUserByPhone(phone);
 
-        if (user.isEmpty()) {
+        if (!isExistUser(user)) {
             log.info("회원가입 이력이 없는 사용자입니다. phone: {}", phone);
             return Pair.of(Boolean.FALSE, null);
         }
 
-        if (user.get().getPassword() != null) {
-            log.warn("이미 회원가입된 사용자입니다. phone: {}", phone);
+        if (isGeneralSignUpUser(user.get())) {
+            log.warn("이미 회원가입된 사용자입니다. user: {}", user.get());
             return null;
         }
 
+        log.info("소셜 회원가입 사용자입니다. user: {}", user.get());
         return Pair.of(Boolean.TRUE, user.get().getUsername());
     }
 
@@ -79,16 +80,28 @@ public class UserGeneralSignService {
     public User readUserIfValid(String username, String password) {
         Optional<User> user = userService.readUserByUsername(username);
 
-        if (user.isEmpty()) {
+        if (!isExistUser(user)) {
             log.warn("해당 유저가 존재하지 않습니다. username: {}", username);
             throw new UserErrorException(UserErrorCode.INVALID_USERNAME_OR_PASSWORD);
         }
 
-        if (!bCryptPasswordEncoder.matches(password, user.get().getPassword())) {
+        if (!isValidPassword(password, user.get())) {
             log.warn("비밀번호가 일치하지 않습니다. username: {}", username);
             throw new UserErrorException(UserErrorCode.INVALID_USERNAME_OR_PASSWORD);
         }
 
         return user.get();
+    }
+
+    private boolean isExistUser(Optional<User> user) {
+        return user.isPresent();
+    }
+
+    private boolean isGeneralSignUpUser(User user) {
+        return user.getPassword() != null;
+    }
+
+    private boolean isValidPassword(String password, User user) {
+        return bCryptPasswordEncoder.matches(password, user.getPassword());
     }
 }
