@@ -1,6 +1,5 @@
-package kr.co.pennyway.api.apis.auth.mapper;
+package kr.co.pennyway.api.apis.auth.service;
 
-import kr.co.pennyway.api.apis.auth.service.UserGeneralSignService;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorCode;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorException;

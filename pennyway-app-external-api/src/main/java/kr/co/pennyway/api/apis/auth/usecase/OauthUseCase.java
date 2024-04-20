@@ -6,7 +6,6 @@ import kr.co.pennyway.api.apis.auth.dto.SignUpReq;
 import kr.co.pennyway.api.apis.auth.helper.JwtAuthHelper;
 import kr.co.pennyway.api.apis.auth.helper.OauthOidcHelper;
 import kr.co.pennyway.api.apis.auth.mapper.PhoneVerificationMapper;
-import kr.co.pennyway.api.apis.auth.mapper.UserSyncMapper;
 import kr.co.pennyway.api.apis.auth.service.UserOauthSignService;
 import kr.co.pennyway.api.common.security.jwt.Jwts;
 import kr.co.pennyway.common.annotation.UseCase;
@@ -31,7 +30,6 @@ public class OauthUseCase {
     private final PhoneVerificationService phoneVerificationService;
     private final JwtAuthHelper jwtAuthHelper;
     private final UserOauthSignService userOauthSignService;
-    private final UserSyncMapper userSyncMapper;
 
     public Pair<Long, Jwts> signIn(Provider provider, SignInReq.Oauth request) {
         OidcDecodePayload payload = oauthOidcHelper.getPayload(provider, request.idToken());
@@ -79,7 +77,7 @@ public class OauthUseCase {
      * Oauth 회원가입 진행 도중, Provider로 가입한 사용자인지 지속적으로 검증하기 위한 메서드
      */
     private Pair<Boolean, String> checkSignUpUserNotOauthByProvider(Provider provider, String phone) {
-        Pair<Boolean, String> isOauthSignUpAllowed = userSyncMapper.isOauthSignUpAllowed(provider, phone);
+        Pair<Boolean, String> isOauthSignUpAllowed = userOauthSignService.isSignUpAllowed(provider, phone);
 
         if (isOauthSignUpAllowed == null) {
             phoneVerificationService.delete(phone, PhoneVerificationType.getOauthSignUpTypeByProvider(provider));

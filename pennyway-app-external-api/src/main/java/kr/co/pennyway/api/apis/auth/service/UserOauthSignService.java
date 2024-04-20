@@ -11,12 +11,14 @@ import kr.co.pennyway.domain.domains.user.service.UserService;
 import kr.co.pennyway.domain.domains.user.type.ProfileVisibility;
 import kr.co.pennyway.domain.domains.user.type.Role;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserOauthSignService {
@@ -28,6 +30,29 @@ public class UserOauthSignService {
         Optional<Oauth> oauth = oauthService.readOauthByOauthIdAndProvider(oauthId, provider);
 
         return oauth.map(Oauth::getUser).orElse(null);
+    }
+
+    /**
+     * Oauth 회원가입 시나리오를 결정한다.
+     *
+     * @return Pair<Boolean, String> : 이미 가입된 회원인지 여부 (TRUE: 계정 연동, FALSE: 소셜 회원가입)
+     * 단, 이미 동일한 Provider로 가입된 회원이 있는 경우에는 해당 회원의 ID를 반환한다.
+     */
+    @Transactional(readOnly = true)
+    public Pair<Boolean, String> isSignUpAllowed(Provider provider, String phone) {
+        Optional<User> user = userService.readUserByPhone(phone);
+
+        if (user.isEmpty()) {
+            log.info("회원가입 이력이 없는 사용자입니다. phone: {}", phone);
+            return Pair.of(Boolean.FALSE, null);
+        }
+
+        if (oauthService.isExistOauthAccount(user.get().getId(), provider)) {
+            log.info("이미 동일한 Provider로 가입된 사용자입니다. phone: {}, provider: {}", phone, provider);
+            return null;
+        }
+
+        return Pair.of(Boolean.TRUE, user.get().getUsername());
     }
 
     /**
