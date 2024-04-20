@@ -3,7 +3,7 @@ package kr.co.pennyway.api.apis.auth.usecase;
 import org.springframework.transaction.annotation.Transactional;
 
 import kr.co.pennyway.api.apis.auth.dto.AuthFindDto;
-import kr.co.pennyway.api.apis.auth.mapper.AuthFindService;
+import kr.co.pennyway.api.apis.auth.service.AuthFindService;
 import kr.co.pennyway.common.annotation.UseCase;
 import kr.co.pennyway.domain.domains.user.service.UserService;
 import lombok.RequiredArgsConstructor;

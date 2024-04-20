@@ -1,4 +1,4 @@
-package kr.co.pennyway.api.apis.auth.mapper;
+package kr.co.pennyway.api.apis.auth.service;
 
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,12 +20,12 @@ public class AuthFindService {
 	@Transactional(readOnly = true)
 	public AuthFindDto.FindUsernameRes findUsername(String phone) {
 		User user = userService.readUserByPhone(phone).orElseThrow(() -> {
-			log.error("User not found by phone: {}", phone);
+			log.info("User not found by phone: {}", phone);
 			return new UserErrorException(UserErrorCode.NOT_FOUND);
 		});
 
 		if (user.getPassword() == null) {
-			log.error("User not found by phone: {}", phone);
+			log.info("User not found by phone: {}", phone);
 			throw new UserErrorException(UserErrorCode.NOT_FOUND);
 		}
 
