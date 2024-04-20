@@ -14,19 +14,23 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import kr.co.pennyway.api.apis.auth.dto.AuthFindDto;
 import kr.co.pennyway.api.apis.auth.service.AuthFindService;
+import kr.co.pennyway.domain.common.redis.phone.PhoneVerificationService;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorException;
 import kr.co.pennyway.domain.domains.user.service.UserService;
 
 @ExtendWith(MockitoExtension.class)
 class AuthFindMapperTest {
-	private AuthFindService authFindMapper;
+	private AuthFindService authFindService;
 	@Mock
 	private UserService userService;
 
+	@Mock
+	private PhoneVerificationService phoneVerificationService;
+
 	@BeforeEach
 	void setUp() {
-		authFindMapper = new AuthFindService(userService);
+		authFindService = new AuthFindService(userService, phoneVerificationService);
 	}
 
 	@DisplayName("휴대폰 번호로 유저를 찾을 수 없을 때 AuthFinderException을 발생시킨다.")
@@ -37,7 +41,7 @@ class AuthFindMapperTest {
 		given(userService.readUserByPhone(phone)).willReturn(Optional.empty());
 
 		// when - then
-		UserErrorException exception = assertThrows(UserErrorException.class, () -> authFindMapper.findUsername(phone));
+		UserErrorException exception = assertThrows(UserErrorException.class, () -> authFindService.findUsername(phone));
 		System.out.println(exception.getExplainError());
 	}
 
@@ -53,7 +57,7 @@ class AuthFindMapperTest {
 		given(userService.readUserByPhone(phone)).willReturn(Optional.of(user));
 
 		// when - then
-		UserErrorException exception = assertThrows(UserErrorException.class, () -> authFindMapper.findUsername(phone));
+		UserErrorException exception = assertThrows(UserErrorException.class, () -> authFindService.findUsername(phone));
 		System.out.println(exception.getExplainError());
 	}
 
@@ -70,7 +74,7 @@ class AuthFindMapperTest {
 		given(userService.readUserByPhone(phone)).willReturn(Optional.of(user));
 
 		// when
-		AuthFindDto.FindUsernameRes result = authFindMapper.findUsername(phone);
+		AuthFindDto.FindUsernameRes result = authFindService.findUsername(phone);
 
 		// then
 		assertEquals(result, new AuthFindDto.FindUsernameRes(username));
