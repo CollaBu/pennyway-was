@@ -16,4 +16,14 @@ public record UserSyncDto(
     public static UserSyncDto of(boolean isSignUpAllowed, boolean isExistAccount, String username) {
         return new UserSyncDto(isSignUpAllowed, isExistAccount, username);
     }
+
+    /**
+     * 이미 회원이 존재하는 경우 사용하는 편의용 메서드. <br/>
+     * 내부에서 {@link UserSyncDto#of(boolean, boolean, String)}를 호출한다.
+     *
+     * @param username String : 사용자명
+     */
+    public static UserSyncDto abort(String username) {
+        return UserSyncDto.of(false, true, username);
+    }
 }
