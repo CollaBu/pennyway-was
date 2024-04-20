@@ -29,9 +29,9 @@ public class GoogleMailSender {
 
             javaMailSender.send(mimeMessage);
         } catch (Exception e) {
-            log.warn(e.getMessage());
+            log.error("MailSender exception:" + e.getMessage());
 
-            throw new IllegalArgumentException(e.getMessage());
+            throw new RuntimeException("메일 전송에 실패했습니다.");
         }
     }
 
