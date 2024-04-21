@@ -6,8 +6,8 @@ import kr.co.pennyway.api.apis.auth.dto.SignUpReq;
 import kr.co.pennyway.api.common.exception.PhoneVerificationErrorCode;
 import kr.co.pennyway.api.config.ExternalApiDBTestConfig;
 import kr.co.pennyway.api.config.ExternalApiIntegrationTest;
-import kr.co.pennyway.domain.common.redis.phone.PhoneVerificationService;
-import kr.co.pennyway.domain.common.redis.phone.PhoneVerificationType;
+import kr.co.pennyway.domain.common.redis.phone.PhoneCodeKeyType;
+import kr.co.pennyway.domain.common.redis.phone.PhoneCodeService;
 import kr.co.pennyway.domain.domains.oauth.domain.Oauth;
 import kr.co.pennyway.domain.domains.oauth.service.OauthService;
 import kr.co.pennyway.domain.domains.oauth.type.Provider;
@@ -52,7 +52,7 @@ public class AuthControllerIntegrationTest extends ExternalApiDBTestConfig {
     @Autowired
     private ObjectMapper objectMapper;
     @SpyBean
-    private PhoneVerificationService phoneVerificationService;
+    private PhoneCodeService phoneCodeService;
     @SpyBean
     private UserService userService;
     @Autowired
@@ -109,7 +109,7 @@ public class AuthControllerIntegrationTest extends ExternalApiDBTestConfig {
         @DisplayName("일반 회원가입 이력이 있는 경우 400 BAD_REQUEST를 반환하고, 인증 코드 캐시 데이터가 제거된다.")
         void generalSignUpFailBecauseAlreadyGeneralSignUp() throws Exception {
             // given
-            phoneVerificationService.create(expectedPhone, expectedCode, PhoneVerificationType.SIGN_UP);
+            phoneCodeService.create(expectedPhone, expectedCode, PhoneCodeKeyType.SIGN_UP);
             given(userService.readUserByPhone(expectedPhone)).willReturn(Optional.of(createGeneralSignedUser()));
 
             // when
@@ -121,7 +121,7 @@ public class AuthControllerIntegrationTest extends ExternalApiDBTestConfig {
                     .andExpect(jsonPath("$.code").value(UserErrorCode.ALREADY_SIGNUP.causedBy().getCode()))
                     .andExpect(jsonPath("$.message").value(UserErrorCode.ALREADY_SIGNUP.getExplainError()))
                     .andDo(print());
-            assertThrows(IllegalArgumentException.class, () -> phoneVerificationService.readByPhone(expectedPhone, PhoneVerificationType.SIGN_UP));
+            assertThrows(IllegalArgumentException.class, () -> phoneCodeService.readByPhone(expectedPhone, PhoneCodeKeyType.SIGN_UP));
         }
 
         @Test
@@ -129,7 +129,7 @@ public class AuthControllerIntegrationTest extends ExternalApiDBTestConfig {
         @DisplayName("인증 번호가 일치하지 않는 경우 401 UNAUTHORIZED를 반환한다.")
         void generalSignUpFailBecauseInvalidCode() throws Exception {
             // given
-            phoneVerificationService.create(expectedPhone, expectedCode, PhoneVerificationType.SIGN_UP);
+            phoneCodeService.create(expectedPhone, expectedCode, PhoneCodeKeyType.SIGN_UP);
             given(userService.readUserByPhone(expectedPhone)).willReturn(Optional.empty());
             String invalidCode = "111111";
 
@@ -167,7 +167,7 @@ public class AuthControllerIntegrationTest extends ExternalApiDBTestConfig {
         @DisplayName("소셜 로그인 이력이 없는 경우, 200 OK를 반환하고 oauth 필드가 false이다.")
         void generalSignUpSuccess() throws Exception {
             // given
-            phoneVerificationService.create(expectedPhone, expectedCode, PhoneVerificationType.SIGN_UP);
+            phoneCodeService.create(expectedPhone, expectedCode, PhoneCodeKeyType.SIGN_UP);
             given(userService.readUserByPhone(expectedPhone)).willReturn(Optional.empty());
 
             // when
@@ -186,7 +186,7 @@ public class AuthControllerIntegrationTest extends ExternalApiDBTestConfig {
         @DisplayName("소셜 로그인 이력이 있는 경우, 200 OK를 반환하고 oauth 필드가 true고 username 필드가 존재한다.")
         void generalSignUpSuccessWithOauth() throws Exception {
             // given
-            phoneVerificationService.create(expectedPhone, expectedCode, PhoneVerificationType.SIGN_UP);
+            phoneCodeService.create(expectedPhone, expectedCode, PhoneCodeKeyType.SIGN_UP);
             given(userService.readUserByPhone(expectedPhone)).willReturn(Optional.of(createOauthSignedUser()));
 
             // when
@@ -203,7 +203,7 @@ public class AuthControllerIntegrationTest extends ExternalApiDBTestConfig {
 
         @AfterEach
         void tearDown() {
-            phoneVerificationService.delete(expectedPhone, PhoneVerificationType.SIGN_UP);
+            phoneCodeService.delete(expectedPhone, PhoneCodeKeyType.SIGN_UP);
         }
 
         private ResultActions performPhoneVerificationRequest(String expectedCode) throws Exception {
@@ -225,7 +225,7 @@ public class AuthControllerIntegrationTest extends ExternalApiDBTestConfig {
         @DisplayName("인증번호가 일치하지 않는 경우 401 UNAUTHORIZED를 반환한다.")
         void generalSignUpFailBecauseInvalidCode() throws Exception {
             // given
-            phoneVerificationService.create(expectedPhone, expectedCode, PhoneVerificationType.SIGN_UP);
+            phoneCodeService.create(expectedPhone, expectedCode, PhoneCodeKeyType.SIGN_UP);
             String invalidCode = "111111";
 
             // when
@@ -245,7 +245,7 @@ public class AuthControllerIntegrationTest extends ExternalApiDBTestConfig {
         @DisplayName("인증번호가 일치하는 경우 200 OK를 반환하고, 회원가입이 완료된다.")
         void generalSignUpSuccess() throws Exception {
             // given
-            phoneVerificationService.create(expectedPhone, expectedCode, PhoneVerificationType.SIGN_UP);
+            phoneCodeService.create(expectedPhone, expectedCode, PhoneCodeKeyType.SIGN_UP);
             given(userService.readUserByPhone(expectedPhone)).willReturn(Optional.empty());
 
             // when
@@ -271,7 +271,7 @@ public class AuthControllerIntegrationTest extends ExternalApiDBTestConfig {
 
         @AfterEach
         void tearDown() {
-            phoneVerificationService.delete(expectedPhone, PhoneVerificationType.SIGN_UP);
+            phoneCodeService.delete(expectedPhone, PhoneCodeKeyType.SIGN_UP);
         }
     }
 
@@ -284,7 +284,7 @@ public class AuthControllerIntegrationTest extends ExternalApiDBTestConfig {
         @DisplayName("인증번호가 일치하지 않는 경우 401 UNAUTHORIZED를 반환한다.")
         void syncWithOauthSignUpFailBecauseInvalidCode() throws Exception {
             // given
-            phoneVerificationService.create(expectedPhone, expectedCode, PhoneVerificationType.SIGN_UP);
+            phoneCodeService.create(expectedPhone, expectedCode, PhoneCodeKeyType.SIGN_UP);
             String invalidCode = "111111";
 
             // when
@@ -304,7 +304,7 @@ public class AuthControllerIntegrationTest extends ExternalApiDBTestConfig {
         @DisplayName("인증번호가 일치하는 경우 200 OK를 반환하고, 기존의 소셜 계정과 연동된 회원가입이 완료된다.")
         void syncWithOauthSignUpSuccess() throws Exception {
             // given
-            phoneVerificationService.create(expectedPhone, expectedCode, PhoneVerificationType.SIGN_UP);
+            phoneCodeService.create(expectedPhone, expectedCode, PhoneCodeKeyType.SIGN_UP);
             User user = createOauthSignedUser();
             userService.createUser(user);
             oauthService.createOauth(createOauthAccount(user));
@@ -334,7 +334,7 @@ public class AuthControllerIntegrationTest extends ExternalApiDBTestConfig {
 
         @AfterEach
         void tearDown() {
-            phoneVerificationService.delete(expectedPhone, PhoneVerificationType.SIGN_UP);
+            phoneCodeService.delete(expectedPhone, PhoneCodeKeyType.SIGN_UP);
         }
     }
 }
