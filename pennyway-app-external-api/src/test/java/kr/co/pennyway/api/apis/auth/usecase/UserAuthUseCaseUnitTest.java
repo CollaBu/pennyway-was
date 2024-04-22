@@ -1,7 +1,9 @@
 package kr.co.pennyway.api.apis.auth.usecase;
 
+import kr.co.pennyway.api.apis.auth.dto.AuthStateDto;
 import kr.co.pennyway.api.apis.auth.helper.JwtAuthHelper;
 import kr.co.pennyway.api.common.security.jwt.access.AccessTokenClaim;
+import kr.co.pennyway.api.common.security.jwt.access.AccessTokenClaimKeys;
 import kr.co.pennyway.api.common.security.jwt.access.AccessTokenProvider;
 import kr.co.pennyway.infra.common.exception.JwtErrorCode;
 import kr.co.pennyway.infra.common.exception.JwtErrorException;
@@ -40,10 +42,11 @@ public class UserAuthUseCaseUnitTest {
     @DisplayName("[1] Authorication 헤더가 없으면 false를 반환한다.")
     public void isSignedInWithoutAuthorizationHeader() {
         // when
-        boolean result = userAuthUseCase.isSignIn("");
+        AuthStateDto result = userAuthUseCase.isSignIn("");
 
         // then
-        assertFalse(result);
+        assertFalse(result.isSignIn());
+        assertNull(result.userId());
     }
 
     @Test
@@ -78,9 +81,10 @@ public class UserAuthUseCaseUnitTest {
         String token = accessTokenProvider.generateToken(jwtClaims);
 
         // when
-        boolean result = userAuthUseCase.isSignIn("Bearer " + token);
+        AuthStateDto result = userAuthUseCase.isSignIn("Bearer " + token);
 
         // then
-        assertTrue(result);
+        assertTrue(result.isSignIn());
+        assertEquals(jwtClaims.getClaims().get(AccessTokenClaimKeys.USER_ID.getValue()), result.userId());
     }
 }
