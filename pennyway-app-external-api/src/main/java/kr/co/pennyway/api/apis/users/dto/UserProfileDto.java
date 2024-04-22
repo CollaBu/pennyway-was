@@ -1,5 +1,8 @@
 package kr.co.pennyway.api.apis.users.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import kr.co.pennyway.domain.domains.user.domain.NotifySetting;
 import kr.co.pennyway.domain.domains.user.domain.User;
@@ -18,6 +21,8 @@ public record UserProfileDto(
         @Schema(description = "사용자 이름", example = "홍길동")
         String name,
         @Schema(description = "비밀번호 변경 일시", example = "2024-04-22 00:00:00")
+        @JsonSerialize(using = LocalDateTimeSerializer.class)
+        @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
         LocalDateTime passwordUpdatedAt,
         @Schema(description = "프로필 이미지 URL", example = "https://example.com/profile.jpg")
         String profileImageUrl,
@@ -30,6 +35,8 @@ public record UserProfileDto(
         @Schema(description = "알림 설정 정보")
         NotifySetting notifySetting,
         @Schema(description = "계정 생성 일시", example = "2024-04-22 00:00:00")
+        @JsonSerialize(using = LocalDateTimeSerializer.class)
+        @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
         LocalDateTime createdAt
 ) {
     public static UserProfileDto from(User user) {
