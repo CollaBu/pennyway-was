@@ -42,6 +42,11 @@ public class JwtAuthHelper {
         this.forbiddenTokenService = forbiddenTokenService;
     }
 
+    /**
+     * JwtClaims에서 key에 해당하는 값을 반환하는 메서드
+     *
+     * @return key에 해당하는 값이 없거나, 타입이 일치하지 않을 경우 null을 반환한다.
+     */
     @SuppressWarnings("unchecked")
     public <T> T getClaimValue(JwtClaims claims, String key, Class<T> type) {
         Object value = claims.getClaims().get(key);
