@@ -55,7 +55,7 @@ class AuthCheckControllerTest {
 		given(authCheckUseCase.findUsername(inputPhone, code)).willReturn(new AuthFindDto.FindUsernameRes(expectedUsername));
 
 		// when
-		ResultActions resultActions = findUsernameRequest(inputPhone);
+		ResultActions resultActions = findUsernameRequest(inputPhone, code);
 
 		// then
 		resultActions
@@ -71,7 +71,7 @@ class AuthCheckControllerTest {
 		given(authCheckUseCase.findUsername(phone, code)).willThrow(new UserErrorException(UserErrorCode.NOT_FOUND));
 
 		// when
-		ResultActions resultActions = findUsernameRequest(phone);
+		ResultActions resultActions = findUsernameRequest(phone, code);
 
 		// then
 		resultActions
@@ -80,8 +80,9 @@ class AuthCheckControllerTest {
 				.andExpect(jsonPath("$.message").value(UserErrorCode.NOT_FOUND.getExplainError()));
 	}
 
-	private ResultActions findUsernameRequest(String phone) throws Exception {
+	private ResultActions findUsernameRequest(String phone, String code) throws Exception {
 		return mockMvc.perform(get("/v1/find/username")
-				.param("phone", phone));
+				.param("phone", phone)
+				.param("code", code));
 	}
 }
