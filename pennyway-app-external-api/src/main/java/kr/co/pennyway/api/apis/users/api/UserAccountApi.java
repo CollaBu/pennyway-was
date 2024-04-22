@@ -55,4 +55,7 @@ public interface UserAccountApi {
                     """)
     }))
     ResponseEntity<?> deleteDevice(@RequestParam("token") @Validated @NotBlank String token, @AuthenticationPrincipal SecurityUserDetails user);
+
+    @Operation(summary = "사용자 계정 조회", description = "사용자 본인의 계정 정보를 조회합니다.")
+    ResponseEntity<?> getMyAccount(@AuthenticationPrincipal SecurityUserDetails user);
 }
