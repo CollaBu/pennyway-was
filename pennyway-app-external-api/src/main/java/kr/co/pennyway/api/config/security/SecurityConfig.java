@@ -27,7 +27,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 @RequiredArgsConstructor
 public class SecurityConfig {
     private static final String[] READ_ONLY_PUBLIC_ENDPOINTS = {"/favicon.ico", "/v1/duplicate/**"};
-    private static final String[] PUBLIC_ENDPOINTS = {"/v1/questions/**"};
+    private static final String[] PUBLIC_ENDPOINTS = {"/v1/questions/**", "/v1/auth"};
     private static final String[] ANONYMOUS_ENDPOINTS = {"/v1/auth/**", "/v1/phone/**"};
     private static final String[] SWAGGER_ENDPOINTS = {"/api-docs/**", "/v3/api-docs/**", "/swagger-ui/**", "/swagger",};
 

@@ -21,7 +21,6 @@ public class UserAuthController implements UserAuthApi {
     private final UserAuthUseCase userAuthUseCase;
     private final CookieUtil cookieUtil;
 
-    // TODO: Security Filter PermitAll url 추가
     @GetMapping("/auth")
     @PreAuthorize("permitAll()")
     public ResponseEntity<?> getAuthState(@RequestHeader(value = "Authorization", required = false, defaultValue = "") String authHeader) {
