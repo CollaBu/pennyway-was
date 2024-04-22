@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import kr.co.pennyway.api.apis.auth.dto.AuthStateDto;
 import kr.co.pennyway.api.common.security.authentication.SecurityUserDetails;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -21,26 +22,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 public interface UserAuthApi {
     @Operation(summary = "로그인 상태 확인", description = "사용자의 로그인 상태를 확인한다. 단, 유효하지 않은 토큰은 에러 응답이 발생한다.")
     @Parameter(name = "Authorization", in = ParameterIn.HEADER, hidden = true)
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Boolean.class), examples = {
-                    @ExampleObject(name = "인증된 사용자", value = """
-                            {
-                                "code": "2000",
-                                "data": {
-                                    "isSignIn": true
-                                }
-                            }
-                            """),
-                    @ExampleObject(name = "인증되지 않은 사용자", value = """
-                            {
-                                "code": "2000",
-                                "data": {
-                                    "isSignIn": false
-                                }
-                            }
-                            """, description = "Authorization 헤더가 없거나, Bearer Token이 없는 경우")
-            }))
-    })
+    @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", schema = @Schema(implementation = AuthStateDto.class)))
     ResponseEntity<?> getAuthState(@RequestHeader(value = "Authorization", required = false, defaultValue = "") String authHeader);
 
     @Operation(summary = "로그아웃", description = """
