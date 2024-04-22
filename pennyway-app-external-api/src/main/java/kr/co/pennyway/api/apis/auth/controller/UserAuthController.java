@@ -5,6 +5,9 @@ import kr.co.pennyway.api.apis.auth.usecase.UserAuthUseCase;
 import kr.co.pennyway.api.common.response.SuccessResponse;
 import kr.co.pennyway.api.common.security.authentication.SecurityUserDetails;
 import kr.co.pennyway.api.common.util.CookieUtil;
+import kr.co.pennyway.infra.common.exception.JwtErrorCode;
+import kr.co.pennyway.infra.common.exception.JwtErrorException;
+import kr.co.pennyway.infra.common.jwt.AuthConstants;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -24,8 +27,14 @@ public class UserAuthController implements UserAuthApi {
     // TODO: Security Filter PermitAll url 추가
     @GetMapping("/auth")
     @PreAuthorize("permitAll()")
-    public ResponseEntity<?> getAuthState() {
-        return ResponseEntity.ok(SuccessResponse.from("user", userAuthUseCase.isSignedIn()));
+    public ResponseEntity<?> getAuthState(@RequestHeader(value = "Authorization", required = false, defaultValue = "") String authHeader) {
+        if (authHeader.isBlank() || !authHeader.startsWith("Bearer ")) {
+            throw new JwtErrorException(JwtErrorCode.INVALID_HEADER);
+        }
+        String accessToken = authHeader.substring(AuthConstants.TOKEN_TYPE.getValue().length());
+        log.debug("accessToken: {}", accessToken);
+
+        return ResponseEntity.ok(SuccessResponse.from("isSignIn", userAuthUseCase.isSignedIn(accessToken)));
     }
 
     @GetMapping("/sign-out")
