@@ -29,6 +29,7 @@ import kr.co.pennyway.domain.domains.user.exception.UserErrorException;
 class AuthCheckControllerTest {
 	private final String inputPhone = "010-1234-5678";
 	private final String expectedUsername = "pennyway";
+	private final String code = "123456";
 
 	@Autowired
 	private MockMvc mockMvc;
@@ -51,7 +52,7 @@ class AuthCheckControllerTest {
 	@DisplayName("일반 회원의 휴대폰 번호로 아이디를 찾을 때 200 응답을 반환한다.")
 	void findUsername() throws Exception {
 		// given
-		given(authCheckUseCase.findUsername(inputPhone)).willReturn(new AuthFindDto.FindUsernameRes(expectedUsername));
+		given(authCheckUseCase.findUsername(inputPhone, code)).willReturn(new AuthFindDto.FindUsernameRes(expectedUsername));
 
 		// when
 		ResultActions resultActions = findUsernameRequest(inputPhone);
@@ -67,7 +68,7 @@ class AuthCheckControllerTest {
 	void findUsernameIfUserNotFound() throws Exception {
 		// given
 		String phone = "010-1111-1111";
-		given(authCheckUseCase.findUsername(phone)).willThrow(new UserErrorException(UserErrorCode.NOT_FOUND));
+		given(authCheckUseCase.findUsername(phone, code)).willThrow(new UserErrorException(UserErrorCode.NOT_FOUND));
 
 		// when
 		ResultActions resultActions = findUsernameRequest(phone);
