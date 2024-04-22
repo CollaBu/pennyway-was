@@ -3,7 +3,6 @@ package kr.co.pennyway.api.apis.auth.usecase;
 import kr.co.pennyway.api.apis.auth.dto.AuthStateDto;
 import kr.co.pennyway.api.apis.auth.helper.JwtAuthHelper;
 import kr.co.pennyway.api.common.security.jwt.access.AccessTokenClaim;
-import kr.co.pennyway.api.common.security.jwt.access.AccessTokenClaimKeys;
 import kr.co.pennyway.api.common.security.jwt.access.AccessTokenProvider;
 import kr.co.pennyway.infra.common.exception.JwtErrorCode;
 import kr.co.pennyway.infra.common.exception.JwtErrorException;
@@ -20,13 +19,15 @@ import org.springframework.test.context.ActiveProfiles;
 import java.time.Duration;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
 @ActiveProfiles("test")
 public class UserAuthUseCaseUnitTest {
     private final String secretStr = "helloMyNameIsPennywayThisIsSecretKeyItNeedsToBeLongerThan256Bits";
+    private final JwtClaims jwtClaims = AccessTokenClaim.of(1L, "ROLE_USER");
     private JwtProvider accessTokenProvider;
-    private JwtClaims jwtClaims;
     private UserAuthUseCase userAuthUseCase;
     @Mock
     private JwtAuthHelper jwtAuthHelper;
@@ -34,7 +35,6 @@ public class UserAuthUseCaseUnitTest {
     @BeforeEach
     public void setUp() {
         accessTokenProvider = new AccessTokenProvider(secretStr, Duration.ofMinutes(5));
-        jwtClaims = AccessTokenClaim.of(1L, "ROLE_USER");
         userAuthUseCase = new UserAuthUseCase(jwtAuthHelper, accessTokenProvider);
     }
 
@@ -79,12 +79,13 @@ public class UserAuthUseCaseUnitTest {
     public void isSignedInWithValidToken() {
         // given
         String token = accessTokenProvider.generateToken(jwtClaims);
+        given(jwtAuthHelper.getClaimValue(any(), any(), any())).willReturn(1L);
 
         // when
         AuthStateDto result = userAuthUseCase.isSignIn("Bearer " + token);
 
         // then
         assertTrue(result.isSignIn());
-        assertEquals(jwtClaims.getClaims().get(AccessTokenClaimKeys.USER_ID.getValue()), result.userId());
+        assertEquals(1L, result.userId());
     }
 }
