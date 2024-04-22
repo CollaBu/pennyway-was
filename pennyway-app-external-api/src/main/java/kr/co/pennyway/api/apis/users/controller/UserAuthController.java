@@ -21,6 +21,13 @@ public class UserAuthController implements UserAuthApi {
     private final UserAuthUseCase userAuthUseCase;
     private final CookieUtil cookieUtil;
 
+    // TODO: Security Filter PermitAll url 추가
+    @GetMapping("/auth")
+    @PreAuthorize("permitAll()")
+    public ResponseEntity<?> getAuthState() {
+        return ResponseEntity.ok(SuccessResponse.from("user", userAuthUseCase.isSignedIn()));
+    }
+
     @GetMapping("/sign-out")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> signOut(
