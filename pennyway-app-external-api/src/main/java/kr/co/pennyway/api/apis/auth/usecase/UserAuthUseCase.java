@@ -1,4 +1,4 @@
-package kr.co.pennyway.api.apis.users.usecase;
+package kr.co.pennyway.api.apis.auth.usecase;
 
 import kr.co.pennyway.api.apis.auth.helper.JwtAuthHelper;
 import kr.co.pennyway.common.annotation.UseCase;

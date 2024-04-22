@@ -1,4 +1,4 @@
-package kr.co.pennyway.api.apis.users.controller;
+package kr.co.pennyway.api.apis.auth.controller;
 
 import jakarta.servlet.http.Cookie;
 import kr.co.pennyway.api.common.security.jwt.access.AccessTokenClaim;
@@ -204,7 +204,7 @@ public class UserAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
         }
 
         private MockHttpServletRequestBuilder performSignOut() {
-            return get("/v1/users/sign-out")
+            return get("/v1/sign-out")
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON);
         }
