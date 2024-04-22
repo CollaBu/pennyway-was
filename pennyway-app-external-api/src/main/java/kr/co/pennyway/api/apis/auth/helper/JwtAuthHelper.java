@@ -42,6 +42,15 @@ public class JwtAuthHelper {
         this.forbiddenTokenService = forbiddenTokenService;
     }
 
+    @SuppressWarnings("unchecked")
+    public <T> T getClaimValue(JwtClaims claims, String key, Class<T> type) {
+        Object value = claims.getClaims().get(key);
+        if (value != null && type.isAssignableFrom(value.getClass())) {
+            return (T) value;
+        }
+        return null;
+    }
+
     /**
      * 사용자 정보 기반으로 access token과 refresh token을 생성하는 메서드 <br/>
      * refresh token은 redis에 저장된다.
