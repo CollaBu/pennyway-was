@@ -32,7 +32,7 @@ public class UserAuthController implements UserAuthApi {
         String accessToken = authHeader.substring(AuthConstants.TOKEN_TYPE.getValue().length());
         log.debug("accessToken: {}", accessToken);
 
-        return ResponseEntity.ok(SuccessResponse.from("isSignIn", userAuthUseCase.isSignedIn(accessToken)));
+        return ResponseEntity.ok(SuccessResponse.from("isSignIn", userAuthUseCase.isSignIn(accessToken)));
     }
 
     @GetMapping("/sign-out")

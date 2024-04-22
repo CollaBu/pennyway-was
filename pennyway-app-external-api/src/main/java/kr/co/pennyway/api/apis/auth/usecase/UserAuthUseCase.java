@@ -15,7 +15,7 @@ public class UserAuthUseCase {
     private final JwtAuthHelper jwtAuthHelper;
     private final JwtProvider accessTokenProvider;
 
-    public boolean isSignedIn(String accessToken) {
+    public boolean isSignIn(String accessToken) {
         if (accessTokenProvider.isTokenExpired(accessToken))
             throw new JwtErrorException(JwtErrorCode.EXPIRED_TOKEN);
 
