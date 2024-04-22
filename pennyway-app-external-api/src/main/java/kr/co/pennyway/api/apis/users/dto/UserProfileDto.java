@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Builder
-@Schema(description = "사용자 프로필 정보")
+@Schema(title = "사용자 프로필 정보 응답")
 public record UserProfileDto(
         @Schema(description = "사용자 ID", example = "1")
         Long id,
@@ -22,7 +22,7 @@ public record UserProfileDto(
         String username,
         @Schema(description = "사용자 이름", example = "홍길동")
         String name,
-        @Schema(description = "비밀번호 변경 일시", example = "2024-04-22 00:00:00")
+        @Schema(description = "비밀번호 변경 일시", nullable = true, type = "string", example = "yyyy-MM-dd HH:mm:ss")
         @JsonInclude(JsonInclude.Include.NON_NULL)
         @JsonSerialize(using = LocalDateTimeSerializer.class)
         @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
@@ -37,7 +37,7 @@ public record UserProfileDto(
         Boolean locked,
         @Schema(description = "알림 설정 정보")
         NotifySetting notifySetting,
-        @Schema(description = "계정 생성 일시", example = "2024-04-22 00:00:00")
+        @Schema(description = "계정 생성 일시", type = "string", example = "yyyy-MM-dd HH:mm:ss")
         @JsonSerialize(using = LocalDateTimeSerializer.class)
         @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
         LocalDateTime createdAt
