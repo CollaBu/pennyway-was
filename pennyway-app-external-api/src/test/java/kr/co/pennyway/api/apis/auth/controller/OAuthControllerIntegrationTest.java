@@ -8,8 +8,8 @@ import kr.co.pennyway.api.apis.auth.helper.OauthOidcHelper;
 import kr.co.pennyway.api.common.exception.PhoneVerificationErrorCode;
 import kr.co.pennyway.api.config.ExternalApiDBTestConfig;
 import kr.co.pennyway.api.config.ExternalApiIntegrationTest;
-import kr.co.pennyway.domain.common.redis.phone.PhoneVerificationService;
-import kr.co.pennyway.domain.common.redis.phone.PhoneVerificationType;
+import kr.co.pennyway.domain.common.redis.phone.PhoneCodeKeyType;
+import kr.co.pennyway.domain.common.redis.phone.PhoneCodeService;
 import kr.co.pennyway.domain.domains.oauth.domain.Oauth;
 import kr.co.pennyway.domain.domains.oauth.exception.OauthErrorCode;
 import kr.co.pennyway.domain.domains.oauth.service.OauthService;
@@ -69,7 +69,7 @@ public class OAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
     @MockBean
     private OauthOidcHelper oauthOidcHelper;
     @SpyBean
-    private PhoneVerificationService phoneVerificationService;
+    private PhoneCodeService phoneCodeService;
     @Autowired
     private UserService userService;
     @Autowired
@@ -269,7 +269,7 @@ public class OAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
             User user = createGeneralSignedUser();
 
             userService.createUser(user);
-            phoneVerificationService.create(expectedPhone, expectedCode, PhoneVerificationType.getOauthSignUpTypeByProvider(provider));
+            phoneCodeService.create(expectedPhone, expectedCode, PhoneCodeKeyType.getOauthSignUpTypeByProvider(provider));
 
             // when
             ResultActions result = performOauthSignUpPhoneVerification(provider, expectedCode);
@@ -296,7 +296,7 @@ public class OAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
 
             userService.createUser(user);
             oauthService.createOauth(oauth);
-            phoneVerificationService.create(expectedPhone, expectedCode, PhoneVerificationType.getOauthSignUpTypeByProvider(Provider.KAKAO));
+            phoneCodeService.create(expectedPhone, expectedCode, PhoneCodeKeyType.getOauthSignUpTypeByProvider(Provider.KAKAO));
 
             // when
             ResultActions result = performOauthSignUpPhoneVerification(provider, expectedCode);
@@ -318,7 +318,7 @@ public class OAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
         void signUpWithNoSignedUser() throws Exception {
             // given
             Provider provider = Provider.KAKAO;
-            phoneVerificationService.create(expectedPhone, expectedCode, PhoneVerificationType.getOauthSignUpTypeByProvider(provider));
+            phoneCodeService.create(expectedPhone, expectedCode, PhoneCodeKeyType.getOauthSignUpTypeByProvider(provider));
 
             // when
             ResultActions result = performOauthSignUpPhoneVerification(provider, expectedCode);
@@ -345,7 +345,7 @@ public class OAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
 
             userService.createUser(user);
             oauthService.createOauth(oauth);
-            phoneVerificationService.create(expectedPhone, expectedCode, PhoneVerificationType.getOauthSignUpTypeByProvider(provider));
+            phoneCodeService.create(expectedPhone, expectedCode, PhoneCodeKeyType.getOauthSignUpTypeByProvider(provider));
 
             // when
             ResultActions result = performOauthSignUpPhoneVerification(provider, expectedCode);
@@ -364,7 +364,7 @@ public class OAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
         @DisplayName("인증 코드를 요청한 provider와 다른 provider로 인증 코드를 입력하면 404 에러가 발생한다.")
         void signUpWithDifferentProviderCode() throws Exception {
             // given
-            phoneVerificationService.create(expectedPhone, expectedCode, PhoneVerificationType.getOauthSignUpTypeByProvider(Provider.KAKAO));
+            phoneCodeService.create(expectedPhone, expectedCode, PhoneCodeKeyType.getOauthSignUpTypeByProvider(Provider.KAKAO));
 
             // when
             ResultActions result = performOauthSignUpPhoneVerification(Provider.GOOGLE, expectedCode);
@@ -385,7 +385,7 @@ public class OAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
         void signUpWithInvalidCode() throws Exception {
             // given
             Provider provider = Provider.KAKAO;
-            phoneVerificationService.create(expectedPhone, expectedCode, PhoneVerificationType.getOauthSignUpTypeByProvider(provider));
+            phoneCodeService.create(expectedPhone, expectedCode, PhoneCodeKeyType.getOauthSignUpTypeByProvider(provider));
 
             // when
             ResultActions result = performOauthSignUpPhoneVerification(provider, "123457");
@@ -421,7 +421,7 @@ public class OAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
             User user = createGeneralSignedUser();
 
             userService.createUser(user);
-            phoneVerificationService.create(expectedPhone, expectedCode, PhoneVerificationType.getOauthSignUpTypeByProvider(provider));
+            phoneCodeService.create(expectedPhone, expectedCode, PhoneCodeKeyType.getOauthSignUpTypeByProvider(provider));
             given(oauthOidcHelper.getPayload(provider, expectedIdToken)).willReturn(new OidcDecodePayload("iss", "aud", expectedOauthId, "email"));
 
             // when
@@ -451,7 +451,7 @@ public class OAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
 
             userService.createUser(user);
             oauthService.createOauth(oauth);
-            phoneVerificationService.create(expectedPhone, expectedCode, PhoneVerificationType.getOauthSignUpTypeByProvider(provider));
+            phoneCodeService.create(expectedPhone, expectedCode, PhoneCodeKeyType.getOauthSignUpTypeByProvider(provider));
             given(oauthOidcHelper.getPayload(provider, expectedIdToken)).willReturn(new OidcDecodePayload("iss", "aud", expectedOauthId, "email"));
 
             // when
@@ -476,7 +476,7 @@ public class OAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
         void signUpWithNoSignedUser() throws Exception {
             // given
             Provider provider = Provider.KAKAO;
-            phoneVerificationService.create(expectedPhone, expectedCode, PhoneVerificationType.getOauthSignUpTypeByProvider(provider));
+            phoneCodeService.create(expectedPhone, expectedCode, PhoneCodeKeyType.getOauthSignUpTypeByProvider(provider));
             given(oauthOidcHelper.getPayload(provider, expectedIdToken)).willReturn(new OidcDecodePayload("iss", "aud", expectedOauthId, "email"));
 
             // when
@@ -502,7 +502,7 @@ public class OAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
 
             userService.createUser(user);
             oauthService.createOauth(oauth);
-            phoneVerificationService.create(expectedPhone, expectedCode, PhoneVerificationType.getOauthSignUpTypeByProvider(provider));
+            phoneCodeService.create(expectedPhone, expectedCode, PhoneCodeKeyType.getOauthSignUpTypeByProvider(provider));
             given(oauthOidcHelper.getPayload(provider, expectedIdToken)).willReturn(new OidcDecodePayload("iss", "aud", expectedOauthId, "email"));
 
             // when
@@ -536,7 +536,7 @@ public class OAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
         void signUpWithNoSignedUser() throws Exception {
             // given
             Provider provider = Provider.KAKAO;
-            phoneVerificationService.create(expectedPhone, expectedCode, PhoneVerificationType.getOauthSignUpTypeByProvider(provider));
+            phoneCodeService.create(expectedPhone, expectedCode, PhoneCodeKeyType.getOauthSignUpTypeByProvider(provider));
             given(oauthOidcHelper.getPayload(provider, expectedIdToken)).willReturn(new OidcDecodePayload("iss", "aud", expectedOauthId, "email"));
 
             // when
@@ -564,7 +564,7 @@ public class OAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
             User user = createGeneralSignedUser();
 
             userService.createUser(user);
-            phoneVerificationService.create(expectedPhone, expectedCode, PhoneVerificationType.getOauthSignUpTypeByProvider(provider));
+            phoneCodeService.create(expectedPhone, expectedCode, PhoneCodeKeyType.getOauthSignUpTypeByProvider(provider));
             given(oauthOidcHelper.getPayload(provider, expectedIdToken)).willReturn(new OidcDecodePayload("iss", "aud", expectedOauthId, "email"));
 
             // when
@@ -590,7 +590,7 @@ public class OAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
 
             userService.createUser(user);
             oauthService.createOauth(oauth);
-            phoneVerificationService.create(expectedPhone, expectedCode, PhoneVerificationType.getOauthSignUpTypeByProvider(provider));
+            phoneCodeService.create(expectedPhone, expectedCode, PhoneCodeKeyType.getOauthSignUpTypeByProvider(provider));
             given(oauthOidcHelper.getPayload(provider, expectedIdToken)).willReturn(new OidcDecodePayload("iss", "aud", expectedOauthId, "email"));
 
             // when

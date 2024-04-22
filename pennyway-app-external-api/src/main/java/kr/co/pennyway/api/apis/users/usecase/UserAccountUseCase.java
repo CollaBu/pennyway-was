@@ -1,6 +1,7 @@
 package kr.co.pennyway.api.apis.users.usecase;
 
 import kr.co.pennyway.api.apis.users.dto.DeviceDto;
+import kr.co.pennyway.api.apis.users.dto.UserProfileDto;
 import kr.co.pennyway.api.apis.users.service.DeviceRegisterService;
 import kr.co.pennyway.common.annotation.UseCase;
 import kr.co.pennyway.domain.domains.device.domain.Device;
@@ -46,5 +47,14 @@ public class UserAccountUseCase {
         );
 
         deviceService.deleteDevice(device);
+    }
+
+    @Transactional(readOnly = true)
+    public UserProfileDto getMyAccount(Long userId) {
+        User user = userService.readUser(userId).orElseThrow(
+                () -> new UserErrorException(UserErrorCode.NOT_FOUND)
+        );
+
+        return UserProfileDto.from(user);
     }
 }

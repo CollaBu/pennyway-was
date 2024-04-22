@@ -18,9 +18,13 @@ public enum ProfileVisibility implements LegacyCommonType {
         return code;
     }
 
-    @JsonValue
     public String getType() {
         return type;
+    }
+
+    @JsonValue
+    public String createJson() {
+        return name();
     }
 
     @Override

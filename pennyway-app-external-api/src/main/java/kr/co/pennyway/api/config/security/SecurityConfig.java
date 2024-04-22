@@ -27,14 +27,16 @@ import lombok.RequiredArgsConstructor;
 @ConditionalOnDefaultWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-	private static final String[] READ_ONLY_PUBLIC_ENDPOINTS = {"/favicon.ico", "/v1/duplicate/**"};
-	private static final String[] ANONYMOUS_ENDPOINTS = {"/v1/auth/**", "/v1/phone/**", "/v1/find/**"};
-	private static final String[] SWAGGER_ENDPOINTS = {"/api-docs/**", "/v3/api-docs/**", "/swagger-ui/**", "/swagger",};
+    private static final String[] READ_ONLY_PUBLIC_ENDPOINTS = {"/favicon.ico", "/v1/duplicate/**"};
+    private static final String[] PUBLIC_ENDPOINTS = {"/v1/questions/**"};
+    private static final String[] ANONYMOUS_ENDPOINTS = {"/v1/auth/**", "/v1/phone/**", "/v1/find/**"};
+    private static final String[] SWAGGER_ENDPOINTS = {"/api-docs/**", "/v3/api-docs/**", "/swagger-ui/**", "/swagger",};
 
-	private final SecurityAdapterConfig securityAdapterConfig;
-	private final CorsConfigurationSource corsConfigurationSource;
-	private final AccessDeniedHandler accessDeniedHandler;
-	private final AuthenticationEntryPoint authenticationEntryPoint;
+
+    private final SecurityAdapterConfig securityAdapterConfig;
+    private final CorsConfigurationSource corsConfigurationSource;
+    private final AccessDeniedHandler accessDeniedHandler;
+    private final AuthenticationEntryPoint authenticationEntryPoint;
 
 	@Bean
 	@Profile({"local", "dev", "test"})
@@ -75,11 +77,12 @@ public class SecurityConfig {
 				);
 	}
 
-	private AbstractRequestMatcherRegistry<AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizedUrl> defaultAuthorizeHttpRequests(
-			AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry auth) {
-		return auth.requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
-				.requestMatchers(HttpMethod.OPTIONS, "*").permitAll()
-				.requestMatchers(HttpMethod.GET, READ_ONLY_PUBLIC_ENDPOINTS).permitAll()
-				.requestMatchers(ANONYMOUS_ENDPOINTS).anonymous();
-	}
+    private AbstractRequestMatcherRegistry<AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizedUrl> defaultAuthorizeHttpRequests(
+            AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry auth) {
+        return auth.requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
+                .requestMatchers(HttpMethod.OPTIONS, "*").permitAll()
+                .requestMatchers(HttpMethod.GET, READ_ONLY_PUBLIC_ENDPOINTS).permitAll()
+                .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
+                .requestMatchers(ANONYMOUS_ENDPOINTS).anonymous();
+    }
 }

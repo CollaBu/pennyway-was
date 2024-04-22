@@ -15,8 +15,8 @@ public class OauthService {
     private final OauthRepository oauthRepository;
 
     @Transactional
-    public void createOauth(Oauth oauth) {
-        oauthRepository.save(oauth);
+    public Oauth createOauth(Oauth oauth) {
+        return oauthRepository.save(oauth);
     }
 
     @Transactional(readOnly = true)

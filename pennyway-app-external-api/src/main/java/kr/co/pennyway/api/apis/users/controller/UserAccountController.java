@@ -33,4 +33,10 @@ public class UserAccountController implements UserAccountApi {
         userAccountUseCase.unregisterDevice(user.getUserId(), token);
         return ResponseEntity.ok(SuccessResponse.noContent());
     }
+
+    @GetMapping("")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> getMyAccount(@AuthenticationPrincipal SecurityUserDetails user) {
+        return ResponseEntity.ok(SuccessResponse.from("user", userAccountUseCase.getMyAccount(user.getUserId())));
+    }
 }

@@ -3,14 +3,14 @@ package kr.co.pennyway.api.apis.auth.usecase;
 import kr.co.pennyway.api.apis.auth.dto.PhoneVerificationDto;
 import kr.co.pennyway.api.apis.auth.dto.SignInReq;
 import kr.co.pennyway.api.apis.auth.dto.SignUpReq;
+import kr.co.pennyway.api.apis.auth.dto.UserSyncDto;
 import kr.co.pennyway.api.apis.auth.helper.JwtAuthHelper;
-import kr.co.pennyway.api.apis.auth.mapper.PhoneVerificationMapper;
-import kr.co.pennyway.api.apis.auth.mapper.UserGeneralSignMapper;
-import kr.co.pennyway.api.apis.auth.mapper.UserSyncMapper;
+import kr.co.pennyway.api.apis.auth.service.PhoneVerificationService;
+import kr.co.pennyway.api.apis.auth.service.UserGeneralSignService;
 import kr.co.pennyway.api.common.security.jwt.Jwts;
 import kr.co.pennyway.common.annotation.UseCase;
-import kr.co.pennyway.domain.common.redis.phone.PhoneVerificationService;
-import kr.co.pennyway.domain.common.redis.phone.PhoneVerificationType;
+import kr.co.pennyway.domain.common.redis.phone.PhoneCodeKeyType;
+import kr.co.pennyway.domain.common.redis.phone.PhoneCodeService;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorCode;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorException;
@@ -23,40 +23,39 @@ import org.springframework.transaction.annotation.Transactional;
 @UseCase
 @RequiredArgsConstructor
 public class AuthUseCase {
-    private final UserSyncMapper userSyncMapper;
-    private final UserGeneralSignMapper userGeneralSignMapper;
+    private final UserGeneralSignService userGeneralSignService;
 
     private final JwtAuthHelper jwtAuthHelper;
-    private final PhoneVerificationMapper phoneVerificationMapper;
     private final PhoneVerificationService phoneVerificationService;
+    private final PhoneCodeService phoneCodeService;
 
     public PhoneVerificationDto.PushCodeRes sendCode(PhoneVerificationDto.PushCodeReq request) {
-        return phoneVerificationMapper.sendCode(request, PhoneVerificationType.SIGN_UP);
+        return phoneVerificationService.sendCode(request, PhoneCodeKeyType.SIGN_UP);
     }
 
     public PhoneVerificationDto.VerifyCodeRes verifyCode(PhoneVerificationDto.VerifyCodeReq request) {
-        Boolean isValidCode = phoneVerificationMapper.isValidCode(request, PhoneVerificationType.SIGN_UP);
-        Pair<Boolean, String> isOauthUser = checkOauthUserNotGeneralSignUp(request.phone());
+        Boolean isValidCode = phoneVerificationService.isValidCode(request, PhoneCodeKeyType.SIGN_UP);
+        UserSyncDto userSync = checkOauthUserNotGeneralSignUp(request.phone());
 
-        phoneVerificationService.extendTimeToLeave(request.phone(), PhoneVerificationType.SIGN_UP);
+        phoneCodeService.extendTimeToLeave(request.phone(), PhoneCodeKeyType.SIGN_UP);
 
-        return PhoneVerificationDto.VerifyCodeRes.valueOfGeneral(isValidCode, isOauthUser.getLeft(), isOauthUser.getRight());
+        return PhoneVerificationDto.VerifyCodeRes.valueOfGeneral(isValidCode, userSync.isExistAccount(), userSync.username());
     }
 
     @Transactional
     public Pair<Long, Jwts> signUp(SignUpReq.Info request) {
-        phoneVerificationMapper.isValidCode(PhoneVerificationDto.VerifyCodeReq.from(request), PhoneVerificationType.SIGN_UP);
-        Pair<Boolean, String> isOauthUser = checkOauthUserNotGeneralSignUp(request.phone());
+        phoneVerificationService.isValidCode(PhoneVerificationDto.VerifyCodeReq.from(request), PhoneCodeKeyType.SIGN_UP);
+        phoneCodeService.delete(request.phone(), PhoneCodeKeyType.SIGN_UP);
 
-        User user = userGeneralSignMapper.saveUserWithEncryptedPassword(request, isOauthUser);
-        phoneVerificationService.delete(request.phone(), PhoneVerificationType.SIGN_UP);
+        UserSyncDto userSync = checkOauthUserNotGeneralSignUp(request.phone());
+        User user = userGeneralSignService.saveUserWithEncryptedPassword(request, userSync);
 
         return Pair.of(user.getId(), jwtAuthHelper.createToken(user));
     }
 
     @Transactional(readOnly = true)
     public Pair<Long, Jwts> signIn(SignInReq.General request) {
-        User user = userGeneralSignMapper.readUserIfValid(request.username(), request.password());
+        User user = userGeneralSignService.readUserIfValid(request.username(), request.password());
 
         return Pair.of(user.getId(), jwtAuthHelper.createToken(user));
     }
@@ -65,14 +64,14 @@ public class AuthUseCase {
         return jwtAuthHelper.refresh(refreshToken);
     }
 
-    private Pair<Boolean, String> checkOauthUserNotGeneralSignUp(String phone) {
-        Pair<Boolean, String> isGeneralSignUpAllowed = userSyncMapper.isGeneralSignUpAllowed(phone);
+    private UserSyncDto checkOauthUserNotGeneralSignUp(String phone) {
+        UserSyncDto userSync = userGeneralSignService.isSignUpAllowed(phone);
 
-        if (isGeneralSignUpAllowed == null) {
-            phoneVerificationService.delete(phone, PhoneVerificationType.SIGN_UP);
+        if (!userSync.isSignUpAllowed()) {
+            phoneCodeService.delete(phone, PhoneCodeKeyType.SIGN_UP);
             throw new UserErrorException(UserErrorCode.ALREADY_SIGNUP);
         }
 
-        return isGeneralSignUpAllowed;
+        return userSync;
     }
 }

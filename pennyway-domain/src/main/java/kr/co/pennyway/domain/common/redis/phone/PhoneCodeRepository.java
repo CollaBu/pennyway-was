@@ -9,28 +9,28 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Repository
-public class PhoneVerificationRepository {
+public class PhoneCodeRepository {
     private final RedisTemplate<String, Object> redisTemplate;
 
-    public PhoneVerificationRepository(@DomainRedisTemplate RedisTemplate<String, Object> redisTemplate) {
+    public PhoneCodeRepository(@DomainRedisTemplate RedisTemplate<String, Object> redisTemplate) {
         this.redisTemplate = redisTemplate;
     }
 
-    public LocalDateTime save(String phone, String code, PhoneVerificationType codeType) {
+    public LocalDateTime save(String phone, String code, PhoneCodeKeyType codeType) {
         LocalDateTime expiresAt = LocalDateTime.now().plusMinutes(5);
         redisTemplate.opsForValue().set(codeType.getPrefix() + ":" + phone, code, Duration.between(LocalDateTime.now(), expiresAt));
         return expiresAt;
     }
 
-    public String findCodeByPhone(String phone, PhoneVerificationType codeType) throws NullPointerException {
+    public String findCodeByPhone(String phone, PhoneCodeKeyType codeType) throws NullPointerException {
         return Objects.requireNonNull(redisTemplate.opsForValue().get(codeType.getPrefix() + ":" + phone)).toString();
     }
 
-    public void extendTimeToLeave(String phone, PhoneVerificationType codeType) {
+    public void extendTimeToLeave(String phone, PhoneCodeKeyType codeType) {
         redisTemplate.expire(codeType.getPrefix() + ":" + phone, Duration.ofMinutes(5));
     }
 
-    public void delete(String phone, PhoneVerificationType codeType) {
+    public void delete(String phone, PhoneCodeKeyType codeType) {
         redisTemplate.opsForValue().getAndDelete(codeType.getPrefix() + ":" + phone);
     }
 }
