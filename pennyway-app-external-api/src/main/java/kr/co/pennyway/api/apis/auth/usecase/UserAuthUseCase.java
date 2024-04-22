@@ -1,5 +1,6 @@
 package kr.co.pennyway.api.apis.auth.usecase;
 
+import kr.co.pennyway.api.apis.auth.dto.AuthStateDto;
 import kr.co.pennyway.api.apis.auth.helper.JwtAuthHelper;
 import kr.co.pennyway.api.common.security.jwt.access.AccessTokenClaimKeys;
 import kr.co.pennyway.common.annotation.UseCase;
@@ -15,17 +16,19 @@ public class UserAuthUseCase {
     private final JwtAuthHelper jwtAuthHelper;
     private final JwtProvider accessTokenProvider;
 
-    public boolean isSignIn(String authHeader) {
+    public AuthStateDto isSignIn(String authHeader) {
         String accessToken = accessTokenProvider.resolveToken(authHeader);
         log.debug("accessToken: {}", accessToken);
 
         if (accessToken.isBlank())
-            return false;
+            return AuthStateDto.of(false);
 
         JwtClaims claims = accessTokenProvider.getJwtClaimsFromToken(accessToken);
+        Long userId = jwtAuthHelper.getClaimValue(claims, AccessTokenClaimKeys.USER_ID.getValue(), Long.class);
+
         log.debug("auth_id: {}", claims.getClaims().get(AccessTokenClaimKeys.USER_ID.getValue()));
 
-        return true;
+        return AuthStateDto.of(true, userId);
     }
 
     public void signOut(Long userId, String authHeader, String refreshToken) {
