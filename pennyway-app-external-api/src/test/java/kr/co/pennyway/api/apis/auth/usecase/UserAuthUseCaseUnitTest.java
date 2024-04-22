@@ -50,7 +50,7 @@ public class UserAuthUseCaseUnitTest {
     @DisplayName("[2] 유효한 토큰이 아니면 false를 반환한다.")
     public void isSignedInWithInvalidToken() {
         // when
-        boolean result = userAuthUseCase.isSignIn("invalidToken");
+        boolean result = userAuthUseCase.isSignIn("Bearer invalidToken");
 
         // then
         assertFalse(result);
@@ -65,7 +65,7 @@ public class UserAuthUseCaseUnitTest {
         String expiredToken = accessTokenProvider.generateToken(jwtClaims);
 
         // when
-        JwtErrorException exception = assertThrows(JwtErrorException.class, () -> userAuthUseCase.isSignIn(expiredToken));
+        JwtErrorException exception = assertThrows(JwtErrorException.class, () -> userAuthUseCase.isSignIn("Bearer " + expiredToken));
         assertEquals(JwtErrorCode.EXPIRED_TOKEN, exception.getErrorCode());
     }
 
@@ -76,7 +76,7 @@ public class UserAuthUseCaseUnitTest {
         String token = accessTokenProvider.generateToken(jwtClaims);
 
         // when
-        boolean result = userAuthUseCase.isSignIn(token);
+        boolean result = userAuthUseCase.isSignIn("Bearer " + token);
 
         // then
         assertFalse(result);
