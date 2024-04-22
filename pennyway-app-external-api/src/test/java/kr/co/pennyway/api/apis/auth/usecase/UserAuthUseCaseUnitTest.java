@@ -40,7 +40,7 @@ public class UserAuthUseCaseUnitTest {
     @DisplayName("[1] Authorication 헤더가 없으면 false를 반환한다.")
     public void isSignedInWithoutAuthorizationHeader() {
         // when
-        boolean result = userAuthUseCase.isSignedIn(null);
+        boolean result = userAuthUseCase.isSignedIn("");
 
         // then
         assertFalse(result);
@@ -50,7 +50,7 @@ public class UserAuthUseCaseUnitTest {
     @DisplayName("[2] 유효한 토큰이 아니면 false를 반환한다.")
     public void isSignedInWithInvalidToken() {
         // when
-        boolean result = userAuthUseCase.isSignedIn("Bearer invalidToken");
+        boolean result = userAuthUseCase.isSignedIn("invalidToken");
 
         // then
         assertFalse(result);
@@ -65,7 +65,7 @@ public class UserAuthUseCaseUnitTest {
         String expiredToken = accessTokenProvider.generateToken(jwtClaims);
 
         // when
-        JwtErrorException exception = assertThrows(JwtErrorException.class, () -> userAuthUseCase.isSignedIn("Bearer " + expiredToken));
+        JwtErrorException exception = assertThrows(JwtErrorException.class, () -> userAuthUseCase.isSignedIn(expiredToken));
         assertEquals(JwtErrorCode.EXPIRED_TOKEN, exception.getErrorCode());
     }
 
@@ -76,7 +76,7 @@ public class UserAuthUseCaseUnitTest {
         String token = accessTokenProvider.generateToken(jwtClaims);
 
         // when
-        boolean result = userAuthUseCase.isSignedIn("Bearer " + token);
+        boolean result = userAuthUseCase.isSignedIn(token);
 
         // then
         assertFalse(result);
