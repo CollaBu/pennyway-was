@@ -32,7 +32,7 @@ public class AuthCheckController implements AuthCheckApi {
 
 	@GetMapping("/find/username")
 	@PreAuthorize("isAnonymous()")
-	public ResponseEntity<?> findUsername(@RequestParam @NotBlank String phone) {
-		return ResponseEntity.ok(SuccessResponse.from("user", authCheckUseCase.findUsername(phone)));
+	public ResponseEntity<?> findUsername(@RequestParam @NotBlank String phone, @RequestParam @NotBlank String code) {
+		return ResponseEntity.ok(SuccessResponse.from("user", authCheckUseCase.findUsername(phone, code)));
 	}
 }

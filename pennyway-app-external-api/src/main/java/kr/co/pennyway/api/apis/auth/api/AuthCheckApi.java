@@ -51,5 +51,5 @@ public interface AuthCheckApi {
 							""")
 			})),
 	})
-	ResponseEntity<?> findUsername(@RequestParam @NotBlank String phone);
+	ResponseEntity<?> findUsername(@RequestParam @NotBlank String phone, @RequestParam @NotBlank String code);
 }
