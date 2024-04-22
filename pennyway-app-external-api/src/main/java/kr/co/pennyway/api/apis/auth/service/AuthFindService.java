@@ -4,10 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import kr.co.pennyway.api.apis.auth.dto.AuthFindDto;
-import kr.co.pennyway.api.common.exception.PhoneVerificationErrorCode;
-import kr.co.pennyway.api.common.exception.PhoneVerificationException;
 import kr.co.pennyway.domain.common.redis.phone.PhoneVerificationService;
-import kr.co.pennyway.domain.common.redis.phone.PhoneVerificationType;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorCode;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorException;
@@ -30,13 +27,15 @@ public class AuthFindService {
 	 */
 	@Transactional(readOnly = true)
 	public AuthFindDto.FindUsernameRes findUsername(String phone) {
-		// 인증번호 유효 여부 확인
-		try {
-			phoneVerificationService.readByPhone(phone, PhoneVerificationType.FIND_USERNAME);
-		} catch (IllegalArgumentException e) {
-			log.info("Phone verification code not found by phone: {}", phone);
-			throw new PhoneVerificationException(PhoneVerificationErrorCode.EXPIRED_OR_INVALID_PHONE);
-		}
+		// 인증번호 유효 여부 확인 > 인증번호 삭제
+		// try {
+		// 	if (phoneVerificationService.readByPhone(phone, PhoneVerificationType.FIND_USERNAME).equals(code)) {
+		// 		phoneVerificationService.delete(phone, PhoneVerificationType.FIND_USERNAME);
+		// 	}
+		// } catch (IllegalArgumentException e) {
+		// 	log.info("Phone verification code not found by phone: {}", phone);
+		// 	throw new PhoneVerificationException(PhoneVerificationErrorCode.EXPIRED_OR_INVALID_PHONE);
+		// }
 
 		// 사용자 조회
 		User user = userService.readUserByPhone(phone).orElseThrow(() -> {
@@ -49,9 +48,6 @@ public class AuthFindService {
 			log.info("User not found by phone: {}", phone);
 			throw new UserErrorException(UserErrorCode.NOT_FOUND);
 		}
-
-		// 인증번호 삭제
-		phoneVerificationService.delete(phone, PhoneVerificationType.FIND_USERNAME);
 
 		return AuthFindDto.FindUsernameRes.of(user);
 	}
