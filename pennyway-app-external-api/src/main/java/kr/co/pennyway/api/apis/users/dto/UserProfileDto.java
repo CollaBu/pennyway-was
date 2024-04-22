@@ -1,6 +1,7 @@
 package kr.co.pennyway.api.apis.users.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -10,6 +11,7 @@ import kr.co.pennyway.domain.domains.user.type.ProfileVisibility;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Builder
 @Schema(description = "사용자 프로필 정보")
@@ -21,6 +23,7 @@ public record UserProfileDto(
         @Schema(description = "사용자 이름", example = "홍길동")
         String name,
         @Schema(description = "비밀번호 변경 일시", example = "2024-04-22 00:00:00")
+        @JsonInclude(JsonInclude.Include.NON_NULL)
         @JsonSerialize(using = LocalDateTimeSerializer.class)
         @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
         LocalDateTime passwordUpdatedAt,
@@ -39,13 +42,25 @@ public record UserProfileDto(
         @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
         LocalDateTime createdAt
 ) {
+    public UserProfileDto {
+        Objects.requireNonNull(id);
+        Objects.requireNonNull(username);
+        Objects.requireNonNull(name);
+        Objects.requireNonNull(profileImageUrl);
+        Objects.requireNonNull(phone);
+        Objects.requireNonNull(profileVisibility);
+        Objects.requireNonNull(locked);
+        Objects.requireNonNull(notifySetting);
+        Objects.requireNonNull(createdAt);
+    }
+
     public static UserProfileDto from(User user) {
         return UserProfileDto.builder()
                 .id(user.getId())
                 .username(user.getUsername())
                 .name(user.getName())
                 .passwordUpdatedAt(user.getPasswordUpdatedAt())
-                .profileImageUrl(user.getProfileImageUrl())
+                .profileImageUrl(Objects.toString(user.getProfileImageUrl(), ""))
                 .phone(user.getPhone())
                 .profileVisibility(user.getProfileVisibility())
                 .locked(user.getLocked())
