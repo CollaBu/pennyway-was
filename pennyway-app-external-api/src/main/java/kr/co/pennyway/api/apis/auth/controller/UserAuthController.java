@@ -22,7 +22,7 @@ public class UserAuthController implements UserAuthApi {
     private final CookieUtil cookieUtil;
 
     @GetMapping("/auth")
-    @PreAuthorize("permitAll()")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> getAuthState(@RequestHeader(value = "Authorization", required = false, defaultValue = "") String authHeader) {
         return ResponseEntity.ok(SuccessResponse.from("isSignIn", userAuthUseCase.isSignIn(authHeader)));
     }
