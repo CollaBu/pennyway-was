@@ -18,17 +18,13 @@ public class UserAuthUseCase {
 
     public AuthStateDto isSignIn(String authHeader) {
         String accessToken = accessTokenProvider.resolveToken(authHeader);
-        log.debug("accessToken: {}", accessToken);
-
-        if (accessToken.isBlank())
-            return AuthStateDto.of(false);
 
         JwtClaims claims = accessTokenProvider.getJwtClaimsFromToken(accessToken);
         Long userId = jwtAuthHelper.getClaimValue(claims, AccessTokenClaimKeys.USER_ID.getValue(), Long.class);
 
         log.debug("auth_id: {}", claims.getClaims().get(AccessTokenClaimKeys.USER_ID.getValue()));
 
-        return AuthStateDto.of(true, userId);
+        return AuthStateDto.of(userId);
     }
 
     public void signOut(Long userId, String authHeader, String refreshToken) {
