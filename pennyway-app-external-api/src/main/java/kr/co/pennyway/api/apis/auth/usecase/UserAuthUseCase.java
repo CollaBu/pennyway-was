@@ -22,8 +22,7 @@ public class UserAuthUseCase {
         JwtClaims claims = accessTokenProvider.getJwtClaimsFromToken(accessToken);
         Long userId = jwtAuthHelper.getClaimValue(claims, AccessTokenClaimKeys.USER_ID.getValue(), Long.class);
 
-        log.debug("auth_id: {}", claims.getClaims().get(AccessTokenClaimKeys.USER_ID.getValue()));
-        log.info("auth_id: {}", userId);
+        log.info("auth_id {} 사용자는 로그인 중입니다.", userId);
 
         return AuthStateDto.of(userId);
     }

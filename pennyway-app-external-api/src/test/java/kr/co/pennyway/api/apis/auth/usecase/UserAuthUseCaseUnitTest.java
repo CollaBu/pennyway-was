@@ -4,8 +4,6 @@ import kr.co.pennyway.api.apis.auth.dto.AuthStateDto;
 import kr.co.pennyway.api.apis.auth.helper.JwtAuthHelper;
 import kr.co.pennyway.api.common.security.jwt.access.AccessTokenClaim;
 import kr.co.pennyway.api.common.security.jwt.access.AccessTokenProvider;
-import kr.co.pennyway.domain.common.redis.forbidden.ForbiddenTokenService;
-import kr.co.pennyway.domain.common.redis.refresh.RefreshTokenService;
 import kr.co.pennyway.infra.common.exception.JwtErrorCode;
 import kr.co.pennyway.infra.common.exception.JwtErrorException;
 import kr.co.pennyway.infra.common.jwt.JwtClaims;
@@ -22,6 +20,8 @@ import java.time.Duration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
 @ActiveProfiles("test")
@@ -30,24 +30,18 @@ public class UserAuthUseCaseUnitTest {
     private final JwtClaims jwtClaims = AccessTokenClaim.of(1L, "ROLE_USER");
     private JwtProvider accessTokenProvider;
     private UserAuthUseCase userAuthUseCase;
+    @Mock
     private JwtAuthHelper jwtAuthHelper;
-
-    @Mock
-    private JwtProvider refreshTokenProvider;
-    @Mock
-    private RefreshTokenService refreshTokenService;
-    @Mock
-    private ForbiddenTokenService forbiddenTokenService;
 
     @BeforeEach
     public void setUp() {
         accessTokenProvider = new AccessTokenProvider(secretStr, Duration.ofMinutes(5));
-        jwtAuthHelper = new JwtAuthHelper(accessTokenProvider, refreshTokenProvider, refreshTokenService, forbiddenTokenService);
         userAuthUseCase = new UserAuthUseCase(jwtAuthHelper, accessTokenProvider);
+
     }
 
     @Test
-    @DisplayName("[1] 만료된 토큰인 경우 ExpiredToken 예외를 던진다.")
+    @DisplayName("[1] 유효하지 않으면서 만료된 토큰인 경우 ExpiredToken 예외를 던진다.")
     public void isSignedInWithExpiredToken() {
         // given
         accessTokenProvider = new AccessTokenProvider(secretStr, Duration.ofMillis(0));
@@ -66,6 +60,7 @@ public class UserAuthUseCaseUnitTest {
     public void isSignedInWithValidToken() {
         // given
         String token = accessTokenProvider.generateToken(jwtClaims);
+        given(jwtAuthHelper.getClaimValue(any(), any(), any())).willReturn(1L);
 
         // when
         AuthStateDto result = userAuthUseCase.isSignIn("Bearer " + token);
