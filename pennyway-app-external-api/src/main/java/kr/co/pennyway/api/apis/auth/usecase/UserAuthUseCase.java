@@ -23,6 +23,7 @@ public class UserAuthUseCase {
         Long userId = jwtAuthHelper.getClaimValue(claims, AccessTokenClaimKeys.USER_ID.getValue(), Long.class);
 
         log.debug("auth_id: {}", claims.getClaims().get(AccessTokenClaimKeys.USER_ID.getValue()));
+        log.info("auth_id: {}", userId);
 
         return AuthStateDto.of(userId);
     }
