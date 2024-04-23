@@ -23,8 +23,8 @@ public class UserAuthController implements UserAuthApi {
 
     @GetMapping("/auth")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> getAuthState(@RequestHeader(value = "Authorization", required = false, defaultValue = "") String authHeader) {
-        return ResponseEntity.ok(SuccessResponse.from("isSignIn", userAuthUseCase.isSignIn(authHeader)));
+    public ResponseEntity<?> getAuthState(@RequestHeader(value = "Authorization") String authHeader) {
+        return ResponseEntity.ok(SuccessResponse.from("user", userAuthUseCase.isSignIn(authHeader)));
     }
 
     @GetMapping("/sign-out")
