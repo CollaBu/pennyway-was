@@ -78,6 +78,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.OPTIONS, "*").permitAll()
                 .requestMatchers(HttpMethod.GET, READ_ONLY_PUBLIC_ENDPOINTS).permitAll()
                 .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
+                .requestMatchers(AUTHENTICATED_ENDPOINTS).authenticated() // FIXME: 2024-04-23 /v1/auth가 anonymous로 설정되어 있어서 authenticated로 덮어씀.
                 .requestMatchers(ANONYMOUS_ENDPOINTS).anonymous();
     }
 }
