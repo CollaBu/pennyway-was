@@ -46,7 +46,7 @@ public class UserAuthUseCaseUnitTest {
 
         // then
         assertFalse(result.isSignIn());
-        assertNull(result.userId());
+        assertNull(result.id());
     }
 
     @Test
@@ -86,6 +86,6 @@ public class UserAuthUseCaseUnitTest {
 
         // then
         assertTrue(result.isSignIn());
-        assertEquals(1L, result.userId());
+        assertEquals(1L, result.id());
     }
 }

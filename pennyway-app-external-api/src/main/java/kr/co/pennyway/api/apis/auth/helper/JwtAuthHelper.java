@@ -120,7 +120,7 @@ public class JwtAuthHelper {
 
     private void deleteRefreshToken(Long userId, JwtClaims jwtClaims, String refreshToken) {
         Long refreshTokenUserId = Long.parseLong((String) jwtClaims.getClaims().get(RefreshTokenClaimKeys.USER_ID.getValue()));
-        log.info("로그아웃 요청 refresh token userId : {}", refreshTokenUserId);
+        log.info("로그아웃 요청 refresh token id : {}", refreshTokenUserId);
 
         if (!userId.equals(refreshTokenUserId)) {
             throw new JwtErrorException(JwtErrorCode.WITHOUT_OWNERSHIP_REFRESH_TOKEN);
@@ -129,7 +129,7 @@ public class JwtAuthHelper {
         try {
             refreshTokenService.delete(refreshTokenUserId, refreshToken);
         } catch (IllegalArgumentException e) {
-            log.warn("refresh token not found. userId : {}", userId);
+            log.warn("refresh token not found. id : {}", userId);
         }
     }
 

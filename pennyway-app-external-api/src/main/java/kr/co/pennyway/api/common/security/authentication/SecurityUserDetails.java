@@ -88,7 +88,7 @@ public final class SecurityUserDetails implements UserDetails {
     @Override
     public String toString() {
         return "SecurityUserDetails{" +
-                "userId=" + userId +
+                "id=" + userId +
                 ", username='" + username + '\'' +
                 ", authorities=" + authorities +
                 ", accountNonLocked=" + accountNonLocked +
