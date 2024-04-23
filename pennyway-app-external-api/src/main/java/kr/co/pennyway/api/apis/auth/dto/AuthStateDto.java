@@ -5,7 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.Objects;
 
 public record AuthStateDto(
-        @Schema(description = "사용자 pk. isSignIn이 false인 경우에는 존재하지 않는 속성", example = "1")
+        @Schema(description = "로그인한 사용자의 pk", example = "1")
         Long id
 ) {
     public AuthStateDto {
