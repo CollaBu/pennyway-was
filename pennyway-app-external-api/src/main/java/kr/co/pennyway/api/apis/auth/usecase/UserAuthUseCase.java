@@ -18,9 +18,8 @@ public class UserAuthUseCase {
 
     public AuthStateDto isSignIn(String authHeader) {
         String accessToken = accessTokenProvider.resolveToken(authHeader);
-
         JwtClaims claims = accessTokenProvider.getJwtClaimsFromToken(accessToken);
-        Long userId = jwtAuthHelper.getClaimValue(claims, AccessTokenClaimKeys.USER_ID.getValue(), Long.class);
+        Long userId = jwtAuthHelper.getClaimsValue(claims, AccessTokenClaimKeys.USER_ID.getValue(), Long::parseLong);
 
         log.info("auth_id {} 사용자는 로그인 중입니다.", userId);
 
