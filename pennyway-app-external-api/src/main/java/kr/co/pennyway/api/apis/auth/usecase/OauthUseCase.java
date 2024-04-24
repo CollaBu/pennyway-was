@@ -32,6 +32,7 @@ public class OauthUseCase {
     private final JwtAuthHelper jwtAuthHelper;
     private final UserOauthSignService userOauthSignService;
 
+    @Transactional(readOnly = true)
     public Pair<Long, Jwts> signIn(Provider provider, SignInReq.Oauth request) {
         OidcDecodePayload payload = oauthOidcHelper.getPayload(provider, request.idToken(), request.nonce());
         log.debug("payload : {}", payload);
