@@ -43,13 +43,6 @@ public class OauthController implements OauthApi {
     }
 
     @Override
-    @PostMapping("/phone")
-    @PreAuthorize("isAnonymous()")
-    public ResponseEntity<?> sendCode(@RequestParam Provider provider, @RequestBody @Validated PhoneVerificationDto.PushCodeReq request) {
-        return ResponseEntity.ok(SuccessResponse.from("sms", oauthUseCase.sendCode(provider, request)));
-    }
-
-    @Override
     @PostMapping("/phone/verification")
     @PreAuthorize("isAnonymous()")
     public ResponseEntity<?> verifyCode(@RequestParam Provider provider, @RequestBody @Validated PhoneVerificationDto.VerifyCodeReq request) {

@@ -59,27 +59,6 @@ public interface OauthApi {
     })
     ResponseEntity<?> signIn(@RequestParam Provider provider, @RequestBody @Validated SignInReq.Oauth request);
 
-    @Deprecated
-    @Operation(summary = "[2] 인증번호 발송", description = "deprecated된 API입니다. [인증코드 SMS 요청]의 /v1/phone API를 사용해주세요.", deprecated = true)
-    @Parameter(name = "provider", description = "소셜 제공자", examples = {
-            @ExampleObject(name = "카카오", value = "kakao"), @ExampleObject(name = "애플", value = "apple"), @ExampleObject(name = "구글", value = "google")
-    }, required = true, in = ParameterIn.QUERY)
-    @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", examples = {
-            @ExampleObject(name = "발신 성공", value = """
-                    {
-                        "code": "2000",
-                        "data": {
-                            "sms": {
-                                "to": "010-1234-5678",
-                                "sendAt": "2024-04-04 00:31:57",
-                                "expiresAt": "2024-04-04 00:36:57"
-                            }
-                        }
-                    }
-                    """)
-    }))
-    ResponseEntity<?> sendCode(@RequestParam Provider provider, @RequestBody @Validated PhoneVerificationDto.PushCodeReq request);
-
     @Operation(summary = "[3] 전화번호 인증", description = "전화번호 인증 후 이미 계정이 존재하면 연동, 없으면 회원가입")
     @Parameter(name = "provider", description = "소셜 제공자", examples = {
             @ExampleObject(name = "카카오", value = "kakao"), @ExampleObject(name = "애플", value = "apple"), @ExampleObject(name = "구글", value = "google")
