@@ -1,11 +1,5 @@
 package kr.co.pennyway.api.apis.auth.controller;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import kr.co.pennyway.api.apis.auth.usecase.AuthCheckUseCase;
-import kr.co.pennyway.api.common.response.SuccessResponse;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -14,18 +8,31 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.validation.constraints.NotBlank;
+import kr.co.pennyway.api.apis.auth.api.AuthCheckApi;
+import kr.co.pennyway.api.apis.auth.usecase.AuthCheckUseCase;
+import kr.co.pennyway.api.common.response.SuccessResponse;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 @Slf4j
-@Tag(name = "[계정 검사 API]")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/v1/duplicate")
-public class AuthCheckController {
-    private final AuthCheckUseCase authCheckUseCase;
+@RequestMapping("/v1")
+public class AuthCheckController implements AuthCheckApi {
+	private final AuthCheckUseCase authCheckUseCase;
 
-    @Operation(summary = "닉네임 중복 검사")
-    @GetMapping("/username")
-    @PreAuthorize("permitAll()")
-    public ResponseEntity<?> checkUsername(@RequestParam @Validated String username) {
-        return ResponseEntity.ok(SuccessResponse.from("isDuplicate", authCheckUseCase.checkUsernameDuplicate(username)));
-    }
+	@GetMapping("/duplicate/username")
+	@PreAuthorize("permitAll()")
+	public ResponseEntity<?> checkUsername(@RequestParam @Validated String username) {
+		return ResponseEntity.ok(
+				SuccessResponse.from("isDuplicate",
+						authCheckUseCase.checkUsernameDuplicate(username)));
+	}
+
+	@GetMapping("/find/username")
+	@PreAuthorize("isAnonymous()")
+	public ResponseEntity<?> findUsername(@RequestParam @NotBlank String phone, @RequestParam @NotBlank String code) {
+		return ResponseEntity.ok(SuccessResponse.from("user", authCheckUseCase.findUsername(phone, code)));
+	}
 }
