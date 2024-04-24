@@ -33,7 +33,7 @@ public class OauthUseCase {
     private final UserOauthSignService userOauthSignService;
 
     public Pair<Long, Jwts> signIn(Provider provider, SignInReq.Oauth request) {
-        OidcDecodePayload payload = oauthOidcHelper.getPayload(provider, request.idToken());
+        OidcDecodePayload payload = oauthOidcHelper.getPayload(provider, request.idToken(), request.nonce());
         log.debug("payload : {}", payload);
 
         if (!request.oauthId().equals(payload.sub()))
@@ -69,7 +69,7 @@ public class OauthUseCase {
             throw new OauthException(OauthErrorCode.INVALID_OAUTH_SYNC_REQUEST);
         }
 
-        OidcDecodePayload payload = oauthOidcHelper.getPayload(provider, request.idToken());
+        OidcDecodePayload payload = oauthOidcHelper.getPayload(provider, request.idToken(), request.nonce());
         User user = userOauthSignService.saveUser(request, userSync, provider, payload.sub());
 
         return Pair.of(user.getId(), jwtAuthHelper.createToken(user));

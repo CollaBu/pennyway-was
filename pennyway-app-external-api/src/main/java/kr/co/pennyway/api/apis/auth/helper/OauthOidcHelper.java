@@ -41,14 +41,15 @@ public class OauthOidcHelper {
      *
      * @param provider : {@link Provider}
      * @param idToken  : idToken
+     * @param nonce    : 인증 서버 로그인 요청 시 전달한 임의의 문자열
      * @return OIDCDecodePayload : ID Token의 payload
      */
-    public OidcDecodePayload getPayload(Provider provider, String idToken) {
+    public OidcDecodePayload getPayload(Provider provider, String idToken, String nonce) {
         OauthOidcClient client = oauthOidcClients.get(provider).keySet().iterator().next();
         OauthOidcClientProperties properties = oauthOidcClients.get(provider).values().iterator().next();
         OidcPublicKeyResponse response = client.getOidcPublicKey();
 
-        return getPayloadFromIdToken(idToken, properties.getIssuer(), properties.getSecret(), null, response);
+        return getPayloadFromIdToken(idToken, properties.getIssuer(), properties.getSecret(), nonce, response);
     }
 
     /**
