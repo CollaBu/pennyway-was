@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.SchemaProperty;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -20,9 +21,9 @@ import org.springframework.web.bind.annotation.RequestHeader;
 
 @Tag(name = "[사용자 인증 관리 API]", description = "사용자의 인증과 관련된 UseCase(로그아웃, 소셜 계정 연동/해지 등)를 제공하는 API")
 public interface UserAuthApi {
-    @Operation(summary = "로그인 상태 확인", description = "사용자의 로그인 상태를 확인한다. 단, 유효하지 않은 토큰은 에러 응답이 발생한다.")
+    @Operation(summary = "로그인 상태 확인", description = "사용자의 로그인 상태를 확인하고 토큰에 등록된 사용자 pk값을 확인한다. 만약, 토큰이 만료되었거나 유효하지 않은 경우에는 401 에러를 반환한다.")
     @Parameter(name = "Authorization", in = ParameterIn.HEADER, hidden = true)
-    @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", schema = @Schema(implementation = AuthStateDto.class)))
+    @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", schemaProperties = @SchemaProperty(name = "user", schema = @Schema(implementation = AuthStateDto.class))))
     ResponseEntity<?> getAuthState(@RequestHeader(value = "Authorization", required = false, defaultValue = "") String authHeader);
 
     @Operation(summary = "로그아웃", description = """

@@ -30,12 +30,6 @@ public class AuthController implements AuthApi {
     private final AuthUseCase authUseCase;
     private final CookieUtil cookieUtil;
 
-    @PostMapping("/phone")
-    @PreAuthorize("isAnonymous()")
-    public ResponseEntity<?> sendCode(@RequestBody @Validated PhoneVerificationDto.PushCodeReq request) {
-        return ResponseEntity.ok(SuccessResponse.from("sms", authUseCase.sendCode(request)));
-    }
-
     @PostMapping("/phone/verification")
     @PreAuthorize("isAnonymous()")
     public ResponseEntity<?> verifyCode(@RequestBody @Validated PhoneVerificationDto.VerifyCodeReq request) {

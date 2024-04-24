@@ -19,24 +19,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 @Tag(name = "[인증 API]")
 public interface AuthApi {
-    @Deprecated
-    @Operation(summary = "[1] 일반 회원가입 인증번호 전송", description = "deprecated된 API입니다. [인증코드 SMS 요청]의 /v1/phone API를 사용해주세요.", deprecated = true)
-    @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", examples = {
-            @ExampleObject(name = "발신 성공", value = """
-                    {
-                        "code": "2000",
-                        "data": {
-                            "sms": {
-                                "to": "010-1234-5678",
-                                "sendAt": "2024-04-04 00:31:57",
-                                "expiresAt": "2024-04-04 00:36:57"
-                            }
-                        }
-                    }
-                    """)
-    }))
-    ResponseEntity<?> sendCode(@RequestBody @Validated PhoneVerificationDto.PushCodeReq request);
-
     @Operation(summary = "[2] 일반 회원가입 인증번호 검증", description = "인증번호를 검증합니다. 미인증 사용자만 가능합니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", examples = {
