@@ -1,5 +1,7 @@
 package kr.co.pennyway.api.config.security;
 
+import static kr.co.pennyway.api.config.security.WebSecurityUrls.*;
+
 import org.springframework.boot.autoconfigure.security.ConditionalOnDefaultWebSecurity;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
@@ -20,23 +22,22 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.web.cors.CorsConfigurationSource;
 
-import static kr.co.pennyway.api.config.security.WebSecurityUrls.*;
+import lombok.RequiredArgsConstructor;
 
 @Configuration
 @EnableWebSecurity
 @ConditionalOnDefaultWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-    private static final String[] READ_ONLY_PUBLIC_ENDPOINTS = {"/favicon.ico", "/v1/duplicate/**"};
-    private static final String[] PUBLIC_ENDPOINTS = {"/v1/questions/**"};
-    private static final String[] ANONYMOUS_ENDPOINTS = {"/v1/auth/**", "/v1/phone/**", "/v1/find/**"};
-    private static final String[] SWAGGER_ENDPOINTS = {"/api-docs/**", "/v3/api-docs/**", "/swagger-ui/**", "/swagger",};
+	private static final String[] READ_ONLY_PUBLIC_ENDPOINTS = {"/favicon.ico", "/v1/duplicate/**"};
+	private static final String[] PUBLIC_ENDPOINTS = {"/v1/questions/**"};
+	private static final String[] ANONYMOUS_ENDPOINTS = {"/v1/auth/**", "/v1/phone/**", "/v1/find/**"};
+	private static final String[] SWAGGER_ENDPOINTS = {"/api-docs/**", "/v3/api-docs/**", "/swagger-ui/**", "/swagger",};
 
-
-    private final SecurityAdapterConfig securityAdapterConfig;
-    private final CorsConfigurationSource corsConfigurationSource;
-    private final AccessDeniedHandler accessDeniedHandler;
-    private final AuthenticationEntryPoint authenticationEntryPoint;
+	private final SecurityAdapterConfig securityAdapterConfig;
+	private final CorsConfigurationSource corsConfigurationSource;
+	private final AccessDeniedHandler accessDeniedHandler;
+	private final AuthenticationEntryPoint authenticationEntryPoint;
 
 	@Bean
 	@Profile({"local", "dev", "test"})
@@ -77,13 +78,13 @@ public class SecurityConfig {
 				);
 	}
 
-    private AbstractRequestMatcherRegistry<AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizedUrl> defaultAuthorizeHttpRequests(
-            AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry auth) {
-        return auth.requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
-                .requestMatchers(HttpMethod.OPTIONS, "*").permitAll()
-                .requestMatchers(HttpMethod.GET, READ_ONLY_PUBLIC_ENDPOINTS).permitAll()
-                .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
-                .requestMatchers(AUTHENTICATED_ENDPOINTS).authenticated() // FIXME: 2024-04-23 /v1/auth가 anonymous로 설정되어 있어서 authenticated로 덮어씀.
-                .requestMatchers(ANONYMOUS_ENDPOINTS).anonymous();
-    }
+	private AbstractRequestMatcherRegistry<AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizedUrl> defaultAuthorizeHttpRequests(
+			AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry auth) {
+		return auth.requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
+				.requestMatchers(HttpMethod.OPTIONS, "*").permitAll()
+				.requestMatchers(HttpMethod.GET, READ_ONLY_PUBLIC_ENDPOINTS).permitAll()
+				.requestMatchers(PUBLIC_ENDPOINTS).permitAll()
+				.requestMatchers(AUTHENTICATED_ENDPOINTS).authenticated() // FIXME: 2024-04-23 /v1/auth가 anonymous로 설정되어 있어서 authenticated로 덮어씀.
+				.requestMatchers(ANONYMOUS_ENDPOINTS).anonymous();
+	}
 }
