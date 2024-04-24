@@ -105,6 +105,9 @@ public class SignUpReq {
             @Schema(description = "OIDC 토큰")
             @NotBlank(message = "OIDC 토큰은 필수 입력값입니다.")
             String idToken,
+            @Schema(description = "OIDC nonce")
+            @NotBlank(message = "OIDC nonce는 필수 입력값입니다.")
+            String nonce,
             @Schema(description = "이름", example = "페니웨이")
             @NotBlank(message = "이름을 입력해주세요")
             @Pattern(regexp = "^[가-힣a-z]{2,8}$", message = "2~8자의 한글, 영문 소문자만 사용 가능합니다.")
