@@ -33,7 +33,7 @@ import java.io.IOException;
  * {@code
  *  @GetMapping("/user")
  *  public ResponseEntity<User> getUser(@AuthenticationPrincipal SecurityUser user) {
- *      Long userId = user.getId();
+ *      Long id = user.getId();
  *      ...
  *  }
  * }

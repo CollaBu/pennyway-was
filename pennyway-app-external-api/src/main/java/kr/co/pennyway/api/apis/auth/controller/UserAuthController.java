@@ -1,7 +1,7 @@
-package kr.co.pennyway.api.apis.users.controller;
+package kr.co.pennyway.api.apis.auth.controller;
 
-import kr.co.pennyway.api.apis.users.api.UserAuthApi;
-import kr.co.pennyway.api.apis.users.usecase.UserAuthUseCase;
+import kr.co.pennyway.api.apis.auth.api.UserAuthApi;
+import kr.co.pennyway.api.apis.auth.usecase.UserAuthUseCase;
 import kr.co.pennyway.api.common.response.SuccessResponse;
 import kr.co.pennyway.api.common.security.authentication.SecurityUserDetails;
 import kr.co.pennyway.api.common.util.CookieUtil;
@@ -16,10 +16,16 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/v1/users")
+@RequestMapping("/v1")
 public class UserAuthController implements UserAuthApi {
     private final UserAuthUseCase userAuthUseCase;
     private final CookieUtil cookieUtil;
+
+    @GetMapping("/auth")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> getAuthState(@RequestHeader(value = "Authorization") String authHeader) {
+        return ResponseEntity.ok(SuccessResponse.from("user", userAuthUseCase.isSignIn(authHeader)));
+    }
 
     @GetMapping("/sign-out")
     @PreAuthorize("isAuthenticated()")
