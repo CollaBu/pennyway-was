@@ -32,8 +32,9 @@ public class OauthUseCase {
     private final JwtAuthHelper jwtAuthHelper;
     private final UserOauthSignService userOauthSignService;
 
+    @Transactional(readOnly = true)
     public Pair<Long, Jwts> signIn(Provider provider, SignInReq.Oauth request) {
-        OidcDecodePayload payload = oauthOidcHelper.getPayload(provider, request.idToken());
+        OidcDecodePayload payload = oauthOidcHelper.getPayload(provider, request.idToken(), request.nonce());
         log.debug("payload : {}", payload);
 
         if (!request.oauthId().equals(payload.sub()))
@@ -41,10 +42,6 @@ public class OauthUseCase {
         User user = userOauthSignService.readUser(request.oauthId(), provider);
 
         return (user != null) ? Pair.of(user.getId(), jwtAuthHelper.createToken(user)) : Pair.of(-1L, null);
-    }
-
-    public PhoneVerificationDto.PushCodeRes sendCode(Provider provider, PhoneVerificationDto.PushCodeReq request) {
-        return phoneVerificationService.sendCode(request, PhoneCodeKeyType.getOauthSignUpTypeByProvider(provider));
     }
 
     @Transactional(readOnly = true)
@@ -69,7 +66,7 @@ public class OauthUseCase {
             throw new OauthException(OauthErrorCode.INVALID_OAUTH_SYNC_REQUEST);
         }
 
-        OidcDecodePayload payload = oauthOidcHelper.getPayload(provider, request.idToken());
+        OidcDecodePayload payload = oauthOidcHelper.getPayload(provider, request.idToken(), request.nonce());
         User user = userOauthSignService.saveUser(request, userSync, provider, payload.sub());
 
         return Pair.of(user.getId(), jwtAuthHelper.createToken(user));

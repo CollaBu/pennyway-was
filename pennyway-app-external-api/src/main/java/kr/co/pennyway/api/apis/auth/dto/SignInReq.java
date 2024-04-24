@@ -22,7 +22,10 @@ public class SignInReq {
             String oauthId,
             @Schema(description = "OIDC 토큰")
             @NotBlank(message = "OIDC 토큰은 필수 입력값입니다.")
-            String idToken
+            String idToken,
+            @Schema(description = "OIDC nonce")
+            @NotBlank(message = "OIDC nonce는 필수 입력값입니다.")
+            String nonce
     ) {
     }
 }
