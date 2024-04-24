@@ -29,10 +29,6 @@ public class AuthUseCase {
     private final PhoneVerificationService phoneVerificationService;
     private final PhoneCodeService phoneCodeService;
 
-    public PhoneVerificationDto.PushCodeRes sendCode(PhoneVerificationDto.PushCodeReq request) {
-        return phoneVerificationService.sendCode(request, PhoneCodeKeyType.SIGN_UP);
-    }
-
     public PhoneVerificationDto.VerifyCodeRes verifyCode(PhoneVerificationDto.VerifyCodeReq request) {
         Boolean isValidCode = phoneVerificationService.isValidCode(request, PhoneCodeKeyType.SIGN_UP);
         UserSyncDto userSync = checkOauthUserNotGeneralSignUp(request.phone());

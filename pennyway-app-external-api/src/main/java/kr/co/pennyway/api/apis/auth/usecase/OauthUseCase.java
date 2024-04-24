@@ -44,10 +44,6 @@ public class OauthUseCase {
         return (user != null) ? Pair.of(user.getId(), jwtAuthHelper.createToken(user)) : Pair.of(-1L, null);
     }
 
-    public PhoneVerificationDto.PushCodeRes sendCode(Provider provider, PhoneVerificationDto.PushCodeReq request) {
-        return phoneVerificationService.sendCode(request, PhoneCodeKeyType.getOauthSignUpTypeByProvider(provider));
-    }
-
     @Transactional(readOnly = true)
     public PhoneVerificationDto.VerifyCodeRes verifyCode(Provider provider, PhoneVerificationDto.VerifyCodeReq request) {
         Boolean isValidCode = phoneVerificationService.isValidCode(request, PhoneCodeKeyType.getOauthSignUpTypeByProvider(provider));
