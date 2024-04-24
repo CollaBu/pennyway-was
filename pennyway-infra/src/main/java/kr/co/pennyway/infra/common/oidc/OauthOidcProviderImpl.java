@@ -52,6 +52,7 @@ public class OauthOidcProviderImpl implements OauthOidcProvider {
      * ID Token의 header와 body를 Base64 방식으로 디코딩하는 메서드 <br/>
      * payload의 iss, aud, exp, nonce를 검증하고, 실패시 예외 처리
      */
+    @SuppressWarnings("unchecked")
     private Map<String, Map<String, String>> getUnsignedTokenClaims(String token, String iss, String aud, String nonce) {
         try {
             Base64.Decoder decoder = Base64.getUrlDecoder();
@@ -60,13 +61,12 @@ public class OauthOidcProviderImpl implements OauthOidcProvider {
             String headerJson = new String(decoder.decode(unsignedToken.split("\\.")[0]));
             String payloadJson = new String(decoder.decode(unsignedToken.split("\\.")[1]));
 
-            @SuppressWarnings("unchecked")
             Map<String, String> header = objectMapper.readValue(headerJson, Map.class);
-            @SuppressWarnings("unchecked")
             Map<String, String> payload = objectMapper.readValue(payloadJson, Map.class);
 
             Assert.isTrue(payload.get("aud").equals(aud), "aud is not matched. expected : " + aud + ", actual : " + payload.get("aud"));
             Assert.isTrue(payload.get("iss").equals(iss), "iss is not matched. expected : " + iss + ", actual : " + payload.get("iss"));
+            Assert.isTrue(payload.get("nonce").equals(nonce), "nonce is not matched. expected : " + nonce + ", actual : " + payload.get("nonce"));
 
             return Map.of("header", header, "payload", payload);
         } catch (IllegalArgumentException e) {
