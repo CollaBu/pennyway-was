@@ -21,6 +21,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.function.Function;
 
 @Slf4j
 @Helper
@@ -40,6 +41,34 @@ public class JwtAuthHelper {
         this.refreshTokenProvider = refreshTokenProvider;
         this.refreshTokenService = refreshTokenService;
         this.forbiddenTokenService = forbiddenTokenService;
+    }
+
+    /**
+     * JwtClaims에서 key에 해당하는 값을 반환하는 메서드
+     *
+     * @return key에 해당하는 값이 없거나, 타입이 일치하지 않을 경우 null을 반환한다.
+     */
+    @SuppressWarnings("unchecked")
+    public <T> T getClaimValue(JwtClaims claims, String key, Class<T> type) {
+        Object value = claims.getClaims().get(key);
+        if (value != null && type.isAssignableFrom(value.getClass())) {
+            return (T) value;
+        }
+        return null;
+    }
+
+    /**
+     * JwtClaims에서 valueConverter를 이용하여 key에 해당하는 값을 반환하는 메서드
+     *
+     * @param valueConverter : String 타입의 값을 T 타입으로 변환하는 함수
+     * @return key에 해당하는 값이 없을 경우 null을 반환한다.
+     */
+    public <T> T getClaimsValue(JwtClaims claims, String key, Function<String, T> valueConverter) {
+        Object value = claims.getClaims().get(key);
+        if (value != null) {
+            return valueConverter.apply((String) value);
+        }
+        return null;
     }
 
     /**
@@ -106,7 +135,7 @@ public class JwtAuthHelper {
 
     private void deleteRefreshToken(Long userId, JwtClaims jwtClaims, String refreshToken) {
         Long refreshTokenUserId = Long.parseLong((String) jwtClaims.getClaims().get(RefreshTokenClaimKeys.USER_ID.getValue()));
-        log.info("로그아웃 요청 refresh token userId : {}", refreshTokenUserId);
+        log.info("로그아웃 요청 refresh token id : {}", refreshTokenUserId);
 
         if (!userId.equals(refreshTokenUserId)) {
             throw new JwtErrorException(JwtErrorCode.WITHOUT_OWNERSHIP_REFRESH_TOKEN);
@@ -115,7 +144,7 @@ public class JwtAuthHelper {
         try {
             refreshTokenService.delete(refreshTokenUserId, refreshToken);
         } catch (IllegalArgumentException e) {
-            log.warn("refresh token not found. userId : {}", userId);
+            log.warn("refresh token not found. id : {}", userId);
         }
     }
 
