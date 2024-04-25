@@ -3,6 +3,7 @@ package kr.co.pennyway.api.apis.users.usecase;
 import kr.co.pennyway.api.apis.users.dto.DeviceDto;
 import kr.co.pennyway.api.apis.users.dto.UserProfileDto;
 import kr.co.pennyway.api.apis.users.service.DeviceRegisterService;
+import kr.co.pennyway.api.apis.users.service.UserProfileUpdateService;
 import kr.co.pennyway.common.annotation.UseCase;
 import kr.co.pennyway.domain.domains.device.domain.Device;
 import kr.co.pennyway.domain.domains.device.exception.DeviceErrorCode;
@@ -24,6 +25,7 @@ public class UserAccountUseCase {
     private final UserService userService;
     private final DeviceService deviceService;
 
+    private final UserProfileUpdateService userProfileUpdateService;
     private final DeviceRegisterService deviceRegisterService;
 
     @Transactional
@@ -57,14 +59,14 @@ public class UserAccountUseCase {
     public void activateNotification(Long userId, NotifySetting.NotifyType type) {
         User user = readUserOrThrow(userId);
 
-        user.activateNotifySetting(type);
+        userProfileUpdateService.updateNotifySetting(user, type, Boolean.TRUE);
     }
 
     @Transactional
     public void deactivateNotification(Long userId, NotifySetting.NotifyType type) {
         User user = readUserOrThrow(userId);
 
-        user.deactivateNotifySetting(type);
+        userProfileUpdateService.updateNotifySetting(user, type, Boolean.FALSE);
     }
 
     private User readUserOrThrow(Long userId) {
