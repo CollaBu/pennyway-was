@@ -76,5 +76,6 @@ public class UserAccountUseCase {
                 () -> new UserErrorException(UserErrorCode.NOT_FOUND)
         );
 
+        userProfileUpdateService.updateUsername(user, newUsername);
     }
 }

@@ -17,4 +17,9 @@ public class UserProfileUpdateService {
     public void updateName(User user, String newName) {
         user.updateName(newName);
     }
+
+    @Transactional
+    public void updateUsername(User user, String newUsername) {
+        user.updateUsername(newUsername);
+    }
 }

@@ -79,6 +79,10 @@ public class User extends DateAuditable {
         this.name = name;
     }
 
+    public void updateUsername(String username) {
+        this.username = username;
+    }
+
     @Override
     public String toString() {
         return "User{" +
