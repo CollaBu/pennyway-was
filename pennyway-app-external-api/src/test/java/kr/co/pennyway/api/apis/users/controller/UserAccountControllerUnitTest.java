@@ -2,6 +2,7 @@ package kr.co.pennyway.api.apis.users.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.pennyway.api.apis.users.dto.DeviceDto;
+import kr.co.pennyway.api.apis.users.dto.UserProfileUpdateDto;
 import kr.co.pennyway.api.apis.users.usecase.UserAccountUseCase;
 import kr.co.pennyway.api.config.supporter.WithSecurityMockUser;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorCode;
@@ -118,7 +119,7 @@ public class UserAccountControllerUnitTest {
             // then
             result.andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.code").value(UserErrorCode.DO_NOT_GENERAL_SIGNED_UP.causedBy().getCode()))
-                    .andExpect(jsonPath("$.message").value(UserErrorCode.DO_NOT_GENERAL_SIGNED_UP.getExplainError())
+                    .andExpect(jsonPath("$.message").value(UserErrorCode.DO_NOT_GENERAL_SIGNED_UP.getExplainError()))
                     .andDo(print());
         }
 
@@ -156,8 +157,8 @@ public class UserAccountControllerUnitTest {
                     .andDo(print());
         }
 
-        private ResultActions performUpdateNameRequest(String newName) {
-            UserAccountUpdateDto.NameReq request = new UserAccountUpdateDto.NameReq(newName);
+        private ResultActions performUpdateNameRequest(String newName) throws Exception {
+            UserProfileUpdateDto.NameReq request = new UserProfileUpdateDto.NameReq(newName);
             return mockMvc.perform(put("/v2/users/me/name")
                     .contentType("application/json")
                     .content(objectMapper.writeValueAsString(request)));
