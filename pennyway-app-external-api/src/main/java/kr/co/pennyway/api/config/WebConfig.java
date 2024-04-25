@@ -1,5 +1,6 @@
 package kr.co.pennyway.api.config;
 
+import kr.co.pennyway.api.common.converter.NotifyTypeConverter;
 import kr.co.pennyway.api.common.converter.ProviderConverter;
 import kr.co.pennyway.api.common.converter.VerificationTypeConverter;
 import org.springframework.context.annotation.Configuration;
@@ -13,5 +14,6 @@ public class WebConfig implements WebMvcConfigurer {
 
         registrar.addConverter(new ProviderConverter());
         registrar.addConverter(new VerificationTypeConverter());
+        registrar.addConverter(new NotifyTypeConverter());
     }
 }
