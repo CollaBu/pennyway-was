@@ -1,6 +1,5 @@
 package kr.co.pennyway.api.apis.users.usecase;
 
-import jakarta.persistence.EntityManager;
 import kr.co.pennyway.api.apis.users.dto.DeviceDto;
 import kr.co.pennyway.api.apis.users.service.DeviceRegisterService;
 import kr.co.pennyway.api.apis.users.service.UserProfileUpdateService;
@@ -40,9 +39,6 @@ import static org.springframework.test.util.AssertionErrors.*;
 @ActiveProfiles("test")
 @TestClassOrder(ClassOrderer.OrderAnnotation.class)
 class UserAccountUseCaseTest extends ExternalApiDBTestConfig {
-    @Autowired
-    private EntityManager em;
-
     @Autowired
     private UserService userService;
 
