@@ -69,4 +69,12 @@ public class UserAccountUseCase {
 
         userProfileUpdateService.updateName(user, newName);
     }
+
+    @Transactional
+    public void updateUsername(Long userId, String newUsername) {
+        User user = userService.readUser(userId).orElseThrow(
+                () -> new UserErrorException(UserErrorCode.NOT_FOUND)
+        );
+
+    }
 }
