@@ -79,8 +79,8 @@ public class UserAccountControllerUnitTest {
 
     @Nested
     @Order(2)
-    @DisplayName("[2] 사용자 이름, 닉네임 수정 테스트")
-    class UpdateUserProfileTest {
+    @DisplayName("[2] 사용자 이름 수정 테스트")
+    class UpdateNameTest {
         @DisplayName("사용자 이름 수정 요청 시, 유효성 검사에 실패하면 422 에러를 반환한다.")
         @Test
         @WithSecurityMockUser
@@ -145,6 +145,89 @@ public class UserAccountControllerUnitTest {
         private ResultActions performUpdateNameRequest(String newName) throws Exception {
             UserProfileUpdateDto.NameReq request = new UserProfileUpdateDto.NameReq(newName);
             return mockMvc.perform(put("/v2/users/me/name")
+                    .contentType("application/json")
+                    .content(objectMapper.writeValueAsString(request)));
+        }
+    }
+
+    @Nested
+    @Order(3)
+    @DisplayName("[3] 사용자 닉네임 수정 테스트")
+    class UpdateNicknameTest {
+        @DisplayName("사용자 닉네임 수정 요청 시, 유효성 검사에 실패하면 422 에러를 반환한다.")
+        @Test
+        @WithSecurityMockUser
+        void updateNicknameValidationFail() throws Exception {
+            // given
+            String newNicknameWithBlank = " ";
+            String newNicknameWithOverLength = "한글이름";
+            String newNicknameWithSpecialCharacter = "hello!";
+            String newNicknameWithWhiteSpace = "jay ang";
+            String newNicknameWithOverLengthAndWhiteSpace = "myNameisJayangHello";
+            String expectedErrorCode = String.valueOf(StatusCode.UNPROCESSABLE_CONTENT.getCode() * 10 + REQUIRED_PARAMETERS_MISSING_IN_REQUEST_BODY.getCode());
+
+            // when
+            ResultActions result1 = performUpdateNicknameRequest(newNicknameWithBlank);
+            ResultActions result2 = performUpdateNicknameRequest(newNicknameWithOverLength);
+            ResultActions result3 = performUpdateNicknameRequest(newNicknameWithSpecialCharacter);
+            ResultActions result4 = performUpdateNicknameRequest(newNicknameWithWhiteSpace);
+            ResultActions result5 = performUpdateNicknameRequest(newNicknameWithOverLengthAndWhiteSpace);
+
+            // then
+            result1.andExpect(status().isUnprocessableEntity())
+                    .andExpect(jsonPath("$.code").value(expectedErrorCode))
+                    .andDo(print());
+            result2.andExpect(status().isUnprocessableEntity())
+                    .andExpect(jsonPath("$.code").value(expectedErrorCode))
+                    .andDo(print());
+            result3.andExpect(status().isUnprocessableEntity())
+                    .andExpect(jsonPath("$.code").value(expectedErrorCode))
+                    .andDo(print());
+            result4.andExpect(status().isUnprocessableEntity())
+                    .andExpect(jsonPath("$.code").value(expectedErrorCode))
+                    .andDo(print());
+            result5.andExpect(status().isUnprocessableEntity())
+                    .andExpect(jsonPath("$.code").value(expectedErrorCode))
+                    .andDo(print());
+        }
+
+        @DisplayName("사용자 닉네임 수정 요청 시, 삭제된 사용자인 경우 404 에러를 반환한다.")
+        @Test
+        @WithSecurityMockUser
+        void updateNicknameDeletedUser() throws Exception {
+            // given
+            String newNickname = "양재서";
+            willThrow(new UserErrorException(UserErrorCode.NOT_FOUND)).given(userAccountUseCase).updateNickname(1L, newNickname);
+
+            // when
+            ResultActions result = performUpdateNicknameRequest(newNickname);
+
+            // then
+            result.andExpect(status().isNotFound())
+                    .andExpect(jsonPath("$.code").value(UserErrorCode.NOT_FOUND.causedBy().getCode()))
+                    .andExpect(jsonPath("$.message").value(UserErrorCode.NOT_FOUND.getExplainError()))
+                    .andDo(print());
+        }
+
+        @DisplayName("사용자 닉네임 수정 요청 시, 사용자 닉네임이 정상적으로 수정되면 200 코드를 반환한다.")
+        @Test
+        @WithSecurityMockUser
+        void updateNicknameSuccess() throws Exception {
+            // given
+            String newNickname = "양재서";
+
+            // when
+            ResultActions result = performUpdateNicknameRequest(newNickname);
+
+            // then
+            result.andExpect(status().isOk())
+                    .andExpect(jsonPath("$.code").value("2000"))
+                    .andDo(print());
+        }
+
+        private ResultActions performUpdateNicknameRequest(String newNickname) throws Exception {
+            UserProfileUpdateDto.NicknameReq request = new UserProfileUpdateDto.NicknameReq(newNickname);
+            return mockMvc.perform(put("/v2/users/me/nickname")
                     .contentType("application/json")
                     .content(objectMapper.writeValueAsString(request)));
         }
