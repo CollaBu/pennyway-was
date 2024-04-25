@@ -45,7 +45,7 @@ public class UserAccountController implements UserAccountApi {
     }
 
     @Override
-    @PutMapping("/name")
+    @PatchMapping("/name")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> putName(UserProfileUpdateDto.NameReq request, SecurityUserDetails user) {
         userAccountUseCase.updateName(user.getUserId(), request.name());
@@ -53,7 +53,7 @@ public class UserAccountController implements UserAccountApi {
     }
 
     @Override
-    @PutMapping("/username")
+    @PatchMapping("/username")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> putUsername(UserProfileUpdateDto.UsernameReq request, SecurityUserDetails user) {
         userAccountUseCase.updateUsername(user.getUserId(), request.username());
