@@ -3,6 +3,7 @@ package kr.co.pennyway.api.apis.users.controller;
 import jakarta.validation.constraints.NotBlank;
 import kr.co.pennyway.api.apis.users.api.UserAccountApi;
 import kr.co.pennyway.api.apis.users.dto.DeviceDto;
+import kr.co.pennyway.api.apis.users.dto.UserProfileUpdateDto;
 import kr.co.pennyway.api.apis.users.usecase.UserAccountUseCase;
 import kr.co.pennyway.api.common.response.SuccessResponse;
 import kr.co.pennyway.api.common.security.authentication.SecurityUserDetails;
@@ -21,12 +22,14 @@ import org.springframework.web.bind.annotation.*;
 public class UserAccountController implements UserAccountApi {
     private final UserAccountUseCase userAccountUseCase;
 
+    @Override
     @PutMapping("/devices")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> putDevice(@RequestBody @Validated DeviceDto.RegisterReq request, @AuthenticationPrincipal SecurityUserDetails user) {
         return ResponseEntity.ok(SuccessResponse.from("device", userAccountUseCase.registerDevice(user.getUserId(), request)));
     }
 
+    @Override
     @DeleteMapping("/devices")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> deleteDevice(@RequestParam("token") @Validated @NotBlank String token, @AuthenticationPrincipal SecurityUserDetails user) {
@@ -34,9 +37,18 @@ public class UserAccountController implements UserAccountApi {
         return ResponseEntity.ok(SuccessResponse.noContent());
     }
 
+    @Override
     @GetMapping("")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> getMyAccount(@AuthenticationPrincipal SecurityUserDetails user) {
         return ResponseEntity.ok(SuccessResponse.from("user", userAccountUseCase.getMyAccount(user.getUserId())));
+    }
+
+    @Override
+    @PutMapping("/name")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> putName(UserProfileUpdateDto.NameReq request, SecurityUserDetails user) {
+        userAccountUseCase.updateName(user.getUserId(), request.name());
+        return ResponseEntity.ok(SuccessResponse.noContent());
     }
 }
