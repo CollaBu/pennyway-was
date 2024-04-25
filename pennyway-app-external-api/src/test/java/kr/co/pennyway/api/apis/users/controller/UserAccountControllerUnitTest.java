@@ -5,6 +5,7 @@ import kr.co.pennyway.api.apis.users.dto.DeviceDto;
 import kr.co.pennyway.api.apis.users.dto.UserProfileUpdateDto;
 import kr.co.pennyway.api.apis.users.usecase.UserAccountUseCase;
 import kr.co.pennyway.api.config.supporter.WithSecurityMockUser;
+import kr.co.pennyway.common.exception.StatusCode;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorCode;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorException;
 import org.junit.jupiter.api.*;
@@ -17,7 +18,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import static kr.co.pennyway.common.exception.ReasonCode.TYPE_MISMATCH_ERROR_IN_REQUEST_BODY;
+import static kr.co.pennyway.common.exception.ReasonCode.REQUIRED_PARAMETERS_MISSING_IN_REQUEST_BODY;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willThrow;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -88,6 +89,7 @@ public class UserAccountControllerUnitTest {
             String newNameWithBlank = " ";
             String newNameWithOverLength = "안녕하세요장페르센입니다";
             String newNameWithSpecialCharacter = "hello!";
+            String expectedErrorCode = String.valueOf(StatusCode.UNPROCESSABLE_CONTENT.getCode() * 10 + REQUIRED_PARAMETERS_MISSING_IN_REQUEST_BODY.getCode());
 
             // when
             ResultActions result1 = performUpdateNameRequest(newNameWithBlank);
@@ -96,13 +98,13 @@ public class UserAccountControllerUnitTest {
 
             // then
             result1.andExpect(status().isUnprocessableEntity())
-                    .andExpect(jsonPath("$.code").value(TYPE_MISMATCH_ERROR_IN_REQUEST_BODY.getCode()))
+                    .andExpect(jsonPath("$.code").value(expectedErrorCode))
                     .andDo(print());
             result2.andExpect(status().isUnprocessableEntity())
-                    .andExpect(jsonPath("$.code").value(TYPE_MISMATCH_ERROR_IN_REQUEST_BODY.getCode()))
+                    .andExpect(jsonPath("$.code").value(expectedErrorCode))
                     .andDo(print());
             result3.andExpect(status().isUnprocessableEntity())
-                    .andExpect(jsonPath("$.code").value(TYPE_MISMATCH_ERROR_IN_REQUEST_BODY.getCode()))
+                    .andExpect(jsonPath("$.code").value(expectedErrorCode))
                     .andDo(print());
         }
 
