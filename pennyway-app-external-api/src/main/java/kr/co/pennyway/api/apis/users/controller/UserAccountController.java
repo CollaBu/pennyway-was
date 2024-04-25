@@ -51,4 +51,12 @@ public class UserAccountController implements UserAccountApi {
         userAccountUseCase.updateName(user.getUserId(), request.name());
         return ResponseEntity.ok(SuccessResponse.noContent());
     }
+
+    @Override
+    @PutMapping("/username")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> putUsername(UserProfileUpdateDto.UsernameReq request, SecurityUserDetails user) {
+        userAccountUseCase.updateUsername(user.getUserId(), request.username());
+        return ResponseEntity.ok(SuccessResponse.noContent());
+    }
 }

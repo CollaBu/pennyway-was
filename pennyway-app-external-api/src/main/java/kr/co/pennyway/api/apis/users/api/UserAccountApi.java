@@ -64,4 +64,7 @@ public interface UserAccountApi {
 
     @Operation(summary = "사용자 이름 수정")
     ResponseEntity<?> putName(@RequestBody @Validated UserProfileUpdateDto.NameReq request, @AuthenticationPrincipal SecurityUserDetails user);
+
+    @Operation(summary = "사용자 아이디 수정")
+    ResponseEntity<?> putUsername(@RequestBody @Validated UserProfileUpdateDto.UsernameReq request, @AuthenticationPrincipal SecurityUserDetails user);
 }

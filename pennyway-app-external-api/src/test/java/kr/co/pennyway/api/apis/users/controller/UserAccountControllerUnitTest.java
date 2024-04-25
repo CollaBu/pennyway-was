@@ -226,7 +226,7 @@ public class UserAccountControllerUnitTest {
         }
 
         private ResultActions performUpdateNicknameRequest(String newNickname) throws Exception {
-            UserProfileUpdateDto.NicknameReq request = new UserProfileUpdateDto.NicknameReq(newNickname);
+            UserProfileUpdateDto.UsernameReq request = new UserProfileUpdateDto.UsernameReq(newNickname);
             return mockMvc.perform(put("/v2/users/me/nickname")
                     .contentType("application/json")
                     .content(objectMapper.writeValueAsString(request)));
