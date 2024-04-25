@@ -45,7 +45,14 @@ public class UserAccountController implements UserAccountApi {
     @Override
     @PutMapping("/notifications")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> putNotifySetting(@RequestParam NotifySetting.NotifyType type, @RequestBody @Validated UserProfileDto.NotifySettingReq request, @AuthenticationPrincipal SecurityUserDetails user) {
-        return ResponseEntity.ok(SuccessResponse.from("notifySetting", userAccountUseCase.putNotifySetting(user.getUserId(), type, request)));
+    public ResponseEntity<?> putNotifySetting(@RequestParam NotifySetting.NotifyType type, @AuthenticationPrincipal SecurityUserDetails user) {
+        return ResponseEntity.ok(SuccessResponse.from("notifySetting", userAccountUseCase.activateNotification(user.getUserId(), type)));
+    }
+
+    @Override
+    @DeleteMapping("/notifications")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> deleteNotifySetting(@RequestParam NotifySetting.NotifyType type, @AuthenticationPrincipal SecurityUserDetails user) {
+        return ResponseEntity.ok(SuccessResponse.from("notifySetting", userAccountUseCase.deactivateNotification(user.getUserId(), type));
     }
 }
