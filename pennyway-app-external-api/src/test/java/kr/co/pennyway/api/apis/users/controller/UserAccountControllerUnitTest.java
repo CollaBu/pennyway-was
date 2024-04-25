@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.pennyway.api.apis.users.dto.DeviceDto;
 import kr.co.pennyway.api.apis.users.usecase.UserAccountUseCase;
 import kr.co.pennyway.api.config.supporter.WithSecurityMockUser;
+import kr.co.pennyway.domain.domains.user.exception.UserErrorCode;
+import kr.co.pennyway.domain.domains.user.exception.UserErrorException;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -14,6 +16,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import static kr.co.pennyway.common.exception.ReasonCode.TYPE_MISMATCH_ERROR_IN_REQUEST_BODY;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -80,11 +83,25 @@ public class UserAccountControllerUnitTest {
         @WithSecurityMockUser
         void updateNameValidationFail() throws Exception {
             // given
+            String newNameWithBlank = " ";
+            String newNameWithOverLength = "안녕하세요장페르센입니다";
+            String newNameWithSpecialCharacter = "hello!";
 
             // when
+            ResultActions result1 = performUpdateNameRequest(newNameWithBlank);
+            ResultActions result2 = performUpdateNameRequest(newNameWithOverLength);
+            ResultActions result3 = performUpdateNameRequest(newNameWithSpecialCharacter);
 
             // then
-
+            result1.andExpect(status().isUnprocessableEntity())
+                    .andExpect(jsonPath("$.code").value(TYPE_MISMATCH_ERROR_IN_REQUEST_BODY.getCode()))
+                    .andDo(print());
+            result2.andExpect(status().isUnprocessableEntity())
+                    .andExpect(jsonPath("$.code").value(TYPE_MISMATCH_ERROR_IN_REQUEST_BODY.getCode()))
+                    .andDo(print());
+            result3.andExpect(status().isUnprocessableEntity())
+                    .andExpect(jsonPath("$.code").value(TYPE_MISMATCH_ERROR_IN_REQUEST_BODY.getCode()))
+                    .andDo(print());
         }
 
         @DisplayName("사용자 이름 수정 요청 시, 일반 회원가입 계정이 아니면 400 에러를 반환한다.")
@@ -92,11 +109,17 @@ public class UserAccountControllerUnitTest {
         @WithSecurityMockUser
         void updateNameNotGeneralSignedUpUser() throws Exception {
             // given
+            String newName = "양재서";
+            given(userAccountUseCase.updateName(1L, newName)).willThrow(new UserErrorException(UserErrorCode.DO_NOT_GENERAL_SIGNED_UP));
 
             // when
+            ResultActions result = performUpdateNameRequest(newName);
 
             // then
-
+            result.andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.code").value(UserErrorCode.DO_NOT_GENERAL_SIGNED_UP.causedBy().getCode()))
+                    .andExpect(jsonPath("$.message").value(UserErrorCode.DO_NOT_GENERAL_SIGNED_UP.getExplainError())
+                    .andDo(print());
         }
 
         @DisplayName("사용자 이름 수정 요청 시, 삭제된 사용자인 경우 404 에러를 반환한다.")
@@ -104,11 +127,17 @@ public class UserAccountControllerUnitTest {
         @WithSecurityMockUser
         void updateNameDeletedUser() throws Exception {
             // given
+            String newName = "양재서";
+            given(userAccountUseCase.updateName(1L, newName)).willThrow(new UserErrorException(UserErrorCode.NOT_FOUND));
 
             // when
+            ResultActions result = performUpdateNameRequest(newName);
 
             // then
-
+            result.andExpect(status().isNotFound())
+                    .andExpect(jsonPath("$.code").value(UserErrorCode.NOT_FOUND.causedBy().getCode()))
+                    .andExpect(jsonPath("$.message").value(UserErrorCode.NOT_FOUND.getExplainError()))
+                    .andDo(print());
         }
 
         @DisplayName("사용자 이름 수정 요청 시, 사용자 이름이 정상적으로 수정되면 200 코드를 반환한다.")
@@ -116,11 +145,22 @@ public class UserAccountControllerUnitTest {
         @WithSecurityMockUser
         void updateNameSuccess() throws Exception {
             // given
+            String newName = "양재서";
 
             // when
+            ResultActions result = performUpdateNameRequest(newName);
 
             // then
+            result.andExpect(status().isOk())
+                    .andExpect(jsonPath("$.code").value("2000"))
+                    .andDo(print());
+        }
 
+        private ResultActions performUpdateNameRequest(String newName) {
+            UserAccountUpdateDto.NameReq request = new UserAccountUpdateDto.NameReq(newName);
+            return mockMvc.perform(put("/v2/users/me/name")
+                    .contentType("application/json")
+                    .content(objectMapper.writeValueAsString(request)));
         }
     }
 }
