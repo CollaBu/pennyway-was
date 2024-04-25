@@ -71,4 +71,56 @@ public class UserAccountControllerUnitTest {
         }
     }
 
+    @Nested
+    @Order(2)
+    @DisplayName("[2] 사용자 이름, 닉네임 수정 테스트")
+    class UpdateUserProfileTest {
+        @DisplayName("사용자 이름 수정 요청 시, 유효성 검사에 실패하면 422 에러를 반환한다.")
+        @Test
+        @WithSecurityMockUser
+        void updateNameValidationFail() throws Exception {
+            // given
+
+            // when
+
+            // then
+
+        }
+
+        @DisplayName("사용자 이름 수정 요청 시, 일반 회원가입 계정이 아니면 400 에러를 반환한다.")
+        @Test
+        @WithSecurityMockUser
+        void updateNameNotGeneralSignedUpUser() throws Exception {
+            // given
+
+            // when
+
+            // then
+
+        }
+
+        @DisplayName("사용자 이름 수정 요청 시, 삭제된 사용자인 경우 404 에러를 반환한다.")
+        @Test
+        @WithSecurityMockUser
+        void updateNameDeletedUser() throws Exception {
+            // given
+
+            // when
+
+            // then
+
+        }
+
+        @DisplayName("사용자 이름 수정 요청 시, 사용자 이름이 정상적으로 수정되면 200 코드를 반환한다.")
+        @Test
+        @WithSecurityMockUser
+        void updateNameSuccess() throws Exception {
+            // given
+
+            // when
+
+            // then
+
+        }
+    }
 }
