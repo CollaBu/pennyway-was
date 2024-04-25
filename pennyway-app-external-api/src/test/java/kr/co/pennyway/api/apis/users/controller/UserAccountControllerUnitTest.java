@@ -108,24 +108,6 @@ public class UserAccountControllerUnitTest {
                     .andDo(print());
         }
 
-        @DisplayName("사용자 이름 수정 요청 시, 일반 회원가입 계정이 아니면 400 에러를 반환한다.")
-        @Test
-        @WithSecurityMockUser
-        void updateNameNotGeneralSignedUpUser() throws Exception {
-            // given
-            String newName = "양재서";
-            willThrow(new UserErrorException(UserErrorCode.DO_NOT_GENERAL_SIGNED_UP)).given(userAccountUseCase).updateName(1L, newName);
-
-            // when
-            ResultActions result = performUpdateNameRequest(newName);
-
-            // then
-            result.andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.code").value(UserErrorCode.DO_NOT_GENERAL_SIGNED_UP.causedBy().getCode()))
-                    .andExpect(jsonPath("$.message").value(UserErrorCode.DO_NOT_GENERAL_SIGNED_UP.getExplainError()))
-                    .andDo(print());
-        }
-
         @DisplayName("사용자 이름 수정 요청 시, 삭제된 사용자인 경우 404 에러를 반환한다.")
         @Test
         @WithSecurityMockUser
