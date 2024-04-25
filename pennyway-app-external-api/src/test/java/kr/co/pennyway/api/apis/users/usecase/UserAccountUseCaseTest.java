@@ -5,12 +5,15 @@ import kr.co.pennyway.api.apis.users.dto.DeviceDto;
 import kr.co.pennyway.api.apis.users.service.DeviceRegisterService;
 import kr.co.pennyway.api.config.ExternalApiDBTestConfig;
 import kr.co.pennyway.api.config.fixture.DeviceFixture;
+import kr.co.pennyway.api.config.fixture.UserFixture;
 import kr.co.pennyway.domain.config.JpaConfig;
 import kr.co.pennyway.domain.domains.device.domain.Device;
 import kr.co.pennyway.domain.domains.device.exception.DeviceErrorCode;
 import kr.co.pennyway.domain.domains.device.exception.DeviceErrorException;
 import kr.co.pennyway.domain.domains.device.service.DeviceService;
 import kr.co.pennyway.domain.domains.user.domain.User;
+import kr.co.pennyway.domain.domains.user.exception.UserErrorCode;
+import kr.co.pennyway.domain.domains.user.exception.UserErrorException;
 import kr.co.pennyway.domain.domains.user.service.UserService;
 import kr.co.pennyway.domain.domains.user.type.ProfileVisibility;
 import kr.co.pennyway.domain.domains.user.type.Role;
@@ -247,5 +250,40 @@ class UserAccountUseCaseTest extends ExternalApiDBTestConfig {
         }
     }
 
+    @Order(3)
+    @Nested
+    @DisplayName("[3] 사용자 이름 수정 테스트")
+    class UpdateNameTest {
+        @Test
+        @Transactional
+        @DisplayName("사용자가 삭제된 유저인 경우 NOT_FOUND 에러를 반환한다.")
+        void updateNameWhenUserIsDeleted() {
+            // given
+            String newName = "양재서";
+            User originUser = UserFixture.GENERAL_USER.toUser();
+            userService.createUser(originUser);
+            userService.deleteUser(originUser);
 
+            // when - then
+            UserErrorException ex = assertThrows(UserErrorException.class, () -> userAccountUseCase.updateName(requestUser.getId(), newName));
+            assertEquals("삭제된 사용자인 경우 Not Found를 반환한다.", UserErrorCode.NOT_FOUND, ex.getBaseErrorCode());
+        }
+
+        @Test
+        @Transactional
+        @DisplayName("사용자의 이름이 성공적으로 변경된다.")
+        void updateName() {
+            // given
+            User originUser = UserFixture.GENERAL_USER.toUser();
+            userService.createUser(originUser);
+            String newName = "양재서";
+
+            // when
+            userAccountUseCase.updateName(requestUser.getId(), newName);
+
+            // then
+            User updatedUser = userService.readUser(requestUser.getId()).orElseThrow();
+            assertEquals("사용자 이름이 변경되어 있어야 한다.", newName, updatedUser.getName());
+        }
+    }
 }
