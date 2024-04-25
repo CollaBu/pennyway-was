@@ -33,11 +33,11 @@ public class NotifySetting {
                 .build();
     }
 
-    public void updateNotifySetting(NotifyType notifyType, Boolean notify) {
+    public void updateNotifySetting(NotifyType notifyType, Boolean flag) {
         switch (notifyType) {
-            case ACCOUNT_BOOK -> this.accountBookNotify = notify;
-            case FEED -> this.feedNotify = notify;
-            case CHAT -> this.chatNotify = notify;
+            case ACCOUNT_BOOK -> this.accountBookNotify = flag;
+            case FEED -> this.feedNotify = flag;
+            case CHAT -> this.chatNotify = flag;
         }
     }
 
