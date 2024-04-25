@@ -28,9 +28,7 @@ public class UserAccountUseCase {
 
     @Transactional
     public DeviceDto.RegisterRes registerDevice(Long userId, DeviceDto.RegisterReq request) {
-        User user = userService.readUser(userId).orElseThrow(
-                () -> new UserErrorException(UserErrorCode.NOT_FOUND)
-        );
+        User user = readUserOrThrow(userId);
 
         Device device = deviceRegisterService.createOrUpdateDevice(user, request);
 
@@ -39,9 +37,7 @@ public class UserAccountUseCase {
 
     @Transactional
     public void unregisterDevice(Long userId, String token) {
-        User user = userService.readUser(userId).orElseThrow(
-                () -> new UserErrorException(UserErrorCode.NOT_FOUND)
-        );
+        User user = readUserOrThrow(userId);
 
         Device device = deviceService.readDeviceByUserIdAndToken(user.getId(), token).orElseThrow(
                 () -> new DeviceErrorException(DeviceErrorCode.NOT_FOUND_DEVICE)
@@ -52,28 +48,28 @@ public class UserAccountUseCase {
 
     @Transactional(readOnly = true)
     public UserProfileDto getMyAccount(Long userId) {
-        User user = userService.readUser(userId).orElseThrow(
-                () -> new UserErrorException(UserErrorCode.NOT_FOUND)
-        );
+        User user = readUserOrThrow(userId);
 
         return UserProfileDto.from(user);
     }
 
     @Transactional
     public void activateNotification(Long userId, NotifySetting.NotifyType type) {
-        User user = userService.readUser(userId).orElseThrow(
-                () -> new UserErrorException(UserErrorCode.NOT_FOUND)
-        );
+        User user = readUserOrThrow(userId);
 
         user.activateNotifySetting(type);
     }
 
     @Transactional
     public void deactivateNotification(Long userId, NotifySetting.NotifyType type) {
-        User user = userService.readUser(userId).orElseThrow(
-                () -> new UserErrorException(UserErrorCode.NOT_FOUND)
-        );
+        User user = readUserOrThrow(userId);
 
         user.deactivateNotifySetting(type);
+    }
+
+    private User readUserOrThrow(Long userId) {
+        return userService.readUser(userId).orElseThrow(
+                () -> new UserErrorException(UserErrorCode.NOT_FOUND)
+        );
     }
 }
