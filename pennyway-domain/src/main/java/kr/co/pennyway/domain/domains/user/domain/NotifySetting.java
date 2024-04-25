@@ -32,4 +32,16 @@ public class NotifySetting {
                 .chatNotify(chatNotify)
                 .build();
     }
+
+    public void updateNotifySetting(NotifyType notifyType, Boolean notify) {
+        switch (notifyType) {
+            case ACCOUNT_BOOK -> this.accountBookNotify = notify;
+            case FEED -> this.feedNotify = notify;
+            case CHAT -> this.chatNotify = notify;
+        }
+    }
+
+    enum NotifyType {
+        ACCOUNT_BOOK, FEED, CHAT
+    }
 }
