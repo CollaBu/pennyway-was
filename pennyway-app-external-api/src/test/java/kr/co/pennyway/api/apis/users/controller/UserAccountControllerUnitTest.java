@@ -196,8 +196,8 @@ public class UserAccountControllerUnitTest {
         @WithSecurityMockUser
         void updateNicknameDeletedUser() throws Exception {
             // given
-            String newNickname = "양재서";
-            willThrow(new UserErrorException(UserErrorCode.NOT_FOUND)).given(userAccountUseCase).updateNickname(1L, newNickname);
+            String newNickname = "jayang._.";
+            willThrow(new UserErrorException(UserErrorCode.NOT_FOUND)).given(userAccountUseCase).updateUsername(1L, newNickname);
 
             // when
             ResultActions result = performUpdateNicknameRequest(newNickname);
@@ -214,7 +214,7 @@ public class UserAccountControllerUnitTest {
         @WithSecurityMockUser
         void updateNicknameSuccess() throws Exception {
             // given
-            String newNickname = "양재서";
+            String newNickname = "jayang._.";
 
             // when
             ResultActions result = performUpdateNicknameRequest(newNickname);
@@ -227,7 +227,7 @@ public class UserAccountControllerUnitTest {
 
         private ResultActions performUpdateNicknameRequest(String newNickname) throws Exception {
             UserProfileUpdateDto.UsernameReq request = new UserProfileUpdateDto.UsernameReq(newNickname);
-            return mockMvc.perform(put("/v2/users/me/nickname")
+            return mockMvc.perform(put("/v2/users/me/username")
                     .contentType("application/json")
                     .content(objectMapper.writeValueAsString(request)));
         }
