@@ -2,6 +2,7 @@ package kr.co.pennyway.api.apis.users.usecase;
 
 import kr.co.pennyway.api.apis.users.dto.DeviceDto;
 import kr.co.pennyway.api.apis.users.dto.UserProfileDto;
+import kr.co.pennyway.api.apis.users.dto.UserProfileUpdateDto;
 import kr.co.pennyway.api.apis.users.service.DeviceRegisterService;
 import kr.co.pennyway.api.apis.users.service.UserProfileUpdateService;
 import kr.co.pennyway.common.annotation.UseCase;
@@ -56,17 +57,19 @@ public class UserAccountUseCase {
     }
 
     @Transactional
-    public void activateNotification(Long userId, NotifySetting.NotifyType type) {
+    public UserProfileUpdateDto.NotifySettingUpdateReq activateNotification(Long userId, NotifySetting.NotifyType type) {
         User user = readUserOrThrow(userId);
 
         userProfileUpdateService.updateNotifySetting(user, type, Boolean.TRUE);
+        return UserProfileUpdateDto.NotifySettingUpdateReq.of(type, Boolean.TRUE);
     }
 
     @Transactional
-    public void deactivateNotification(Long userId, NotifySetting.NotifyType type) {
+    public UserProfileUpdateDto.NotifySettingUpdateReq deactivateNotification(Long userId, NotifySetting.NotifyType type) {
         User user = readUserOrThrow(userId);
 
         userProfileUpdateService.updateNotifySetting(user, type, Boolean.FALSE);
+        return UserProfileUpdateDto.NotifySettingUpdateReq.of(type, Boolean.FALSE);
     }
 
     private User readUserOrThrow(Long userId) {

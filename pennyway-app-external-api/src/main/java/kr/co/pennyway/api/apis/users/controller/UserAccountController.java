@@ -3,7 +3,6 @@ package kr.co.pennyway.api.apis.users.controller;
 import jakarta.validation.constraints.NotBlank;
 import kr.co.pennyway.api.apis.users.api.UserAccountApi;
 import kr.co.pennyway.api.apis.users.dto.DeviceDto;
-import kr.co.pennyway.api.apis.users.dto.UserProfileDto;
 import kr.co.pennyway.api.apis.users.usecase.UserAccountUseCase;
 import kr.co.pennyway.api.common.response.SuccessResponse;
 import kr.co.pennyway.api.common.security.authentication.SecurityUserDetails;
@@ -53,6 +52,6 @@ public class UserAccountController implements UserAccountApi {
     @DeleteMapping("/notifications")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> deleteNotifySetting(@RequestParam NotifySetting.NotifyType type, @AuthenticationPrincipal SecurityUserDetails user) {
-        return ResponseEntity.ok(SuccessResponse.from("notifySetting", userAccountUseCase.deactivateNotification(user.getUserId(), type));
+        return ResponseEntity.ok(SuccessResponse.from("notifySetting", userAccountUseCase.deactivateNotification(user.getUserId(), type)));
     }
 }
