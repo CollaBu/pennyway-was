@@ -37,6 +37,7 @@ import static org.springframework.test.util.AssertionErrors.*;
 @ContextConfiguration(classes = {JpaConfig.class, UserAccountUseCase.class, DeviceRegisterService.class, UserService.class, DeviceService.class})
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ActiveProfiles("test")
+@TestClassOrder(ClassOrderer.OrderAnnotation.class)
 class UserAccountUseCaseTest extends ExternalApiDBTestConfig {
     @Autowired
     private UserService userService;
