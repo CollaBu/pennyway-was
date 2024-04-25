@@ -57,4 +57,9 @@ public class UserAccountUseCase {
 
         return UserProfileDto.from(user);
     }
+
+    @Transactional
+    public void updateName(Long userId, String name) {
+
+    }
 }

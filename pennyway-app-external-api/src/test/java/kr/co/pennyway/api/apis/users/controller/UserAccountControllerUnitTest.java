@@ -19,6 +19,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 import static kr.co.pennyway.common.exception.ReasonCode.TYPE_MISMATCH_ERROR_IN_REQUEST_BODY;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.willThrow;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -111,7 +112,7 @@ public class UserAccountControllerUnitTest {
         void updateNameNotGeneralSignedUpUser() throws Exception {
             // given
             String newName = "양재서";
-            given(userAccountUseCase.updateName(1L, newName)).willThrow(new UserErrorException(UserErrorCode.DO_NOT_GENERAL_SIGNED_UP));
+            willThrow(new UserErrorException(UserErrorCode.DO_NOT_GENERAL_SIGNED_UP)).given(userAccountUseCase).updateName(1L, newName);
 
             // when
             ResultActions result = performUpdateNameRequest(newName);
@@ -129,7 +130,7 @@ public class UserAccountControllerUnitTest {
         void updateNameDeletedUser() throws Exception {
             // given
             String newName = "양재서";
-            given(userAccountUseCase.updateName(1L, newName)).willThrow(new UserErrorException(UserErrorCode.NOT_FOUND));
+            willThrow(new UserErrorException(UserErrorCode.NOT_FOUND)).given(userAccountUseCase).updateName(1L, newName);
 
             // when
             ResultActions result = performUpdateNameRequest(newName);
