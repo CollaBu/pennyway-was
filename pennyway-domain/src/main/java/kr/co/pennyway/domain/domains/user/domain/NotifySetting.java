@@ -41,7 +41,7 @@ public class NotifySetting {
         }
     }
 
-    enum NotifyType {
+    public enum NotifyType {
         ACCOUNT_BOOK, FEED, CHAT
     }
 }

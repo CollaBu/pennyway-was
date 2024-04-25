@@ -14,6 +14,7 @@ import jakarta.validation.constraints.NotBlank;
 import kr.co.pennyway.api.apis.users.dto.DeviceDto;
 import kr.co.pennyway.api.apis.users.dto.UserProfileDto;
 import kr.co.pennyway.api.common.security.authentication.SecurityUserDetails;
+import kr.co.pennyway.domain.domains.user.domain.NotifySetting;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
@@ -60,4 +61,10 @@ public interface UserAccountApi {
     @Operation(summary = "사용자 계정 조회", description = "사용자 본인의 계정 정보를 조회합니다.")
     @ApiResponse(responseCode = "200", content = @Content(schemaProperties = @SchemaProperty(name = "user", schema = @Schema(implementation = UserProfileDto.class))))
     ResponseEntity<?> getMyAccount(@AuthenticationPrincipal SecurityUserDetails user);
+
+    @Operation(summary = "사용자 알림 활성화")
+    @Parameter(name = "type", description = "알림 타입", examples = {
+            @ExampleObject(name = "가계부", value = "account_book"), @ExampleObject(name = "피드", value = "feed"), @ExampleObject(name = "채팅", value = "chat")
+    }, required = true, in = ParameterIn.QUERY)
+    ResponseEntity<?> putNotifySetting(@RequestParam NotifySetting.NotifyType type, @RequestBody @Validated UserProfileDto.NotifySettingReq request, @AuthenticationPrincipal SecurityUserDetails user);
 }
