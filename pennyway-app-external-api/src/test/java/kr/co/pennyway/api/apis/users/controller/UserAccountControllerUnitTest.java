@@ -22,8 +22,7 @@ import static kr.co.pennyway.common.exception.ReasonCode.REQUIRED_PARAMETERS_MIS
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willThrow;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -47,6 +46,7 @@ public class UserAccountControllerUnitTest {
                 .webAppContextSetup(webApplicationContext)
                 .defaultRequest(put("/**").with(csrf()))
                 .defaultRequest(delete("/**").with(csrf()))
+                .defaultRequest(patch("/**").with(csrf()))
                 .build();
     }
 
@@ -144,7 +144,7 @@ public class UserAccountControllerUnitTest {
 
         private ResultActions performUpdateNameRequest(String newName) throws Exception {
             UserProfileUpdateDto.NameReq request = new UserProfileUpdateDto.NameReq(newName);
-            return mockMvc.perform(put("/v2/users/me/name")
+            return mockMvc.perform(patch("/v2/users/me/name")
                     .contentType("application/json")
                     .content(objectMapper.writeValueAsString(request)));
         }
@@ -227,7 +227,7 @@ public class UserAccountControllerUnitTest {
 
         private ResultActions performUpdateNicknameRequest(String newNickname) throws Exception {
             UserProfileUpdateDto.UsernameReq request = new UserProfileUpdateDto.UsernameReq(newNickname);
-            return mockMvc.perform(put("/v2/users/me/username")
+            return mockMvc.perform(patch("/v2/users/me/username")
                     .contentType("application/json")
                     .content(objectMapper.writeValueAsString(request)));
         }
