@@ -4,9 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.pennyway.api.apis.users.dto.DeviceDto;
 import kr.co.pennyway.api.apis.users.usecase.UserAccountUseCase;
 import kr.co.pennyway.api.config.supporter.WithSecurityMockUser;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -26,6 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(controllers = {UserAccountController.class})
 @ActiveProfiles("local")
+@TestClassOrder(ClassOrderer.OrderAnnotation.class)
 public class UserAccountControllerUnitTest {
     @Autowired
     private MockMvc mockMvc;
@@ -45,25 +44,31 @@ public class UserAccountControllerUnitTest {
                 .build();
     }
 
-    @DisplayName("[1] 디바이스가 정상적으로 저장되었을 때, 디바이스 pk와 등록된 토큰을 반환한다.")
-    @Test
-    @WithSecurityMockUser
-    void putDeviceSuccess() throws Exception {
-        // given
-        DeviceDto.RegisterReq request = new DeviceDto.RegisterReq("newToken", "newToken", "modelA", "Windows");
-        DeviceDto.RegisterRes expectedResponse = new DeviceDto.RegisterRes(2L, "newToken");
-        given(userAccountUseCase.registerDevice(1L, request)).willReturn(expectedResponse);
+    @Nested
+    @Order(1)
+    @DisplayName("[1] 디바이스 요청 테스트")
+    class DeviceRequestTest {
+        @DisplayName("디바이스가 정상적으로 저장되었을 때, 디바이스 pk와 등록된 토큰을 반환한다.")
+        @Test
+        @WithSecurityMockUser
+        void putDevice() throws Exception {
+            // given
+            DeviceDto.RegisterReq request = new DeviceDto.RegisterReq("newToken", "newToken", "modelA", "Windows");
+            DeviceDto.RegisterRes expectedResponse = new DeviceDto.RegisterRes(2L, "newToken");
+            given(userAccountUseCase.registerDevice(1L, request)).willReturn(expectedResponse);
 
-        // when
-        ResultActions result = mockMvc.perform(put("/v2/users/me/devices")
-                .contentType("application/json")
-                .content(objectMapper.writeValueAsString(request)));
+            // when
+            ResultActions result = mockMvc.perform(put("/v2/users/me/devices")
+                    .contentType("application/json")
+                    .content(objectMapper.writeValueAsString(request)));
 
-        // then
-        result.andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value("2000"))
-                .andExpect(jsonPath("$.data.device.id").value(expectedResponse.id()))
-                .andExpect(jsonPath("$.data.device.token").value(expectedResponse.token()))
-                .andDo(print());
+            // then
+            result.andExpect(status().isOk())
+                    .andExpect(jsonPath("$.code").value("2000"))
+                    .andExpect(jsonPath("$.data.device.id").value(expectedResponse.id()))
+                    .andExpect(jsonPath("$.data.device.token").value(expectedResponse.token()))
+                    .andDo(print());
+        }
     }
+
 }
