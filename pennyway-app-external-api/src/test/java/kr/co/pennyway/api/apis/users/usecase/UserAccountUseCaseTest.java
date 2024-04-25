@@ -3,6 +3,7 @@ package kr.co.pennyway.api.apis.users.usecase;
 import jakarta.persistence.EntityManager;
 import kr.co.pennyway.api.apis.users.dto.DeviceDto;
 import kr.co.pennyway.api.apis.users.service.DeviceRegisterService;
+import kr.co.pennyway.api.apis.users.service.UserProfileUpdateService;
 import kr.co.pennyway.api.config.ExternalApiDBTestConfig;
 import kr.co.pennyway.api.config.fixture.DeviceFixture;
 import kr.co.pennyway.api.config.fixture.UserFixture;
@@ -34,11 +35,14 @@ import static org.springframework.test.util.AssertionErrors.*;
 
 @ExtendWith(MockitoExtension.class)
 @DataJpaTest(properties = "spring.jpa.hibernate.ddl-auto=create")
-@ContextConfiguration(classes = {JpaConfig.class, UserAccountUseCase.class, DeviceRegisterService.class, UserService.class, DeviceService.class})
+@ContextConfiguration(classes = {JpaConfig.class, UserAccountUseCase.class, DeviceRegisterService.class, UserService.class, DeviceService.class, UserProfileUpdateService.class})
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ActiveProfiles("test")
 @TestClassOrder(ClassOrderer.OrderAnnotation.class)
 class UserAccountUseCaseTest extends ExternalApiDBTestConfig {
+    @Autowired
+    private EntityManager em;
+
     @Autowired
     private UserService userService;
 
@@ -48,21 +52,18 @@ class UserAccountUseCaseTest extends ExternalApiDBTestConfig {
     @Autowired
     private UserAccountUseCase userAccountUseCase;
 
-    @Autowired
-    private EntityManager em;
-
-    private User requestUser;
-
-    @BeforeEach
-    void setUp() {
-        User user = User.builder().role(Role.USER).profileVisibility(ProfileVisibility.PUBLIC).build();
-        requestUser = userService.createUser(user);
-    }
-
     @Order(1)
     @Nested
     @DisplayName("[1] 디바이스 등록 테스트")
     class DeviceRegisterTest {
+        private User requestUser;
+
+        @BeforeEach
+        void setUp() {
+            User user = User.builder().role(Role.USER).profileVisibility(ProfileVisibility.PUBLIC).build();
+            requestUser = userService.createUser(user);
+        }
+
         @Test
         @Transactional
         @DisplayName("[1] originToken과 newToken이 같은 경우, 신규 디바이스를 등록한다.")
@@ -149,11 +150,8 @@ class UserAccountUseCaseTest extends ExternalApiDBTestConfig {
         void updateDeactivateDeviceToken() {
             // given
             Device originDevice = DeviceFixture.ORIGIN_DEVICE.toDevice(requestUser);
+            originDevice.deactivate();
             deviceService.createDevice(originDevice);
-            em.createQuery("UPDATE Device d SET d.activated = false WHERE d.id = :id AND d.token = :token")
-                    .setParameter("id", originDevice.getId())
-                    .setParameter("token", originDevice.getToken())
-                    .executeUpdate(); // 비활성화 처리
 
             System.out.println("originDevice = " + originDevice);
             DeviceDto.RegisterReq request = DeviceFixture.ONLY_TOKEN_CHANGED.toRegisterReq();
@@ -175,7 +173,6 @@ class UserAccountUseCaseTest extends ExternalApiDBTestConfig {
                     () -> fail("디바이스 토큰이 갱신되어 있어야 한다.")
             );
         }
-
 
         @Test
         @Transactional
@@ -221,6 +218,14 @@ class UserAccountUseCaseTest extends ExternalApiDBTestConfig {
     @Nested
     @DisplayName("[2] 디바이스 삭제 테스트")
     class DeviceUnregisterTest {
+        private User requestUser;
+
+        @BeforeEach
+        void setUp() {
+            User user = User.builder().role(Role.USER).profileVisibility(ProfileVisibility.PUBLIC).build();
+            requestUser = userService.createUser(user);
+        }
+
         @Test
         @Transactional
         @DisplayName("사용자 ID와 origin token에 매칭되는 활성 디바이스가 존재하는 경우 디바이스를 삭제한다.")
@@ -266,7 +271,7 @@ class UserAccountUseCaseTest extends ExternalApiDBTestConfig {
             userService.deleteUser(originUser);
 
             // when - then
-            UserErrorException ex = assertThrows(UserErrorException.class, () -> userAccountUseCase.updateName(requestUser.getId(), newName));
+            UserErrorException ex = assertThrows(UserErrorException.class, () -> userAccountUseCase.updateName(originUser.getId(), newName));
             assertEquals("삭제된 사용자인 경우 Not Found를 반환한다.", UserErrorCode.NOT_FOUND, ex.getBaseErrorCode());
         }
 
@@ -280,10 +285,10 @@ class UserAccountUseCaseTest extends ExternalApiDBTestConfig {
             String newName = "양재서";
 
             // when
-            userAccountUseCase.updateName(requestUser.getId(), newName);
+            userAccountUseCase.updateName(originUser.getId(), newName);
 
             // then
-            User updatedUser = userService.readUser(requestUser.getId()).orElseThrow();
+            User updatedUser = userService.readUser(originUser.getId()).orElseThrow();
             assertEquals("사용자 이름이 변경되어 있어야 한다.", newName, updatedUser.getName());
         }
     }
