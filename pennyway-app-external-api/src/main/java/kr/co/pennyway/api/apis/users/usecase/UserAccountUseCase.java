@@ -8,6 +8,7 @@ import kr.co.pennyway.domain.domains.device.domain.Device;
 import kr.co.pennyway.domain.domains.device.exception.DeviceErrorCode;
 import kr.co.pennyway.domain.domains.device.exception.DeviceErrorException;
 import kr.co.pennyway.domain.domains.device.service.DeviceService;
+import kr.co.pennyway.domain.domains.user.domain.NotifySetting;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorCode;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorException;
@@ -56,5 +57,23 @@ public class UserAccountUseCase {
         );
 
         return UserProfileDto.from(user);
+    }
+
+    @Transactional
+    public void activateNotification(Long userId, NotifySetting.NotifyType type) {
+        User user = userService.readUser(userId).orElseThrow(
+                () -> new UserErrorException(UserErrorCode.NOT_FOUND)
+        );
+
+        user.activateNotifySetting(type);
+    }
+
+    @Transactional
+    public void deactivateNotification(Long userId, NotifySetting.NotifyType type) {
+        User user = userService.readUser(userId).orElseThrow(
+                () -> new UserErrorException(UserErrorCode.NOT_FOUND)
+        );
+
+        user.deactivateNotifySetting(type);
     }
 }
