@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotBlank;
 import kr.co.pennyway.api.apis.users.dto.DeviceDto;
 import kr.co.pennyway.api.apis.users.dto.UserProfileDto;
+import kr.co.pennyway.api.apis.users.dto.UserProfileUpdateDto;
 import kr.co.pennyway.api.common.security.authentication.SecurityUserDetails;
 import kr.co.pennyway.domain.domains.user.domain.NotifySetting;
 import org.springframework.http.ResponseEntity;
@@ -61,6 +62,12 @@ public interface UserAccountApi {
     @Operation(summary = "사용자 계정 조회", description = "사용자 본인의 계정 정보를 조회합니다.")
     @ApiResponse(responseCode = "200", content = @Content(schemaProperties = @SchemaProperty(name = "user", schema = @Schema(implementation = UserProfileDto.class))))
     ResponseEntity<?> getMyAccount(@AuthenticationPrincipal SecurityUserDetails user);
+      
+    @Operation(summary = "사용자 이름 수정")
+    ResponseEntity<?> putName(@RequestBody @Validated UserProfileUpdateDto.NameReq request, @AuthenticationPrincipal SecurityUserDetails user);
+
+    @Operation(summary = "사용자 아이디 수정")
+    ResponseEntity<?> putUsername(@RequestBody @Validated UserProfileUpdateDto.UsernameReq request, @AuthenticationPrincipal SecurityUserDetails user);
 
     @Operation(summary = "사용자 알림 활성화")
     @Parameter(name = "type", description = "알림 타입", examples = {

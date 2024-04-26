@@ -55,6 +55,20 @@ public class UserAccountUseCase {
 
         return UserProfileDto.from(user);
     }
+  
+    @Transactional
+    public void updateName(Long userId, String newName) {
+        User user = readUserOrThrow(userId);
+
+        userProfileUpdateService.updateName(user, newName);
+    }
+
+    @Transactional
+    public void updateUsername(Long userId, String newUsername) {
+        User user = readUserOrThrow(userId);
+
+        userProfileUpdateService.updateUsername(user, newUsername);
+    }
 
     @Transactional
     public UserProfileUpdateDto.NotifySettingUpdateReq activateNotification(Long userId, NotifySetting.NotifyType type) {
