@@ -7,6 +7,7 @@ import kr.co.pennyway.api.apis.users.dto.UserProfileUpdateDto;
 import kr.co.pennyway.api.apis.users.usecase.UserAccountUseCase;
 import kr.co.pennyway.api.common.response.SuccessResponse;
 import kr.co.pennyway.api.common.security.authentication.SecurityUserDetails;
+import kr.co.pennyway.domain.domains.user.domain.NotifySetting;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -43,7 +44,7 @@ public class UserAccountController implements UserAccountApi {
     public ResponseEntity<?> getMyAccount(@AuthenticationPrincipal SecurityUserDetails user) {
         return ResponseEntity.ok(SuccessResponse.from("user", userAccountUseCase.getMyAccount(user.getUserId())));
     }
-
+  
     @Override
     @PatchMapping("/name")
     @PreAuthorize("isAuthenticated()")
@@ -58,5 +59,19 @@ public class UserAccountController implements UserAccountApi {
     public ResponseEntity<?> putUsername(UserProfileUpdateDto.UsernameReq request, SecurityUserDetails user) {
         userAccountUseCase.updateUsername(user.getUserId(), request.username());
         return ResponseEntity.ok(SuccessResponse.noContent());
+    }
+
+    @Override
+    @PatchMapping("/notifications")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> patchNotifySetting(@RequestParam NotifySetting.NotifyType type, @AuthenticationPrincipal SecurityUserDetails user) {
+        return ResponseEntity.ok(SuccessResponse.from("notifySetting", userAccountUseCase.activateNotification(user.getUserId(), type)));
+    }
+
+    @Override
+    @DeleteMapping("/notifications")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> deleteNotifySetting(@RequestParam NotifySetting.NotifyType type, @AuthenticationPrincipal SecurityUserDetails user) {
+        return ResponseEntity.ok(SuccessResponse.from("notifySetting", userAccountUseCase.deactivateNotification(user.getUserId(), type)));
     }
 }

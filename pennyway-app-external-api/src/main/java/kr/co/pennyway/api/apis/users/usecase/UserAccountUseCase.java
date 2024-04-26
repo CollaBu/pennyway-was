@@ -2,6 +2,7 @@ package kr.co.pennyway.api.apis.users.usecase;
 
 import kr.co.pennyway.api.apis.users.dto.DeviceDto;
 import kr.co.pennyway.api.apis.users.dto.UserProfileDto;
+import kr.co.pennyway.api.apis.users.dto.UserProfileUpdateDto;
 import kr.co.pennyway.api.apis.users.service.DeviceRegisterService;
 import kr.co.pennyway.api.apis.users.service.UserProfileUpdateService;
 import kr.co.pennyway.common.annotation.UseCase;
@@ -9,6 +10,7 @@ import kr.co.pennyway.domain.domains.device.domain.Device;
 import kr.co.pennyway.domain.domains.device.exception.DeviceErrorCode;
 import kr.co.pennyway.domain.domains.device.exception.DeviceErrorException;
 import kr.co.pennyway.domain.domains.device.service.DeviceService;
+import kr.co.pennyway.domain.domains.user.domain.NotifySetting;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorCode;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorException;
@@ -25,7 +27,6 @@ public class UserAccountUseCase {
     private final DeviceService deviceService;
 
     private final UserProfileUpdateService userProfileUpdateService;
-
     private final DeviceRegisterService deviceRegisterService;
 
     @Transactional
@@ -54,7 +55,7 @@ public class UserAccountUseCase {
 
         return UserProfileDto.from(user);
     }
-
+  
     @Transactional
     public void updateName(Long userId, String newName) {
         User user = readUserOrThrow(userId);
@@ -67,6 +68,22 @@ public class UserAccountUseCase {
         User user = readUserOrThrow(userId);
 
         userProfileUpdateService.updateUsername(user, newUsername);
+    }
+
+    @Transactional
+    public UserProfileUpdateDto.NotifySettingUpdateReq activateNotification(Long userId, NotifySetting.NotifyType type) {
+        User user = readUserOrThrow(userId);
+
+        userProfileUpdateService.updateNotifySetting(user, type, Boolean.TRUE);
+        return UserProfileUpdateDto.NotifySettingUpdateReq.of(type, Boolean.TRUE);
+    }
+
+    @Transactional
+    public UserProfileUpdateDto.NotifySettingUpdateReq deactivateNotification(Long userId, NotifySetting.NotifyType type) {
+        User user = readUserOrThrow(userId);
+
+        userProfileUpdateService.updateNotifySetting(user, type, Boolean.FALSE);
+        return UserProfileUpdateDto.NotifySettingUpdateReq.of(type, Boolean.FALSE);
     }
 
     private User readUserOrThrow(Long userId) {

@@ -15,6 +15,7 @@ import kr.co.pennyway.api.apis.users.dto.DeviceDto;
 import kr.co.pennyway.api.apis.users.dto.UserProfileDto;
 import kr.co.pennyway.api.apis.users.dto.UserProfileUpdateDto;
 import kr.co.pennyway.api.common.security.authentication.SecurityUserDetails;
+import kr.co.pennyway.domain.domains.user.domain.NotifySetting;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
@@ -61,10 +62,90 @@ public interface UserAccountApi {
     @Operation(summary = "사용자 계정 조회", description = "사용자 본인의 계정 정보를 조회합니다.")
     @ApiResponse(responseCode = "200", content = @Content(schemaProperties = @SchemaProperty(name = "user", schema = @Schema(implementation = UserProfileDto.class))))
     ResponseEntity<?> getMyAccount(@AuthenticationPrincipal SecurityUserDetails user);
-
+      
     @Operation(summary = "사용자 이름 수정")
     ResponseEntity<?> putName(@RequestBody @Validated UserProfileUpdateDto.NameReq request, @AuthenticationPrincipal SecurityUserDetails user);
 
     @Operation(summary = "사용자 아이디 수정")
     ResponseEntity<?> putUsername(@RequestBody @Validated UserProfileUpdateDto.UsernameReq request, @AuthenticationPrincipal SecurityUserDetails user);
+
+    @Operation(summary = "사용자 알림 활성화")
+    @Parameter(name = "type", description = "알림 타입", examples = {
+            @ExampleObject(name = "가계부", value = "account_book"), @ExampleObject(name = "피드", value = "feed"), @ExampleObject(name = "채팅", value = "chat")
+    }, required = true, in = ParameterIn.QUERY)
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", examples = {
+                    @ExampleObject(name = "가계부 알림 활성화", value = """
+                            {
+                                "code": "2000",
+                                "data": {
+                                    "notifySetting": {
+                                        "accountBookNotify": true
+                                    }
+                                }
+                            }
+                            """),
+                    @ExampleObject(name = "피드 알림 활성화", value = """
+                            {
+                                "code": "2000",
+                                "data": {
+                                    "notifySetting": {
+                                        "feedNotify": true
+                                    }
+                                }
+                            }
+                            """),
+                    @ExampleObject(name = "채팅 알림 활성화", value = """
+                            {
+                                "code": "2000",
+                                "data": {
+                                    "notifySetting": {
+                                        "chatNotify": true
+                                    }
+                                }
+                            }
+                            """)
+            }))
+    })
+    ResponseEntity<?> patchNotifySetting(@RequestParam NotifySetting.NotifyType type, @AuthenticationPrincipal SecurityUserDetails user);
+
+    @Operation(summary = "사용자 알림 비활성화")
+    @Parameter(name = "type", description = "알림 타입", examples = {
+            @ExampleObject(name = "가계부", value = "account_book"), @ExampleObject(name = "피드", value = "feed"), @ExampleObject(name = "채팅", value = "chat")
+    }, required = true, in = ParameterIn.QUERY)
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", examples = {
+                    @ExampleObject(name = "가계부 알림 비활성화", value = """
+                            {
+                                "code": "2000",
+                                "data": {
+                                    "notifySetting": {
+                                        "accountBookNotify": false
+                                    }
+                                }
+                            }
+                            """),
+                    @ExampleObject(name = "피드 알림 비활성화", value = """
+                            {
+                                "code": "2000",
+                                "data": {
+                                    "notifySetting": {
+                                        "feedNotify": false
+                                    }
+                                }
+                            }
+                            """),
+                    @ExampleObject(name = "채팅 알림 비활성화", value = """
+                            {
+                                "code": "2000",
+                                "data": {
+                                    "notifySetting": {
+                                        "chatNotify": false
+                                    }
+                                }
+                            }
+                            """)
+            }))
+    })
+    ResponseEntity<?> deleteNotifySetting(@RequestParam NotifySetting.NotifyType type, @AuthenticationPrincipal SecurityUserDetails user);
 }
