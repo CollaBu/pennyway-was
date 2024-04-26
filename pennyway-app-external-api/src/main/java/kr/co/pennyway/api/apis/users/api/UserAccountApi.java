@@ -100,7 +100,7 @@ public interface UserAccountApi {
                             """)
             }))
     })
-    ResponseEntity<?> putNotifySetting(@RequestParam NotifySetting.NotifyType type, @AuthenticationPrincipal SecurityUserDetails user);
+    ResponseEntity<?> patchNotifySetting(@RequestParam NotifySetting.NotifyType type, @AuthenticationPrincipal SecurityUserDetails user);
 
     @Operation(summary = "사용자 알림 비활성화")
     @Parameter(name = "type", description = "알림 타입", examples = {
