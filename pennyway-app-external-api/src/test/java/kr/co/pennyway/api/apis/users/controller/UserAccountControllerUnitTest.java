@@ -260,7 +260,7 @@ public class UserAccountControllerUnitTest {
         void verifyCurrentPasswordDeletedUser() throws Exception {
             // given
             String currentPassword = "currentPassword";
-            willThrow(new UserErrorException(UserErrorCode.NOT_FOUND)).given(userAccountUseCase).verifyCurrentPassword(currentPassword);
+            willThrow(new UserErrorException(UserErrorCode.NOT_FOUND)).given(userAccountUseCase).verifyPassword(currentPassword);
 
             // when
             ResultActions result = performVerifyCurrentPasswordRequest(currentPassword);
@@ -272,7 +272,7 @@ public class UserAccountControllerUnitTest {
                     .andDo(print());
         }
 
-        @DisplayName("[4-1-c] 사용자 현재 비밀번호 검증 시, 소셜 로그인 사용자인 경우 400 에러를 반환한다.")
+        @DisplayName("[4-1-c] 사용자 현재 비밀번호 검증 시, 일반 회원가입 이력이 없는 경우 403 에러를 반환한다.")
         @Test
         @WithSecurityMockUser
         void verifyCurrentPasswordSocialUser() throws Exception {
@@ -284,13 +284,13 @@ public class UserAccountControllerUnitTest {
             ResultActions result = performVerifyCurrentPasswordRequest(currentPassword);
 
             // then
-            result.andExpect(status().isBadRequest())
+            result.andExpect(status().isForbidden())
                     .andExpect(jsonPath("$.code").value(UserErrorCode.DO_NOT_GENERAL_SIGNED_UP.causedBy().getCode()))
                     .andExpect(jsonPath("$.message").value(UserErrorCode.DO_NOT_GENERAL_SIGNED_UP.getExplainError()))
                     .andDo(print());
         }
 
-        @DisplayName("[4-1-d] 사용자 현재 비밀번호 검증 시, 비밀번호가 일치하지 않으면 401 에러를 반환한다.")
+        @DisplayName("[4-1-d] 사용자 현재 비밀번호 검증 시, 비밀번호가 일치하지 않으면 400 에러를 반환한다.")
         @Test
         @WithSecurityMockUser
         void verifyCurrentPasswordFail() throws Exception {

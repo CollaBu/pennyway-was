@@ -17,7 +17,7 @@ public enum UserErrorCode implements BaseErrorCode {
 
     /* 403 FORBIDDEN */
     ALREADY_WITHDRAWAL(StatusCode.FORBIDDEN, ReasonCode.ACCESS_TO_THE_REQUESTED_RESOURCE_IS_FORBIDDEN, "이미 탈퇴한 유저입니다."),
-    DO_NOT_GENERAL_SIGNED_UP(StatusCode.BAD_REQUEST, ReasonCode.ACCESS_TO_THE_REQUESTED_RESOURCE_IS_FORBIDDEN, "일반 회원가입 계정이 아닙니다."),
+    DO_NOT_GENERAL_SIGNED_UP(StatusCode.FORBIDDEN, ReasonCode.ACCESS_TO_THE_REQUESTED_RESOURCE_IS_FORBIDDEN, "일반 회원가입 계정이 아닙니다."),
 
     /* 404 NOT_FOUND */
     NOT_FOUND(StatusCode.NOT_FOUND, ReasonCode.REQUESTED_RESOURCE_NOT_FOUND, "유저를 찾을 수 없습니다."),

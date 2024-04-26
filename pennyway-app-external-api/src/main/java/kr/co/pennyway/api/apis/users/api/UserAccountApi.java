@@ -62,12 +62,33 @@ public interface UserAccountApi {
     @Operation(summary = "사용자 계정 조회", description = "사용자 본인의 계정 정보를 조회합니다.")
     @ApiResponse(responseCode = "200", content = @Content(schemaProperties = @SchemaProperty(name = "user", schema = @Schema(implementation = UserProfileDto.class))))
     ResponseEntity<?> getMyAccount(@AuthenticationPrincipal SecurityUserDetails user);
-      
+
     @Operation(summary = "사용자 이름 수정")
     ResponseEntity<?> putName(@RequestBody @Validated UserProfileUpdateDto.NameReq request, @AuthenticationPrincipal SecurityUserDetails user);
 
     @Operation(summary = "사용자 아이디 수정")
     ResponseEntity<?> putUsername(@RequestBody @Validated UserProfileUpdateDto.UsernameReq request, @AuthenticationPrincipal SecurityUserDetails user);
+
+    @Operation(summary = "사용자 비밀번호 검증")
+    @ApiResponses({
+            @ApiResponse(responseCode = "400", content = @Content(mediaType = "application/json", examples = {
+                    @ExampleObject(name = "비밀번호 불일치", value = """
+                            {
+                                "code": "4004",
+                                "message": "비밀번호가 일치하지 않습니다."
+                            }
+                            """)
+            })),
+            @ApiResponse(responseCode = "403", content = @Content(mediaType = "application/json", examples = {
+                    @ExampleObject(name = "일반 회원가입 이력이 없는 경우", value = """
+                            {
+                                "code": "4030",
+                                "message": "일반 회원가입 계정이 아닙니다."
+                            }
+                            """)
+            }))
+    })
+    ResponseEntity<?> postPasswordVerification(@RequestBody @Validated UserProfileUpdateDto.PasswordVerificationReq request, @AuthenticationPrincipal SecurityUserDetails user);
 
     @Operation(summary = "사용자 알림 활성화")
     @Parameter(name = "type", description = "알림 타입", examples = {

@@ -44,7 +44,7 @@ public class UserAccountController implements UserAccountApi {
     public ResponseEntity<?> getMyAccount(@AuthenticationPrincipal SecurityUserDetails user) {
         return ResponseEntity.ok(SuccessResponse.from("user", userAccountUseCase.getMyAccount(user.getUserId())));
     }
-  
+
     @Override
     @PatchMapping("/name")
     @PreAuthorize("isAuthenticated()")
@@ -58,6 +58,14 @@ public class UserAccountController implements UserAccountApi {
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> putUsername(UserProfileUpdateDto.UsernameReq request, SecurityUserDetails user) {
         userAccountUseCase.updateUsername(user.getUserId(), request.username());
+        return ResponseEntity.ok(SuccessResponse.noContent());
+    }
+
+    @Override
+    @PostMapping("/password/verification")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> postPasswordVerification(UserProfileUpdateDto.PasswordVerificationReq request, SecurityUserDetails user) {
+        userAccountUseCase.verifyPassword(user.getUserId(), request);
         return ResponseEntity.ok(SuccessResponse.noContent());
     }
 
