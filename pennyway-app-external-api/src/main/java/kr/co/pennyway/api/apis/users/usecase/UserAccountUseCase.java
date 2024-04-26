@@ -109,18 +109,23 @@ public class UserAccountUseCase {
 
     private User readUserOrThrow(Long userId) {
         return userService.readUser(userId).orElseThrow(
-                () -> new UserErrorException(UserErrorCode.NOT_FOUND)
+                () -> {
+                    log.info("사용자를 찾을 수 없습니다.");
+                    return new UserErrorException(UserErrorCode.NOT_FOUND);
+                }
         );
     }
 
     private void validateGeneralSignedUpUser(User user) {
         if (!user.isGeneralSignedUpUser()) {
+            log.info("일반 회원가입 이력이 없습니다.");
             throw new UserErrorException(UserErrorCode.DO_NOT_GENERAL_SIGNED_UP);
         }
     }
 
     private void validatePasswordMatch(String password, String storedPassword) {
         if (!passwordEncoderHelper.isSamePassword(password, storedPassword)) {
+            log.info("기존 비밀번호와 일치하지 않습니다.");
             throw new UserErrorException(UserErrorCode.NOT_MATCHED_PASSWORD);
         }
     }
