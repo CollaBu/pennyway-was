@@ -43,12 +43,14 @@ public class ExternalApiLogAspect {
         }
 
         for (Object arg : args) {
-            if (arg instanceof String param && param.startsWith("Bearer ")) {
-                continue;
+            if (method.getName().equals("refresh")) {
+                log.debug("요청 헤더 : {} ⇾ 값 : {}", HttpHeaders.COOKIE, arg);
+            } else if (arg instanceof String param && param.startsWith("Bearer ")) {
+                log.debug("요청 헤더 : {} ⇾ 값 : {}", HttpHeaders.AUTHORIZATION, param);
+            } else {
+                log.info("요청 파라미터 타입 : {} ⇾ 값 : {}", arg.getClass().getSimpleName(), arg);
             }
-            log.info("요청 파라미터 타입 : {} ⇾ 값 : {}", arg.getClass().getSimpleName(), arg);
         }
-
         log.info("===========================================================================");
     }
 
@@ -61,7 +63,9 @@ public class ExternalApiLogAspect {
         log.info("응답 상태 : {}", responseEntity.getStatusCode());
 
         for (Map.Entry<String, String> entry : headers.toSingleValueMap().entrySet()) {
-            if (!(entry.getKey().equals(HttpHeaders.SET_COOKIE)) && !(entry.getKey().equals(HttpHeaders.AUTHORIZATION))) {
+            if (entry.getKey().equals(HttpHeaders.SET_COOKIE) || entry.getKey().equals(HttpHeaders.AUTHORIZATION)) {
+                log.debug("응답 헤더 : {} ⇾ 값 : {}", entry.getKey(), entry.getValue());
+            } else {
                 log.info("응답 헤더 : {} ⇾ 값 : {}", entry.getKey(), entry.getValue());
             }
         }
