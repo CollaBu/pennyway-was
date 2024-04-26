@@ -1,6 +1,7 @@
 package kr.co.pennyway.api.apis.users.usecase;
 
 import kr.co.pennyway.api.apis.users.dto.DeviceDto;
+import kr.co.pennyway.api.apis.users.helper.PasswordEncoderHelper;
 import kr.co.pennyway.api.apis.users.service.DeviceRegisterService;
 import kr.co.pennyway.api.apis.users.service.UserProfileUpdateService;
 import kr.co.pennyway.api.config.ExternalApiDBTestConfig;
@@ -19,6 +20,7 @@ import kr.co.pennyway.domain.domains.user.type.ProfileVisibility;
 import kr.co.pennyway.domain.domains.user.type.Role;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -31,6 +33,8 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static org.springframework.test.util.AssertionErrors.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -48,6 +52,9 @@ class UserAccountUseCaseTest extends ExternalApiDBTestConfig {
 
     @Autowired
     private UserAccountUseCase userAccountUseCase;
+
+    @Mock
+    private PasswordEncoderHelper passwordEncoderHelper;
 
     @Order(1)
     @Nested
@@ -313,7 +320,7 @@ class UserAccountUseCaseTest extends ExternalApiDBTestConfig {
         @DisplayName("사용자가 일반 회원가입 이력이 없는 소셜 계정인 경우, DO_NOT_GENERAL_SIGNED_UP 에러를 반환한다.")
         void verifyPasswordWhenUserIsNotGeneralSignedUp() {
             // given
-            User originUser = UserFixture.ONLY_OAUTH_USER.toUser();
+            User originUser = UserFixture.OAUTH_USER.toUser();
             userService.createUser(originUser);
 
             // when - then
@@ -341,6 +348,7 @@ class UserAccountUseCaseTest extends ExternalApiDBTestConfig {
             // given
             User originUser = UserFixture.GENERAL_USER.toUser();
             userService.createUser(originUser);
+            given(passwordEncoderHelper.isSamePassword(any(), any())).willReturn(true);
 
             // when - then
             assertDoesNotThrow(() -> userAccountUseCase.verifyPassword(originUser.getId(), originUser.getPassword()));

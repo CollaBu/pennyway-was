@@ -10,7 +10,7 @@ import java.util.List;
 
 public enum UserFixture {
     GENERAL_USER(1L, "jayang", "dkssudgktpdy1", "Yang", "010-1111-1111", Role.USER, ProfileVisibility.PUBLIC, false),
-    ONLY_OAUTH_USER(2L, "only._.o", null, "Only", "0101-2222-2222", Role.USER, ProfileVisibility.PUBLIC, false),
+    OAUTH_USER(2L, "only._.o", null, "Only", "0101-2222-2222", Role.USER, ProfileVisibility.PUBLIC, false),
     ;
 
     private final Long id;
