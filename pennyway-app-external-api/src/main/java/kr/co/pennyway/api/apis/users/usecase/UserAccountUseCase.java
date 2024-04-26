@@ -85,6 +85,11 @@ public class UserAccountUseCase {
     }
 
     @Transactional
+    public void updatePassword(Long userId, String oldPassword, String newPassword) {
+
+    }
+
+    @Transactional
     public UserProfileUpdateDto.NotifySettingUpdateReq activateNotification(Long userId, NotifySetting.NotifyType type) {
         User user = readUserOrThrow(userId);
 
