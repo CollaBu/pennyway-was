@@ -2,9 +2,9 @@ package kr.co.pennyway.api.apis.users.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
-import kr.co.pennyway.domain.domains.user.domain.NotifySetting;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
+import kr.co.pennyway.domain.domains.user.domain.NotifySetting;
 
 public class UserProfileUpdateDto {
     @Schema(title = "이름 변경 요청 DTO")
@@ -24,7 +24,15 @@ public class UserProfileUpdateDto {
             String username
     ) {
     }
-  
+
+    @Schema(title = "현재 비밀번호 검증 요청 DTO")
+    public record PasswordVerificationReq(
+            @Schema(description = "현재 비밀번호", example = "password")
+            @NotBlank(message = "비밀번호를 입력해주세요")
+            String password
+    ) {
+    }
+
     @Schema(title = "사용자 알림 설정 응답 DTO")
     public record NotifySettingUpdateReq(
             @Schema(description = "계좌 알림 설정", example = "true", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
