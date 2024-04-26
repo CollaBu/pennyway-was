@@ -12,7 +12,7 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.constraints.NotBlank;
+import kr.co.pennyway.api.apis.auth.dto.PhoneVerificationDto;
 
 @Tag(name = "[계정 검사 API]")
 public interface AuthCheckApi {
@@ -51,5 +51,5 @@ public interface AuthCheckApi {
 							""")
 			})),
 	})
-	ResponseEntity<?> findUsername(@RequestParam @NotBlank String phone, @RequestParam @NotBlank String code);
+	ResponseEntity<?> findUsername(@Validated PhoneVerificationDto.VerifyCodeReq request);
 }

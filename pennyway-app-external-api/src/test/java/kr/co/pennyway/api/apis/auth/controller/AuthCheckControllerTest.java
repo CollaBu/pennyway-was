@@ -1,5 +1,6 @@
 package kr.co.pennyway.api.apis.auth.controller;
 
+import static kr.co.pennyway.common.exception.ReasonCode.*;
 import static org.mockito.BDDMockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -20,7 +21,9 @@ import org.springframework.web.context.WebApplicationContext;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import kr.co.pennyway.api.apis.auth.dto.AuthFindDto;
+import kr.co.pennyway.api.apis.auth.dto.PhoneVerificationDto;
 import kr.co.pennyway.api.apis.auth.usecase.AuthCheckUseCase;
+import kr.co.pennyway.common.exception.StatusCode;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorCode;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorException;
 
@@ -52,7 +55,8 @@ class AuthCheckControllerTest {
 	@DisplayName("일반 회원의 휴대폰 번호로 아이디를 찾을 때 200 응답을 반환한다.")
 	void findUsername() throws Exception {
 		// given
-		given(authCheckUseCase.findUsername(inputPhone, code)).willReturn(new AuthFindDto.FindUsernameRes(expectedUsername));
+		given(authCheckUseCase.findUsername(new PhoneVerificationDto.VerifyCodeReq(inputPhone, code))).willReturn(
+				new AuthFindDto.FindUsernameRes(expectedUsername));
 
 		// when
 		ResultActions resultActions = findUsernameRequest(inputPhone, code);
@@ -68,7 +72,7 @@ class AuthCheckControllerTest {
 	void findUsernameIfUserNotFound() throws Exception {
 		// given
 		String phone = "010-1111-1111";
-		given(authCheckUseCase.findUsername(phone, code)).willThrow(new UserErrorException(UserErrorCode.NOT_FOUND));
+		given(authCheckUseCase.findUsername(new PhoneVerificationDto.VerifyCodeReq(phone, code))).willThrow(new UserErrorException(UserErrorCode.NOT_FOUND));
 
 		// when
 		ResultActions resultActions = findUsernameRequest(phone, code);
@@ -78,6 +82,20 @@ class AuthCheckControllerTest {
 				.andExpect(status().isNotFound())
 				.andExpect(jsonPath("$.code").value(UserErrorCode.NOT_FOUND.causedBy().getCode()))
 				.andExpect(jsonPath("$.message").value(UserErrorCode.NOT_FOUND.getExplainError()));
+	}
+
+	@Test
+	@DisplayName("휴대폰 번호와 코드를 입력하지 않았을 때 422 응답을 반환한다.")
+	void findUsernameIfInputIsEmpty() throws Exception {
+		// when
+		ResultActions resultActions = findUsernameRequest("", "");
+
+		// then
+		resultActions
+				.andExpect(status().is4xxClientError())
+				.andExpect(jsonPath("$.code").value(
+						String.valueOf(StatusCode.UNPROCESSABLE_CONTENT.getCode() * 10 + REQUIRED_PARAMETERS_MISSING_IN_REQUEST_BODY.getCode())))
+				.andExpect(jsonPath("$.message").value(StatusCode.UNPROCESSABLE_CONTENT.name()));
 	}
 
 	private ResultActions findUsernameRequest(String phone, String code) throws Exception {
