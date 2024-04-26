@@ -33,13 +33,4 @@ public class PasswordEncoderHelper {
     public boolean isSamePassword(String actual, String expected) {
         return passwordEncoder.matches(actual, expected);
     }
-
-    /**
-     * 암호화된 비밀번호인지 확인하는 메서드. 암호화된 비밀번호는 $2a$로 시작한다.
-     *
-     * @return 암호화된 비밀번호이면 true, 아니면 false를 반환한다.
-     */
-    public boolean isEncodedPassword(String password) {
-        return password.startsWith("$2a$");
-    }
 }
