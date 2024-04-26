@@ -232,4 +232,103 @@ public class UserAccountControllerUnitTest {
                     .content(objectMapper.writeValueAsString(request)));
         }
     }
+
+    @Nested
+    @Order(4)
+    @DisplayName("[4] 사용자 비밀번호 수정 테스트")
+    class UpdatePasswordTest {
+        @DisplayName("[4-1-a] 사용자 현재 비밀번호 검증 시, 빈 문자열이면 422 에러를 반환한다.")
+        @Test
+        @WithSecurityMockUser
+        void updatePasswordValidationFail() throws Exception {
+            // given
+            String currentPasswordWithBlank = " ";
+            String expectedErrorCode = String.valueOf(StatusCode.UNPROCESSABLE_CONTENT.getCode() * 10 + REQUIRED_PARAMETERS_MISSING_IN_REQUEST_BODY.getCode());
+
+            // when
+            ResultActions result = performVerifyCurrentPasswordRequest(currentPasswordWithBlank);
+
+            // then
+            result.andExpect(status().isUnprocessableEntity())
+                    .andExpect(jsonPath("$.code").value(expectedErrorCode))
+                    .andDo(print());
+        }
+
+        @DisplayName("[4-1-b] 사용자 현재 비밀번호 검증 시, 삭제된 사용자인 경우 404 에러를 반환한다.")
+        @Test
+        @WithSecurityMockUser
+        void verifyCurrentPasswordDeletedUser() throws Exception {
+            // given
+            String currentPassword = "currentPassword";
+            willThrow(new UserErrorException(UserErrorCode.NOT_FOUND)).given(userAccountUseCase).verifyCurrentPassword(currentPassword);
+
+            // when
+            ResultActions result = performVerifyCurrentPasswordRequest(currentPassword);
+
+            // then
+            result.andExpect(status().isNotFound())
+                    .andExpect(jsonPath("$.code").value(UserErrorCode.NOT_FOUND.causedBy().getCode()))
+                    .andExpect(jsonPath("$.message").value(UserErrorCode.NOT_FOUND.getExplainError()))
+                    .andDo(print());
+        }
+
+        @DisplayName("[4-1-c] 사용자 현재 비밀번호 검증 시, 소셜 로그인 사용자인 경우 400 에러를 반환한다.")
+        @Test
+        @WithSecurityMockUser
+        void verifyCurrentPasswordSocialUser() throws Exception {
+            // given
+            String currentPassword = "currentPassword";
+            willThrow(new UserErrorException(UserErrorCode.DO_NOT_GENERAL_SIGNED_UP)).given(userAccountUseCase).verifyCurrentPassword(currentPassword);
+
+            // when
+            ResultActions result = performVerifyCurrentPasswordRequest(currentPassword);
+
+            // then
+            result.andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.code").value(UserErrorCode.DO_NOT_GENERAL_SIGNED_UP.causedBy().getCode()))
+                    .andExpect(jsonPath("$.message").value(UserErrorCode.DO_NOT_GENERAL_SIGNED_UP.getExplainError()))
+                    .andDo(print());
+        }
+
+        @DisplayName("[4-1-d] 사용자 현재 비밀번호 검증 시, 비밀번호가 일치하지 않으면 401 에러를 반환한다.")
+        @Test
+        @WithSecurityMockUser
+        void verifyCurrentPasswordFail() throws Exception {
+            // given
+            String currentPassword = "currentPassword";
+            willThrow(new UserErrorException(UserErrorCode.NOT_MATCHED_PASSWORD)).given(userAccountUseCase).verifyCurrentPassword(currentPassword);
+
+            // when
+            ResultActions result = performVerifyCurrentPasswordRequest(currentPassword);
+
+            // then
+            result.andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.code").value(UserErrorCode.NOT_MATCHED_PASSWORD.causedBy().getCode()))
+                    .andExpect(jsonPath("$.message").value(UserErrorCode.NOT_MATCHED_PASSWORD.getExplainError()))
+                    .andDo(print());
+        }
+
+        @DisplayName("[4-1-e] 사용자 현재 비밀번호 검증 시, 비밀번호가 일치하면 200 코드를 반환한다.")
+        @Test
+        @WithSecurityMockUser
+        void verifyCurrentPasswordSuccess() throws Exception {
+            // given
+            String currentPassword = "currentPassword";
+
+            // when
+            ResultActions result = performVerifyCurrentPasswordRequest(currentPassword);
+
+            // then
+            result.andExpect(status().isOk())
+                    .andExpect(jsonPath("$.code").value("2000"))
+                    .andDo(print());
+        }
+
+        private ResultActions performVerifyCurrentPasswordRequest(String currentPassword) throws Exception {
+            UserProfileUpdateDto.PasswordVerificationReq request = new UserProfileUpdateDto.PasswordVerificationReq(currentPassword);
+            return mockMvc.perform(post("/v2/users/me/password/verification")
+                    .contentType("application/json")
+                    .content(objectMapper.writeValueAsString(request)));
+        }
+    }
 }
