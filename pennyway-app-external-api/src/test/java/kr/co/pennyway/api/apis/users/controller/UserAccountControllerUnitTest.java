@@ -260,7 +260,7 @@ public class UserAccountControllerUnitTest {
         void verifyCurrentPasswordDeletedUser() throws Exception {
             // given
             String currentPassword = "currentPassword";
-            willThrow(new UserErrorException(UserErrorCode.NOT_FOUND)).given(userAccountUseCase).verifyPassword(currentPassword);
+            willThrow(new UserErrorException(UserErrorCode.NOT_FOUND)).given(userAccountUseCase).verifyPassword(1L, currentPassword);
 
             // when
             ResultActions result = performVerifyCurrentPasswordRequest(currentPassword);
@@ -278,7 +278,7 @@ public class UserAccountControllerUnitTest {
         void verifyCurrentPasswordSocialUser() throws Exception {
             // given
             String currentPassword = "currentPassword";
-            willThrow(new UserErrorException(UserErrorCode.DO_NOT_GENERAL_SIGNED_UP)).given(userAccountUseCase).verifyCurrentPassword(currentPassword);
+            willThrow(new UserErrorException(UserErrorCode.DO_NOT_GENERAL_SIGNED_UP)).given(userAccountUseCase).verifyPassword(1L, currentPassword);
 
             // when
             ResultActions result = performVerifyCurrentPasswordRequest(currentPassword);
@@ -296,7 +296,7 @@ public class UserAccountControllerUnitTest {
         void verifyCurrentPasswordFail() throws Exception {
             // given
             String currentPassword = "currentPassword";
-            willThrow(new UserErrorException(UserErrorCode.NOT_MATCHED_PASSWORD)).given(userAccountUseCase).verifyCurrentPassword(currentPassword);
+            willThrow(new UserErrorException(UserErrorCode.NOT_MATCHED_PASSWORD)).given(userAccountUseCase).verifyPassword(1L, currentPassword);
 
             // when
             ResultActions result = performVerifyCurrentPasswordRequest(currentPassword);

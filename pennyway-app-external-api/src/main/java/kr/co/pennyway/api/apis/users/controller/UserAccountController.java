@@ -65,7 +65,7 @@ public class UserAccountController implements UserAccountApi {
     @PostMapping("/password/verification")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> postPasswordVerification(UserProfileUpdateDto.PasswordVerificationReq request, SecurityUserDetails user) {
-        userAccountUseCase.verifyPassword(user.getUserId(), request);
+        userAccountUseCase.verifyPassword(user.getUserId(), request.password());
         return ResponseEntity.ok(SuccessResponse.noContent());
     }
 

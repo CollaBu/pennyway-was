@@ -55,7 +55,7 @@ public class UserAccountUseCase {
 
         return UserProfileDto.from(user);
     }
-  
+
     @Transactional
     public void updateName(Long userId, String newName) {
         User user = readUserOrThrow(userId);
@@ -68,6 +68,13 @@ public class UserAccountUseCase {
         User user = readUserOrThrow(userId);
 
         userProfileUpdateService.updateUsername(user, newUsername);
+    }
+
+    @Transactional(readOnly = true)
+    public void verifyPassword(Long userId, String expectedPassword) {
+        User user = readUserOrThrow(userId);
+
+
     }
 
     @Transactional
