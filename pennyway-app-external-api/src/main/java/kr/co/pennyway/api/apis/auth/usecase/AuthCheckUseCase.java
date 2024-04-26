@@ -28,9 +28,9 @@ public class AuthCheckUseCase {
 	}
 
 	@Transactional(readOnly = true)
-	public AuthFindDto.FindUsernameRes findUsername(String phone, String code) {
-		phoneVerificationService.isValidCode(PhoneVerificationDto.VerifyCodeReq.of(phone, code), PhoneCodeKeyType.FIND_USERNAME);
-		phoneCodeService.delete(phone, PhoneCodeKeyType.FIND_USERNAME);
-		return authFindService.findUsername(phone);
+	public AuthFindDto.FindUsernameRes findUsername(PhoneVerificationDto.VerifyCodeReq request) {
+		phoneVerificationService.isValidCode(request, PhoneCodeKeyType.FIND_USERNAME);
+		phoneCodeService.delete(request.phone(), PhoneCodeKeyType.FIND_USERNAME);
+		return authFindService.findUsername(request.phone());
 	}
 }
