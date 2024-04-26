@@ -18,6 +18,8 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.util.List;
+
 import static kr.co.pennyway.common.exception.ReasonCode.REQUIRED_PARAMETERS_MISSING_IN_REQUEST_BODY;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willThrow;
@@ -235,12 +237,12 @@ public class UserAccountControllerUnitTest {
 
     @Nested
     @Order(4)
-    @DisplayName("[4] 사용자 비밀번호 수정 테스트")
-    class UpdatePasswordTest {
-        @DisplayName("[4-1-a] 사용자 현재 비밀번호 검증 시, 빈 문자열이면 422 에러를 반환한다.")
+    @DisplayName("[4] 사용자 비밀번호 검증 테스트")
+    class VerifyNicknameTest {
+        @DisplayName("사용자 현재 비밀번호 검증 시, 빈 문자열이면 422 에러를 반환한다.")
         @Test
         @WithSecurityMockUser
-        void updatePasswordValidationFail() throws Exception {
+        void verifyPasswordValidationFail() throws Exception {
             // given
             String currentPasswordWithBlank = " ";
             String expectedErrorCode = String.valueOf(StatusCode.UNPROCESSABLE_CONTENT.getCode() * 10 + REQUIRED_PARAMETERS_MISSING_IN_REQUEST_BODY.getCode());
@@ -254,7 +256,7 @@ public class UserAccountControllerUnitTest {
                     .andDo(print());
         }
 
-        @DisplayName("[4-1-b] 사용자 현재 비밀번호 검증 시, 삭제된 사용자인 경우 404 에러를 반환한다.")
+        @DisplayName("사용자 현재 비밀번호 검증 시, 삭제된 사용자인 경우 404 에러를 반환한다.")
         @Test
         @WithSecurityMockUser
         void verifyCurrentPasswordDeletedUser() throws Exception {
@@ -272,7 +274,7 @@ public class UserAccountControllerUnitTest {
                     .andDo(print());
         }
 
-        @DisplayName("[4-1-c] 사용자 현재 비밀번호 검증 시, 일반 회원가입 이력이 없는 경우 403 에러를 반환한다.")
+        @DisplayName("사용자 현재 비밀번호 검증 시, 일반 회원가입 이력이 없는 경우 403 에러를 반환한다.")
         @Test
         @WithSecurityMockUser
         void verifyCurrentPasswordSocialUser() throws Exception {
@@ -290,7 +292,7 @@ public class UserAccountControllerUnitTest {
                     .andDo(print());
         }
 
-        @DisplayName("[4-1-d] 사용자 현재 비밀번호 검증 시, 비밀번호가 일치하지 않으면 400 에러를 반환한다.")
+        @DisplayName("사용자 현재 비밀번호 검증 시, 비밀번호가 일치하지 않으면 400 에러를 반환한다.")
         @Test
         @WithSecurityMockUser
         void verifyCurrentPasswordFail() throws Exception {
@@ -308,7 +310,7 @@ public class UserAccountControllerUnitTest {
                     .andDo(print());
         }
 
-        @DisplayName("[4-1-e] 사용자 현재 비밀번호 검증 시, 비밀번호가 일치하면 200 코드를 반환한다.")
+        @DisplayName("사용자 현재 비밀번호 검증 시, 비밀번호가 일치하면 200 코드를 반환한다.")
         @Test
         @WithSecurityMockUser
         void verifyCurrentPasswordSuccess() throws Exception {
@@ -327,6 +329,144 @@ public class UserAccountControllerUnitTest {
         private ResultActions performVerifyCurrentPasswordRequest(String currentPassword) throws Exception {
             UserProfileUpdateDto.PasswordVerificationReq request = new UserProfileUpdateDto.PasswordVerificationReq(currentPassword);
             return mockMvc.perform(post("/v2/users/me/password/verification")
+                    .contentType("application/json")
+                    .content(objectMapper.writeValueAsString(request)));
+        }
+
+    }
+
+    @Nested
+    @Order(5)
+    @DisplayName("[5] 사용자 비밀번호 수정 테스트")
+    class UpdatePasswordTest {
+        @DisplayName("비밀번호가 8~16자의 영문 대/소문, 숫자, 특수문자(이모티콘, 공백 사용 불가, 적어도 하나 이상의 소문자 알파벳과 숫자 포함)가 아니면 422 에러를 반환한다.")
+        @Test
+        @WithSecurityMockUser
+        void updatePasswordValidationFail() throws Exception {
+            // given
+            String oldPassword = "oldPassword";
+            String newPasswordWithBlank = " ";
+            String newPasswordWithUnderLength = "short";
+            String newPasswordWithOverLength = "passwordpasswordpasswordpassword";
+            String newPasswordWithOnlyAlphabet = "passwordpassword";
+            String newPasswordWithOnlyNumber = "1234567890";
+            String newPasswordWithOnlySpecialCharacter = "!@#$%^&*()";
+            String newPasswordWithOnlyUpperCase = "PASSWORDPASSWORD";
+            String newPasswordWithOnlyLowerCase = "passwordpassword";
+            String newPasswordWithOnlyEmoji = "😊😊😊😊😊😊😊😊";
+            String newPasswordWithOnlyWhiteSpace = "password password";
+            String newPasswordWithOnlySpecialCharacterAndWhiteSpace = "!@#$%^&*() ";
+            String newPasswordWithOnlySpecialCharacterAndEmoji = "!@#$%^&*()😊";
+            String newPasswordWithOnlySpecialCharacterAndEmojiAndWhiteSpace = "!@#$%^&*() 😊";
+            List<String> newPasswords = List.of(newPasswordWithBlank, newPasswordWithUnderLength, newPasswordWithOverLength, newPasswordWithOnlyAlphabet, newPasswordWithOnlyNumber, newPasswordWithOnlySpecialCharacter, newPasswordWithOnlyUpperCase, newPasswordWithOnlyLowerCase, newPasswordWithOnlyEmoji, newPasswordWithOnlyWhiteSpace, newPasswordWithOnlySpecialCharacterAndWhiteSpace, newPasswordWithOnlySpecialCharacterAndEmoji, newPasswordWithOnlySpecialCharacterAndEmojiAndWhiteSpace);
+
+            String expectedErrorCode = String.valueOf(StatusCode.UNPROCESSABLE_CONTENT.getCode() * 10 + REQUIRED_PARAMETERS_MISSING_IN_REQUEST_BODY.getCode());
+
+            // when - then
+            for (String newPassword : newPasswords) {
+                ResultActions result = performUpdatePasswordRequest(oldPassword, newPassword);
+                result.andExpect(status().isUnprocessableEntity())
+                        .andExpect(jsonPath("$.code").value(expectedErrorCode))
+                        .andDo(print());
+            }
+        }
+
+        @DisplayName("비밀번호가 현재 비밀번호와 동일하면 400 에러를 반환한다.")
+        @Test
+        @WithSecurityMockUser
+        void updatePasswordSamePassword() throws Exception {
+            // given
+            String oldPassword = "oldPassword";
+            String newPassword = "oldPassword";
+            willThrow(new UserErrorException(UserErrorCode.PASSWORD_NOT_CHANGED)).given(userAccountUseCase).updatePassword(1L, oldPassword, newPassword);
+
+            // when
+            ResultActions result = performUpdatePasswordRequest(oldPassword, newPassword);
+
+            // then
+            result.andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.code").value(UserErrorCode.PASSWORD_NOT_CHANGED.causedBy().getCode()))
+                    .andExpect(jsonPath("$.message").value(UserErrorCode.PASSWORD_NOT_CHANGED.getExplainError()))
+                    .andDo(print());
+        }
+
+        @DisplayName("기존 비밀번호가 일치하지 않으면 400 에러를 반환한다.")
+        @Test
+        @WithSecurityMockUser
+        void updatePasswordFail() throws Exception {
+            // given
+            String oldPassword = "oldPassword";
+            String newPassword = "newPassword";
+            willThrow(new UserErrorException(UserErrorCode.NOT_MATCHED_PASSWORD)).given(userAccountUseCase).updatePassword(1L, oldPassword, newPassword);
+
+            // when
+            ResultActions result = performUpdatePasswordRequest(oldPassword, newPassword);
+
+            // then
+            result.andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.code").value(UserErrorCode.NOT_MATCHED_PASSWORD.causedBy().getCode()))
+                    .andExpect(jsonPath("$.message").value(UserErrorCode.NOT_MATCHED_PASSWORD.getExplainError()))
+                    .andDo(print());
+        }
+
+        @DisplayName("사용자가 삭제된 사용자인 경우 404 에러를 반환한다.")
+        @Test
+        @WithSecurityMockUser
+        void updatePasswordDeletedUser() throws Exception {
+            // given
+            String oldPassword = "oldPassword";
+            String newPassword = "newPassword";
+            willThrow(new UserErrorException(UserErrorCode.NOT_FOUND)).given(userAccountUseCase).updatePassword(1L, oldPassword, newPassword);
+
+            // when
+            ResultActions result = performUpdatePasswordRequest(oldPassword, newPassword);
+
+            // then
+            result.andExpect(status().isNotFound())
+                    .andExpect(jsonPath("$.code").value(UserErrorCode.NOT_FOUND.causedBy().getCode()))
+                    .andExpect(jsonPath("$.message").value(UserErrorCode.NOT_FOUND.getExplainError()))
+                    .andDo(print());
+        }
+
+        @DisplayName("사용자가 일반 회원가입 이력이 없는 경우 403 에러를 반환한다.")
+        @Test
+        @WithSecurityMockUser
+        void updatePasswordSocialUser() throws Exception {
+            // given
+            String oldPassword = "oldPassword";
+            String newPassword = "newPassword";
+            willThrow(new UserErrorException(UserErrorCode.DO_NOT_GENERAL_SIGNED_UP)).given(userAccountUseCase).updatePassword(1L, oldPassword, newPassword);
+
+            // when
+            ResultActions result = performUpdatePasswordRequest(oldPassword, newPassword);
+
+            // then
+            result.andExpect(status().isForbidden())
+                    .andExpect(jsonPath("$.code").value(UserErrorCode.DO_NOT_GENERAL_SIGNED_UP.causedBy().getCode()))
+                    .andExpect(jsonPath("$.message").value(UserErrorCode.DO_NOT_GENERAL_SIGNED_UP.getExplainError()))
+                    .andDo(print());
+        }
+
+        @DisplayName("비밀번호가 정상적으로 수정되면 200 코드를 반환한다.")
+        @Test
+        @WithSecurityMockUser
+        void updatePasswordSuccess() throws Exception {
+            // given
+            String oldPassword = "oldPassword";
+            String newPassword = "newPassword";
+
+            // when
+            ResultActions result = performUpdatePasswordRequest(oldPassword, newPassword);
+
+            // then
+            result.andExpect(status().isOk())
+                    .andExpect(jsonPath("$.code").value("2000"))
+                    .andDo(print());
+        }
+
+        private ResultActions performUpdatePasswordRequest(String oldPassword, String newPassword) throws Exception {
+            UserProfileUpdateDto.PasswordReq request = new UserProfileUpdateDto.PasswordReq(oldPassword, newPassword);
+            return mockMvc.perform(patch("/v2/users/me/password")
                     .contentType("application/json")
                     .content(objectMapper.writeValueAsString(request)));
         }
