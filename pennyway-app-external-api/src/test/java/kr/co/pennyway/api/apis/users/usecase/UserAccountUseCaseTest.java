@@ -421,7 +421,8 @@ class UserAccountUseCaseTest extends ExternalApiDBTestConfig {
         @DisplayName("정상적인 요청인 경우 비밀번호가 정상적으로 변경된다.")
         void updatePassword() {
             // given
-            given(passwordEncoderHelper.isSamePassword(any(), any())).willReturn(true);
+            given(passwordEncoderHelper.isSamePassword(originUser.getPassword(), originUser.getPassword())).willReturn(true);
+            given(passwordEncoderHelper.isSamePassword(originUser.getPassword(), "newPassword")).willReturn(false);
             given(passwordEncoderHelper.encodePassword(any())).willReturn("encodedPassword");
 
             // when - then
