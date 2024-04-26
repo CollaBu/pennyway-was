@@ -12,7 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Helper
 @RequiredArgsConstructor
 public class PasswordEncoderHelper {
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
     /**
      * 비밀번호 암호화 메서드
