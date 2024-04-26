@@ -1,7 +1,10 @@
 package kr.co.pennyway.api.apis.users.service;
 
+import kr.co.pennyway.api.apis.users.helper.PasswordEncoderHelper;
 import kr.co.pennyway.domain.domains.user.domain.NotifySetting;
 import kr.co.pennyway.domain.domains.user.domain.User;
+import kr.co.pennyway.domain.domains.user.exception.UserErrorCode;
+import kr.co.pennyway.domain.domains.user.exception.UserErrorException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -11,6 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class UserProfileUpdateService {
+    private final PasswordEncoderHelper passwordEncoderHelper;
+
     @Transactional
     public void updateName(User user, String newName) {
         user.updateName(newName);
@@ -19,6 +24,15 @@ public class UserProfileUpdateService {
     @Transactional
     public void updateUsername(User user, String newUsername) {
         user.updateUsername(newUsername);
+    }
+
+    @Transactional
+    public void updatePassword(User user, String oldPassword, String newPassword) {
+        if (oldPassword.equals(newPassword) || !passwordEncoderHelper.isSamePassword(user.getPassword(), oldPassword)) {
+            throw new UserErrorException(UserErrorCode.PASSWORD_NOT_CHANGED);
+        }
+
+        user.updatePassword(passwordEncoderHelper.encodePassword(newPassword));
     }
 
     @Transactional

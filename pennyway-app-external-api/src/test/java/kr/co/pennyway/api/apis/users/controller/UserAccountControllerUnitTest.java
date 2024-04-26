@@ -339,6 +339,9 @@ public class UserAccountControllerUnitTest {
     @Order(5)
     @DisplayName("[5] 사용자 비밀번호 수정 테스트")
     class UpdatePasswordTest {
+        String oldPassword = "oldPassword1";
+        String newPassword = "newPassword1";
+
         @DisplayName("비밀번호가 8~16자의 영문 대/소문, 숫자, 특수문자(이모티콘, 공백 사용 불가, 적어도 하나 이상의 소문자 알파벳과 숫자 포함)가 아니면 422 에러를 반환한다.")
         @Test
         @WithSecurityMockUser
@@ -376,8 +379,6 @@ public class UserAccountControllerUnitTest {
         @WithSecurityMockUser
         void updatePasswordSamePassword() throws Exception {
             // given
-            String oldPassword = "oldPassword";
-            String newPassword = "oldPassword";
             willThrow(new UserErrorException(UserErrorCode.PASSWORD_NOT_CHANGED)).given(userAccountUseCase).updatePassword(1L, oldPassword, newPassword);
 
             // when
@@ -395,8 +396,6 @@ public class UserAccountControllerUnitTest {
         @WithSecurityMockUser
         void updatePasswordFail() throws Exception {
             // given
-            String oldPassword = "oldPassword";
-            String newPassword = "newPassword";
             willThrow(new UserErrorException(UserErrorCode.NOT_MATCHED_PASSWORD)).given(userAccountUseCase).updatePassword(1L, oldPassword, newPassword);
 
             // when
@@ -414,8 +413,6 @@ public class UserAccountControllerUnitTest {
         @WithSecurityMockUser
         void updatePasswordDeletedUser() throws Exception {
             // given
-            String oldPassword = "oldPassword";
-            String newPassword = "newPassword";
             willThrow(new UserErrorException(UserErrorCode.NOT_FOUND)).given(userAccountUseCase).updatePassword(1L, oldPassword, newPassword);
 
             // when
@@ -433,8 +430,6 @@ public class UserAccountControllerUnitTest {
         @WithSecurityMockUser
         void updatePasswordSocialUser() throws Exception {
             // given
-            String oldPassword = "oldPassword";
-            String newPassword = "newPassword";
             willThrow(new UserErrorException(UserErrorCode.DO_NOT_GENERAL_SIGNED_UP)).given(userAccountUseCase).updatePassword(1L, oldPassword, newPassword);
 
             // when
@@ -451,10 +446,6 @@ public class UserAccountControllerUnitTest {
         @Test
         @WithSecurityMockUser
         void updatePasswordSuccess() throws Exception {
-            // given
-            String oldPassword = "oldPassword";
-            String newPassword = "newPassword";
-
             // when
             ResultActions result = performUpdatePasswordRequest(oldPassword, newPassword);
 

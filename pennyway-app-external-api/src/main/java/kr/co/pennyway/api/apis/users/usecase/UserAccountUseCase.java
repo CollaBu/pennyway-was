@@ -77,16 +77,18 @@ public class UserAccountUseCase {
     public void verifyPassword(Long userId, String expectedPassword) {
         User user = readUserOrThrow(userId);
 
-        if (!user.isGeneralSignedUpUser())
-            throw new UserErrorException(UserErrorCode.DO_NOT_GENERAL_SIGNED_UP);
-
-        if (!passwordEncoderHelper.isSamePassword(expectedPassword, user.getPassword()))
-            throw new UserErrorException(UserErrorCode.NOT_MATCHED_PASSWORD);
+        validateGeneralSignedUpUser(user);
+        validatePasswordMatch(expectedPassword, user.getPassword());
     }
 
     @Transactional
     public void updatePassword(Long userId, String oldPassword, String newPassword) {
+        User user = readUserOrThrow(userId);
 
+        validateGeneralSignedUpUser(user);
+        validatePasswordMatch(oldPassword, user.getPassword());
+
+        userProfileUpdateService.updatePassword(user, oldPassword, newPassword);
     }
 
     @Transactional
@@ -109,5 +111,17 @@ public class UserAccountUseCase {
         return userService.readUser(userId).orElseThrow(
                 () -> new UserErrorException(UserErrorCode.NOT_FOUND)
         );
+    }
+
+    private void validateGeneralSignedUpUser(User user) {
+        if (!user.isGeneralSignedUpUser()) {
+            throw new UserErrorException(UserErrorCode.DO_NOT_GENERAL_SIGNED_UP);
+        }
+    }
+
+    private void validatePasswordMatch(String password, String storedPassword) {
+        if (!passwordEncoderHelper.isSamePassword(password, storedPassword)) {
+            throw new UserErrorException(UserErrorCode.NOT_MATCHED_PASSWORD);
+        }
     }
 }

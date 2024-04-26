@@ -354,4 +354,49 @@ class UserAccountUseCaseTest extends ExternalApiDBTestConfig {
             assertDoesNotThrow(() -> userAccountUseCase.verifyPassword(originUser.getId(), originUser.getPassword()));
         }
     }
+
+    @Order(5)
+    @Nested
+    @DisplayName("[5] 사용자 비밀번호 변경 테스트")
+    class UpdatePasswordTest {
+        @Test
+        @Transactional
+        @DisplayName("사용자가 삭제된 유저인 경우 NOT_FOUND 에러를 반환한다.")
+        void updatePasswordWhenUserIsDeleted() {
+            // given
+            User originUser = UserFixture.GENERAL_USER.toUser();
+            userService.createUser(originUser);
+            userService.deleteUser(originUser);
+
+            // when - then
+            UserErrorException ex = assertThrows(UserErrorException.class, () -> userAccountUseCase.updatePassword(originUser.getId(), originUser.getPassword(), "newPassword"));
+            assertEquals("삭제된 사용자인 경우 Not Found를 반환한다.", UserErrorCode.NOT_FOUND, ex.getBaseErrorCode());
+        }
+
+        @Test
+        @Transactional
+        @DisplayName("현재 비밀번호와 동일한 비밀번호로 변경할 수 없는 경우 CLIENT_ERROR 에러를 반환한다.")
+        void updatePasswordWhenSamePassword() {
+            // given
+            User originUser = UserFixture.GENERAL_USER.toUser();
+            userService.createUser(originUser);
+
+            // when - then
+            UserErrorException ex = assertThrows(UserErrorException.class, () -> userAccountUseCase.updatePassword(originUser.getId(), originUser.getPassword(), originUser.getPassword()));
+            assertEquals("현재 비밀번호와 동일한 비밀번호로 변경할 수 없는 경우 Client Error를 반환한다.", UserErrorCode.PASSWORD_NOT_CHANGED, ex.getBaseErrorCode());
+        }
+
+        @Test
+        @Transactional
+        @DisplayName("비밀번호가 일치하는 경우 정상적으로 처리된다.")
+        void updatePassword() {
+            // given
+            User originUser = UserFixture.GENERAL_USER.toUser();
+            userService.createUser(originUser);
+            given(passwordEncoderHelper.isSamePassword(any(), any())).willReturn(true);
+
+            // when - then
+            assertDoesNotThrow(() -> userAccountUseCase.updatePassword(originUser.getId(), originUser.getPassword(), "newPassword"));
+        }
+    }
 }
