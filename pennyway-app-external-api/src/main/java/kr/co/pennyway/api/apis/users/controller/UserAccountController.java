@@ -70,6 +70,14 @@ public class UserAccountController implements UserAccountApi {
     }
 
     @Override
+    @PatchMapping("/password")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> patchPassword(UserProfileUpdateDto.PasswordReq request, SecurityUserDetails user) {
+        userAccountUseCase.updatePassword(user.getUserId(), request.oldPassword(), request.newPassword());
+        return ResponseEntity.ok(SuccessResponse.noContent());
+    }
+
+    @Override
     @PatchMapping("/notifications")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> patchNotifySetting(@RequestParam NotifySetting.NotifyType type, @AuthenticationPrincipal SecurityUserDetails user) {

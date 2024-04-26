@@ -90,6 +90,33 @@ public interface UserAccountApi {
     })
     ResponseEntity<?> postPasswordVerification(@RequestBody @Validated UserProfileUpdateDto.PasswordVerificationReq request, @AuthenticationPrincipal SecurityUserDetails user);
 
+    @Operation(summary = "사용자 비밀번호 변경")
+    @ApiResponses({
+            @ApiResponse(responseCode = "400", content = @Content(mediaType = "application/json", examples = {
+                    @ExampleObject(name = "기존 비밀번호 불일치", value = """
+                            {
+                                "code": "4004",
+                                "message": "비밀번호가 일치하지 않습니다."
+                            }
+                            """),
+                    @ExampleObject(name = "변경 비밀번호가 기존 비밀번호와 동일한 경우", value = """
+                            {
+                                "code": "4005",
+                                "message": "현재 비밀번호와 동일한 비밀번호로 변경할 수 없습니다."
+                            }
+                            """)
+            })),
+            @ApiResponse(responseCode = "403", content = @Content(mediaType = "application/json", examples = {
+                    @ExampleObject(name = "일반 회원가입 이력이 없는 경우", value = """
+                            {
+                                "code": "4030",
+                                "message": "일반 회원가입 계정이 아닙니다."
+                            }
+                            """)
+            }))
+    })
+    ResponseEntity<?> patchPassword(@RequestBody @Validated UserProfileUpdateDto.PasswordReq request, @AuthenticationPrincipal SecurityUserDetails user);
+
     @Operation(summary = "사용자 알림 활성화")
     @Parameter(name = "type", description = "알림 타입", examples = {
             @ExampleObject(name = "가계부", value = "account_book"), @ExampleObject(name = "피드", value = "feed"), @ExampleObject(name = "채팅", value = "chat")

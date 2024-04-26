@@ -10,8 +10,8 @@ import lombok.RequiredArgsConstructor;
 public enum UserErrorCode implements BaseErrorCode {
     /* 400 BAD_REQUEST */
     ALREADY_SIGNUP(StatusCode.BAD_REQUEST, ReasonCode.INVALID_REQUEST, "이미 회원가입한 유저입니다."),
-    PASSWORD_NOT_CHANGED(StatusCode.BAD_REQUEST, ReasonCode.CLIENT_ERROR, "현재 비밀번호와 동일한 비밀번호로 변경할 수 없습니다."),
     NOT_MATCHED_PASSWORD(StatusCode.BAD_REQUEST, ReasonCode.INVALID_REQUEST, "비밀번호가 일치하지 않습니다."),
+    PASSWORD_NOT_CHANGED(StatusCode.BAD_REQUEST, ReasonCode.CLIENT_ERROR, "현재 비밀번호와 동일한 비밀번호로 변경할 수 없습니다."),
 
     /* 401 UNAUTHORIZED */
     INVALID_USERNAME_OR_PASSWORD(StatusCode.UNAUTHORIZED, ReasonCode.MISSING_OR_INVALID_AUTHENTICATION_CREDENTIALS, "유효하지 않은 아이디 또는 비밀번호입니다."),
