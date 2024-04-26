@@ -20,7 +20,7 @@ public class UserProfileUpdateService {
     public void updateUsername(User user, String newUsername) {
         user.updateUsername(newUsername);
     }
-  
+
     @Transactional
     public void updateNotifySetting(User user, NotifySetting.NotifyType type, Boolean flag) {
         user.getNotifySetting().updateNotifySetting(type, flag);

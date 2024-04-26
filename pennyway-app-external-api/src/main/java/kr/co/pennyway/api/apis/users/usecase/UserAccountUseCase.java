@@ -3,6 +3,7 @@ package kr.co.pennyway.api.apis.users.usecase;
 import kr.co.pennyway.api.apis.users.dto.DeviceDto;
 import kr.co.pennyway.api.apis.users.dto.UserProfileDto;
 import kr.co.pennyway.api.apis.users.dto.UserProfileUpdateDto;
+import kr.co.pennyway.api.apis.users.helper.PasswordEncoderHelper;
 import kr.co.pennyway.api.apis.users.service.DeviceRegisterService;
 import kr.co.pennyway.api.apis.users.service.UserProfileUpdateService;
 import kr.co.pennyway.common.annotation.UseCase;
@@ -28,6 +29,8 @@ public class UserAccountUseCase {
 
     private final UserProfileUpdateService userProfileUpdateService;
     private final DeviceRegisterService deviceRegisterService;
+
+    private final PasswordEncoderHelper passwordEncoderHelper;
 
     @Transactional
     public DeviceDto.RegisterRes registerDevice(Long userId, DeviceDto.RegisterReq request) {
@@ -74,7 +77,11 @@ public class UserAccountUseCase {
     public void verifyPassword(Long userId, String expectedPassword) {
         User user = readUserOrThrow(userId);
 
+        if (!user.isGeneralSignedUpUser())
+            throw new UserErrorException(UserErrorCode.DO_NOT_GENERAL_SIGNED_UP);
 
+        if (!passwordEncoderHelper.isSamePassword(expectedPassword, user.getPassword()))
+            throw new UserErrorException(UserErrorCode.NOT_MATCHED_PASSWORD);
     }
 
     @Transactional
