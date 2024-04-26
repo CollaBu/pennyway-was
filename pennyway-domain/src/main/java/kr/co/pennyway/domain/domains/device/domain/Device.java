@@ -47,6 +47,10 @@ public class Device extends DateAuditable {
         this.activated = Boolean.TRUE;
     }
 
+    public void deactivate() {
+        this.activated = Boolean.FALSE;
+    }
+
     public void updateToken(String token) {
         this.token = token;
     }

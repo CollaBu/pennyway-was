@@ -75,6 +75,14 @@ public class User extends DateAuditable {
         this.passwordUpdatedAt = LocalDateTime.now();
     }
 
+    public void updateName(String name) {
+        this.name = name;
+    }
+
+    public void updateUsername(String username) {
+        this.username = username;
+    }
+
     @Override
     public String toString() {
         return "User{" +
