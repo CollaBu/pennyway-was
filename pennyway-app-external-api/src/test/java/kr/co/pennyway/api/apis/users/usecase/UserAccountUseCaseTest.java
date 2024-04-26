@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.util.AssertionErrors.*;
 
@@ -286,6 +287,63 @@ class UserAccountUseCaseTest extends ExternalApiDBTestConfig {
             // then
             User updatedUser = userService.readUser(originUser.getId()).orElseThrow();
             assertEquals("사용자 이름이 변경되어 있어야 한다.", newName, updatedUser.getName());
+        }
+    }
+
+    @Order(4)
+    @Nested
+    @DisplayName("[4] 사용자 비밀번호 검증 테스트")
+    class VerificationPasswordTest {
+        @Test
+        @Transactional
+        @DisplayName("사용자가 삭제된 유저인 경우 NOT_FOUND 에러를 반환한다.")
+        void verifyPasswordWhenUserIsDeleted() {
+            // given
+            User originUser = UserFixture.GENERAL_USER.toUser();
+            userService.createUser(originUser);
+            userService.deleteUser(originUser);
+
+            // when - then
+            UserErrorException ex = assertThrows(UserErrorException.class, () -> userAccountUseCase.verifyPassword(originUser.getId(), originUser.getPassword()));
+            assertEquals("삭제된 사용자인 경우 Not Found를 반환한다.", UserErrorCode.NOT_FOUND, ex.getBaseErrorCode());
+        }
+
+        @Test
+        @Transactional
+        @DisplayName("사용자가 일반 회원가입 이력이 없는 소셜 계정인 경우, DO_NOT_GENERAL_SIGNED_UP 에러를 반환한다.")
+        void verifyPasswordWhenUserIsNotGeneralSignedUp() {
+            // given
+            User originUser = UserFixture.ONLY_OAUTH_USER.toUser();
+            userService.createUser(originUser);
+
+            // when - then
+            UserErrorException ex = assertThrows(UserErrorException.class, () -> userAccountUseCase.verifyPassword(originUser.getId(), originUser.getPassword()));
+            assertEquals("일반 회원가입 이력이 없는 경우 Do Not General Signed Up을 반환한다.", UserErrorCode.DO_NOT_GENERAL_SIGNED_UP, ex.getBaseErrorCode());
+        }
+
+        @Test
+        @Transactional
+        @DisplayName("비밀번호가 다른 경우 NOT_MATCHED_PASSWORD 에러를 반환한다.")
+        void verifyPasswordWhenPasswordIsNotMatched() {
+            // given
+            User originUser = UserFixture.GENERAL_USER.toUser();
+            userService.createUser(originUser);
+
+            // when - then
+            UserErrorException ex = assertThrows(UserErrorException.class, () -> userAccountUseCase.verifyPassword(originUser.getId(), "notMatchedPassword"));
+            assertEquals("비밀번호가 다른 경우 Not Matched Password를 반환한다.", UserErrorCode.NOT_MATCHED_PASSWORD, ex.getBaseErrorCode());
+        }
+
+        @Test
+        @Transactional
+        @DisplayName("비밀번호가 일치하는 경우 정상적으로 처리된다.")
+        void verifyPassword() {
+            // given
+            User originUser = UserFixture.GENERAL_USER.toUser();
+            userService.createUser(originUser);
+
+            // when - then
+            assertDoesNotThrow(() -> userAccountUseCase.verifyPassword(originUser.getId(), originUser.getPassword()));
         }
     }
 }
