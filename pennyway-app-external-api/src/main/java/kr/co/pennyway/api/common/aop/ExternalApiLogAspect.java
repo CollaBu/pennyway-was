@@ -43,6 +43,8 @@ public class ExternalApiLogAspect {
         }
 
         for (Object arg : args) {
+            if (arg == null) continue;
+
             if (method.getName().equals("refresh")) {
                 log.debug("요청 헤더 : {} ⇾ 값 : {}", HttpHeaders.COOKIE, arg);
             } else if (arg instanceof String param && param.startsWith("Bearer ")) {
