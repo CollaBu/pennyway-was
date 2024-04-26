@@ -301,13 +301,19 @@ class UserAccountUseCaseTest extends ExternalApiDBTestConfig {
     @Nested
     @DisplayName("[4] 사용자 비밀번호 검증 테스트")
     class VerificationPasswordTest {
+        private User originUser;
+
+        @BeforeEach
+        void setUp() {
+            originUser = UserFixture.GENERAL_USER.toUser();
+            userService.createUser(originUser);
+        }
+
         @Test
         @Transactional
         @DisplayName("사용자가 삭제된 유저인 경우 NOT_FOUND 에러를 반환한다.")
         void verifyPasswordWhenUserIsDeleted() {
             // given
-            User originUser = UserFixture.GENERAL_USER.toUser();
-            userService.createUser(originUser);
             userService.deleteUser(originUser);
 
             // when - then
@@ -332,10 +338,6 @@ class UserAccountUseCaseTest extends ExternalApiDBTestConfig {
         @Transactional
         @DisplayName("비밀번호가 다른 경우 NOT_MATCHED_PASSWORD 에러를 반환한다.")
         void verifyPasswordWhenPasswordIsNotMatched() {
-            // given
-            User originUser = UserFixture.GENERAL_USER.toUser();
-            userService.createUser(originUser);
-
             // when - then
             UserErrorException ex = assertThrows(UserErrorException.class, () -> userAccountUseCase.verifyPassword(originUser.getId(), "notMatchedPassword"));
             assertEquals("비밀번호가 다른 경우 Not Matched Password를 반환한다.", UserErrorCode.NOT_MATCHED_PASSWORD, ex.getBaseErrorCode());
@@ -346,8 +348,6 @@ class UserAccountUseCaseTest extends ExternalApiDBTestConfig {
         @DisplayName("비밀번호가 일치하는 경우 정상적으로 처리된다.")
         void verifyPassword() {
             // given
-            User originUser = UserFixture.GENERAL_USER.toUser();
-            userService.createUser(originUser);
             given(passwordEncoderHelper.isSamePassword(any(), any())).willReturn(true);
 
             // when - then
@@ -359,13 +359,19 @@ class UserAccountUseCaseTest extends ExternalApiDBTestConfig {
     @Nested
     @DisplayName("[5] 사용자 비밀번호 변경 테스트")
     class UpdatePasswordTest {
+        private User originUser;
+
+        @BeforeEach
+        void setUp() {
+            originUser = UserFixture.GENERAL_USER.toUser();
+            userService.createUser(originUser);
+        }
+
         @Test
         @Transactional
         @DisplayName("사용자가 삭제된 유저인 경우 NOT_FOUND 에러를 반환한다.")
         void updatePasswordWhenUserIsDeleted() {
             // given
-            User originUser = UserFixture.GENERAL_USER.toUser();
-            userService.createUser(originUser);
             userService.deleteUser(originUser);
 
             // when - then
@@ -378,8 +384,6 @@ class UserAccountUseCaseTest extends ExternalApiDBTestConfig {
         @DisplayName("oldPassword와 newPassword가 일치하는 경우와 현재 비밀번호와 동일한 비밀번호로 변경을 시도하는 경우, CLIENT_ERROR 에러를 반환한다.")
         void updatePasswordWhenSamePassword() {
             // given
-            User originUser = UserFixture.GENERAL_USER.toUser();
-            userService.createUser(originUser);
             given(passwordEncoderHelper.isSamePassword(any(), any())).willReturn(true);
 
             // when - then
@@ -392,8 +396,6 @@ class UserAccountUseCaseTest extends ExternalApiDBTestConfig {
         @DisplayName("비밀번호가 다른 경우 NOT_MATCHED_PASSWORD 에러를 반환한다.")
         void updatePasswordWhenPasswordIsNotMatched() {
             // given
-            User originUser = UserFixture.GENERAL_USER.toUser();
-            userService.createUser(originUser);
             given(passwordEncoderHelper.isSamePassword(any(), any())).willReturn(false);
 
             // when - then
@@ -419,8 +421,6 @@ class UserAccountUseCaseTest extends ExternalApiDBTestConfig {
         @DisplayName("정상적인 요청인 경우 비밀번호가 정상적으로 변경된다.")
         void updatePassword() {
             // given
-            User originUser = UserFixture.GENERAL_USER.toUser();
-            userService.createUser(originUser);
             given(passwordEncoderHelper.isSamePassword(any(), any())).willReturn(true);
             given(passwordEncoderHelper.encodePassword(any())).willReturn("encodedPassword");
 
