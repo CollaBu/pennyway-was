@@ -28,7 +28,7 @@ public class UserProfileUpdateService {
 
     @Transactional
     public void updatePassword(User user, String oldPassword, String newPassword) {
-        if (oldPassword.equals(newPassword) || !passwordEncoderHelper.isSamePassword(user.getPassword(), oldPassword)) {
+        if (passwordEncoderHelper.isSamePassword(user.getPassword(), newPassword)) {
             log.info("기존과 동일한 비밀번호로는 변경할 수 없습니다.");
             throw new UserErrorException(UserErrorCode.PASSWORD_NOT_CHANGED);
         }
