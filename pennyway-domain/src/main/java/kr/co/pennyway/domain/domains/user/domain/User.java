@@ -83,6 +83,10 @@ public class User extends DateAuditable {
         this.username = username;
     }
 
+    public boolean isGeneralSignedUpUser() {
+        return password != null;
+    }
+
     @Override
     public String toString() {
         return "User{" +
