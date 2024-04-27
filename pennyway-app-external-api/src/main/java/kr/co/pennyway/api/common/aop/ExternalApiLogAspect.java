@@ -1,5 +1,6 @@
 package kr.co.pennyway.api.common.aop;
 
+import kr.co.pennyway.infra.common.jwt.AuthConstants;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.*;
@@ -45,9 +46,12 @@ public class ExternalApiLogAspect {
         for (Object arg : args) {
             if (arg == null) continue;
 
-            if (method.getName().equals("refresh")) {
+            if (method.isAnnotationPresent(RequestHeaderLog.class) && method.getAnnotation(RequestHeaderLog.class).hasCookie()) {
                 log.debug("요청 헤더 : {} ⇾ 값 : {}", HttpHeaders.COOKIE, arg);
-            } else if (arg instanceof String param && param.startsWith("Bearer ")) {
+                continue;
+            }
+
+            if (arg instanceof String param && param.startsWith(AuthConstants.TOKEN_TYPE.getValue())) {
                 log.debug("요청 헤더 : {} ⇾ 값 : {}", HttpHeaders.AUTHORIZATION, param);
             } else {
                 log.info("요청 파라미터 타입 : {} ⇾ 값 : {}", arg.getClass().getSimpleName(), arg);
