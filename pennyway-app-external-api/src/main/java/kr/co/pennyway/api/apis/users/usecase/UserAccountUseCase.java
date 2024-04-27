@@ -3,6 +3,7 @@ package kr.co.pennyway.api.apis.users.usecase;
 import kr.co.pennyway.api.apis.users.dto.DeviceDto;
 import kr.co.pennyway.api.apis.users.dto.UserProfileDto;
 import kr.co.pennyway.api.apis.users.dto.UserProfileUpdateDto;
+import kr.co.pennyway.api.apis.users.helper.PasswordEncoderHelper;
 import kr.co.pennyway.api.apis.users.service.DeviceRegisterService;
 import kr.co.pennyway.api.apis.users.service.UserProfileUpdateService;
 import kr.co.pennyway.common.annotation.UseCase;
@@ -28,6 +29,8 @@ public class UserAccountUseCase {
 
     private final UserProfileUpdateService userProfileUpdateService;
     private final DeviceRegisterService deviceRegisterService;
+
+    private final PasswordEncoderHelper passwordEncoderHelper;
 
     @Transactional
     public DeviceDto.RegisterRes registerDevice(Long userId, DeviceDto.RegisterReq request) {
@@ -55,7 +58,7 @@ public class UserAccountUseCase {
 
         return UserProfileDto.from(user);
     }
-  
+
     @Transactional
     public void updateName(Long userId, String newName) {
         User user = readUserOrThrow(userId);
@@ -68,6 +71,24 @@ public class UserAccountUseCase {
         User user = readUserOrThrow(userId);
 
         userProfileUpdateService.updateUsername(user, newUsername);
+    }
+
+    @Transactional(readOnly = true)
+    public void verifyPassword(Long userId, String expectedPassword) {
+        User user = readUserOrThrow(userId);
+
+        validateGeneralSignedUpUser(user);
+        validatePasswordMatch(expectedPassword, user.getPassword());
+    }
+
+    @Transactional
+    public void updatePassword(Long userId, String oldPassword, String newPassword) {
+        User user = readUserOrThrow(userId);
+
+        validateGeneralSignedUpUser(user);
+        validatePasswordMatch(oldPassword, user.getPassword());
+
+        userProfileUpdateService.updatePassword(user, oldPassword, newPassword);
     }
 
     @Transactional
@@ -88,7 +109,24 @@ public class UserAccountUseCase {
 
     private User readUserOrThrow(Long userId) {
         return userService.readUser(userId).orElseThrow(
-                () -> new UserErrorException(UserErrorCode.NOT_FOUND)
+                () -> {
+                    log.info("사용자를 찾을 수 없습니다.");
+                    return new UserErrorException(UserErrorCode.NOT_FOUND);
+                }
         );
+    }
+
+    private void validateGeneralSignedUpUser(User user) {
+        if (!user.isGeneralSignedUpUser()) {
+            log.info("일반 회원가입 이력이 없습니다.");
+            throw new UserErrorException(UserErrorCode.DO_NOT_GENERAL_SIGNED_UP);
+        }
+    }
+
+    private void validatePasswordMatch(String password, String storedPassword) {
+        if (!passwordEncoderHelper.isSamePassword(password, storedPassword)) {
+            log.info("기존 비밀번호와 일치하지 않습니다.");
+            throw new UserErrorException(UserErrorCode.NOT_MATCHED_PASSWORD);
+        }
     }
 }
