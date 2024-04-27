@@ -56,7 +56,7 @@ public class AuthController implements AuthApi {
     }
 
     @GetMapping("/refresh")
-    @RequestHeaderLog(hasCookie = true)
+    @RequestHeaderLog
     @PreAuthorize("isAnonymous()")
     public ResponseEntity<?> refresh(@CookieValue("refreshToken") @Valid String refreshToken) {
         return createAuthenticatedResponse(authUseCase.refresh(refreshToken));
