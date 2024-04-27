@@ -6,6 +6,7 @@ import kr.co.pennyway.api.apis.auth.dto.PhoneVerificationDto;
 import kr.co.pennyway.api.apis.auth.dto.SignInReq;
 import kr.co.pennyway.api.apis.auth.dto.SignUpReq;
 import kr.co.pennyway.api.apis.auth.usecase.AuthUseCase;
+import kr.co.pennyway.api.common.aop.RequestHeaderLog;
 import kr.co.pennyway.api.common.response.SuccessResponse;
 import kr.co.pennyway.api.common.security.jwt.Jwts;
 import kr.co.pennyway.api.common.util.CookieUtil;
@@ -55,6 +56,7 @@ public class AuthController implements AuthApi {
     }
 
     @GetMapping("/refresh")
+    @RequestHeaderLog
     @PreAuthorize("isAnonymous()")
     public ResponseEntity<?> refresh(@CookieValue("refreshToken") @Valid String refreshToken) {
         return createAuthenticatedResponse(authUseCase.refresh(refreshToken));
