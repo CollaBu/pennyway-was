@@ -1,6 +1,5 @@
 package kr.co.pennyway.domain.common.redis.refresh;
 
-import kr.co.pennyway.domain.common.redis.forbidden.ForbiddenTokenRepository;
 import kr.co.pennyway.domain.config.ContainerRedisTestConfig;
 import kr.co.pennyway.domain.config.RedisConfig;
 import kr.co.pennyway.domain.config.RedisUnitTest;
@@ -23,8 +22,6 @@ import static org.springframework.test.util.AssertionErrors.assertEquals;
 public class RefreshTokenServiceUnitTest extends ContainerRedisTestConfig {
     @Autowired
     private RefreshTokenRepository refreshTokenRepository;
-    @Autowired
-    private ForbiddenTokenRepository forbiddenTokenRepository;
     private RefreshTokenService refreshTokenService;
 
     @BeforeEach
