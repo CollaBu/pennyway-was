@@ -20,7 +20,6 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.Map;
 import java.util.function.Function;
 
 @Slf4j
@@ -49,7 +48,7 @@ public class JwtAuthHelper {
      * @return key에 해당하는 값이 없거나, 타입이 일치하지 않을 경우 null을 반환한다.
      */
     @SuppressWarnings("unchecked")
-    public <T> T getClaimValue(JwtClaims claims, String key, Class<T> type) {
+    public <T> T getClaimsValue(JwtClaims claims, String key, Class<T> type) {
         Object value = claims.getClaims().get(key);
         if (value != null && type.isAssignableFrom(value.getClass())) {
             return (T) value;
@@ -87,15 +86,19 @@ public class JwtAuthHelper {
     }
 
     public Pair<Long, Jwts> refresh(String refreshToken) {
-        Map<String, ?> claims = refreshTokenProvider.getJwtClaimsFromToken(refreshToken).getClaims();
+        JwtClaims claims = refreshTokenProvider.getJwtClaimsFromToken(refreshToken);
 
-        Long userId = Long.parseLong((String) claims.get(RefreshTokenClaimKeys.USER_ID.getValue()));
-        String role = (String) claims.get(RefreshTokenClaimKeys.ROLE.getValue());
+        Long userId = getClaimsValue(claims, RefreshTokenClaimKeys.USER_ID.getValue(), Long::parseLong);
+        String role = getClaimsValue(claims, RefreshTokenClaimKeys.ROLE.getValue(), String.class);
+        log.debug("refresh token userId : {}, role : {}", userId, role);
 
         String newAccessToken = accessTokenProvider.generateToken(AccessTokenClaim.of(userId, role));
+        log.debug("new access token : {}", newAccessToken);
+
         RefreshToken newRefreshToken;
         try {
             newRefreshToken = refreshTokenService.refresh(userId, refreshToken, refreshTokenProvider.generateToken(RefreshTokenClaim.of(userId, role)));
+            log.debug("new refresh token : {}", newRefreshToken.getToken());
         } catch (IllegalArgumentException e) {
             throw new JwtErrorException(JwtErrorCode.EXPIRED_TOKEN);
         } catch (IllegalStateException e) {
