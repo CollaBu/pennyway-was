@@ -12,7 +12,9 @@ import org.springframework.boot.test.autoconfigure.data.redis.DataRedisTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.util.AssertionErrors.assertEquals;
+import static org.springframework.test.util.AssertionErrors.assertFalse;
 
 @Slf4j
 @RedisUnitTest
@@ -66,5 +68,24 @@ public class RefreshTokenServiceUnitTest extends ContainerRedisTestConfig {
         RefreshToken savedRefreshToken = refreshTokenRepository.findById(1L).orElse(null);
         assertEquals("갱신된 리프레시 토큰이 일치하지 않습니다.", "newRefreshToken", savedRefreshToken.getToken());
         log.info("갱신된 리프레시 토큰 정보 : {}", savedRefreshToken);
+    }
+
+    @Test
+    @DisplayName("요청한 리프레시 토큰과 저장된 리프레시 토큰이 다를 경우 토큰이 탈취되었다고 판단하여 값 삭제")
+    void validateTokenTest() {
+        // given
+        RefreshToken refreshToken = RefreshToken.builder()
+                .userId(1L)
+                .token("refreshToken")
+                .ttl(1000L)
+                .build();
+        refreshTokenService.save(refreshToken);
+
+        // when
+        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> refreshTokenService.refresh(1L, "anotherRefreshToken", "newRefreshToken"));
+
+        // then
+        assertEquals("리프레시 토큰이 탈취되었을 때 예외가 발생해야 합니다.", "refresh token mismatched", exception.getMessage());
+        assertFalse("리프레시 토큰이 탈취되었을 때 저장된 리프레시 토큰이 삭제되어야 합니다.", refreshTokenRepository.existsById(1L));
     }
 }
