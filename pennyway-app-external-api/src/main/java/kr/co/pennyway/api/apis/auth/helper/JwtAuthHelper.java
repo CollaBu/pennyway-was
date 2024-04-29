@@ -92,9 +92,6 @@ public class JwtAuthHelper {
         String role = getClaimsValue(claims, RefreshTokenClaimKeys.ROLE.getValue(), String.class);
         log.debug("refresh token userId : {}, role : {}", userId, role);
 
-        String newAccessToken = accessTokenProvider.generateToken(AccessTokenClaim.of(userId, role));
-        log.debug("new access token : {}", newAccessToken);
-
         RefreshToken newRefreshToken;
         try {
             newRefreshToken = refreshTokenService.refresh(userId, refreshToken, refreshTokenProvider.generateToken(RefreshTokenClaim.of(userId, role)));
@@ -104,6 +101,9 @@ public class JwtAuthHelper {
         } catch (IllegalStateException e) {
             throw new JwtErrorException(JwtErrorCode.TAKEN_AWAY_TOKEN);
         }
+
+        String newAccessToken = accessTokenProvider.generateToken(AccessTokenClaim.of(userId, role));
+        log.debug("new access token : {}", newAccessToken);
 
         return Pair.of(userId, Jwts.of(newAccessToken, newRefreshToken.getToken()));
     }
