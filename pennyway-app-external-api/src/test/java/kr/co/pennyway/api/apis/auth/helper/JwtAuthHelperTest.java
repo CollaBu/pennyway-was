@@ -12,6 +12,7 @@ import kr.co.pennyway.domain.common.redis.refresh.RefreshTokenService;
 import kr.co.pennyway.domain.common.redis.refresh.RefreshTokenServiceImpl;
 import kr.co.pennyway.domain.config.RedisConfig;
 import kr.co.pennyway.domain.config.RedisUnitTest;
+import kr.co.pennyway.domain.domains.user.type.Role;
 import kr.co.pennyway.infra.common.exception.JwtErrorCode;
 import kr.co.pennyway.infra.common.exception.JwtErrorException;
 import lombok.extern.slf4j.Slf4j;
@@ -72,7 +73,7 @@ public class JwtAuthHelperTest extends ExternalApiDBTestConfig {
                 .ttl(1000L)
                 .build();
         refreshTokenRepository.save(refreshToken);
-        given(refreshTokenProvider.getJwtClaimsFromToken(refreshToken.getToken())).willReturn(RefreshTokenClaim.of(refreshToken.getUserId(), refreshToken.getToken()));
+        given(refreshTokenProvider.getJwtClaimsFromToken(refreshToken.getToken())).willReturn(RefreshTokenClaim.of(refreshToken.getUserId(), Role.USER.getType()));
         given(accessTokenProvider.generateToken(any())).willReturn("newAccessToken");
         given(refreshTokenProvider.generateToken(any())).willReturn("newRefreshToken");
 
@@ -96,18 +97,12 @@ public class JwtAuthHelperTest extends ExternalApiDBTestConfig {
                 .ttl(1000L)
                 .build();
         refreshTokenRepository.save(refreshToken);
-        given(refreshTokenProvider.getJwtClaimsFromToken(refreshToken.getToken())).willReturn(RefreshTokenClaim.of(refreshToken.getUserId(), refreshToken.getToken()));
-        given(accessTokenProvider.generateToken(any())).willReturn("newAccessToken");
+
+        given(refreshTokenProvider.getJwtClaimsFromToken("anotherRefreshToken")).willReturn(RefreshTokenClaim.of(refreshToken.getUserId(), Role.USER.toString()));
         given(refreshTokenProvider.generateToken(any())).willReturn("newRefreshToken");
-        RefreshToken otherRefreshToken = RefreshToken.builder()
-                .userId(1L)
-                .token("otherRefreshToken")
-                .ttl(1000L)
-                .build();
-        refreshTokenRepository.save(otherRefreshToken);
 
         // when
-        JwtErrorException jwtErrorException = assertThrows(JwtErrorException.class, () -> jwtAuthHelper.refresh(refreshToken.getToken()));
+        JwtErrorException jwtErrorException = assertThrows(JwtErrorException.class, () -> jwtAuthHelper.refresh("anotherRefreshToken"));
 
         // then
         assertEquals("탈취 시나리오 예외가 발생하지 않았습니다.", JwtErrorCode.TAKEN_AWAY_TOKEN, jwtErrorException.getErrorCode());
