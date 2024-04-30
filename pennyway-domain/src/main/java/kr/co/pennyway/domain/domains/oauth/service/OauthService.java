@@ -38,4 +38,9 @@ public class OauthService {
     public boolean isExistOauthAccount(Long userId, Provider provider) {
         return oauthRepository.existsByUser_IdAndProvider(userId, provider);
     }
+
+    @Transactional
+    public void deleteOauth(Oauth oauth) {
+        oauthRepository.delete(oauth);
+    }
 }
