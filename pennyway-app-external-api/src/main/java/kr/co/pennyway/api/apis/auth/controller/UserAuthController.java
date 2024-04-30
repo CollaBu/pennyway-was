@@ -24,12 +24,14 @@ public class UserAuthController implements UserAuthApi {
     private final UserAuthUseCase userAuthUseCase;
     private final CookieUtil cookieUtil;
 
+    @Override
     @GetMapping("/auth")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> getAuthState(@RequestHeader(value = "Authorization") String authHeader) {
         return ResponseEntity.ok(SuccessResponse.from("user", userAuthUseCase.isSignIn(authHeader)));
     }
 
+    @Override
     @GetMapping("/sign-out")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> signOut(
@@ -46,6 +48,7 @@ public class UserAuthController implements UserAuthApi {
 
     @Override
     @PostMapping("/link-oauth")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> linkOauth(@RequestParam Provider provider, @RequestBody @Validated SignInReq.Oauth request, @AuthenticationPrincipal SecurityUserDetails user) {
         userAuthUseCase.linkOauth(provider, request, user.getUserId());
         return ResponseEntity.ok(SuccessResponse.noContent());

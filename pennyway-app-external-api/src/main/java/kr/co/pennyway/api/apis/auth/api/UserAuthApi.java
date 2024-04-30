@@ -63,7 +63,7 @@ public interface UserAuthApi {
             @AuthenticationPrincipal SecurityUserDetails user
     );
 
-    @Operation(summary = "소셜 계정 연동")
+    @Operation(summary = "소셜 계정 연동", description = "인증된 사용자의 소셜 계정을 연동한다. 이미 연동된 계정이 있는 경우에는 409 에러를 반환한다. 미인증 사용자는 해당 API를 사용할 수 없다.")
     @Parameter(name = "provider", description = "소셜 제공자", examples = {
             @ExampleObject(name = "카카오", value = "kakao"), @ExampleObject(name = "애플", value = "apple"), @ExampleObject(name = "구글", value = "google")
     }, required = true, in = ParameterIn.QUERY)
