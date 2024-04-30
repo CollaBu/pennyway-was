@@ -1,6 +1,9 @@
 package kr.co.pennyway.api.apis.auth.dto;
 
+import kr.co.pennyway.domain.domains.oauth.domain.Oauth;
 import kr.co.pennyway.domain.domains.oauth.type.Provider;
+
+import java.time.LocalDateTime;
 
 /**
  * 전화번호 검증 후, 시나리오 분기 정보를 위한 DTO
@@ -44,10 +47,18 @@ public record UserSyncDto(
     public record OauthSync(
             Long id,
             String oauthId,
-            Provider provider
+            Provider provider,
+            LocalDateTime deletedAt
     ) {
-        public static OauthSync of(Long id, String oauthId, Provider provider) {
-            return new OauthSync(id, oauthId, provider);
+        /**
+         * Oauth 정보를 OauthSync로 변환한다. <br/>
+         * Oauth 정보가 없는 경우 null을 반환한다.
+         */
+        public static OauthSync from(Oauth oauth) {
+            if (oauth == null) {
+                return null;
+            }
+            return new OauthSync(oauth.getId(), oauth.getOauthId(), oauth.getProvider(), oauth.getDeletedAt());
         }
     }
 }
