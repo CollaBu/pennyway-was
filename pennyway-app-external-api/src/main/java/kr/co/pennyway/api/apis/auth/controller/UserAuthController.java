@@ -47,7 +47,7 @@ public class UserAuthController implements UserAuthApi {
     }
 
     @Override
-    @PostMapping("/link-oauth")
+    @PutMapping("/link-oauth")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> linkOauth(@RequestParam Provider provider, @RequestBody @Validated SignInReq.Oauth request, @AuthenticationPrincipal SecurityUserDetails user) {
         userAuthUseCase.linkOauth(provider, request, user.getUserId());
