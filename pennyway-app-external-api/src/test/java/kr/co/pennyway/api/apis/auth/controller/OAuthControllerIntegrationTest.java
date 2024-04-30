@@ -336,7 +336,7 @@ public class OAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
         @Test
         @WithAnonymousUser
         @Transactional
-        @DisplayName("같은 provider로 OAuth 회원가입 이력이 있으면 400 에러가 발생한다.")
+        @DisplayName("같은 provider로 OAuth 회원가입 이력이 있으면 409 Conflict 에러가 발생한다.")
         void signUpWithSameProvider() throws Exception {
             // given
             Provider provider = Provider.KAKAO;
@@ -352,7 +352,7 @@ public class OAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
 
             // then
             result
-                    .andExpect(status().isBadRequest())
+                    .andExpect(status().isConflict())
                     .andExpect(jsonPath("$.code").value(OauthErrorCode.ALREADY_SIGNUP_OAUTH.causedBy().getCode()))
                     .andExpect(jsonPath("$.message").value(OauthErrorCode.ALREADY_SIGNUP_OAUTH.getExplainError()))
                     .andDo(print());
@@ -493,7 +493,7 @@ public class OAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
         @Test
         @WithAnonymousUser
         @Transactional
-        @DisplayName("같은 provider로 OAuth 회원가입 이력이 있으면 400 에러가 발생한다.")
+        @DisplayName("같은 provider로 OAuth 회원가입 이력이 있으면 409 Conflict 에러가 발생한다.")
         void signUpWithSameProvider() throws Exception {
             // given
             Provider provider = Provider.KAKAO;
@@ -510,7 +510,7 @@ public class OAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
 
             // then
             result
-                    .andExpect(status().isBadRequest())
+                    .andExpect(status().isConflict())
                     .andExpect(jsonPath("$.code").value(OauthErrorCode.ALREADY_SIGNUP_OAUTH.causedBy().getCode()))
                     .andExpect(jsonPath("$.message").value(OauthErrorCode.ALREADY_SIGNUP_OAUTH.getExplainError()))
                     .andDo(print());

@@ -9,5 +9,7 @@ import java.util.Optional;
 public interface OauthRepository extends JpaRepository<Oauth, Long> {
     Optional<Oauth> findByOauthIdAndProvider(String oauthId, Provider provider);
 
+    Optional<Oauth> findByUser_IdAndProvider(Long userId, Provider provider);
+
     boolean existsByUser_IdAndProvider(Long userId, Provider provider);
 }

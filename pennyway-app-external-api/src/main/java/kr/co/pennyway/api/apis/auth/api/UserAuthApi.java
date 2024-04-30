@@ -12,12 +12,17 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.co.pennyway.api.apis.auth.dto.AuthStateDto;
+import kr.co.pennyway.api.apis.auth.dto.SignInReq;
 import kr.co.pennyway.api.common.security.authentication.SecurityUserDetails;
+import kr.co.pennyway.domain.domains.oauth.type.Provider;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Tag(name = "[사용자 인증 관리 API]", description = "사용자의 인증과 관련된 UseCase(로그아웃, 소셜 계정 연동/해지 등)를 제공하는 API")
 public interface UserAuthApi {
@@ -57,4 +62,18 @@ public interface UserAuthApi {
             @CookieValue(value = "refreshToken", required = false) String refreshToken,
             @AuthenticationPrincipal SecurityUserDetails user
     );
+
+    @Operation(summary = "소셜 계정 연동", description = "인증된 사용자의 소셜 계정을 연동한다. 이미 연동된 계정이 있는 경우에는 409 에러를 반환한다. 미인증 사용자는 해당 API를 사용할 수 없다.")
+    @Parameter(name = "provider", description = "소셜 제공자", examples = {
+            @ExampleObject(name = "카카오", value = "kakao"), @ExampleObject(name = "애플", value = "apple"), @ExampleObject(name = "구글", value = "google")
+    }, required = true, in = ParameterIn.QUERY)
+    @ApiResponse(responseCode = "409", content = @Content(mediaType = "application/json", examples = {
+            @ExampleObject(name = "해당 provider로 로그인한 이력이 이미 존재함", value = """
+                    {
+                        "code": "4091",
+                        "message": "이미 해당 제공자로 가입된 사용자입니다."
+                    }
+                    """)
+    }))
+    ResponseEntity<?> linkOauth(@RequestParam Provider provider, @RequestBody @Validated SignInReq.Oauth request, @AuthenticationPrincipal SecurityUserDetails user);
 }

@@ -1,19 +1,32 @@
 package kr.co.pennyway.api.apis.auth.usecase;
 
 import kr.co.pennyway.api.apis.auth.dto.AuthStateDto;
+import kr.co.pennyway.api.apis.auth.dto.SignInReq;
+import kr.co.pennyway.api.apis.auth.dto.UserSyncDto;
 import kr.co.pennyway.api.apis.auth.helper.JwtAuthHelper;
+import kr.co.pennyway.api.apis.auth.helper.OauthOidcHelper;
+import kr.co.pennyway.api.apis.auth.service.UserOauthSignService;
 import kr.co.pennyway.api.common.security.jwt.access.AccessTokenClaimKeys;
 import kr.co.pennyway.common.annotation.UseCase;
+import kr.co.pennyway.domain.domains.oauth.exception.OauthErrorCode;
+import kr.co.pennyway.domain.domains.oauth.exception.OauthException;
+import kr.co.pennyway.domain.domains.oauth.type.Provider;
 import kr.co.pennyway.infra.common.jwt.JwtClaims;
 import kr.co.pennyway.infra.common.jwt.JwtProvider;
+import kr.co.pennyway.infra.common.oidc.OidcDecodePayload;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @UseCase
 @RequiredArgsConstructor
 public class UserAuthUseCase {
+    private final UserOauthSignService userOauthSignService;
+
     private final JwtAuthHelper jwtAuthHelper;
+    private final OauthOidcHelper oauthOidcHelper;
+
     private final JwtProvider accessTokenProvider;
 
     public AuthStateDto isSignIn(String authHeader) {
@@ -28,5 +41,16 @@ public class UserAuthUseCase {
 
     public void signOut(Long userId, String authHeader, String refreshToken) {
         jwtAuthHelper.removeAccessTokenAndRefreshToken(userId, authHeader, refreshToken);
+    }
+
+    @Transactional
+    public void linkOauth(Provider provider, SignInReq.Oauth request, Long userId) {
+        OidcDecodePayload payload = oauthOidcHelper.getPayload(provider, request.idToken(), request.nonce());
+
+        if (!request.oauthId().equals(payload.sub()))
+            throw new OauthException(OauthErrorCode.NOT_MATCHED_OAUTH_ID);
+
+        UserSyncDto userSync = userOauthSignService.isLinkAllowed(userId, provider);
+        userOauthSignService.saveUser(null, userSync, provider, request.oauthId());
     }
 }

@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.SQLRestriction;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -23,7 +22,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
 @DynamicInsert
-@SQLRestriction("deleted_at IS NULL")
 @SQLDelete(sql = "UPDATE oauth SET deleted_at = NOW() WHERE id = ?")
 public class Oauth {
     @Id
@@ -60,6 +58,18 @@ public class Oauth {
                 .oauthId(oauthId)
                 .user(user)
                 .build();
+    }
+
+    public boolean isDeleted() {
+        return deletedAt != null;
+    }
+
+    public void revertDelete(String oauthId) {
+        if (deletedAt == null) {
+            throw new IllegalStateException("삭제되지 않은 oauth 정보 갱신 요청입니다. oauthId: " + oauthId);
+        }
+        this.oauthId = oauthId;
+        this.deletedAt = null;
     }
 
     @Override

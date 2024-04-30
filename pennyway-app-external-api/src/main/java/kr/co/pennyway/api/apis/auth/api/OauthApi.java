@@ -89,14 +89,6 @@ public interface OauthApi {
                             }
                             """)
             })),
-            @ApiResponse(responseCode = "400", content = @Content(mediaType = "application/json", examples = {
-                    @ExampleObject(name = "해당 provider로 로그인한 이력이 이미 존재함", value = """
-                            {
-                                "code": "4004",
-                                "message": "이미 해당 제공자로 가입된 사용자입니다."
-                            }
-                            """)
-            })),
             @ApiResponse(responseCode = "401", content = @Content(mediaType = "application/json", examples = {
                     @ExampleObject(name = "인증코드 불일치", value = """
                             {
@@ -112,7 +104,15 @@ public interface OauthApi {
                                 "message": "만료되었거나 등록되지 않은 휴대폰 정보입니다."
                             }
                             """),
-            }))
+            })),
+            @ApiResponse(responseCode = "409", content = @Content(mediaType = "application/json", examples = {
+                    @ExampleObject(name = "해당 provider로 로그인한 이력이 이미 존재함", value = """
+                            {
+                                "code": "4091",
+                                "message": "이미 해당 제공자로 가입된 사용자입니다."
+                            }
+                            """)
+            })),
     })
     ResponseEntity<?> verifyCode(@RequestParam Provider provider, @RequestBody @Validated PhoneVerificationDto.VerifyCodeReq request);
 

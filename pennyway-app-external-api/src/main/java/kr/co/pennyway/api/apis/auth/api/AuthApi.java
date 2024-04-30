@@ -46,14 +46,6 @@ public interface AuthApi {
                             }
                             """)
             })),
-            @ApiResponse(responseCode = "400", content = @Content(mediaType = "application/json", examples = {
-                    @ExampleObject(name = "일반 회원가입 계정이 이미 존재함", value = """
-                            {
-                                "code": "4004",
-                                "message": "이미 회원가입한 유저입니다."
-                            }
-                            """)
-            })),
             @ApiResponse(responseCode = "401", content = @Content(mediaType = "application/json", examples = {
                     @ExampleObject(name = "검증 실패", value = """
                             {
@@ -67,6 +59,14 @@ public interface AuthApi {
                             {
                                 "code": "4042",
                                 "message": "만료되었거나 등록되지 않은 휴대폰 정보입니다."
+                            }
+                            """)
+            })),
+            @ApiResponse(responseCode = "409", content = @Content(mediaType = "application/json", examples = {
+                    @ExampleObject(name = "일반 회원가입 계정이 이미 존재함", value = """
+                            {
+                                "code": "4091",
+                                "message": "이미 회원가입한 유저입니다."
                             }
                             """)
             }))
