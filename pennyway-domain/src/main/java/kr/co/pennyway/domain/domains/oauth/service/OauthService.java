@@ -19,6 +19,11 @@ public class OauthService {
         return oauthRepository.save(oauth);
     }
 
+    @Transactional
+    public Optional<Oauth> readOauth(Long id) {
+        return oauthRepository.findById(id);
+    }
+
     @Transactional(readOnly = true)
     public Optional<Oauth> readOauthByOauthIdAndProvider(String oauthId, Provider provider) {
         return oauthRepository.findByOauthIdAndProvider(oauthId, provider);
