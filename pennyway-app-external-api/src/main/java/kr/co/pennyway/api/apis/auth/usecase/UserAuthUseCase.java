@@ -8,8 +8,6 @@ import kr.co.pennyway.api.apis.auth.helper.OauthOidcHelper;
 import kr.co.pennyway.api.apis.auth.service.UserOauthSignService;
 import kr.co.pennyway.api.common.security.jwt.access.AccessTokenClaimKeys;
 import kr.co.pennyway.common.annotation.UseCase;
-import kr.co.pennyway.domain.domains.oauth.exception.OauthErrorCode;
-import kr.co.pennyway.domain.domains.oauth.exception.OauthException;
 import kr.co.pennyway.domain.domains.oauth.type.Provider;
 import kr.co.pennyway.infra.common.jwt.JwtClaims;
 import kr.co.pennyway.infra.common.jwt.JwtProvider;
@@ -45,12 +43,9 @@ public class UserAuthUseCase {
 
     @Transactional
     public void linkOauth(Provider provider, SignInReq.Oauth request, Long userId) {
-        OidcDecodePayload payload = oauthOidcHelper.getPayload(provider, request.idToken(), request.nonce());
-
-        if (!request.oauthId().equals(payload.sub()))
-            throw new OauthException(OauthErrorCode.NOT_MATCHED_OAUTH_ID);
+        OidcDecodePayload payload = oauthOidcHelper.getPayload(provider, request.oauthId(), request.idToken(), request.nonce());
 
         UserSyncDto userSync = userOauthSignService.isLinkAllowed(userId, provider);
-        userOauthSignService.saveUser(null, userSync, provider, request.oauthId());
+        userOauthSignService.saveUser(null, userSync, provider, payload.sub());
     }
 }
