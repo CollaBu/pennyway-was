@@ -106,7 +106,7 @@ public class AuthControllerIntegrationTest extends ExternalApiDBTestConfig {
     class GeneralSignUpPhoneVerifyTest {
         @Test
         @WithAnonymousUser
-        @DisplayName("일반 회원가입 이력이 있는 경우 400 BAD_REQUEST를 반환하고, 인증 코드 캐시 데이터가 제거된다.")
+        @DisplayName("일반 회원가입 이력이 있는 경우 409 Conflict를 반환하고, 인증 코드 캐시 데이터가 제거된다.")
         void generalSignUpFailBecauseAlreadyGeneralSignUp() throws Exception {
             // given
             phoneCodeService.create(expectedPhone, expectedCode, PhoneCodeKeyType.SIGN_UP);
@@ -117,7 +117,7 @@ public class AuthControllerIntegrationTest extends ExternalApiDBTestConfig {
 
             // then
             resultActions
-                    .andExpect(status().isBadRequest())
+                    .andExpect(status().isConflict())
                     .andExpect(jsonPath("$.code").value(UserErrorCode.ALREADY_SIGNUP.causedBy().getCode()))
                     .andExpect(jsonPath("$.message").value(UserErrorCode.ALREADY_SIGNUP.getExplainError()))
                     .andDo(print());
