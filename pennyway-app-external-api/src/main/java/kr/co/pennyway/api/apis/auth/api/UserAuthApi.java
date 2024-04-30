@@ -67,5 +67,13 @@ public interface UserAuthApi {
     @Parameter(name = "provider", description = "소셜 제공자", examples = {
             @ExampleObject(name = "카카오", value = "kakao"), @ExampleObject(name = "애플", value = "apple"), @ExampleObject(name = "구글", value = "google")
     }, required = true, in = ParameterIn.QUERY)
+    @ApiResponse(responseCode = "409", content = @Content(mediaType = "application/json", examples = {
+            @ExampleObject(name = "해당 provider로 로그인한 이력이 이미 존재함", value = """
+                    {
+                        "code": "4091",
+                        "message": "이미 해당 제공자로 가입된 사용자입니다."
+                    }
+                    """)
+    }))
     ResponseEntity<?> linkOauth(@RequestParam Provider provider, @RequestBody @Validated SignInReq.Oauth request, @AuthenticationPrincipal SecurityUserDetails user);
 }
