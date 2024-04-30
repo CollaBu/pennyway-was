@@ -29,6 +29,9 @@ public class UserOauthSignService {
     public User readUser(String oauthId, Provider provider) {
         Optional<Oauth> oauth = oauthService.readOauthByOauthIdAndProvider(oauthId, provider);
 
+        if (oauth.isPresent() && oauth.get().isDeleted())
+            return null;
+
         return oauth.map(Oauth::getUser).orElse(null);
     }
 
@@ -90,32 +93,25 @@ public class UserOauthSignService {
             log.info("기존 계정에 연동합니다. username: {}", userSync.username());
             user = userService.readUser(userSync.userId())
                     .orElseThrow(() -> new UserErrorException(UserErrorCode.NOT_FOUND));
-
-            if (userSync.isExistOauthAccount()) {
-                log.debug("기존 Oauth 정보가 삭제된 계정입니다. oauth: {}", userSync.oauthSync());
-                revertDeletedOauth(userSync);
-                return user;
-            }
         } else {
             log.info("새로운 계정을 생성합니다. username: {}", request.username());
             user = request.toUser();
             userService.createUser(user);
         }
 
-        Oauth oauth = mappingOauthToUser(user, provider, oauthId);
+        Oauth oauth = (userSync.isExistOauthAccount()) ? revertDeletedOauth(userSync) : Oauth.of(provider, oauthId, user);
+        oauthService.createOauth(oauth);
         log.info("연동된 Oauth 정보 : {}", oauth);
 
         return user;
     }
 
-    private void revertDeletedOauth(UserSyncDto userSync) {
+    private Oauth revertDeletedOauth(UserSyncDto userSync) {
+        log.info("기존 Oauth 정보가 삭제된 계정입니다. oauth: {}", userSync.oauthSync());
+
         Oauth oauth = oauthService.readOauth(userSync.oauthSync().id())
                 .orElseThrow(() -> new OauthException(OauthErrorCode.NOT_FOUND_OAUTH));
         oauth.revertDelete(userSync.oauthSync().oauthId());
-    }
-
-    private Oauth mappingOauthToUser(User user, Provider provider, String oauthId) {
-        Oauth oauth = Oauth.of(provider, oauthId, user);
-        return oauthService.createOauth(oauth);
+        return oauth;
     }
 }
