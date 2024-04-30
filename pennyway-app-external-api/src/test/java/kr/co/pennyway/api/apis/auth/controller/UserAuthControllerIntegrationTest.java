@@ -42,7 +42,7 @@ import java.time.ZoneId;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -281,9 +281,36 @@ public class UserAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
                     .andDo(print());
         }
 
+        @Order(3)
+        @Test
+        @DisplayName("해당 provider가 soft delete된 이력이 존재한다면, deleted_at을 null로 업데이트하고 최신 oauth_id를 반영하여 계정 연동에 성공한다.")
+        @WithSecurityMockUser(userId = "10")
+        @Transactional
+        void linkOauthWithDeletedHistory() throws Exception {
+            // given
+            User user = UserFixture.GENERAL_USER.toUser();
+            userService.createUser(user);
+            Provider expectedProvider = Provider.KAKAO;
+            Oauth oauth = Oauth.of(expectedProvider, "oauthId", user);
+            oauthService.createOauth(oauth);
+            oauthService.deleteOauth(oauth);
+            given(oauthOidcHelper.getPayload(expectedProvider, "idToken", "nonce")).willReturn(new OidcDecodePayload("iss", "aud", "newOauthId", "email"));
+
+            // when
+            ResultActions result = performLinkOauth(expectedProvider);
+
+            // then
+            result.andExpect(status().isOk()).andDo(print());
+            Oauth savedOauth = oauthService.readOauth(oauth.getId()).orElse(null);
+            assertNotNull(savedOauth);
+            assertEquals("newOauthId", savedOauth.getOauthId());
+            assertNull(savedOauth.getDeletedAt());
+            log.info("연동된 Oauth 정보 : {}", savedOauth);
+        }
+
         private ResultActions performLinkOauth(Provider provider) throws Exception {
             SignInReq.Oauth request = new SignInReq.Oauth("oauthId", "idToken", "nonce");
-            return mockMvc.perform(post("/v1/link-oauth")
+            return mockMvc.perform(put("/v1/link-oauth")
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON)
                     .queryParam("provider", provider.name())
