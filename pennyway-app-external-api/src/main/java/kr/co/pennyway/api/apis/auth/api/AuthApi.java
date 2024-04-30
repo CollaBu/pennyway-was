@@ -144,22 +144,41 @@ public interface AuthApi {
     ResponseEntity<?> signIn(@RequestBody @Validated SignInReq.General request);
 
     @Operation(summary = "[5] 토큰 갱신", description = "리프레시 토큰을 이용해 액세스 토큰과 리프레시 토큰을 갱신합니다.")
-    @ApiResponse(responseCode = "200", description = "로그인 성공",
-            headers = {
-                    @Header(name = "Set-Cookie", description = "리프레시 토큰", schema = @Schema(type = "string"), required = true),
-                    @Header(name = "Authorization", description = "액세스 토큰", schema = @Schema(type = "string", format = "jwt"), required = true)
-            },
-            content = @Content(mediaType = "application/json", examples = {
-                    @ExampleObject(name = "성공", value = """
-                            {
-                                "code": "2000",
-                                "data": {
-                                    "user": {
-                                        "id": 1
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "로그인 성공",
+                    headers = {
+                            @Header(name = "Set-Cookie", description = "리프레시 토큰", schema = @Schema(type = "string"), required = true),
+                            @Header(name = "Authorization", description = "액세스 토큰", schema = @Schema(type = "string", format = "jwt"), required = true)
+                    },
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(name = "성공", value = """
+                                    {
+                                        "code": "2000",
+                                        "data": {
+                                            "user": {
+                                                "id": 1
+                                            }
+                                        }
                                     }
-                                }
+                                    """)
+                    })),
+            @ApiResponse(responseCode = "401", description = "리프레시 토큰 만료", content = @Content(mediaType = "application/json", examples = {
+                    @ExampleObject(name = "실패 - 리프레시 토큰 만료", value = """
+                            {
+                                "code": "4011",
+                                "message": "사용기간이 만료된 토큰입니다"
                             }
                             """)
-            }))
+            })),
+            @ApiResponse(responseCode = "403", description = "탈취된 토큰", content = @Content(mediaType = "application/json", examples = {
+                    @ExampleObject(name = "실패 - 탈취된 토큰", value = """
+                            {
+                                "code": "4030",
+                                "message": "탈취당한 토큰입니다. 다시 로그인 해주세요."
+                            }
+                            """)
+            })),
+
+    })
     ResponseEntity<?> refresh(@CookieValue("refreshToken") @Valid String refreshToken);
 }
