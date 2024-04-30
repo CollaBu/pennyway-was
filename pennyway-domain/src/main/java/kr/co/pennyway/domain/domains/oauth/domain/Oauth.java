@@ -64,6 +64,14 @@ public class Oauth {
         return deletedAt != null;
     }
 
+    public void revertDelete(String oauthId) {
+        if (deletedAt != null) {
+            throw new IllegalStateException("이미 삭제된 Oauth입니다. oauthId: " + oauthId);
+        }
+        this.oauthId = oauthId;
+        this.deletedAt = null;
+    }
+
     @Override
     public String toString() {
         return "Oauth{" +
