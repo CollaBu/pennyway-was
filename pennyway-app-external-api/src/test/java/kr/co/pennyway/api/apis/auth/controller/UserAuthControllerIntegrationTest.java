@@ -294,7 +294,7 @@ public class UserAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
             Oauth oauth = Oauth.of(expectedProvider, "oauthId", user);
             oauthService.createOauth(oauth);
             oauthService.deleteOauth(oauth);
-            given(oauthOidcHelper.getPayload(expectedProvider, "oauthId", "idToken", "nonce")).willReturn(new OidcDecodePayload("iss", "aud", "newOauthId", "email"));
+            given(oauthOidcHelper.getPayload(expectedProvider, "newOauthId", "idToken", "nonce")).willReturn(new OidcDecodePayload("iss", "aud", "newOauthId", "email"));
 
             // when
             ResultActions result = performLinkOauth(expectedProvider, "newOauthId");
