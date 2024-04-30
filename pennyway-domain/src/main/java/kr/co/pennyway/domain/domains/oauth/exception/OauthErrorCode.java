@@ -16,6 +16,9 @@ public enum OauthErrorCode implements BaseErrorCode {
     /* 401 Unauthorized */
     NOT_MATCHED_OAUTH_ID(StatusCode.UNAUTHORIZED, ReasonCode.MISSING_OR_INVALID_AUTHENTICATION_CREDENTIALS, "OAuth ID가 일치하지 않습니다."),
 
+    /* 404 Not Found */
+    NOT_FOUND_OAUTH(StatusCode.NOT_FOUND, ReasonCode.REQUESTED_RESOURCE_NOT_FOUND, "해당 제공자로 가입된 이력을 찾을 수 없습니다."),
+
     /* 409 Conflict */
     ALREADY_SIGNUP_OAUTH(StatusCode.CONFLICT, ReasonCode.RESOURCE_ALREADY_EXISTS, "이미 해당 제공자로 가입된 사용자입니다."),
 
