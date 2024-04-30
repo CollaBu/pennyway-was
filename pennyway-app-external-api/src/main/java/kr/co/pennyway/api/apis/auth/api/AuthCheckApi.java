@@ -53,6 +53,6 @@ public interface AuthCheckApi {
     })
     ResponseEntity<?> findUsername(@Validated PhoneVerificationDto.VerifyCodeReq request);
 
-    @Operation(summary = "일반 회원 아이디 찾기")
+    @Operation(summary = "일반 회원 비밀번호 찾기에 사용되는 비밀번호 변경")
     ResponseEntity<?> findPassword(@Validated PhoneVerificationDto.VerifyCodeReq request, @Validated AuthFindDto.PasswordReq passwordReq);
 }
