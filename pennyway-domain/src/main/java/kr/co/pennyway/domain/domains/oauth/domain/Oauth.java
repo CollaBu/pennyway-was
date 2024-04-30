@@ -60,6 +60,10 @@ public class Oauth {
                 .build();
     }
 
+    public boolean isDeleted() {
+        return deletedAt != null;
+    }
+
     @Override
     public String toString() {
         return "Oauth{" +
