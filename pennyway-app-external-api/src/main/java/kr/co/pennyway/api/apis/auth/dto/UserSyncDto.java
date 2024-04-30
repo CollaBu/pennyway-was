@@ -44,6 +44,13 @@ public record UserSyncDto(
         return UserSyncDto.of(true, false, null, null, null);
     }
 
+    /**
+     * 기존의 soft delete된 Oauth 정보가 있는지 확인한다.
+     */
+    public boolean isExistOauthAccount() {
+        return oauthSync != null;
+    }
+
     public record OauthSync(
             Long id,
             String oauthId,
