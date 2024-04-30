@@ -63,7 +63,9 @@ public class UserOauthSignService {
      */
     @Transactional(readOnly = true)
     public UserSyncDto isLinkAllowed(Long userId, Provider provider) {
-        if (oauthService.isExistOauthAccount(userId, provider))
+        Optional<Oauth> oauth = oauthService.readOauthByUserIdAndProvider(userId, provider);
+
+        if (oauth.isPresent() && oauth.get().getDeletedAt() != null)
             throw new OauthException(OauthErrorCode.ALREADY_SIGNUP_OAUTH);
 
         User user = userService.readUser(userId).orElseThrow(() -> new UserErrorException(UserErrorCode.NOT_FOUND));
