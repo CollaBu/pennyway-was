@@ -251,7 +251,7 @@ public class UserAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
             given(oauthOidcHelper.getPayload(expectedProvider, "idToken", "nonce")).willReturn(new OidcDecodePayload("iss", "aud", "oauthId", "email"));
 
             // when
-            ResultActions result = performLinkOauth(expectedProvider);
+            ResultActions result = performLinkOauth(expectedProvider, "oauthId");
 
             // then
             result.andExpect(status().isOk()).andDo(print());
@@ -272,7 +272,7 @@ public class UserAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
             given(oauthOidcHelper.getPayload(expectedProvider, "idToken", "nonce")).willReturn(new OidcDecodePayload("iss", "aud", "oauthId", "email"));
 
             // when
-            ResultActions result = performLinkOauth(expectedProvider);
+            ResultActions result = performLinkOauth(expectedProvider, "oauthId");
 
             // then
             result.andExpect(status().isConflict())
@@ -297,7 +297,7 @@ public class UserAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
             given(oauthOidcHelper.getPayload(expectedProvider, "idToken", "nonce")).willReturn(new OidcDecodePayload("iss", "aud", "newOauthId", "email"));
 
             // when
-            ResultActions result = performLinkOauth(expectedProvider);
+            ResultActions result = performLinkOauth(expectedProvider, "newOauthId");
 
             // then
             result.andExpect(status().isOk()).andDo(print());
@@ -308,8 +308,8 @@ public class UserAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
             log.info("연동된 Oauth 정보 : {}", savedOauth);
         }
 
-        private ResultActions performLinkOauth(Provider provider) throws Exception {
-            SignInReq.Oauth request = new SignInReq.Oauth("oauthId", "idToken", "nonce");
+        private ResultActions performLinkOauth(Provider provider, String oauthId) throws Exception {
+            SignInReq.Oauth request = new SignInReq.Oauth(oauthId, "idToken", "nonce");
             return mockMvc.perform(put("/v1/link-oauth")
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON)
