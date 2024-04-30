@@ -13,11 +13,15 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.co.pennyway.api.apis.auth.dto.AuthStateDto;
 import kr.co.pennyway.api.common.security.authentication.SecurityUserDetails;
+import kr.co.pennyway.domain.domains.oauth.type.Provider;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Tag(name = "[사용자 인증 관리 API]", description = "사용자의 인증과 관련된 UseCase(로그아웃, 소셜 계정 연동/해지 등)를 제공하는 API")
 public interface UserAuthApi {
@@ -57,4 +61,10 @@ public interface UserAuthApi {
             @CookieValue(value = "refreshToken", required = false) String refreshToken,
             @AuthenticationPrincipal SecurityUserDetails user
     );
+
+    @Operation(summary = "소셜 계정 연동")
+    @Parameter(name = "provider", description = "소셜 제공자", examples = {
+            @ExampleObject(name = "카카오", value = "kakao"), @ExampleObject(name = "애플", value = "apple"), @ExampleObject(name = "구글", value = "google")
+    }, required = true, in = ParameterIn.QUERY)
+    ResponseEntity<?> linkOauth(@RequestParam Provider provider, @RequestBody @Validated OauthLinkReq request, @AuthenticationPrincipal SecurityUserDetails user);
 }

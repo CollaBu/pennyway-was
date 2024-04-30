@@ -5,12 +5,14 @@ import kr.co.pennyway.api.apis.auth.usecase.UserAuthUseCase;
 import kr.co.pennyway.api.common.response.SuccessResponse;
 import kr.co.pennyway.api.common.security.authentication.SecurityUserDetails;
 import kr.co.pennyway.api.common.util.CookieUtil;
+import kr.co.pennyway.domain.domains.oauth.type.Provider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
@@ -39,5 +41,12 @@ public class UserAuthController implements UserAuthApi {
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, cookieUtil.deleteCookie("refreshToken").toString())
                 .body(SuccessResponse.noContent());
+    }
+
+    @Override
+    @PostMapping("/link-oauth")
+    public ResponseEntity<?> linkOauth(@RequestParam Provider provider, @RequestBody @Validated OauthLinkReq request, @AuthenticationPrincipal SecurityUserDetails user) {
+        userAuthUseCase.linkOauth(provider, request, user.getUserId());
+        return ResponseEntity.ok(SuccessResponse.noContent());
     }
 }
