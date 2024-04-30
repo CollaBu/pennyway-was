@@ -33,6 +33,14 @@ public record UserSyncDto(
         return UserSyncDto.of(false, true, userId, username, null);
     }
 
+    /**
+     * 회원 가입 이력이 없는 경우 사용하는 편의용 메서드. <br/>
+     * 내부에서 {@link UserSyncDto#of(boolean, boolean, Long, String, OauthSync)}를 호출한다.
+     */
+    public static UserSyncDto signUpAllowed() {
+        return UserSyncDto.of(true, false, null, null, null);
+    }
+
     public record OauthSync(
             Long id,
             String oauthId,

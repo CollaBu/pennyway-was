@@ -44,7 +44,7 @@ public class UserOauthSignService {
 
         if (user.isEmpty()) {
             log.info("회원가입 이력이 없는 사용자입니다. phone: {}", phone);
-            return UserSyncDto.of(true, false, null, null);
+            return UserSyncDto.signUpAllowed();
         }
 
         if (oauthService.isExistOauthAccount(user.get().getId(), provider)) {
