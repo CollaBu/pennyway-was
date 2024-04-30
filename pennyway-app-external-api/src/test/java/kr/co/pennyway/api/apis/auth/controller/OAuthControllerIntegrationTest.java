@@ -398,6 +398,34 @@ public class OAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
                     .andDo(print());
         }
 
+        @Test
+        @WithAnonymousUser
+        @Transactional
+        @DisplayName("같은 provider로 Oauth 로그인 이력이 soft delete 되었으면 성공 응답을 반환한다.")
+        void signUpWithDeletedOauth() throws Exception {
+            // given
+            Provider provider = Provider.KAKAO;
+            User user = createGeneralSignedUser();
+            Oauth oauth = createOauthAccount(user, provider);
+
+            userService.createUser(user);
+            oauthService.createOauth(oauth);
+            oauthService.deleteOauth(oauth);
+            phoneCodeService.create(expectedPhone, expectedCode, PhoneCodeKeyType.getOauthSignUpTypeByProvider(provider));
+
+            // when
+            ResultActions result = performOauthSignUpPhoneVerification(provider, expectedCode);
+
+            // then
+            result
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.code").value("2000"))
+                    .andExpect(jsonPath("$.data.sms.code").value(true))
+                    .andExpect(jsonPath("$.data.sms.existsUser").value(true))
+                    .andExpect(jsonPath("$.data.sms.username").value(user.getUsername()))
+                    .andDo(print());
+        }
+
         private ResultActions performOauthSignUpPhoneVerification(Provider provider, String code) throws Exception {
             PhoneVerificationDto.VerifyCodeReq request = new PhoneVerificationDto.VerifyCodeReq(expectedPhone, code);
             return mockMvc.perform(post("/v1/auth/oauth/phone/verification")
