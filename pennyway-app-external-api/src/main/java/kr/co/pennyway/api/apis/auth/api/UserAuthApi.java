@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.co.pennyway.api.apis.auth.dto.AuthStateDto;
+import kr.co.pennyway.api.apis.auth.dto.SignInReq;
 import kr.co.pennyway.api.common.security.authentication.SecurityUserDetails;
 import kr.co.pennyway.domain.domains.oauth.type.Provider;
 import org.springframework.http.ResponseEntity;
@@ -66,5 +67,5 @@ public interface UserAuthApi {
     @Parameter(name = "provider", description = "소셜 제공자", examples = {
             @ExampleObject(name = "카카오", value = "kakao"), @ExampleObject(name = "애플", value = "apple"), @ExampleObject(name = "구글", value = "google")
     }, required = true, in = ParameterIn.QUERY)
-    ResponseEntity<?> linkOauth(@RequestParam Provider provider, @RequestBody @Validated OauthLinkReq request, @AuthenticationPrincipal SecurityUserDetails user);
+    ResponseEntity<?> linkOauth(@RequestParam Provider provider, @RequestBody @Validated SignInReq.Oauth request, @AuthenticationPrincipal SecurityUserDetails user);
 }

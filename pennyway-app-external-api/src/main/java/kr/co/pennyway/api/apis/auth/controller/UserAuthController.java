@@ -1,6 +1,7 @@
 package kr.co.pennyway.api.apis.auth.controller;
 
 import kr.co.pennyway.api.apis.auth.api.UserAuthApi;
+import kr.co.pennyway.api.apis.auth.dto.SignInReq;
 import kr.co.pennyway.api.apis.auth.usecase.UserAuthUseCase;
 import kr.co.pennyway.api.common.response.SuccessResponse;
 import kr.co.pennyway.api.common.security.authentication.SecurityUserDetails;
@@ -45,7 +46,7 @@ public class UserAuthController implements UserAuthApi {
 
     @Override
     @PostMapping("/link-oauth")
-    public ResponseEntity<?> linkOauth(@RequestParam Provider provider, @RequestBody @Validated OauthLinkReq request, @AuthenticationPrincipal SecurityUserDetails user) {
+    public ResponseEntity<?> linkOauth(@RequestParam Provider provider, @RequestBody @Validated SignInReq.Oauth request, @AuthenticationPrincipal SecurityUserDetails user) {
         userAuthUseCase.linkOauth(provider, request, user.getUserId());
         return ResponseEntity.ok(SuccessResponse.noContent());
     }
