@@ -57,6 +57,21 @@ public class UserOauthSignService {
     }
 
     /**
+     * 인증된 사용자에게 provider로 연동할 수 있는지 여부를 반환한다.
+     *
+     * @return {@link UserSyncDto}
+     */
+    @Transactional(readOnly = true)
+    public UserSyncDto isLinkAllowed(Long userId, Provider provider) {
+        if (oauthService.isExistOauthAccount(userId, provider))
+            throw new OauthException(OauthErrorCode.ALREADY_SIGNUP_OAUTH);
+
+        User user = userService.readUser(userId).orElseThrow(() -> new UserErrorException(UserErrorCode.NOT_FOUND));
+
+        return UserSyncDto.of(true, true, user.getId(), user.getUsername());
+    }
+
+    /**
      * 기존 계정이 존재하면 Oauth 계정을 생성하여 연동하고, 존재하지 않으면 새로운 계정을 생성한다.
      *
      * @param request {@link SignUpReq.OauthInfo}
@@ -79,21 +94,6 @@ public class UserOauthSignService {
         log.info("연동된 Oauth 정보 : {}", oauth);
 
         return user;
-    }
-
-    /**
-     * 인증된 사용자에게 provider로 연동할 수 있는지 여부를 반환한다.
-     *
-     * @return {@link UserSyncDto}
-     */
-    @Transactional(readOnly = true)
-    public UserSyncDto isLinkAllowed(Long userId, Provider provider) {
-        if (oauthService.isExistOauthAccount(userId, provider))
-            throw new OauthException(OauthErrorCode.ALREADY_SIGNUP_OAUTH);
-
-        User user = userService.readUser(userId).orElseThrow(() -> new UserErrorException(UserErrorCode.NOT_FOUND));
-
-        return UserSyncDto.of(true, true, user.getId(), user.getUsername());
     }
 
     private Oauth mappingOauthToUser(User user, Provider provider, String oauthId) {
