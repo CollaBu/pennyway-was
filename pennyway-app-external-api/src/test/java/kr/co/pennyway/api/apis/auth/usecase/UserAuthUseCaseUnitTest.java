@@ -2,6 +2,8 @@ package kr.co.pennyway.api.apis.auth.usecase;
 
 import kr.co.pennyway.api.apis.auth.dto.AuthStateDto;
 import kr.co.pennyway.api.apis.auth.helper.JwtAuthHelper;
+import kr.co.pennyway.api.apis.auth.helper.OauthOidcHelper;
+import kr.co.pennyway.api.apis.auth.service.UserOauthSignService;
 import kr.co.pennyway.api.common.security.jwt.access.AccessTokenClaim;
 import kr.co.pennyway.api.common.security.jwt.access.AccessTokenProvider;
 import kr.co.pennyway.domain.common.redis.forbidden.ForbiddenTokenService;
@@ -33,6 +35,10 @@ public class UserAuthUseCaseUnitTest {
     private JwtAuthHelper jwtAuthHelper;
 
     @Mock
+    private UserOauthSignService userOauthSignService;
+    @Mock
+    private OauthOidcHelper oauthOidcHelper;
+    @Mock
     private JwtProvider refreshTokenProvider;
     @Mock
     private RefreshTokenService refreshTokenService;
@@ -43,7 +49,7 @@ public class UserAuthUseCaseUnitTest {
     public void setUp() {
         accessTokenProvider = new AccessTokenProvider(secretStr, Duration.ofMinutes(5));
         jwtAuthHelper = new JwtAuthHelper(accessTokenProvider, refreshTokenProvider, refreshTokenService, forbiddenTokenService);
-        userAuthUseCase = new UserAuthUseCase(jwtAuthHelper, accessTokenProvider);
+        userAuthUseCase = new UserAuthUseCase(userOauthSignService, jwtAuthHelper, oauthOidcHelper, accessTokenProvider);
     }
 
     @Test
@@ -51,7 +57,7 @@ public class UserAuthUseCaseUnitTest {
     public void isSignedInWithExpiredToken() {
         // given
         accessTokenProvider = new AccessTokenProvider(secretStr, Duration.ofMillis(0));
-        userAuthUseCase = new UserAuthUseCase(jwtAuthHelper, accessTokenProvider);
+        userAuthUseCase = new UserAuthUseCase(userOauthSignService, jwtAuthHelper, oauthOidcHelper, accessTokenProvider);
         String expiredToken = accessTokenProvider.generateToken(jwtClaims);
 
         // when
