@@ -25,6 +25,11 @@ public class OauthService {
     }
 
     @Transactional(readOnly = true)
+    public Optional<Oauth> readOauthByUserIdAndProvider(Long userId, Provider provider) {
+        return oauthRepository.findByUser_IdAndProvider(userId, provider);
+    }
+
+    @Transactional(readOnly = true)
     public boolean isExistOauthAccount(Long userId, Provider provider) {
         return oauthRepository.existsByUser_IdAndProvider(userId, provider);
     }
