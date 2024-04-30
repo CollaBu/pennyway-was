@@ -3,6 +3,8 @@ package kr.co.pennyway.api.apis.auth.service;
 import kr.co.pennyway.api.apis.auth.dto.SignUpReq;
 import kr.co.pennyway.api.apis.auth.dto.UserSyncDto;
 import kr.co.pennyway.domain.domains.oauth.domain.Oauth;
+import kr.co.pennyway.domain.domains.oauth.exception.OauthErrorCode;
+import kr.co.pennyway.domain.domains.oauth.exception.OauthException;
 import kr.co.pennyway.domain.domains.oauth.service.OauthService;
 import kr.co.pennyway.domain.domains.oauth.type.Provider;
 import kr.co.pennyway.domain.domains.user.domain.User;
@@ -28,6 +30,14 @@ public class UserOauthSignService {
         Optional<Oauth> oauth = oauthService.readOauthByOauthIdAndProvider(oauthId, provider);
 
         return oauth.map(Oauth::getUser).orElse(null);
+    }
+
+    @Transactional(readOnly = true)
+    public User readUserIfDoesNotExistOauthProvider(Long userId, Provider provider) {
+        if (oauthService.isExistOauthAccount(userId, provider))
+            throw new OauthException(OauthErrorCode.ALREADY_SIGNUP_OAUTH);
+
+        return userService.readUser(userId).orElseThrow(() -> new UserErrorException(UserErrorCode.NOT_FOUND));
     }
 
     /**
