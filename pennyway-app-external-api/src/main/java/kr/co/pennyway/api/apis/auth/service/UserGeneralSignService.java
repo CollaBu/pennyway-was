@@ -38,7 +38,7 @@ public class UserGeneralSignService {
 
         if (!isExistUser(user)) {
             log.info("회원가입 이력이 없는 사용자입니다. phone: {}", phone);
-            return UserSyncDto.of(true, false, null, null);
+            return UserSyncDto.signUpAllowed();
         }
 
         if (isGeneralSignUpUser(user.get())) {
@@ -47,7 +47,7 @@ public class UserGeneralSignService {
         }
 
         log.info("소셜 회원가입 사용자입니다. user: {}", user.get());
-        return UserSyncDto.of(true, true, user.get().getId(), user.get().getUsername());
+        return UserSyncDto.of(true, true, user.get().getId(), user.get().getUsername(), null);
     }
 
     /**
