@@ -47,13 +47,15 @@ public class UserOauthSignService {
             return UserSyncDto.signUpAllowed();
         }
 
-        if (oauthService.isExistOauthAccount(user.get().getId(), provider)) {
+        Optional<Oauth> oauth = oauthService.readOauthByUserIdAndProvider(user.get().getId(), provider);
+
+        if (oauth.isPresent() && !oauth.get().isDeleted()) {
             log.info("이미 동일한 Provider로 가입된 사용자입니다. phone: {}, provider: {}", phone, provider);
             return UserSyncDto.abort(user.get().getId(), user.get().getUsername());
         }
 
         log.info("소셜 회원가입 사용자입니다. user: {}", user.get());
-        return UserSyncDto.of(true, true, user.get().getId(), user.get().getUsername());
+        return UserSyncDto.of(true, true, user.get().getId(), user.get().getUsername(), UserSyncDto.OauthSync.from(oauth.orElse(null)));
     }
 
     /**
@@ -65,12 +67,14 @@ public class UserOauthSignService {
     public UserSyncDto isLinkAllowed(Long userId, Provider provider) {
         Optional<Oauth> oauth = oauthService.readOauthByUserIdAndProvider(userId, provider);
 
-        if (oauth.isPresent() && oauth.get().getDeletedAt() != null)
+        if (oauth.isPresent() && !oauth.get().isDeleted()) {
+            log.info("이미 동일한 Provider로 가입된 사용자입니다. userId: {}, provider: {}", userId, provider);
             throw new OauthException(OauthErrorCode.ALREADY_SIGNUP_OAUTH);
+        }
 
         User user = userService.readUser(userId).orElseThrow(() -> new UserErrorException(UserErrorCode.NOT_FOUND));
 
-        return UserSyncDto.of(true, true, user.getId(), user.getUsername());
+        return UserSyncDto.of(true, true, user.getId(), user.getUsername(), UserSyncDto.OauthSync.from(oauth.orElse(null)));
     }
 
     /**
@@ -86,6 +90,12 @@ public class UserOauthSignService {
             log.info("기존 계정에 연동합니다. username: {}", userSync.username());
             user = userService.readUser(userSync.userId())
                     .orElseThrow(() -> new UserErrorException(UserErrorCode.NOT_FOUND));
+
+            if (userSync.isExistOauthAccount()) {
+                log.debug("기존 Oauth 정보가 삭제된 계정입니다. oauth: {}", userSync.oauthSync());
+                revertDeletedOauth(userSync);
+                return user;
+            }
         } else {
             log.info("새로운 계정을 생성합니다. username: {}", request.username());
             user = request.toUser();
@@ -96,6 +106,12 @@ public class UserOauthSignService {
         log.info("연동된 Oauth 정보 : {}", oauth);
 
         return user;
+    }
+
+    private void revertDeletedOauth(UserSyncDto userSync) {
+        Oauth oauth = oauthService.readOauth(userSync.oauthSync().id())
+                .orElseThrow(() -> new OauthException(OauthErrorCode.NOT_FOUND_OAUTH));
+        oauth.revertDelete(userSync.oauthSync().oauthId());
     }
 
     private Oauth mappingOauthToUser(User user, Provider provider, String oauthId) {
