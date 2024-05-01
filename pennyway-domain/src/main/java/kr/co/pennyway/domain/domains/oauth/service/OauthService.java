@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
+import java.util.Set;
 
 @DomainService
 @RequiredArgsConstructor
@@ -32,6 +33,11 @@ public class OauthService {
     @Transactional(readOnly = true)
     public Optional<Oauth> readOauthByUserIdAndProvider(Long userId, Provider provider) {
         return oauthRepository.findByUser_IdAndProvider(userId, provider);
+    }
+
+    @Transactional(readOnly = true)
+    public Set<Oauth> readOauthsByUserId(Long userId) {
+        return oauthRepository.findAllByUser_Id(userId);
     }
 
     @Transactional(readOnly = true)
