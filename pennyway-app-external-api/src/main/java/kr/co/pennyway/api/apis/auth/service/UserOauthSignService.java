@@ -28,12 +28,10 @@ public class UserOauthSignService {
 
     @Transactional(readOnly = true)
     public User readUser(String oauthId, Provider provider) {
-        Optional<Oauth> oauth = oauthService.readOauthByOauthIdAndProvider(oauthId, provider);
-
-        if (oauth.isPresent() && oauth.get().isDeleted())
-            return null;
-
-        return oauth.map(Oauth::getUser).orElse(null);
+        return oauthService.readOauthByOauthIdAndProvider(oauthId, provider)
+                .filter(o -> !o.isDeleted())
+                .map(Oauth::getUser)
+                .orElse(null);
     }
 
     /**
@@ -82,6 +80,32 @@ public class UserOauthSignService {
     }
 
     /**
+     * 연동을 해지할 수 있는 Oauth 계정을 조회한다.
+     *
+     * @throws OauthException : <br/>
+     *                        {@link OauthErrorCode#NOT_FOUND_OAUTH} : Provider에 해당하는 Oauth가 없는 경우 <br/>
+     *                        {@link OauthErrorCode#CANNOT_UNLINK_OAUTH} : Oauth가 1개이고 일반 회원 이력이 없어 연동 해지가 불가능한 경우 <br/>
+     */
+    @Transactional(readOnly = true)
+    public Oauth readOauthForUnlink(Long userId, Provider provider) {
+        Set<Oauth> oauths = oauthService.readOauthsByUserId(userId);
+
+        Oauth oauth = oauths.stream()
+                .filter(o -> o.getProvider().equals(provider) && !o.isDeleted())
+                .findFirst()
+                .orElseThrow(() -> new OauthException(OauthErrorCode.NOT_FOUND_OAUTH));
+        long oauthCount = oauths.stream().filter(o -> !o.isDeleted()).count();
+
+        User user = oauth.getUser();
+
+        if (oauthCount == 1 && !user.isGeneralSignedUpUser()) {
+            throw new OauthException(OauthErrorCode.CANNOT_UNLINK_OAUTH);
+        }
+
+        return oauth;
+    }
+
+    /**
      * 기존 계정이 존재하면 Oauth 계정을 생성하여 연동하고, 존재하지 않으면 새로운 계정을 생성한다.
      *
      * @param request {@link SignUpReq.OauthInfo}
@@ -104,29 +128,6 @@ public class UserOauthSignService {
         log.info("연동된 Oauth 정보 : {}", oauth);
 
         return user;
-    }
-
-    @Transactional
-    public void unlinkOauth(Long userId, Provider provider) {
-        // 1. User에 연동된 Oauth 조회
-        Set<Oauth> oauths = oauthService.readOauthsByUserId(userId);
-
-        // 2. provider에 해당하는 Oauth가 없다면 404
-        Oauth oauth = oauths.stream()
-                .filter(o -> o.getProvider() == provider && !o.isDeleted())
-                .findFirst()
-                .orElseThrow(() -> new OauthException(OauthErrorCode.NOT_FOUND_OAUTH));
-
-        // 3. user 조회
-        User user = oauth.getUser();
-
-        // 4. Oauth가 1개이고 일반 회원 이력이 없는 경우 400
-        if (oauths.size() == 1 && !user.isGeneralSignedUpUser()) {
-            throw new OauthException(OauthErrorCode.CANNOT_UNLINK_OAUTH);
-        }
-
-        // 5. Oauth 삭제
-        oauthService.deleteOauth(oauth);
     }
 
     private Oauth readOrCreateOauth(UserSyncDto userSync, Provider provider, String oauthId, User user) {

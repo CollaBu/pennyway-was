@@ -8,6 +8,8 @@ import kr.co.pennyway.api.apis.auth.helper.OauthOidcHelper;
 import kr.co.pennyway.api.apis.auth.service.UserOauthSignService;
 import kr.co.pennyway.api.common.security.jwt.access.AccessTokenClaimKeys;
 import kr.co.pennyway.common.annotation.UseCase;
+import kr.co.pennyway.domain.domains.oauth.domain.Oauth;
+import kr.co.pennyway.domain.domains.oauth.service.OauthService;
 import kr.co.pennyway.domain.domains.oauth.type.Provider;
 import kr.co.pennyway.infra.common.jwt.JwtClaims;
 import kr.co.pennyway.infra.common.jwt.JwtProvider;
@@ -21,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class UserAuthUseCase {
     private final UserOauthSignService userOauthSignService;
+    private final OauthService oauthService;
 
     private final JwtAuthHelper jwtAuthHelper;
     private final OauthOidcHelper oauthOidcHelper;
@@ -51,6 +54,7 @@ public class UserAuthUseCase {
 
     @Transactional
     public void unlinkOauth(Provider provider, Long userId) {
-        userOauthSignService.unlinkOauth(userId, provider);
+        Oauth oauth = userOauthSignService.readOauthForUnlink(userId, provider);
+        oauthService.deleteOauth(oauth);
     }
 }
