@@ -40,7 +40,8 @@ public class SignUpReq {
         }
     }
 
-    public record OauthInfo(String idToken, String nonce, String name, String username, String phone, String code) {
+    public record OauthInfo(String oauthId, String idToken, String nonce, String name, String username, String phone,
+                            String code) {
         public User toUser() {
             return User.builder()
                     .username(username)
@@ -102,6 +103,9 @@ public class SignUpReq {
 
     @Schema(title = "소셜 회원가입 요청 DTO")
     public record Oauth(
+            @Schema(description = "OAuth id")
+            @NotBlank(message = "OAuth id는 필수 입력값입니다.")
+            String oauthId,
             @Schema(description = "OIDC 토큰")
             @NotBlank(message = "OIDC 토큰은 필수 입력값입니다.")
             String idToken,
@@ -126,12 +130,15 @@ public class SignUpReq {
             String code
     ) {
         public OauthInfo toOauthInfo() {
-            return new OauthInfo(idToken, nonce, name, username, phone, code);
+            return new OauthInfo(oauthId, idToken, nonce, name, username, phone, code);
         }
     }
 
     @Schema(title = "소셜 회원가입(기존 계정 존재) 요청 DTO")
     public record SyncWithAuth(
+            @Schema(description = "OAuth id")
+            @NotBlank(message = "OAuth id는 필수 입력값입니다.")
+            String oauthId,
             @Schema(description = "OIDC 토큰")
             @NotBlank(message = "OIDC 토큰은 필수 입력값입니다.")
             String idToken,
@@ -148,7 +155,7 @@ public class SignUpReq {
             String code
     ) {
         public OauthInfo toOauthInfo() {
-            return new OauthInfo(idToken, nonce, null, null, phone, code);
+            return new OauthInfo(oauthId, idToken, nonce, null, null, phone, code);
         }
     }
 }

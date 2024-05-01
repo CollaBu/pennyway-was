@@ -248,7 +248,7 @@ public class UserAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
             User user = UserFixture.GENERAL_USER.toUser();
             userService.createUser(user);
             Provider expectedProvider = Provider.KAKAO;
-            given(oauthOidcHelper.getPayload(expectedProvider, "idToken", "nonce")).willReturn(new OidcDecodePayload("iss", "aud", "oauthId", "email"));
+            given(oauthOidcHelper.getPayload(expectedProvider, "oauthId", "idToken", "nonce")).willReturn(new OidcDecodePayload("iss", "aud", "oauthId", "email"));
 
             // when
             ResultActions result = performLinkOauth(expectedProvider, "oauthId");
@@ -269,7 +269,7 @@ public class UserAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
             userService.createUser(user);
             Provider expectedProvider = Provider.KAKAO;
             oauthService.createOauth(Oauth.of(expectedProvider, "oauthId", user));
-            given(oauthOidcHelper.getPayload(expectedProvider, "idToken", "nonce")).willReturn(new OidcDecodePayload("iss", "aud", "oauthId", "email"));
+            given(oauthOidcHelper.getPayload(expectedProvider, "oauthId", "idToken", "nonce")).willReturn(new OidcDecodePayload("iss", "aud", "oauthId", "email"));
 
             // when
             ResultActions result = performLinkOauth(expectedProvider, "oauthId");
@@ -294,7 +294,7 @@ public class UserAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
             Oauth oauth = Oauth.of(expectedProvider, "oauthId", user);
             oauthService.createOauth(oauth);
             oauthService.deleteOauth(oauth);
-            given(oauthOidcHelper.getPayload(expectedProvider, "idToken", "nonce")).willReturn(new OidcDecodePayload("iss", "aud", "newOauthId", "email"));
+            given(oauthOidcHelper.getPayload(expectedProvider, "newOauthId", "idToken", "nonce")).willReturn(new OidcDecodePayload("iss", "aud", "newOauthId", "email"));
 
             // when
             ResultActions result = performLinkOauth(expectedProvider, "newOauthId");
