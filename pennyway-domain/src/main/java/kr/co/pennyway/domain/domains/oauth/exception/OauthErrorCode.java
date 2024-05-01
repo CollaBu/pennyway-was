@@ -20,6 +20,7 @@ public enum OauthErrorCode implements BaseErrorCode {
     NOT_FOUND_OAUTH(StatusCode.NOT_FOUND, ReasonCode.REQUESTED_RESOURCE_NOT_FOUND, "해당 제공자로 가입된 이력을 찾을 수 없습니다."),
 
     /* 409 Conflict */
+    CANNOT_UNLINK_OAUTH(StatusCode.CONFLICT, ReasonCode.REQUEST_CONFLICTS_WITH_CURRENT_STATE_OF_RESOURCE, "해당 제공자로만 가입된 사용자는 연동을 해제할 수 없습니다."),
     ALREADY_SIGNUP_OAUTH(StatusCode.CONFLICT, ReasonCode.RESOURCE_ALREADY_EXISTS, "이미 해당 제공자로 가입된 사용자입니다."),
 
     /* 422 Unprocessable Entity */

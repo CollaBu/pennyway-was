@@ -19,6 +19,7 @@ import kr.co.pennyway.domain.domains.user.service.UserService;
 import kr.co.pennyway.domain.domains.user.type.ProfileVisibility;
 import kr.co.pennyway.domain.domains.user.type.Role;
 import kr.co.pennyway.infra.common.oidc.OidcDecodePayload;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -49,6 +50,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+@Slf4j
 @ExternalApiIntegrationTest
 @AutoConfigureMockMvc
 @TestClassOrder(ClassOrderer.OrderAnnotation.class)
@@ -439,7 +441,7 @@ public class OAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
                     .andDo(print());
             Oauth savedOauth = oauthService.readOauthByOauthIdAndProvider(expectedOauthId, provider).get();
             assertEquals(savedOauth.getUser().getId(), user.getId());
-            System.out.println("oauth : " + savedOauth);
+            log.debug("oauth : {}", savedOauth);
         }
 
         @Test
@@ -469,7 +471,7 @@ public class OAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
                     .andDo(print());
             Oauth savedOauth = oauthService.readOauthByOauthIdAndProvider(expectedOauthId, provider).get();
             assertEquals(savedOauth.getUser().getId(), user.getId());
-            System.out.println("oauth : " + savedOauth);
+            log.debug("oauth : {}", savedOauth);
         }
 
         @Test
@@ -550,7 +552,7 @@ public class OAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
             assertEquals(oauth.getId(), savedOauth.getId());
             assertEquals("newOauthId", savedOauth.getOauthId());
             assertFalse(savedOauth.isDeleted());
-            System.out.println("oauth : " + savedOauth);
+            log.debug("oauth : {}", savedOauth);
         }
 
         private ResultActions performOauthSignUpAccountLinking(Provider provider, String code, String oauthId) throws Exception {
@@ -588,7 +590,7 @@ public class OAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
                     .andDo(print());
             Oauth savedOauth = oauthService.readOauthByOauthIdAndProvider(expectedOauthId, provider).get();
             assertNotNull(savedOauth.getUser().getId());
-            System.out.println("oauth : " + savedOauth);
+            log.debug("oauth : {}", savedOauth);
         }
 
         @Test

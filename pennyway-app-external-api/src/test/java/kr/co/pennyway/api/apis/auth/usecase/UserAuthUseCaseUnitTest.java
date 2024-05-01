@@ -8,6 +8,7 @@ import kr.co.pennyway.api.common.security.jwt.access.AccessTokenClaim;
 import kr.co.pennyway.api.common.security.jwt.access.AccessTokenProvider;
 import kr.co.pennyway.domain.common.redis.forbidden.ForbiddenTokenService;
 import kr.co.pennyway.domain.common.redis.refresh.RefreshTokenService;
+import kr.co.pennyway.domain.domains.oauth.service.OauthService;
 import kr.co.pennyway.infra.common.exception.JwtErrorCode;
 import kr.co.pennyway.infra.common.exception.JwtErrorException;
 import kr.co.pennyway.infra.common.jwt.JwtClaims;
@@ -37,6 +38,8 @@ public class UserAuthUseCaseUnitTest {
     @Mock
     private UserOauthSignService userOauthSignService;
     @Mock
+    private OauthService oauthService;
+    @Mock
     private OauthOidcHelper oauthOidcHelper;
     @Mock
     private JwtProvider refreshTokenProvider;
@@ -49,7 +52,7 @@ public class UserAuthUseCaseUnitTest {
     public void setUp() {
         accessTokenProvider = new AccessTokenProvider(secretStr, Duration.ofMinutes(5));
         jwtAuthHelper = new JwtAuthHelper(accessTokenProvider, refreshTokenProvider, refreshTokenService, forbiddenTokenService);
-        userAuthUseCase = new UserAuthUseCase(userOauthSignService, jwtAuthHelper, oauthOidcHelper, accessTokenProvider);
+        userAuthUseCase = new UserAuthUseCase(userOauthSignService, oauthService, jwtAuthHelper, oauthOidcHelper, accessTokenProvider);
     }
 
     @Test
@@ -57,7 +60,7 @@ public class UserAuthUseCaseUnitTest {
     public void isSignedInWithExpiredToken() {
         // given
         accessTokenProvider = new AccessTokenProvider(secretStr, Duration.ofMillis(0));
-        userAuthUseCase = new UserAuthUseCase(userOauthSignService, jwtAuthHelper, oauthOidcHelper, accessTokenProvider);
+        userAuthUseCase = new UserAuthUseCase(userOauthSignService, oauthService, jwtAuthHelper, oauthOidcHelper, accessTokenProvider);
         String expiredToken = accessTokenProvider.generateToken(jwtClaims);
 
         // when

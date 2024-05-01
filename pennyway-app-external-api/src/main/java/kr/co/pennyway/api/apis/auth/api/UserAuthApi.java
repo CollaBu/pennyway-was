@@ -76,4 +76,28 @@ public interface UserAuthApi {
                     """)
     }))
     ResponseEntity<?> linkOauth(@RequestParam Provider provider, @RequestBody @Validated SignInReq.Oauth request, @AuthenticationPrincipal SecurityUserDetails user);
+
+    @Operation(summary = "소셜 계정 연동 해제", description = "인증된 사용자의 소셜 계정 연동을 해제한다. 연동되지 않은 계정을 해제하려고 하는 경우에는 404 에러를 반환한다. 미인증 사용자는 해당 API를 사용할 수 없다.")
+    @Parameter(name = "provider", description = "소셜 제공자", examples = {
+            @ExampleObject(name = "카카오", value = "kakao"), @ExampleObject(name = "애플", value = "apple"), @ExampleObject(name = "구글", value = "google")
+    }, required = true, in = ParameterIn.QUERY)
+    @ApiResponses({
+            @ApiResponse(responseCode = "404", content = @Content(mediaType = "application/json", examples = {
+                    @ExampleObject(name = "해당 provider로 로그인한 이력이 없음", value = """
+                            {
+                                "code": "4040",
+                                "message": "해당 제공자로 가입된 이력을 찾을 수 없습니다."
+                            }
+                            """)
+            })),
+            @ApiResponse(responseCode = "409", content = @Content(mediaType = "application/json", examples = {
+                    @ExampleObject(name = "연결 해제 요청 실패", value = """
+                            {
+                                "code": "4090",
+                                "message": "해당 제공자로만 가입된 사용자는 연동을 해제할 수 없습니다."
+                            }
+                            """, description = "일반 회원 가입 이력이 없고, 연동된 소셜 계정이 해지를 요청하는 제공자 하나 뿐인 경우 -> 계정 삭제 API를 호출해야 한다.")
+            }))
+    })
+    ResponseEntity<?> unlinkOauth(@RequestParam Provider provider, @AuthenticationPrincipal SecurityUserDetails user);
 }
