@@ -8,7 +8,6 @@ import kr.co.pennyway.api.apis.auth.helper.OauthOidcHelper;
 import kr.co.pennyway.api.common.exception.PhoneVerificationErrorCode;
 import kr.co.pennyway.api.config.ExternalApiDBTestConfig;
 import kr.co.pennyway.api.config.ExternalApiIntegrationTest;
-import kr.co.pennyway.api.config.supporter.WithSecurityMockUser;
 import kr.co.pennyway.domain.common.redis.phone.PhoneCodeKeyType;
 import kr.co.pennyway.domain.common.redis.phone.PhoneCodeService;
 import kr.co.pennyway.domain.domains.oauth.domain.Oauth;
@@ -33,7 +32,6 @@ import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ResourceUtils;
@@ -651,133 +649,6 @@ public class OAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
                     .param("provider", provider.name())
                     .contentType("application/json")
                     .content(objectMapper.writeValueAsString(request)));
-        }
-    }
-
-    @Nested
-    @Order(5)
-    @DisplayName("[5] 소셜 회원가입 연동 해제")
-    @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-    class OauthUnlinkTest {
-        @Test
-        @Order(1)
-        @WithSecurityMockUser(userId = "15")
-        @Transactional
-        @DisplayName("제공자로 연동한 이력이 존재하지 않으면 404 에러가 발생한다.")
-        void unlinkWithNoOauth() throws Exception {
-            // given
-            User user = createGeneralSignedUser();
-            userService.createUser(user);
-
-            // when
-            ResultActions result = performOauthUnlink(Provider.KAKAO);
-
-            // then
-            result
-                    .andExpect(status().isNotFound())
-                    .andExpect(jsonPath("$.code").value(OauthErrorCode.NOT_FOUND_OAUTH.causedBy().getCode()))
-                    .andExpect(jsonPath("$.message").value(OauthErrorCode.NOT_FOUND_OAUTH.getExplainError()))
-                    .andDo(print());
-        }
-
-        @Test
-        @Order(2)
-        @WithSecurityMockUser(userId = "16")
-        @Transactional
-        @DisplayName("제공자로 연동한 이력이 soft delete 되어 있으면 404 에러가 발생한다.")
-        void unlinkWithSoftDeletedOauth() throws Exception {
-            // given
-            User user = createOauthSignedUser();
-            Oauth oauth = createOauthAccount(user, Provider.KAKAO);
-
-            userService.createUser(user);
-            oauthService.createOauth(oauth);
-            oauthService.deleteOauth(oauth);
-
-            // when
-            ResultActions result = performOauthUnlink(Provider.KAKAO);
-
-            // then
-            result
-                    .andExpect(status().isNotFound())
-                    .andExpect(jsonPath("$.code").value(OauthErrorCode.NOT_FOUND_OAUTH.causedBy().getCode()))
-                    .andExpect(jsonPath("$.message").value(OauthErrorCode.NOT_FOUND_OAUTH.getExplainError()))
-                    .andDo(print());
-        }
-
-        @Test
-        @Order(3)
-        @WithSecurityMockUser(userId = "17")
-        @Transactional
-        @DisplayName("연동된 Oauth가 1개이고 일반 회원 이력이 없는 경우에는 409 에러가 발생한다.")
-        void unlinkWithOnlyOauthSignedUser() throws Exception {
-            // given
-            Provider provider = Provider.KAKAO;
-            User user = createOauthSignedUser();
-            Oauth oauth = createOauthAccount(user, provider);
-
-            userService.createUser(user);
-            oauthService.createOauth(oauth);
-
-            // when
-            ResultActions result = performOauthUnlink(provider);
-
-            // then
-            result
-                    .andExpect(status().isConflict())
-                    .andExpect(jsonPath("$.code").value(OauthErrorCode.CANNOT_UNLINK_OAUTH.causedBy().getCode()))
-                    .andExpect(jsonPath("$.message").value(OauthErrorCode.CANNOT_UNLINK_OAUTH.getExplainError()))
-                    .andDo(print());
-        }
-
-        @Test
-        @Order(4)
-        @WithSecurityMockUser(userId = "18")
-        @Transactional
-        @DisplayName("연동된 Oauth가 1개이고 일반 회원 이력이 있는 경우에는 연동 해제에 성공한다.")
-        void unlinkWithGeneralSignedUser() throws Exception {
-            // given
-            Provider provider = Provider.KAKAO;
-            User user = createGeneralSignedUser();
-            Oauth oauth = createOauthAccount(user, provider);
-
-            userService.createUser(user);
-            oauthService.createOauth(oauth);
-
-            // when
-            ResultActions result = performOauthUnlink(provider);
-
-            // then
-            result.andExpect(status().isOk()).andDo(print());
-            assertTrue(oauthService.readOauthByOauthIdAndProvider(expectedOauthId, provider).get().isDeleted());
-        }
-
-        @Test
-        @Order(5)
-        @WithSecurityMockUser(userId = "19")
-        @Transactional
-        @DisplayName("연동된 Oauth가 2개 이상이고 일반 회원 이력이 없는 경우에는 연동 해제에 성공한다.")
-        void unlinkWithMultipleOauthSignedUser() throws Exception {
-            // given
-            User user = createOauthSignedUser();
-            Oauth oauth1 = createOauthAccount(user, Provider.KAKAO);
-            Oauth oauth2 = createOauthAccount(user, Provider.GOOGLE);
-
-            userService.createUser(user);
-            oauthService.createOauth(oauth1);
-            oauthService.createOauth(oauth2);
-
-            // when
-            ResultActions result = performOauthUnlink(Provider.KAKAO);
-
-            // then
-            result.andExpect(status().isOk()).andDo(print());
-            assertTrue(oauthService.readOauthByOauthIdAndProvider(expectedOauthId, Provider.KAKAO).get().isDeleted());
-        }
-
-        private ResultActions performOauthUnlink(Provider provider) throws Exception {
-            return mockMvc.perform(MockMvcRequestBuilders.delete("/v1/link-oauth")
-                    .param("provider", provider.name()));
         }
     }
 }
