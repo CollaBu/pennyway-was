@@ -35,8 +35,11 @@ public class AuthCheckController implements AuthCheckApi {
 
     @PatchMapping("/find/password")
     @PreAuthorize("isAnonymous()")
-    public ResponseEntity<?> findPassword(@Validated PhoneVerificationDto.VerifyCodeReq request, @Validated AuthFindDto.PasswordReq passwordReq) {
-        authCheckUseCase.findPassword(request, passwordReq);
+    public ResponseEntity<?> findPassword(@RequestBody AuthFindDto.UpdatePasswordReq request) {
+        PhoneVerificationDto.VerifyCodeReq codeReq = new PhoneVerificationDto.VerifyCodeReq(request.phone(), request.code());
+        String passwordReq = request.newPassword();
+
+        authCheckUseCase.findPassword(codeReq, passwordReq);
         return ResponseEntity.ok(SuccessResponse.noContent());
     }
 }

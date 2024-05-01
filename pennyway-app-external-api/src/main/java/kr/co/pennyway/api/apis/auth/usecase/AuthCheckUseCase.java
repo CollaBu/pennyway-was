@@ -34,9 +34,9 @@ public class AuthCheckUseCase {
     }
 
     @Transactional
-    public void findPassword(PhoneVerificationDto.VerifyCodeReq request, AuthFindDto.PasswordReq passwordReq) {
+    public void findPassword(PhoneVerificationDto.VerifyCodeReq request, String passwordReq) {
         phoneVerificationService.isValidCode(request, PhoneCodeKeyType.FIND_PASSWORD);
         phoneCodeService.delete(request.phone(), PhoneCodeKeyType.FIND_PASSWORD);
-        authFindService.updatePassword(request.phone(), passwordReq.newPassword());
+        authFindService.updatePassword(request.phone(), passwordReq);
     }
 }
