@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
+import java.util.Set;
 
 @Slf4j
 @Service
@@ -103,6 +104,29 @@ public class UserOauthSignService {
         log.info("연동된 Oauth 정보 : {}", oauth);
 
         return user;
+    }
+
+    @Transactional
+    public void unlinkOauth(Long userId, Provider provider) {
+        // 1. User에 연동된 Oauth 조회
+        Set<Oauth> oauths = oauthService.readOauthsByUserId(userId);
+
+        // 2. provider에 해당하는 Oauth가 없다면 404
+        Oauth oauth = oauths.stream()
+                .filter(o -> o.getProvider() == provider && !o.isDeleted())
+                .findFirst()
+                .orElseThrow(() -> new OauthException(OauthErrorCode.NOT_FOUND_OAUTH));
+
+        // 3. user 조회
+        User user = oauth.getUser();
+
+        // 4. Oauth가 1개이고 일반 회원 이력이 없는 경우 400
+        if (oauths.size() == 1 && !user.isGeneralSignedUpUser()) {
+            throw new OauthException(OauthErrorCode.CANNOT_UNLINK_OAUTH);
+        }
+
+        // 5. Oauth 삭제
+        oauthService.deleteOauth(oauth);
     }
 
     private Oauth readOrCreateOauth(UserSyncDto userSync, Provider provider, String oauthId, User user) {

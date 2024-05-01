@@ -48,4 +48,9 @@ public class UserAuthUseCase {
         UserSyncDto userSync = userOauthSignService.isLinkAllowed(userId, provider);
         userOauthSignService.saveUser(null, userSync, provider, payload.sub());
     }
+
+    @Transactional
+    public void unlinkOauth(Provider provider, Long userId) {
+        userOauthSignService.unlinkOauth(userId, provider);
+    }
 }
