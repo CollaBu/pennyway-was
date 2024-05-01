@@ -54,5 +54,35 @@ public interface AuthCheckApi {
     ResponseEntity<?> findUsername(@Validated PhoneVerificationDto.VerifyCodeReq request);
 
     @Operation(summary = "일반 회원 비밀번호 찾기에 사용되는 비밀번호 변경")
-    ResponseEntity<?> findPassword(@Validated PhoneVerificationDto.VerifyCodeReq request, @Validated AuthFindDto.PasswordReq passwordReq);
+    @ApiResponses({
+            @ApiResponse(responseCode = "400", content = @Content(mediaType = "application/json", examples = {
+                    @ExampleObject(name = "기존 비밀번호 불일치", value = """
+                            {
+                                "code": "4004",
+                                "message": "비밀번호가 일치하지 않습니다."
+                            }
+                            """),
+                    @ExampleObject(name = "변경 비밀번호가 기존 비밀번호와 동일한 경우", value = """
+                            {
+                                "code": "4005",
+                                "message": "현재 비밀번호와 동일한 비밀번호로 변경할 수 없습니다."
+                            }
+                            """)
+            })),
+            @ApiResponse(responseCode = "404", content = @Content(mediaType = "application/json", examples = {
+                    @ExampleObject(name = "일반 회원가입 이력이 없는 경우", value = """
+                            {
+                                "code": "4040",
+                                "message": "일반 회원가입 계정이 아닙니다."
+                            }
+                            """),
+                    @ExampleObject(name = "인증번호 만료 또는 유효하지 않은 경우", value = """
+                                {
+                                    "code": "4042",
+                                    "message": "인증번호가 만료되었거나 유효하지 않습니다."
+                                }
+                            """)
+            }))
+    })
+    public ResponseEntity<?> findPassword(@Validated AuthFindDto.UpdatePasswordReq request);
 }
