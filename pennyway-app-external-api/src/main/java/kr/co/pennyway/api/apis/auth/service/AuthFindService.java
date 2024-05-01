@@ -32,6 +32,12 @@ public class AuthFindService {
         return AuthFindDto.FindUsernameRes.of(user);
     }
 
+    /**
+     * 일반 회원 비밀번호 찾기 & 수정하기
+     *
+     * @param phone       전화번호 (e.g. 010-1234-5678)
+     * @param newPassword 새롭게 변경할 비밀번호 (e.g. qwer1234)
+     */
     @Transactional
     public void updatePassword(String phone, String newPassword) {
         User user = readUserOrThrow(phone);
