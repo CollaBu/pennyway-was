@@ -22,8 +22,8 @@ public record UserProfileDto(
         String username,
         @Schema(description = "사용자 이름", example = "홍길동")
         String name,
-        @Schema(description = "Oauth 계정 여부. 일반 회원가입 계정이 있으면 true, 없으면 false", example = "false")
-        boolean isOauthAccount,
+        @Schema(description = "일반 회원가입 이력. 일반 회원가입 계정이 있으면 true, 없으면 false", example = "false")
+        boolean isGeneralSignUp,
         @Schema(description = "비밀번호 변경 일시. isOauthAccount가 true면 존재하지 않는 필드", nullable = true, type = "string", example = "yyyy-MM-dd HH:mm:ss")
         @JsonInclude(JsonInclude.Include.NON_NULL)
         @JsonSerialize(using = LocalDateTimeSerializer.class)
@@ -70,7 +70,7 @@ public record UserProfileDto(
                 .profileVisibility(user.getProfileVisibility())
                 .locked(user.getLocked())
                 .notifySetting(user.getNotifySetting())
-                .isOauthAccount(user.getPassword() == null)
+                .isGeneralSignUp(user.isGeneralSignedUpUser())
                 .createdAt(user.getCreatedAt())
                 .oauthAccount(oauthAccount)
                 .build();
