@@ -12,6 +12,7 @@ import kr.co.pennyway.domain.domains.device.domain.Device;
 import kr.co.pennyway.domain.domains.device.exception.DeviceErrorCode;
 import kr.co.pennyway.domain.domains.device.exception.DeviceErrorException;
 import kr.co.pennyway.domain.domains.device.service.DeviceService;
+import kr.co.pennyway.domain.domains.oauth.service.OauthService;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorCode;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorException;
@@ -55,6 +56,9 @@ class UserAccountUseCaseTest extends ExternalApiDBTestConfig {
 
     @MockBean
     private PasswordEncoderHelper passwordEncoderHelper;
+
+    @MockBean
+    private OauthService oauthService;
 
     @Order(1)
     @Nested
