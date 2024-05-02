@@ -61,12 +61,6 @@ public interface AuthCheckApi {
                                 "code": "4004",
                                 "message": "비밀번호가 일치하지 않습니다."
                             }
-                            """),
-                    @ExampleObject(name = "변경 비밀번호가 기존 비밀번호와 동일한 경우", value = """
-                            {
-                                "code": "4005",
-                                "message": "현재 비밀번호와 동일한 비밀번호로 변경할 수 없습니다."
-                            }
                             """)
             })),
             @ApiResponse(responseCode = "404", content = @Content(mediaType = "application/json", examples = {
