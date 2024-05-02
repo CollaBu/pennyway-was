@@ -27,13 +27,25 @@ public class AuthFindService {
     @Transactional(readOnly = true)
     public AuthFindDto.FindUsernameRes findUsername(String phone) {
         User user = readUserOrThrow(phone);
-        checkUserPassword(user);
+        validateGeneralSignedUpUser(user);
 
         return AuthFindDto.FindUsernameRes.of(user);
     }
 
     /**
-     * 일반 회원 비밀번호 찾기 & 수정하기
+     * 일반 회원 비밀번호 찾기에 사용되는 코드 인증
+     * 전화 번호를 이용해 사용자 조회후 사용자가 Oauth 사용자인지, General사용자인지 확인한다.
+     *
+     * @param phone 전화번호 (e.g. 010-1234-5678)
+     */
+    @Transactional(readOnly = true)
+    public void verifyUser(String phone) {
+        User user = readUserOrThrow(phone);
+        validateGeneralSignedUpUser(user);
+    }
+
+    /**
+     * 일반 회원 비밀번호 찾기 & 변경하기
      *
      * @param phone       전화번호 (e.g. 010-1234-5678)
      * @param newPassword 새롭게 변경할 비밀번호 (e.g. qwer1234)
@@ -41,12 +53,10 @@ public class AuthFindService {
     @Transactional
     public void updatePassword(String phone, String newPassword) {
         User user = readUserOrThrow(phone);
-        String password = checkUserPassword(user);
 
         user.updatePassword(passwordEncoderHelper.encodePassword(newPassword));
     }
 
-    // 유저 존재 여부 검증
     private User readUserOrThrow(String phone) {
         return userService.readUserByPhone(phone).orElseThrow(
                 () -> {
@@ -56,14 +66,10 @@ public class AuthFindService {
         );
     }
 
-    // Oauth 회원 여부 검증
-    private String checkUserPassword(User user) {
-        String password = user.getPassword();
-        if (password == null) {
-            log.info("해당 번호의 사용자는 Oauth 유저 입니다.: {}", user.getPhone());
-            throw new UserErrorException(UserErrorCode.NOT_FOUND);
+    private void validateGeneralSignedUpUser(User user) {
+        if (!user.isGeneralSignedUpUser()) {
+            log.info("일반 회원가입 이력이 없습니다.");
+            throw new UserErrorException(UserErrorCode.DO_NOT_GENERAL_SIGNED_UP);
         }
-
-        return password;
     }
 }

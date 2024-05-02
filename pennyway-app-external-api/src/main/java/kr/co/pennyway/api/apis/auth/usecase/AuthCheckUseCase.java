@@ -33,7 +33,11 @@ public class AuthCheckUseCase {
         return authFindService.findUsername(request.phone());
     }
 
-    @Transactional
+    public void verifyCode(PhoneVerificationDto.VerifyCodeReq request) {
+        phoneVerificationService.isValidCode(request, PhoneCodeKeyType.FIND_PASSWORD);
+        authFindService.verifyUser(request.phone());
+    }
+
     public void findPassword(PhoneVerificationDto.VerifyCodeReq request, String passwordReq) {
         phoneVerificationService.isValidCode(request, PhoneCodeKeyType.FIND_PASSWORD);
         phoneCodeService.delete(request.phone(), PhoneCodeKeyType.FIND_PASSWORD);
