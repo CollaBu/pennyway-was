@@ -44,7 +44,6 @@ public record UserProfileDto(
         @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
         LocalDateTime createdAt,
         @Schema(description = "Oauth 계정 정보")
-        @JsonInclude(JsonInclude.Include.NON_NULL)
         OauthAccountDto oauthAccount
 ) {
     public UserProfileDto {
@@ -57,23 +56,7 @@ public record UserProfileDto(
         Objects.requireNonNull(locked);
         Objects.requireNonNull(notifySetting);
         Objects.requireNonNull(createdAt);
-    }
-
-    public static UserProfileDto from(User user) {
-        return UserProfileDto.builder()
-                .id(user.getId())
-                .username(user.getUsername())
-                .name(user.getName())
-                .passwordUpdatedAt(user.getPasswordUpdatedAt())
-                .profileImageUrl(Objects.toString(user.getProfileImageUrl(), ""))
-                .phone(user.getPhone())
-                .profileVisibility(user.getProfileVisibility())
-                .locked(user.getLocked())
-                .notifySetting(user.getNotifySetting())
-                .isOauthAccount(user.getPassword() == null)
-                .createdAt(user.getCreatedAt())
-                .oauthAccount(null)
-                .build();
+        Objects.requireNonNull(oauthAccount);
     }
 
     public static UserProfileDto from(User user, OauthAccountDto oauthAccount) {
