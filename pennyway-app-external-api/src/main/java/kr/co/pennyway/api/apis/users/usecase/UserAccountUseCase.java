@@ -4,6 +4,7 @@ import kr.co.pennyway.api.apis.users.dto.DeviceDto;
 import kr.co.pennyway.api.apis.users.dto.UserProfileDto;
 import kr.co.pennyway.api.apis.users.dto.UserProfileUpdateDto;
 import kr.co.pennyway.api.apis.users.helper.PasswordEncoderHelper;
+import kr.co.pennyway.api.apis.users.mapper.UserProfileMapper;
 import kr.co.pennyway.api.apis.users.service.DeviceRegisterService;
 import kr.co.pennyway.api.apis.users.service.UserProfileUpdateService;
 import kr.co.pennyway.common.annotation.UseCase;
@@ -11,6 +12,8 @@ import kr.co.pennyway.domain.domains.device.domain.Device;
 import kr.co.pennyway.domain.domains.device.exception.DeviceErrorCode;
 import kr.co.pennyway.domain.domains.device.exception.DeviceErrorException;
 import kr.co.pennyway.domain.domains.device.service.DeviceService;
+import kr.co.pennyway.domain.domains.oauth.domain.Oauth;
+import kr.co.pennyway.domain.domains.oauth.service.OauthService;
 import kr.co.pennyway.domain.domains.user.domain.NotifySetting;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorCode;
@@ -20,11 +23,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Set;
+import java.util.stream.Collectors;
+
 @Slf4j
 @UseCase
 @RequiredArgsConstructor
 public class UserAccountUseCase {
     private final UserService userService;
+    private final OauthService oauthService;
     private final DeviceService deviceService;
 
     private final UserProfileUpdateService userProfileUpdateService;
@@ -55,8 +62,9 @@ public class UserAccountUseCase {
     @Transactional(readOnly = true)
     public UserProfileDto getMyAccount(Long userId) {
         User user = readUserOrThrow(userId);
+        Set<Oauth> oauths = oauthService.readOauthsByUserId(userId).stream().filter(oauth -> !oauth.isDeleted()).collect(Collectors.toUnmodifiableSet());
 
-        return UserProfileDto.from(user);
+        return UserProfileMapper.toUserProfileDto(user, oauths);
     }
 
     @Transactional
