@@ -462,4 +462,44 @@ public class UserAccountControllerUnitTest {
                     .content(objectMapper.writeValueAsString(request)));
         }
     }
+
+    @Nested
+    @Order(6)
+    @DisplayName("[6] 사용자 계정 삭제 테스트")
+    class DeleteAccountTest {
+        @DisplayName("사용자 계정 삭제 요청 시, 삭제된 사용자인 경우 404 에러를 반환한다.")
+        @Test
+        @WithSecurityMockUser
+        void deleteAccountDeletedUser() throws Exception {
+            // given
+            willThrow(new UserErrorException(UserErrorCode.NOT_FOUND)).given(userAccountUseCase).deleteAccount(1L);
+
+            // when
+            ResultActions result = performDeleteAccountRequest();
+
+            // then
+            result.andExpect(status().isNotFound())
+                    .andExpect(jsonPath("$.code").value(UserErrorCode.NOT_FOUND.causedBy().getCode()))
+                    .andExpect(jsonPath("$.message").value(UserErrorCode.NOT_FOUND.getExplainError()))
+                    .andDo(print());
+        }
+
+        @DisplayName("사용자 계정 삭제 요청 시, 사용자 계정이 정상적으로 삭제되면 200 코드를 반환한다.")
+        @Test
+        @WithSecurityMockUser
+        void deleteAccountSuccess() throws Exception {
+            // when
+            ResultActions result = performDeleteAccountRequest();
+
+            // then
+            result.andExpect(status().isOk())
+                    .andExpect(jsonPath("$.code").value("2000"))
+                    .andDo(print());
+        }
+
+        private ResultActions performDeleteAccountRequest() throws Exception {
+            return mockMvc.perform(delete("/v2/users/me")
+                    .contentType("application/json"));
+        }
+    }
 }
