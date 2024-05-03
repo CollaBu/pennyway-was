@@ -119,7 +119,9 @@ public class UserAccountUseCase {
     public void deleteAccount(Long userId) {
         User user = readUserOrThrow(userId);
 
+        // TODO: [2024-05-03] 하나라도 채팅방의 방장으로 참여하는 경우 삭제 불가능 처리
 
+        userService.deleteUser(user);
     }
 
     private User readUserOrThrow(Long userId) {
