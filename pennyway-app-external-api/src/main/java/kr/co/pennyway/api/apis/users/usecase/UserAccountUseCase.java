@@ -115,6 +115,13 @@ public class UserAccountUseCase {
         return UserProfileUpdateDto.NotifySettingUpdateReq.of(type, Boolean.FALSE);
     }
 
+    @Transactional
+    public void deleteAccount(Long userId) {
+        User user = readUserOrThrow(userId);
+
+
+    }
+
     private User readUserOrThrow(Long userId) {
         return userService.readUser(userId).orElseThrow(
                 () -> {
