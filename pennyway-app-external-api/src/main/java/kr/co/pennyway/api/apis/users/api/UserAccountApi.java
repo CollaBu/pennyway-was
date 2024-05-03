@@ -197,6 +197,6 @@ public interface UserAccountApi {
     })
     ResponseEntity<?> deleteNotifySetting(@RequestParam NotifySetting.NotifyType type, @AuthenticationPrincipal SecurityUserDetails user);
 
-    @Operation(summary = "사용자 계정 삭제")
+    @Operation(summary = "사용자 계정 삭제", description = "사용자 본인의 계정을 삭제합니다. 채팅방 방장이면 삭제가 안 되는 시나리오는 고려하지 않고 있습니다.")
     ResponseEntity<?> deleteAccount(@AuthenticationPrincipal SecurityUserDetails user);
 }
