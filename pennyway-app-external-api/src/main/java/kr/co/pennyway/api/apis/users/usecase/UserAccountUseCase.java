@@ -119,11 +119,11 @@ public class UserAccountUseCase {
 
     @Transactional
     public void deleteAccount(Long userId) {
-        User user = readUserOrThrow(userId);
+        if (!userService.isExistUser(userId)) throw new UserErrorException(UserErrorCode.NOT_FOUND);
 
         // TODO: [2024-05-03] 하나라도 채팅방의 방장으로 참여하는 경우 삭제 불가능 처리
 
-        userDeleteService.deleteUser(user);
+        userDeleteService.deleteUser(userId);
     }
 
     private User readUserOrThrow(Long userId) {
