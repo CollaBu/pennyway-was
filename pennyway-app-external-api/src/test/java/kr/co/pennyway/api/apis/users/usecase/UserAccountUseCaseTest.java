@@ -3,6 +3,7 @@ package kr.co.pennyway.api.apis.users.usecase;
 import kr.co.pennyway.api.apis.users.dto.DeviceDto;
 import kr.co.pennyway.api.apis.users.helper.PasswordEncoderHelper;
 import kr.co.pennyway.api.apis.users.service.DeviceRegisterService;
+import kr.co.pennyway.api.apis.users.service.UserDeleteService;
 import kr.co.pennyway.api.apis.users.service.UserProfileUpdateService;
 import kr.co.pennyway.api.config.ExternalApiDBTestConfig;
 import kr.co.pennyway.api.config.fixture.DeviceFixture;
@@ -12,7 +13,9 @@ import kr.co.pennyway.domain.domains.device.domain.Device;
 import kr.co.pennyway.domain.domains.device.exception.DeviceErrorCode;
 import kr.co.pennyway.domain.domains.device.exception.DeviceErrorException;
 import kr.co.pennyway.domain.domains.device.service.DeviceService;
+import kr.co.pennyway.domain.domains.oauth.domain.Oauth;
 import kr.co.pennyway.domain.domains.oauth.service.OauthService;
+import kr.co.pennyway.domain.domains.oauth.type.Provider;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorCode;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorException;
@@ -40,7 +43,9 @@ import static org.springframework.test.util.AssertionErrors.*;
 
 @ExtendWith(MockitoExtension.class)
 @DataJpaTest(properties = "spring.jpa.hibernate.ddl-auto=create")
-@ContextConfiguration(classes = {JpaConfig.class, UserAccountUseCase.class, DeviceRegisterService.class, UserService.class, DeviceService.class, UserProfileUpdateService.class})
+@ContextConfiguration(classes = {
+        JpaConfig.class, UserAccountUseCase.class, DeviceRegisterService.class, UserProfileUpdateService.class, UserDeleteService.class,
+        UserService.class, DeviceService.class, OauthService.class})
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ActiveProfiles("test")
 @TestClassOrder(ClassOrderer.OrderAnnotation.class)
@@ -52,13 +57,13 @@ class UserAccountUseCaseTest extends ExternalApiDBTestConfig {
     private DeviceService deviceService;
 
     @Autowired
+    private OauthService oauthService;
+
+    @Autowired
     private UserAccountUseCase userAccountUseCase;
 
     @MockBean
     private PasswordEncoderHelper passwordEncoderHelper;
-
-    @MockBean
-    private OauthService oauthService;
 
     @Order(1)
     @Nested
@@ -432,6 +437,61 @@ class UserAccountUseCaseTest extends ExternalApiDBTestConfig {
             // when - then
             assertDoesNotThrow(() -> userAccountUseCase.updatePassword(originUser.getId(), originUser.getPassword(), "newPassword"));
             assertEquals("비밀번호가 정상적으로 변경되어 있어야 한다.", "encodedPassword", userService.readUser(originUser.getId()).orElseThrow().getPassword());
+        }
+    }
+
+    @Order(6)
+    @Nested
+    @DisplayName("[6] 사용자 계정 삭제")
+    class DeleteAccountTest {
+        @Test
+        @Transactional
+        @DisplayName("사용자가 삭제된 유저인 경우 NOT_FOUND 에러를 반환한다.")
+        void deleteAccountWhenUserIsDeleted() {
+            // given
+            User user = UserFixture.GENERAL_USER.toUser();
+            userService.createUser(user);
+            userService.deleteUser(user);
+
+            // when - then
+            UserErrorException ex = assertThrows(UserErrorException.class, () -> userAccountUseCase.deleteAccount(user.getId()));
+            assertEquals("삭제된 사용자인 경우 Not Found를 반환한다.", UserErrorCode.NOT_FOUND, ex.getBaseErrorCode());
+        }
+
+        @Test
+        @Transactional
+        @DisplayName("일반 회원가입 이력만 있는 사용자의 경우, 정상적으로 계정이 삭제된다.")
+        void deleteAccount() {
+            // given
+            User user = UserFixture.GENERAL_USER.toUser();
+            userService.createUser(user);
+
+            // when - then
+            assertDoesNotThrow(() -> userAccountUseCase.deleteAccount(user.getId()));
+            assertTrue("사용자가 삭제되어 있어야 한다.", userService.readUser(user.getId()).isEmpty());
+        }
+
+        @Test
+        @Transactional
+        @DisplayName("삭제 시, 연동된 모든 소셜 계정은 soft delete 처리되어야 한다.")
+        void deleteAccountWithSocialAccounts() {
+            // given
+            User user = UserFixture.OAUTH_USER.toUser();
+            userService.createUser(user);
+
+            Oauth kakao = createOauth(Provider.KAKAO, "kakaoId", user);
+            Oauth google = createOauth(Provider.GOOGLE, "googleId", user);
+
+            // when - then
+            assertDoesNotThrow(() -> userAccountUseCase.deleteAccount(user.getId()));
+            assertTrue("사용자가 삭제되어 있어야 한다.", userService.readUser(user.getId()).isEmpty());
+            assertTrue("카카오 계정이 삭제되어 있어야 한다.", oauthService.readOauth(kakao.getId()).get().isDeleted());
+            assertTrue("구글 계정이 삭제되어 있어야 한다.", oauthService.readOauth(google.getId()).get().isDeleted());
+        }
+
+        private Oauth createOauth(Provider provider, String providerId, User user) {
+            Oauth oauth = Oauth.of(provider, providerId, user);
+            return oauthService.createOauth(oauth);
         }
     }
 }
