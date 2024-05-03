@@ -1,7 +1,6 @@
 package kr.co.pennyway.api.apis.users.service;
 
 import kr.co.pennyway.domain.domains.oauth.service.OauthService;
-import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,8 +22,8 @@ public class UserDeleteService {
     private final OauthService oauthService;
 
     @Transactional
-    public void deleteUser(User user) {
-        oauthService.deleteOauthsByUserId(user.getId());
-        userService.deleteUser(user);
+    public void deleteUser(Long userId) {
+        oauthService.deleteOauthsByUserId(userId);
+        userService.deleteUser(userId);
     }
 }
