@@ -92,7 +92,9 @@ public class UserAccountController implements UserAccountApi {
     }
 
     @Override
-    public ResponseEntity<?> deleteAccount(SecurityUserDetails user) {
+    @DeleteMapping("")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> deleteAccount(@AuthenticationPrincipal SecurityUserDetails user) {
         userAccountUseCase.deleteAccount(user.getUserId());
         return ResponseEntity.ok(SuccessResponse.noContent());
     }
