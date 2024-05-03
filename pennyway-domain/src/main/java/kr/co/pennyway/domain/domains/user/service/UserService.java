@@ -47,4 +47,9 @@ public class UserService {
     public void deleteUser(User user) {
         userRepository.delete(user);
     }
+
+    @Transactional
+    public void deleteUser(Long userId) {
+        userRepository.deleteByIdInQuery(userId);
+    }
 }
