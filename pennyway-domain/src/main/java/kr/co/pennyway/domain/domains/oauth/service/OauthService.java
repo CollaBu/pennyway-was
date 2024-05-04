@@ -49,4 +49,9 @@ public class OauthService {
     public void deleteOauth(Oauth oauth) {
         oauthRepository.delete(oauth);
     }
+
+    @Transactional
+    public void deleteOauthsByUserId(Long userId) {
+        oauthRepository.deleteAllByUser_IdAndDeletedAtNullInQuery(userId);
+    }
 }

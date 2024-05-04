@@ -6,6 +6,7 @@ import kr.co.pennyway.api.apis.users.dto.UserProfileUpdateDto;
 import kr.co.pennyway.api.apis.users.helper.PasswordEncoderHelper;
 import kr.co.pennyway.api.apis.users.mapper.UserProfileMapper;
 import kr.co.pennyway.api.apis.users.service.DeviceRegisterService;
+import kr.co.pennyway.api.apis.users.service.UserDeleteService;
 import kr.co.pennyway.api.apis.users.service.UserProfileUpdateService;
 import kr.co.pennyway.common.annotation.UseCase;
 import kr.co.pennyway.domain.domains.device.domain.Device;
@@ -35,6 +36,7 @@ public class UserAccountUseCase {
     private final DeviceService deviceService;
 
     private final UserProfileUpdateService userProfileUpdateService;
+    private final UserDeleteService userDeleteService;
     private final DeviceRegisterService deviceRegisterService;
 
     private final PasswordEncoderHelper passwordEncoderHelper;
@@ -113,6 +115,15 @@ public class UserAccountUseCase {
 
         userProfileUpdateService.updateNotifySetting(user, type, Boolean.FALSE);
         return UserProfileUpdateDto.NotifySettingUpdateReq.of(type, Boolean.FALSE);
+    }
+
+    @Transactional
+    public void deleteAccount(Long userId) {
+        if (!userService.isExistUser(userId)) throw new UserErrorException(UserErrorCode.NOT_FOUND);
+
+        // TODO: [2024-05-03] 하나라도 채팅방의 방장으로 참여하는 경우 삭제 불가능 처리
+
+        userDeleteService.deleteUser(userId);
     }
 
     private User readUserOrThrow(Long userId) {
