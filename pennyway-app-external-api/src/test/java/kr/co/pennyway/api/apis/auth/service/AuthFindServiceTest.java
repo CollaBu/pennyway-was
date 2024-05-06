@@ -2,9 +2,11 @@ package kr.co.pennyway.api.apis.auth.service;
 
 import kr.co.pennyway.api.apis.auth.dto.AuthFindDto;
 import kr.co.pennyway.api.apis.users.helper.PasswordEncoderHelper;
+import kr.co.pennyway.api.config.fixture.UserFixture;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorException;
 import kr.co.pennyway.domain.domains.user.service.UserService;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 
+@Slf4j
 @ExtendWith(MockitoExtension.class)
 class AuthFindServiceTest {
     private AuthFindService authFindService;
@@ -41,7 +44,7 @@ class AuthFindServiceTest {
 
         // when - then
         UserErrorException exception = assertThrows(UserErrorException.class, () -> authFindService.findUsername(phone));
-        System.out.println(exception.getExplainError());
+        log.debug(exception.getExplainError());
     }
 
     @DisplayName("휴대폰 번호로 유저를 찾았으나 OAuth 유저일 때 AuthFinderException을 발생시킨다.")
@@ -49,15 +52,12 @@ class AuthFindServiceTest {
     void findUsernameIfUserIsOAuth() {
         // given
         String phone = "010-1234-5678";
-        User user = User.builder()
-                .username("pennyway")
-                .password(null)
-                .build();
+        User user = UserFixture.OAUTH_USER.toUser();
         given(userService.readUserByPhone(phone)).willReturn(Optional.of(user));
 
         // when - then
         UserErrorException exception = assertThrows(UserErrorException.class, () -> authFindService.findUsername(phone));
-        System.out.println(exception.getExplainError());
+        log.debug(exception.getExplainError());
     }
 
     @DisplayName("휴대폰 번호를 통해 유저를 찾아 User를 반환한다.")
@@ -65,11 +65,8 @@ class AuthFindServiceTest {
     void findUsernameIfUserFound() {
         // given
         String phone = "010-1234-5678";
-        String username = "pennyway";
-        User user = User.builder()
-                .username("pennyway")
-                .password("password")
-                .build();
+        String username = "jayang";
+        User user = UserFixture.GENERAL_USER.toUser();
         given(userService.readUserByPhone(phone)).willReturn(Optional.of(user));
 
         // when
@@ -100,10 +97,7 @@ class AuthFindServiceTest {
     void findPasswordVerificationIfUserOauth() {
         // given
         String phone = "010-1234-5678";
-        User user = User.builder()
-                .username("pennyway")
-                .password(null)
-                .build();
+        User user = UserFixture.OAUTH_USER.toUser();
         given(userService.readUserByPhone(phone)).willReturn(Optional.of(user));
 
         // when - then
@@ -115,10 +109,7 @@ class AuthFindServiceTest {
     void findPasswordVerification() {
         // given
         String phone = "010-1234-5678";
-        User user = User.builder()
-                .username("pennyway")
-                .password("password")
-                .build();
+        User user = UserFixture.GENERAL_USER.toUser();
         given(userService.readUserByPhone(phone)).willReturn(Optional.of(user));
 
         // when
@@ -143,10 +134,7 @@ class AuthFindServiceTest {
         // given
         String phone = "010-1234-5678";
         String newPassword = "newPassword123";
-        User user = User.builder()
-                .username("pennyway")
-                .password("oldPassword")
-                .build();
+        User user = UserFixture.GENERAL_USER.toUser();
         given(userService.readUserByPhone(phone)).willReturn(Optional.of(user));
         given(passwordEncoderHelper.encodePassword(newPassword)).willReturn("encodedNewPassword");
 
