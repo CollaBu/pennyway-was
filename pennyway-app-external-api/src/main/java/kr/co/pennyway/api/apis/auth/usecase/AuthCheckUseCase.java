@@ -36,6 +36,7 @@ public class AuthCheckUseCase {
     public void verifyCode(PhoneVerificationDto.VerifyCodeReq request) {
         phoneVerificationService.isValidCode(request, PhoneCodeKeyType.FIND_PASSWORD);
         authFindService.verifyUser(request.phone());
+        phoneCodeService.extendTimeToLeave(request.phone(), PhoneCodeKeyType.FIND_PASSWORD);
     }
 
     public void findPassword(PhoneVerificationDto.VerifyCodeReq request, String passwordReq) {
