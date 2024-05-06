@@ -41,60 +41,54 @@ public interface AuthCheckApi {
                                     "code": "4040",
                                     "message": "일반 회원으로 등록되지 않은 휴대폰 번호입니다."
                                 }
-                            """)
-            })),
-            @ApiResponse(responseCode = "404", description = "인증번호 만료 또는 유효하지 않은 경우", content = @Content(mediaType = "application/json", examples = {
+                            """),
                     @ExampleObject(name = "인증번호 만료 또는 유효하지 않은 경우", value = """
                                 {
                                     "code": "4042",
                                     "message": "인증번호가 만료되었거나 유효하지 않습니다."
                                 }
                             """)
-            })),
+            }))
     })
     ResponseEntity<?> findUsername(@Validated PhoneVerificationDto.VerifyCodeReq request);
 
     @Operation(summary = "일반 회원 비밀번호 찾기에 사용되는 인증코드 인증")
-    @ApiResponses({
-            @ApiResponse(responseCode = "404", content = @Content(mediaType = "application/json", examples = {
-                    @ExampleObject(name = "존재하지 않는 회원일 경우", value = """
-                            {
-                                "code": "4040",
-                                "message": "유저를 찾을 수 없습니다."
-                            }
-                            """),
-                    @ExampleObject(name = "일반 회원가입 이력이 없는 경우", value = """
-                            {
-                                "code": "4040",
-                                "message": "일반 회원가입 계정이 아닙니다."
-                            }
-                            """),
-                    @ExampleObject(name = "인증번호 만료 또는 유효하지 않은 경우", value = """
-                                {
-                                    "code": "4042",
-                                    "message": "인증번호가 만료되었거나 유효하지 않습니다."
-                                }
-                            """)
-            }))
-    })
+    @ApiResponse(responseCode = "404", content = @Content(mediaType = "application/json", examples = {
+            @ExampleObject(name = "존재하지 않는 회원일 경우", value = """
+                    {
+                        "code": "4040",
+                        "message": "유저를 찾을 수 없습니다."
+                    }
+                    """),
+            @ExampleObject(name = "일반 회원가입 이력이 없는 경우", value = """
+                    {
+                        "code": "4040",
+                        "message": "일반 회원가입 계정이 아닙니다."
+                    }
+                    """),
+            @ExampleObject(name = "인증번호 만료 또는 유효하지 않은 경우", value = """
+                        {
+                            "code": "4042",
+                            "message": "인증번호가 만료되었거나 유효하지 않습니다."
+                        }
+                    """)
+    }))
     ResponseEntity<?> verifyCodeForPassword(@RequestBody PhoneVerificationDto.VerifyCodeReq request);
 
     @Operation(summary = "일반 회원 비밀번호 찾기에 사용되는 비밀번호 변경")
-    @ApiResponses({
-            @ApiResponse(responseCode = "404", content = @Content(mediaType = "application/json", examples = {
-                    @ExampleObject(name = "존재하지 않는 회원일 경우", value = """
-                            {
-                                "code": "4040",
-                                "message": "유저를 찾을 수 없습니다."
-                            }
-                            """),
-                    @ExampleObject(name = "인증번호 만료 또는 유효하지 않은 경우", value = """
-                                {
-                                    "code": "4042",
-                                    "message": "인증번호가 만료되었거나 유효하지 않습니다."
-                                }
-                            """)
-            }))
-    })
+    @ApiResponse(responseCode = "404", content = @Content(mediaType = "application/json", examples = {
+            @ExampleObject(name = "존재하지 않는 회원일 경우", value = """
+                    {
+                        "code": "4040",
+                        "message": "유저를 찾을 수 없습니다."
+                    }
+                    """),
+            @ExampleObject(name = "인증번호 만료 또는 유효하지 않은 경우", value = """
+                        {
+                            "code": "4042",
+                            "message": "인증번호가 만료되었거나 유효하지 않습니다."
+                        }
+                    """)
+    }))
     public ResponseEntity<?> findPassword(@Validated AuthFindDto.UpdatePasswordReq request);
 }
