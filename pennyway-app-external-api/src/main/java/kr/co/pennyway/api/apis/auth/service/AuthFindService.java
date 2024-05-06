@@ -26,8 +26,7 @@ public class AuthFindService {
      */
     @Transactional(readOnly = true)
     public AuthFindDto.FindUsernameRes findUsername(String phone) {
-        User user = readUserOrThrow(phone);
-        validateGeneralSignedUpUser(user);
+        User user = readGeneralSignUpUser(phone);
 
         return AuthFindDto.FindUsernameRes.of(user);
     }
@@ -39,9 +38,8 @@ public class AuthFindService {
      * @param phone 전화번호 (e.g. 010-1234-5678)
      */
     @Transactional(readOnly = true)
-    public void verifyUser(String phone) {
-        User user = readUserOrThrow(phone);
-        validateGeneralSignedUpUser(user);
+    public void existsGeneralSignUpUser(String phone) {
+        readGeneralSignUpUser(phone);
     }
 
     /**
@@ -55,6 +53,13 @@ public class AuthFindService {
         User user = readUserOrThrow(phone);
 
         user.updatePassword(passwordEncoderHelper.encodePassword(newPassword));
+    }
+
+    private User readGeneralSignUpUser(String phone) {
+        User user = readUserOrThrow(phone);
+        validateGeneralSignedUpUser(user);
+
+        return user;
     }
 
     private User readUserOrThrow(String phone) {
