@@ -19,6 +19,7 @@ import kr.co.pennyway.domain.domains.user.service.UserService;
 import kr.co.pennyway.domain.domains.user.type.ProfileVisibility;
 import kr.co.pennyway.domain.domains.user.type.Role;
 import kr.co.pennyway.infra.common.oidc.OidcDecodePayload;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -41,8 +42,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -50,6 +50,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+@Slf4j
 @ExternalApiIntegrationTest
 @AutoConfigureMockMvc
 @TestClassOrder(ClassOrderer.OrderAnnotation.class)
@@ -140,7 +141,7 @@ public class OAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
             Provider provider = Provider.KAKAO;
             User user = createOauthSignedUser();
 
-            given(oauthOidcHelper.getPayload(provider, expectedIdToken, expectedNonce)).willReturn(new OidcDecodePayload("iss", "aud", expectedOauthId, "email"));
+            given(oauthOidcHelper.getPayload(provider, expectedOauthId, expectedIdToken, expectedNonce)).willReturn(new OidcDecodePayload("iss", "aud", expectedOauthId, "email"));
             userService.createUser(user);
             oauthService.createOauth(createOauthAccount(user, provider));
 
@@ -165,7 +166,7 @@ public class OAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
             Provider provider = Provider.KAKAO;
             User user = createOauthSignedUser();
 
-            given(oauthOidcHelper.getPayload(provider, expectedIdToken, expectedNonce)).willReturn(new OidcDecodePayload("iss", "aud", expectedOauthId, "email"));
+            given(oauthOidcHelper.getPayload(provider, expectedOauthId, expectedIdToken, expectedNonce)).willReturn(new OidcDecodePayload("iss", "aud", expectedOauthId, "email"));
             userService.createUser(user);
             oauthService.createOauth(createOauthAccount(user, Provider.GOOGLE));
 
@@ -188,7 +189,7 @@ public class OAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
             Provider provider = Provider.KAKAO;
             User user = createGeneralSignedUser();
 
-            given(oauthOidcHelper.getPayload(provider, expectedIdToken, expectedNonce)).willReturn(new OidcDecodePayload("iss", "aud", expectedOauthId, "email"));
+            given(oauthOidcHelper.getPayload(provider, expectedOauthId, expectedIdToken, expectedNonce)).willReturn(new OidcDecodePayload("iss", "aud", expectedOauthId, "email"));
             userService.createUser(user);
 
             // when
@@ -209,7 +210,7 @@ public class OAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
             // given
             Provider provider = Provider.KAKAO;
 
-            given(oauthOidcHelper.getPayload(provider, expectedIdToken, expectedNonce)).willReturn(new OidcDecodePayload("iss", "aud", expectedOauthId, "email"));
+            given(oauthOidcHelper.getPayload(provider, expectedOauthId, expectedIdToken, expectedNonce)).willReturn(new OidcDecodePayload("iss", "aud", expectedOauthId, "email"));
 
             // when
             ResultActions result = performOauthSignIn(provider, expectedOauthId, expectedIdToken, expectedNonce);
@@ -218,30 +219,6 @@ public class OAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
             result
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.data.user.id").value(-1))
-                    .andDo(print());
-        }
-
-        @Test
-        @WithAnonymousUser
-        @Transactional
-        @DisplayName("OAuth id와 payload의 sub가 다른 경우에는 NOT_MATCHED_OAUTH_ID 에러가 발생한다.")
-        void signInWithNotMatchedOauthId() throws Exception {
-            // given
-            Provider provider = Provider.KAKAO;
-            User user = createOauthSignedUser();
-
-            given(oauthOidcHelper.getPayload(provider, expectedIdToken, expectedNonce)).willReturn(new OidcDecodePayload("iss", "aud", "differentOauthId", "email"));
-            userService.createUser(user);
-            oauthService.createOauth(createOauthAccount(user, provider));
-
-            // when
-            ResultActions result = performOauthSignIn(provider, expectedOauthId, expectedIdToken, expectedNonce);
-
-            // then
-            result
-                    .andExpect(status().isUnauthorized())
-                    .andExpect(jsonPath("$.code").value(OauthErrorCode.NOT_MATCHED_OAUTH_ID.causedBy().getCode()))
-                    .andExpect(jsonPath("$.message").value(OauthErrorCode.NOT_MATCHED_OAUTH_ID.getExplainError()))
                     .andDo(print());
         }
 
@@ -398,6 +375,34 @@ public class OAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
                     .andDo(print());
         }
 
+        @Test
+        @WithAnonymousUser
+        @Transactional
+        @DisplayName("같은 provider로 Oauth 로그인 이력이 soft delete 되었으면 성공 응답을 반환한다.")
+        void signUpWithDeletedOauth() throws Exception {
+            // given
+            Provider provider = Provider.KAKAO;
+            User user = createGeneralSignedUser();
+            Oauth oauth = createOauthAccount(user, provider);
+
+            userService.createUser(user);
+            oauthService.createOauth(oauth);
+            oauthService.deleteOauth(oauth);
+            phoneCodeService.create(expectedPhone, expectedCode, PhoneCodeKeyType.getOauthSignUpTypeByProvider(provider));
+
+            // when
+            ResultActions result = performOauthSignUpPhoneVerification(provider, expectedCode);
+
+            // then
+            result
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.code").value("2000"))
+                    .andExpect(jsonPath("$.data.sms.code").value(true))
+                    .andExpect(jsonPath("$.data.sms.existsUser").value(true))
+                    .andExpect(jsonPath("$.data.sms.username").value(user.getUsername()))
+                    .andDo(print());
+        }
+
         private ResultActions performOauthSignUpPhoneVerification(Provider provider, String code) throws Exception {
             PhoneVerificationDto.VerifyCodeReq request = new PhoneVerificationDto.VerifyCodeReq(expectedPhone, code);
             return mockMvc.perform(post("/v1/auth/oauth/phone/verification")
@@ -422,10 +427,10 @@ public class OAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
 
             userService.createUser(user);
             phoneCodeService.create(expectedPhone, expectedCode, PhoneCodeKeyType.getOauthSignUpTypeByProvider(provider));
-            given(oauthOidcHelper.getPayload(provider, expectedIdToken, expectedNonce)).willReturn(new OidcDecodePayload("iss", "aud", expectedOauthId, "email"));
+            given(oauthOidcHelper.getPayload(provider, expectedOauthId, expectedIdToken, expectedNonce)).willReturn(new OidcDecodePayload("iss", "aud", expectedOauthId, "email"));
 
             // when
-            ResultActions result = performOauthSignUpAccountLinking(provider, expectedCode);
+            ResultActions result = performOauthSignUpAccountLinking(provider, expectedCode, expectedOauthId);
 
             // then
             result
@@ -436,7 +441,7 @@ public class OAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
                     .andDo(print());
             Oauth savedOauth = oauthService.readOauthByOauthIdAndProvider(expectedOauthId, provider).get();
             assertEquals(savedOauth.getUser().getId(), user.getId());
-            System.out.println("oauth : " + savedOauth);
+            log.debug("oauth : {}", savedOauth);
         }
 
         @Test
@@ -452,10 +457,10 @@ public class OAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
             userService.createUser(user);
             oauthService.createOauth(oauth);
             phoneCodeService.create(expectedPhone, expectedCode, PhoneCodeKeyType.getOauthSignUpTypeByProvider(provider));
-            given(oauthOidcHelper.getPayload(provider, expectedIdToken, expectedNonce)).willReturn(new OidcDecodePayload("iss", "aud", expectedOauthId, "email"));
+            given(oauthOidcHelper.getPayload(provider, expectedOauthId, expectedIdToken, expectedNonce)).willReturn(new OidcDecodePayload("iss", "aud", expectedOauthId, "email"));
 
             // when
-            ResultActions result = performOauthSignUpAccountLinking(provider, expectedCode);
+            ResultActions result = performOauthSignUpAccountLinking(provider, expectedCode, expectedOauthId);
 
             // then
             result
@@ -466,7 +471,7 @@ public class OAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
                     .andDo(print());
             Oauth savedOauth = oauthService.readOauthByOauthIdAndProvider(expectedOauthId, provider).get();
             assertEquals(savedOauth.getUser().getId(), user.getId());
-            System.out.println("oauth : " + savedOauth);
+            log.debug("oauth : {}", savedOauth);
         }
 
         @Test
@@ -477,10 +482,10 @@ public class OAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
             // given
             Provider provider = Provider.KAKAO;
             phoneCodeService.create(expectedPhone, expectedCode, PhoneCodeKeyType.getOauthSignUpTypeByProvider(provider));
-            given(oauthOidcHelper.getPayload(provider, expectedIdToken, expectedNonce)).willReturn(new OidcDecodePayload("iss", "aud", expectedOauthId, "email"));
+            given(oauthOidcHelper.getPayload(provider, expectedOauthId, expectedIdToken, expectedNonce)).willReturn(new OidcDecodePayload("iss", "aud", expectedOauthId, "email"));
 
             // when
-            ResultActions result = performOauthSignUpAccountLinking(provider, expectedCode);
+            ResultActions result = performOauthSignUpAccountLinking(provider, expectedCode, expectedOauthId);
 
             // then
             result
@@ -503,10 +508,10 @@ public class OAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
             userService.createUser(user);
             oauthService.createOauth(oauth);
             phoneCodeService.create(expectedPhone, expectedCode, PhoneCodeKeyType.getOauthSignUpTypeByProvider(provider));
-            given(oauthOidcHelper.getPayload(provider, expectedIdToken, expectedNonce)).willReturn(new OidcDecodePayload("iss", "aud", expectedOauthId, "email"));
+            given(oauthOidcHelper.getPayload(provider, expectedOauthId, expectedIdToken, expectedNonce)).willReturn(new OidcDecodePayload("iss", "aud", expectedOauthId, "email"));
 
             // when
-            ResultActions result = performOauthSignUpAccountLinking(provider, expectedCode);
+            ResultActions result = performOauthSignUpAccountLinking(provider, expectedCode, expectedOauthId);
 
             // then
             result
@@ -516,8 +521,42 @@ public class OAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
                     .andDo(print());
         }
 
-        private ResultActions performOauthSignUpAccountLinking(Provider provider, String code) throws Exception {
-            SignUpReq.SyncWithAuth request = new SignUpReq.SyncWithAuth(expectedIdToken, expectedNonce, expectedPhone, code);
+        @Test
+        @WithAnonymousUser
+        @Transactional
+        @DisplayName("같은 provider로 Oauth 로그인 이력이 soft delete 되었으면, Oauth 정보가 복구되고 새로운 oauth_id를 반영한다.")
+        void signUpWithDeletedOauth() throws Exception {
+            // given
+            Provider provider = Provider.KAKAO;
+            User user = createGeneralSignedUser();
+            Oauth oauth = createOauthAccount(user, provider);
+
+            userService.createUser(user);
+            oauthService.createOauth(oauth);
+            oauthService.deleteOauth(oauth);
+            phoneCodeService.create(expectedPhone, expectedCode, PhoneCodeKeyType.getOauthSignUpTypeByProvider(provider));
+            given(oauthOidcHelper.getPayload(provider, "newOauthId", expectedIdToken, expectedNonce)).willReturn(new OidcDecodePayload("iss", "aud", "newOauthId", "email"));
+
+            // when
+            ResultActions result = performOauthSignUpAccountLinking(provider, expectedCode, "newOauthId");
+
+            // then
+            result
+                    .andExpect(status().isOk())
+                    .andExpect(header().exists("Set-Cookie"))
+                    .andExpect(header().exists("Authorization"))
+                    .andExpect(jsonPath("$.data.user.id").value(user.getId()))
+                    .andDo(print());
+            Oauth savedOauth = oauthService.readOauthByOauthIdAndProvider("newOauthId", provider).get();
+            assertEquals(user.getId(), savedOauth.getUser().getId());
+            assertEquals(oauth.getId(), savedOauth.getId());
+            assertEquals("newOauthId", savedOauth.getOauthId());
+            assertFalse(savedOauth.isDeleted());
+            log.debug("oauth : {}", savedOauth);
+        }
+
+        private ResultActions performOauthSignUpAccountLinking(Provider provider, String code, String oauthId) throws Exception {
+            SignUpReq.SyncWithAuth request = new SignUpReq.SyncWithAuth(oauthId, expectedIdToken, expectedNonce, expectedPhone, code);
             return mockMvc.perform(post("/v1/auth/oauth/link-auth")
                     .param("provider", provider.name())
                     .contentType("application/json")
@@ -537,7 +576,7 @@ public class OAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
             // given
             Provider provider = Provider.KAKAO;
             phoneCodeService.create(expectedPhone, expectedCode, PhoneCodeKeyType.getOauthSignUpTypeByProvider(provider));
-            given(oauthOidcHelper.getPayload(provider, expectedIdToken, expectedNonce)).willReturn(new OidcDecodePayload("iss", "aud", expectedOauthId, "email"));
+            given(oauthOidcHelper.getPayload(provider, expectedOauthId, expectedIdToken, expectedNonce)).willReturn(new OidcDecodePayload("iss", "aud", expectedOauthId, "email"));
 
             // when
             ResultActions result = performOauthSignUp(provider, expectedCode);
@@ -551,7 +590,7 @@ public class OAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
                     .andDo(print());
             Oauth savedOauth = oauthService.readOauthByOauthIdAndProvider(expectedOauthId, provider).get();
             assertNotNull(savedOauth.getUser().getId());
-            System.out.println("oauth : " + savedOauth);
+            log.debug("oauth : {}", savedOauth);
         }
 
         @Test
@@ -565,7 +604,7 @@ public class OAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
 
             userService.createUser(user);
             phoneCodeService.create(expectedPhone, expectedCode, PhoneCodeKeyType.getOauthSignUpTypeByProvider(provider));
-            given(oauthOidcHelper.getPayload(provider, expectedIdToken, expectedNonce)).willReturn(new OidcDecodePayload("iss", "aud", expectedOauthId, "email"));
+            given(oauthOidcHelper.getPayload(provider, expectedOauthId, expectedIdToken, expectedNonce)).willReturn(new OidcDecodePayload("iss", "aud", expectedOauthId, "email"));
 
             // when
             ResultActions result = performOauthSignUp(provider, expectedCode);
@@ -591,7 +630,7 @@ public class OAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
             userService.createUser(user);
             oauthService.createOauth(oauth);
             phoneCodeService.create(expectedPhone, expectedCode, PhoneCodeKeyType.getOauthSignUpTypeByProvider(provider));
-            given(oauthOidcHelper.getPayload(provider, expectedIdToken, expectedNonce)).willReturn(new OidcDecodePayload("iss", "aud", expectedOauthId, "email"));
+            given(oauthOidcHelper.getPayload(provider, expectedOauthId, expectedIdToken, expectedNonce)).willReturn(new OidcDecodePayload("iss", "aud", expectedOauthId, "email"));
 
             // when
             ResultActions result = performOauthSignUp(provider, expectedCode);
@@ -605,7 +644,7 @@ public class OAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
         }
 
         private ResultActions performOauthSignUp(Provider provider, String code) throws Exception {
-            SignUpReq.Oauth request = new SignUpReq.Oauth(expectedIdToken, expectedNonce, "jayang", expectedUsername, expectedPhone, code);
+            SignUpReq.Oauth request = new SignUpReq.Oauth(expectedOauthId, expectedIdToken, expectedNonce, "jayang", expectedUsername, expectedPhone, code);
             return mockMvc.perform(post("/v1/auth/oauth/sign-up")
                     .param("provider", provider.name())
                     .contentType("application/json")

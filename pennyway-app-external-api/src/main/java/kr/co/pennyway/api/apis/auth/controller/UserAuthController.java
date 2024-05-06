@@ -53,4 +53,12 @@ public class UserAuthController implements UserAuthApi {
         userAuthUseCase.linkOauth(provider, request, user.getUserId());
         return ResponseEntity.ok(SuccessResponse.noContent());
     }
+
+    @Override
+    @DeleteMapping("/link-oauth")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> unlinkOauth(@RequestParam Provider provider, @AuthenticationPrincipal SecurityUserDetails user) {
+        userAuthUseCase.unlinkOauth(provider, user.getUserId());
+        return ResponseEntity.ok(SuccessResponse.noContent());
+    }
 }

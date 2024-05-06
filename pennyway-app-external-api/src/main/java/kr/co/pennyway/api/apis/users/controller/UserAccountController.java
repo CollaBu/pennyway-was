@@ -90,4 +90,12 @@ public class UserAccountController implements UserAccountApi {
     public ResponseEntity<?> deleteNotifySetting(@RequestParam NotifySetting.NotifyType type, @AuthenticationPrincipal SecurityUserDetails user) {
         return ResponseEntity.ok(SuccessResponse.from("notifySetting", userAccountUseCase.deactivateNotification(user.getUserId(), type)));
     }
+
+    @Override
+    @DeleteMapping("")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> deleteAccount(@AuthenticationPrincipal SecurityUserDetails user) {
+        userAccountUseCase.deleteAccount(user.getUserId());
+        return ResponseEntity.ok(SuccessResponse.noContent());
+    }
 }

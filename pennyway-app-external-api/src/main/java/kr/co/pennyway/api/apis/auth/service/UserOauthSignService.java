@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
+import java.util.Set;
 
 @Slf4j
 @Service
@@ -27,12 +28,10 @@ public class UserOauthSignService {
 
     @Transactional(readOnly = true)
     public User readUser(String oauthId, Provider provider) {
-        Optional<Oauth> oauth = oauthService.readOauthByOauthIdAndProvider(oauthId, provider);
-
-        if (oauth.isPresent() && oauth.get().isDeleted())
-            return null;
-
-        return oauth.map(Oauth::getUser).orElse(null);
+        return oauthService.readOauthByOauthIdAndProvider(oauthId, provider)
+                .filter(o -> !o.isDeleted())
+                .map(Oauth::getUser)
+                .orElse(null);
     }
 
     /**
@@ -78,6 +77,32 @@ public class UserOauthSignService {
         User user = userService.readUser(userId).orElseThrow(() -> new UserErrorException(UserErrorCode.NOT_FOUND));
 
         return UserSyncDto.of(true, true, user.getId(), user.getUsername(), UserSyncDto.OauthSync.from(oauth.orElse(null)));
+    }
+
+    /**
+     * 연동을 해지할 수 있는 Oauth 계정을 조회한다.
+     *
+     * @throws OauthException : <br/>
+     *                        {@link OauthErrorCode#NOT_FOUND_OAUTH} : Provider에 해당하는 Oauth가 없는 경우 <br/>
+     *                        {@link OauthErrorCode#CANNOT_UNLINK_OAUTH} : Oauth가 1개이고 일반 회원 이력이 없어 연동 해지가 불가능한 경우 <br/>
+     */
+    @Transactional(readOnly = true)
+    public Oauth readOauthForUnlink(Long userId, Provider provider) {
+        Set<Oauth> oauths = oauthService.readOauthsByUserId(userId);
+
+        Oauth oauth = oauths.stream()
+                .filter(o -> o.getProvider().equals(provider) && !o.isDeleted())
+                .findFirst()
+                .orElseThrow(() -> new OauthException(OauthErrorCode.NOT_FOUND_OAUTH));
+        long oauthCount = oauths.stream().filter(o -> !o.isDeleted()).count();
+
+        User user = oauth.getUser();
+
+        if (oauthCount == 1 && !user.isGeneralSignedUpUser()) {
+            throw new OauthException(OauthErrorCode.CANNOT_UNLINK_OAUTH);
+        }
+
+        return oauth;
     }
 
     /**

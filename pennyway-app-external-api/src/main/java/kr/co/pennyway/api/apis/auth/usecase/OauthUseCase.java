@@ -34,11 +34,9 @@ public class OauthUseCase {
 
     @Transactional(readOnly = true)
     public Pair<Long, Jwts> signIn(Provider provider, SignInReq.Oauth request) {
-        OidcDecodePayload payload = oauthOidcHelper.getPayload(provider, request.idToken(), request.nonce());
+        OidcDecodePayload payload = oauthOidcHelper.getPayload(provider, request.oauthId(), request.idToken(), request.nonce());
         log.debug("payload : {}", payload);
 
-        if (!request.oauthId().equals(payload.sub()))
-            throw new OauthException(OauthErrorCode.NOT_MATCHED_OAUTH_ID);
         User user = userOauthSignService.readUser(request.oauthId(), provider);
 
         return (user != null) ? Pair.of(user.getId(), jwtAuthHelper.createToken(user)) : Pair.of(-1L, null);
@@ -66,7 +64,7 @@ public class OauthUseCase {
             throw new OauthException(OauthErrorCode.INVALID_OAUTH_SYNC_REQUEST);
         }
 
-        OidcDecodePayload payload = oauthOidcHelper.getPayload(provider, request.idToken(), request.nonce());
+        OidcDecodePayload payload = oauthOidcHelper.getPayload(provider, request.oauthId(), request.idToken(), request.nonce());
         User user = userOauthSignService.saveUser(request, userSync, provider, payload.sub());
 
         return Pair.of(user.getId(), jwtAuthHelper.createToken(user));
