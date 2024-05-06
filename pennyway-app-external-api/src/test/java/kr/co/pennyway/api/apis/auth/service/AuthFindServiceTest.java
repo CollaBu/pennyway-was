@@ -88,7 +88,7 @@ class AuthFindServiceTest {
         given(userService.readUserByPhone(phone)).willReturn(Optional.empty());
 
         // when - then
-        assertThrows(UserErrorException.class, () -> authFindService.verifyUser(phone));
+        assertThrows(UserErrorException.class, () -> authFindService.existsGeneralSignUpUser(phone));
     }
 
     // Oauth 유저로 인증 쐈을때
@@ -101,7 +101,7 @@ class AuthFindServiceTest {
         given(userService.readUserByPhone(phone)).willReturn(Optional.of(user));
 
         // when - then
-        assertThrows(UserErrorException.class, () -> authFindService.verifyUser(phone));
+        assertThrows(UserErrorException.class, () -> authFindService.existsGeneralSignUpUser(phone));
     }
 
     @DisplayName("정상적인 비밀번호 찾기 인증요청일 경우 SuccessResponse.noContent()를 반환한다.")
@@ -113,7 +113,7 @@ class AuthFindServiceTest {
         given(userService.readUserByPhone(phone)).willReturn(Optional.of(user));
 
         // when
-        authFindService.verifyUser(phone);
+        authFindService.existsGeneralSignUpUser(phone);
     }
 
     @DisplayName("존재하지 않는 사용자의 번호로 비밀번호 변경 요청이 올 경우 UserErrorException을 발생시킨다.")
