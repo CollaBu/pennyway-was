@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
+import java.util.Set;
 
 @DomainService
 @RequiredArgsConstructor
@@ -35,6 +36,11 @@ public class OauthService {
     }
 
     @Transactional(readOnly = true)
+    public Set<Oauth> readOauthsByUserId(Long userId) {
+        return oauthRepository.findAllByUser_Id(userId);
+    }
+
+    @Transactional(readOnly = true)
     public boolean isExistOauthAccount(Long userId, Provider provider) {
         return oauthRepository.existsByUser_IdAndProvider(userId, provider);
     }
@@ -42,5 +48,10 @@ public class OauthService {
     @Transactional
     public void deleteOauth(Oauth oauth) {
         oauthRepository.delete(oauth);
+    }
+
+    @Transactional
+    public void deleteOauthsByUserId(Long userId) {
+        oauthRepository.deleteAllByUser_IdAndDeletedAtNullInQuery(userId);
     }
 }

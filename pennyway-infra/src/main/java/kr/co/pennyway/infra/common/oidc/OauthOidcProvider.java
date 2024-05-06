@@ -10,7 +10,7 @@ public interface OauthOidcProvider {
      * @param nonce : 인증 서버 로그인 요청 시 전달한 임의의 문자열
      * @return kid : ID Token의 서명에 사용된 공개키의 ID
      */
-    String getKidFromUnsignedTokenHeader(String token, String iss, String aud, String nonce);
+    String getKidFromUnsignedTokenHeader(String token, String iss, String sub, String aud, String nonce);
 
     /**
      * ID Token의 payload를 추출하는 메서드
