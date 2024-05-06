@@ -34,7 +34,8 @@ public class AuthCheckController implements AuthCheckApi {
     }
 
     @PostMapping("/find/password/verification")
-    public ResponseEntity<?> verifyCodeForPassword(@RequestBody PhoneVerificationDto.VerifyCodeReq request) {
+    @PreAuthorize("isAnonymous()")
+    public ResponseEntity<?> verifyCodeForPassword(@RequestBody @Validated PhoneVerificationDto.VerifyCodeReq request) {
         authCheckUseCase.verifyCode(request);
 
         return ResponseEntity.ok(SuccessResponse.noContent());
@@ -42,7 +43,7 @@ public class AuthCheckController implements AuthCheckApi {
 
     @PatchMapping("/find/password")
     @PreAuthorize("isAnonymous()")
-    public ResponseEntity<?> findPassword(@RequestBody AuthFindDto.UpdatePasswordReq request) {
+    public ResponseEntity<?> findPassword(@RequestBody @Validated AuthFindDto.UpdatePasswordReq request) {
         PhoneVerificationDto.VerifyCodeReq codeReq = new PhoneVerificationDto.VerifyCodeReq(request.phone(), request.code());
 
         authCheckUseCase.findPassword(codeReq, request.newPassword());
