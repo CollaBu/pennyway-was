@@ -47,12 +47,6 @@ public class QueryDslUtil {
      * @return {@link OrderSpecifier.NullHandling}
      */
     public static OrderSpecifier.NullHandling getQueryDslNullHandling(Sort.Order order) {
-        Function<Sort.NullHandling, OrderSpecifier.NullHandling> castToQueryDsl = nullHandling -> switch (nullHandling) {
-            case NATIVE -> OrderSpecifier.NullHandling.Default;
-            case NULLS_FIRST -> OrderSpecifier.NullHandling.NullsFirst;
-            case NULLS_LAST -> OrderSpecifier.NullHandling.NullsLast;
-        };
-
         return castToQueryDsl.apply(order.getNullHandling());
     }
 
