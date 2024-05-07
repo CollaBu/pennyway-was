@@ -446,7 +446,7 @@ class UserAccountUseCaseTest extends ExternalApiDBTestConfig {
     class DeleteAccountTest {
         @Test
         @Transactional
-        @DisplayName("사용자가 삭제된 유저인 경우 NOT_FOUND 에러를 반환한다.")
+        @DisplayName("사용자가 삭제된 유저를 조회하려는 경우 NOT_FOUND 에러를 반환한다.")
         void deleteAccountWhenUserIsDeleted() {
             // given
             User user = UserFixture.GENERAL_USER.toUser();
@@ -473,7 +473,7 @@ class UserAccountUseCaseTest extends ExternalApiDBTestConfig {
 
         @Test
         @Transactional
-        @DisplayName("삭제 시, 연동된 모든 소셜 계정은 soft delete 처리되어야 한다.")
+        @DisplayName("사용자 계정 삭제 시, 연동된 모든 소셜 계정은 soft delete 처리되어야 한다.")
         void deleteAccountWithSocialAccounts() {
             // given
             User user = UserFixture.OAUTH_USER.toUser();
@@ -487,6 +487,23 @@ class UserAccountUseCaseTest extends ExternalApiDBTestConfig {
             assertTrue("사용자가 삭제되어 있어야 한다.", userService.readUser(user.getId()).isEmpty());
             assertTrue("카카오 계정이 삭제되어 있어야 한다.", oauthService.readOauth(kakao.getId()).get().isDeleted());
             assertTrue("구글 계정이 삭제되어 있어야 한다.", oauthService.readOauth(google.getId()).get().isDeleted());
+        }
+
+        @Test
+        @Transactional
+        @DisplayName("사용자 삭제 시, 디바이스 정보는 CASCADE로 삭제되어야 한다.")
+        void deleteAccountWithDevices() {
+            // given
+            User user = UserFixture.GENERAL_USER.toUser();
+            userService.createUser(user);
+
+            Device device = DeviceFixture.ORIGIN_DEVICE.toDevice(user);
+            deviceService.createDevice(device);
+
+            // when - then
+            assertDoesNotThrow(() -> userAccountUseCase.deleteAccount(user.getId()));
+            assertTrue("사용자가 삭제되어 있어야 한다.", userService.readUser(user.getId()).isEmpty());
+            assertTrue("디바이스가 삭제되어 있어야 한다.", deviceService.readDeviceByUserIdAndToken(user.getId(), device.getToken()).isEmpty());
         }
 
         private Oauth createOauth(Provider provider, String providerId, User user) {

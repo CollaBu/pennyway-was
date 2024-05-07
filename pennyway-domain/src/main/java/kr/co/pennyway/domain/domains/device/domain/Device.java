@@ -23,7 +23,7 @@ public class Device extends DateAuditable {
     @ColumnDefault("true")
     private Boolean activated;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     @JoinColumn(name = "user_id")
     private User user;
 
@@ -66,6 +66,7 @@ public class Device extends DateAuditable {
                 "id=" + id +
                 ", token='" + token + '\'' +
                 ", model='" + model + '\'' +
-                ", os='" + os + '}';
+                ", os='" + os + '\'' +
+                ", activated=" + activated + '}';
     }
 }
