@@ -18,6 +18,7 @@ public interface ExtendedRepository<T> {
 
     /**
      * 검색 조건에 해당하는 도메인 리스트를 조회하는 메서드
+     *
      * @param predicate : 검색 조건
      * @param queryHandler : 검색 조건에 추가적으로 적용할 조건
      * @param sort : 정렬 조건
@@ -44,12 +45,15 @@ public interface ExtendedRepository<T> {
      * </pre>
      * // @formatter:on
      *
+     * @see Predicate
+     * @see QueryHandler
      * @see org.springframework.data.domain.PageRequest
      */
     List<T> findList(Predicate predicate, QueryHandler queryHandler, Sort sort);
 
     /**
      * 검색 조건에 해당하는 도메인 페이지를 조회하는 메서드
+     *
      * @param predicate : 검색 조건
      * @param queryHandler : 검색 조건에 추가적으로 적용할 조건
      * @param pageable : 페이지 정보
@@ -76,12 +80,15 @@ public interface ExtendedRepository<T> {
      * </pre>
      * // @formatter:on
      *
+     * @see Predicate
+     * @see QueryHandler
      * @see org.springframework.data.domain.PageRequest
      */
     Page<T> findPage(Predicate predicate, QueryHandler queryHandler, Pageable pageable);
 
     /**
      * 검색 조건에 해당하는 DTO 리스트를 조회하는 메서드
+     *
      * @param predicate : 검색 조건
      * @param type : 조회할 도메인(혹은 DTO) 타입
      * @param bindings : 검색 조건에 해당하는 도메인(혹은 DTO)의 필드
@@ -119,12 +126,15 @@ public interface ExtendedRepository<T> {
      * </pre>
      * // @formatter:on
      *
+     * @see Predicate
+     * @see QueryHandler
      * @see org.springframework.data.domain.PageRequest
      */
     <P> List<P> selectList(Predicate predicate, Class<P> type, Map<String, Expression<?>> bindings, QueryHandler queryHandler, Sort sort);
 
     /**
      * 검색 조건에 해당하는 DTO 페이지를 조회하는 메서드
+     *
      * @param predicate : 검색 조건
      * @param type : 조회할 도메인(혹은 DTO) 타입
      * @param bindings : 검색 조건에 해당하는 도메인(혹은 DTO)의 필드
@@ -159,6 +169,8 @@ public interface ExtendedRepository<T> {
      *  </pre>
      * // @formatter:on
      *
+     * @see Predicate
+     * @see QueryHandler
      * @see org.springframework.data.domain.PageRequest
      */
     <P> Page<P> selectPage(Predicate predicate, Class<P> type, Map<String, Expression<?>> bindings, QueryHandler queryHandler, Pageable pageable);
