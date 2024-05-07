@@ -36,7 +36,7 @@ public interface QueryDslSearchRepository<T> {
      *          predicate.and(entity.id.eq(1L));
      *
      *          QueryHandler queryHandler = query -> query.leftJoin(entityChild).on(entity.id.eq(entityChild.entity.id));
-     *          Sort sort = Sort.by(Sort.Direction.DESC, entity.id);
+     *          Sort sort = Sort.by(Sort.Order.desc("entity.id"));
      *
      *          return searchRepository.findList(predicate, queryHandler, sort);
      *      }
@@ -71,7 +71,7 @@ public interface QueryDslSearchRepository<T> {
      *          predicate.and(entity.id.eq(1L));
      *
      *          QueryHandler queryHandler = query -> query.leftJoin(entityChild).on(entity.id.eq(entityChild.entity.id));
-     *          Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, entity.id));
+     *          Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Order.desc("entity.id")));
      *
      *          return searchRepository.findList(predicate, queryHandler, pageable);
      *      }
@@ -108,7 +108,7 @@ public interface QueryDslSearchRepository<T> {
      *          predicate.and(entity.id.eq(1L));
      *
      *          QueryHandler queryHandler = query -> query.leftJoin(entityChild).on(entity.id.eq(entityChild.entity.id));
-     *          Sort sort = Sort.by(Sort.Direction.DESC, entity.id);
+     *          Sort sort = Sort.by(Sort.Order.desc("entity.id"));
      *
      *          return searchRepository.findList(predicate, EntityDto.class, this.buildBindings(), queryHandler, sort);
      *      }
@@ -153,7 +153,7 @@ public interface QueryDslSearchRepository<T> {
      *          Predicate predicate = new BooleanBuilder();
      *          predicate.and(entity.id.eq(1L));
      *          QueryHandler queryHandler = query -> query.leftJoin(entityChild).on(entity.id.eq(entityChild.entity.id));
-     *          Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, entity.id));
+     *          Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Order.desc("entity.id")));
      *
      *          return searchRepository.findPage(predicate, EntityDto.class, this.buildBindings(), queryHandler, pageable);
      *      }
