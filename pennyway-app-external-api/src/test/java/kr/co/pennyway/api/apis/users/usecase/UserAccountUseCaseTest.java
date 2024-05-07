@@ -489,6 +489,23 @@ class UserAccountUseCaseTest extends ExternalApiDBTestConfig {
             assertTrue("구글 계정이 삭제되어 있어야 한다.", oauthService.readOauth(google.getId()).get().isDeleted());
         }
 
+        @Test
+        @Transactional
+        @DisplayName("사용자 삭제 시, 디바이스 정보는 CASCADE로 삭제되어야 한다.")
+        void deleteAccountWithDevices() {
+            // given
+            User user = UserFixture.GENERAL_USER.toUser();
+            userService.createUser(user);
+
+            Device device = DeviceFixture.ORIGIN_DEVICE.toDevice(user);
+            deviceService.createDevice(device);
+
+            // when - then
+            assertDoesNotThrow(() -> userAccountUseCase.deleteAccount(user.getId()));
+            assertTrue("사용자가 삭제되어 있어야 한다.", userService.readUser(user.getId()).isEmpty());
+            assertTrue("디바이스가 삭제되어 있어야 한다.", deviceService.readDeviceByUserIdAndToken(user.getId(), device.getToken()).isEmpty());
+        }
+
         private Oauth createOauth(Provider provider, String providerId, User user) {
             Oauth oauth = Oauth.of(provider, providerId, user);
             return oauthService.createOauth(oauth);
