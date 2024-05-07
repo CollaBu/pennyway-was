@@ -1,4 +1,4 @@
-package kr.co.pennyway.domain.domains.amount.domain;
+package kr.co.pennyway.domain.domains.target.domain;
 
 import jakarta.persistence.*;
 import kr.co.pennyway.domain.common.model.DateAuditable;
