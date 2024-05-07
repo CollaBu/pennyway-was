@@ -35,18 +35,19 @@ public class Spending extends DateAuditable {
     @JoinColumn(name = "user_id")
     private User user;
 
+    /* category가 OTHER일 경우 spendingCustomCategory를 참조 */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id")
-    private SpendingCategory spendingCategory;
+    @JoinColumn(name = "spending_custom_category_id")
+    private SpendingCustomCategory spendingCustomCategory;
 
     @Builder
-    private Spending(Integer amount, SpendingIcon category, LocalDateTime spendAt, String accountName, String memo, User user, SpendingCategory spendingCategory) {
+    private Spending(Integer amount, SpendingIcon category, LocalDateTime spendAt, String accountName, String memo, User user, SpendingCustomCategory spendingCustomCategory) {
         this.amount = amount;
         this.category = category;
         this.spendAt = spendAt;
         this.accountName = accountName;
         this.memo = memo;
         this.user = user;
-        this.spendingCategory = spendingCategory;
+        this.spendingCustomCategory = spendingCustomCategory;
     }
 }

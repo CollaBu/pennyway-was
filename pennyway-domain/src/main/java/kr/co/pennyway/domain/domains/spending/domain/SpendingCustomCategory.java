@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 @Table(name = "spending_category")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @SQLDelete(sql = "UPDATE spending_category SET deleted_at = NOW() WHERE id = ?")
-public class SpendingCategory extends DateAuditable {
+public class SpendingCustomCategory extends DateAuditable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -29,15 +29,15 @@ public class SpendingCategory extends DateAuditable {
     @JoinColumn(name = "user_id")
     private User user;
 
-    private SpendingCategory(String name, SpendingIcon icon, User user) {
+    private SpendingCustomCategory(String name, SpendingIcon icon, User user) {
         this.name = name;
         this.icon = icon;
         this.user = user;
     }
 
-    public static SpendingCategory of(String name, SpendingIcon icon, User user) {
+    public static SpendingCustomCategory of(String name, SpendingIcon icon, User user) {
         if (icon.equals(SpendingIcon.OTHER))
             throw new IllegalArgumentException("OTHER 아이콘은 커스텀 카테고리의 icon으로 사용할 수 없습니다.");
-        return new SpendingCategory(name, icon, user);
+        return new SpendingCustomCategory(name, icon, user);
     }
 }
