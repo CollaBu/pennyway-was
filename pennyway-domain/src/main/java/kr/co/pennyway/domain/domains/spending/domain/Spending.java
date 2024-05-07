@@ -22,7 +22,7 @@ public class Spending extends DateAuditable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+    
     private Integer amount;
     @Convert(converter = SpendingIconConverter.class)
     private SpendingIcon category;
