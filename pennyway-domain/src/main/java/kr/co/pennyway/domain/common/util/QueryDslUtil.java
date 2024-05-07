@@ -7,6 +7,7 @@ import org.springframework.data.domain.Sort;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
 @Slf4j
@@ -33,10 +34,53 @@ public class QueryDslUtil {
         return orders;
     }
 
-    private static OrderSpecifier<?> getOrderSpecifier(Sort.Order order, OrderSpecifier.NullHandling nullHandling) {
+    /**
+     * OrderSpecifier를 생성할 때, Sort.Order의 정보를 이용하여 OrderSpecifier.NullHandling을 적용하는 메서드
+     *
+     * @param order : {@link Sort.Order}
+     * @return {@link OrderSpecifier.NullHandling}
+     */
+    public static OrderSpecifier.NullHandling getQueryDslNullHandling(Sort.Order order) {
+        Function<Sort.NullHandling, OrderSpecifier.NullHandling> castToQueryDsl = nullHandling -> switch (nullHandling) {
+            case NATIVE -> OrderSpecifier.NullHandling.Default;
+            case NULLS_FIRST -> OrderSpecifier.NullHandling.NullsFirst;
+            case NULLS_LAST -> OrderSpecifier.NullHandling.NullsLast;
+        };
+
+        return castToQueryDsl.apply(order.getNullHandling());
+    }
+
+    /**
+     * OrderSpecifier를 생성할 때, Sort.Order의 정보를 이용하여 OrderSpecifier.NullHandling을 적용하는 메서드
+     *
+     * @param order        : {@link Sort.Order}
+     * @param nullHandling : {@link OrderSpecifier.NullHandling}
+     * @return {@link OrderSpecifier}
+     */
+    public static OrderSpecifier<?> getOrderSpecifier(Sort.Order order, OrderSpecifier.NullHandling nullHandling) {
         Order orderBy = order.isAscending() ? Order.ASC : Order.DESC;
 
         return createOrderSpecifier(orderBy, Expressions.stringPath(order.getProperty()), nullHandling);
+    }
+
+    /**
+     * Expression이 Operation이고 Operator가 ALIAS일 경우, OrderSpecifier를 생성할 때, Expression을 StringPath로 변환하여 생성한다. <br/>
+     * 그 외의 경우에는 OrderSpecifier를 생성한다.
+     *
+     * @param order                : {@link Sort.Order}
+     * @param bindings             : 검색 조건에 해당하는 도메인(혹은 DTO)의 필드 정보. {@code binding}은 Map<String, Expression<?>> 형태로 전달된다.
+     * @param queryDslNullHandling : {@link OrderSpecifier.NullHandling}
+     * @return {@link OrderSpecifier}
+     */
+    public static OrderSpecifier<?> getOrderSpecifier(Sort.Order order, Map<String, Expression<?>> bindings, OrderSpecifier.NullHandling queryDslNullHandling) {
+        Order orderBy = order.isAscending() ? Order.ASC : Order.DESC;
+
+        if (bindings != null && bindings.containsKey(order.getProperty())) {
+            Expression<?> expression = bindings.get(order.getProperty());
+            return createOrderSpecifier(orderBy, expression, queryDslNullHandling);
+        } else {
+            return createOrderSpecifier(orderBy, Expressions.stringPath(order.getProperty()), queryDslNullHandling);
+        }
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})

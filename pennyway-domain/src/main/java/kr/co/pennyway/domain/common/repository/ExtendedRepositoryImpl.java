@@ -2,10 +2,10 @@ package kr.co.pennyway.domain.common.repository;
 
 import com.querydsl.core.types.*;
 import com.querydsl.core.types.dsl.EntityPathBase;
-import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
+import kr.co.pennyway.domain.common.util.QueryDslUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -17,7 +17,6 @@ import org.springframework.util.Assert;
 
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 
 public class ExtendedRepositoryImpl<T> implements ExtendedRepository<T> {
     private final EntityManager em;
@@ -116,41 +115,11 @@ public class ExtendedRepositoryImpl<T> implements ExtendedRepository<T> {
 
     private void applySortOrders(JPAQuery<?> query, Sort sort, Map<String, Expression<?>> bindings) {
         for (Sort.Order order : sort) {
-            OrderSpecifier.NullHandling queryDslNullHandling = getQueryDslNullHandling(order);
+            OrderSpecifier.NullHandling queryDslNullHandling = QueryDslUtil.getQueryDslNullHandling(order);
 
-            OrderSpecifier<?> os = getOrderSpecifier(order, bindings, queryDslNullHandling);
+            OrderSpecifier<?> os = QueryDslUtil.getOrderSpecifier(order, bindings, queryDslNullHandling);
 
             query.orderBy(os);
-        }
-    }
-
-    private OrderSpecifier.NullHandling getQueryDslNullHandling(Sort.Order order) {
-        Function<Sort.NullHandling, OrderSpecifier.NullHandling> castToQueryDsl = nullHandling -> switch (nullHandling) {
-            case NATIVE -> OrderSpecifier.NullHandling.Default;
-            case NULLS_FIRST -> OrderSpecifier.NullHandling.NullsFirst;
-            case NULLS_LAST -> OrderSpecifier.NullHandling.NullsLast;
-        };
-
-        return castToQueryDsl.apply(order.getNullHandling());
-    }
-
-    private OrderSpecifier<?> getOrderSpecifier(Sort.Order order, Map<String, Expression<?>> bindings, OrderSpecifier.NullHandling queryDslNullHandling) {
-        Order orderBy = order.isAscending() ? Order.ASC : Order.DESC;
-
-        if (bindings != null && bindings.containsKey(order.getProperty())) {
-            Expression<?> expression = bindings.get(order.getProperty());
-            return createOrderSpecifier(orderBy, expression, queryDslNullHandling);
-        } else {
-            return createOrderSpecifier(orderBy, Expressions.stringPath(order.getProperty()), queryDslNullHandling);
-        }
-    }
-
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    private OrderSpecifier<?> createOrderSpecifier(Order orderBy, Expression<?> expression, OrderSpecifier.NullHandling queryDslNullHandling) {
-        if (expression instanceof Operation && ((Operation<?>) expression).getOperator() == Ops.ALIAS) {
-            return new OrderSpecifier<>(orderBy, Expressions.stringPath(((Operation<?>) expression).getArg(1).toString()), queryDslNullHandling);
-        } else {
-            return new OrderSpecifier(orderBy, expression, queryDslNullHandling);
         }
     }
 }
