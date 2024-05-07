@@ -9,13 +9,13 @@ import org.springframework.data.repository.core.support.RepositoryComposition;
 import org.springframework.data.repository.core.support.RepositoryFactorySupport;
 import org.springframework.lang.NonNull;
 
-public class QueryDslSearchRepositoryFactory<T extends Repository<E, ID>, E, ID> extends JpaRepositoryFactoryBean<T, E, ID> {
+public class ExtendedRepositoryFactory<T extends Repository<E, ID>, E, ID> extends JpaRepositoryFactoryBean<T, E, ID> {
     /**
      * Creates a new {@link JpaRepositoryFactoryBean} for the given repository interface.
      *
      * @param repositoryInterface must not be {@literal null}.
      */
-    public QueryDslSearchRepositoryFactory(Class<? extends T> repositoryInterface) {
+    public ExtendedRepositoryFactory(Class<? extends T> repositoryInterface) {
         super(repositoryInterface);
     }
 
