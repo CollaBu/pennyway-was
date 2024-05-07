@@ -446,7 +446,7 @@ class UserAccountUseCaseTest extends ExternalApiDBTestConfig {
     class DeleteAccountTest {
         @Test
         @Transactional
-        @DisplayName("사용자가 삭제된 유저인 경우 NOT_FOUND 에러를 반환한다.")
+        @DisplayName("사용자가 삭제된 유저를 조회하려는 경우 NOT_FOUND 에러를 반환한다.")
         void deleteAccountWhenUserIsDeleted() {
             // given
             User user = UserFixture.GENERAL_USER.toUser();
@@ -473,7 +473,7 @@ class UserAccountUseCaseTest extends ExternalApiDBTestConfig {
 
         @Test
         @Transactional
-        @DisplayName("삭제 시, 연동된 모든 소셜 계정은 soft delete 처리되어야 한다.")
+        @DisplayName("사용자 계정 삭제 시, 연동된 모든 소셜 계정은 soft delete 처리되어야 한다.")
         void deleteAccountWithSocialAccounts() {
             // given
             User user = UserFixture.OAUTH_USER.toUser();
