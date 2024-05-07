@@ -2,7 +2,7 @@ package kr.co.pennyway.domain.domains.spending.domain;
 
 import jakarta.persistence.*;
 import kr.co.pennyway.domain.common.model.DateAuditable;
-import kr.co.pennyway.domain.domains.spending.type.SpendingIcon;
+import kr.co.pennyway.domain.domains.spending.type.SpendingCategory;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -22,21 +22,21 @@ public class SpendingCustomCategory extends DateAuditable {
     private Long id;
 
     private String name;
-    private SpendingIcon icon;
+    private SpendingCategory icon;
     private LocalDateTime deletedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
-    private SpendingCustomCategory(String name, SpendingIcon icon, User user) {
+    private SpendingCustomCategory(String name, SpendingCategory icon, User user) {
         this.name = name;
         this.icon = icon;
         this.user = user;
     }
 
-    public static SpendingCustomCategory of(String name, SpendingIcon icon, User user) {
-        if (icon.equals(SpendingIcon.OTHER))
+    public static SpendingCustomCategory of(String name, SpendingCategory icon, User user) {
+        if (icon.equals(SpendingCategory.OTHER))
             throw new IllegalArgumentException("OTHER 아이콘은 커스텀 카테고리의 icon으로 사용할 수 없습니다.");
         return new SpendingCustomCategory(name, icon, user);
     }

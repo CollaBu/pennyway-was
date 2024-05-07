@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum SpendingIcon implements LegacyCommonType {
+public enum SpendingCategory implements LegacyCommonType {
     OTHER("0", "사용자 정의"),
     FOOD("1", "식비"),
     TRANSPORTATION("2", "교통비"),

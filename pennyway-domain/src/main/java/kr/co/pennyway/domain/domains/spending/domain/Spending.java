@@ -3,7 +3,7 @@ package kr.co.pennyway.domain.domains.spending.domain;
 import jakarta.persistence.*;
 import kr.co.pennyway.domain.common.converter.SpendingIconConverter;
 import kr.co.pennyway.domain.common.model.DateAuditable;
-import kr.co.pennyway.domain.domains.spending.type.SpendingIcon;
+import kr.co.pennyway.domain.domains.spending.type.SpendingCategory;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -22,10 +22,10 @@ public class Spending extends DateAuditable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+
     private Integer amount;
     @Convert(converter = SpendingIconConverter.class)
-    private SpendingIcon category;
+    private SpendingCategory category;
     private LocalDateTime spendAt;
     private String accountName;
     private String memo;
@@ -41,7 +41,7 @@ public class Spending extends DateAuditable {
     private SpendingCustomCategory spendingCustomCategory;
 
     @Builder
-    private Spending(Integer amount, SpendingIcon category, LocalDateTime spendAt, String accountName, String memo, User user, SpendingCustomCategory spendingCustomCategory) {
+    private Spending(Integer amount, SpendingCategory category, LocalDateTime spendAt, String accountName, String memo, User user, SpendingCustomCategory spendingCustomCategory) {
         this.amount = amount;
         this.category = category;
         this.spendAt = spendAt;
