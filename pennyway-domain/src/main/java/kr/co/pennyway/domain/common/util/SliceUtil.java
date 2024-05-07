@@ -10,6 +10,7 @@ import java.util.List;
  * Slice를 생성하는 메서드를 제공하는 유틸리티 클래스
  *
  * @author YANG JAESEO
+ * @version 1.0
  */
 public class SliceUtil {
     /**
