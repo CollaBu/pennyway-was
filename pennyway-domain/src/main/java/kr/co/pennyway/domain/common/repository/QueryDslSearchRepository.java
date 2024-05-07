@@ -14,7 +14,7 @@ import java.util.Map;
  *
  * @author YANG JAESEO
  */
-public interface ExtendedRepository<T> {
+public interface QueryDslSearchRepository<T> {
 
     /**
      * 검색 조건에 해당하는 도메인 리스트를 조회하는 메서드

@@ -18,18 +18,24 @@ import org.springframework.util.Assert;
 import java.util.List;
 import java.util.Map;
 
-public class ExtendedRepositoryImpl<T> implements ExtendedRepository<T> {
+/**
+ * QueryDSL을 이용한 검색 조건을 처리하는 기본적인 메서드를 선언한 인터페이스 <br/>
+ *
+ * @author YANG JAESEO
+ * @version 1.0
+ */
+public class QueryDslSearchRepositoryImpl<T> implements QueryDslSearchRepository<T> {
     private final EntityManager em;
     private final JPAQueryFactory queryFactory;
     private final EntityPath<T> path;
 
-    public ExtendedRepositoryImpl(JpaEntityInformation<T, ?> entityInformation, EntityManager entityManager) {
+    public QueryDslSearchRepositoryImpl(JpaEntityInformation<T, ?> entityInformation, EntityManager entityManager) {
         this.em = entityManager;
         this.queryFactory = new JPAQueryFactory(entityManager);
         this.path = SimpleEntityPathResolver.INSTANCE.createPath(entityInformation.getJavaType());
     }
 
-    public ExtendedRepositoryImpl(Class<T> type, EntityManager entityManager) {
+    public QueryDslSearchRepositoryImpl(Class<T> type, EntityManager entityManager) {
         this.em = entityManager;
         this.queryFactory = new JPAQueryFactory(entityManager);
         this.path = new EntityPathBase<>(type, "entity");

@@ -9,13 +9,13 @@ import org.springframework.data.repository.core.support.RepositoryComposition;
 import org.springframework.data.repository.core.support.RepositoryFactorySupport;
 import org.springframework.lang.NonNull;
 
-public class ExtendedRepositoryFactory<T extends Repository<E, ID>, E, ID> extends JpaRepositoryFactoryBean<T, E, ID> {
+public class QueryDslSearchRepositoryFactory<T extends Repository<E, ID>, E, ID> extends JpaRepositoryFactoryBean<T, E, ID> {
     /**
      * Creates a new {@link JpaRepositoryFactoryBean} for the given repository interface.
      *
      * @param repositoryInterface must not be {@literal null}.
      */
-    public ExtendedRepositoryFactory(Class<? extends T> repositoryInterface) {
+    public QueryDslSearchRepositoryFactory(Class<? extends T> repositoryInterface) {
         super(repositoryInterface);
     }
 
@@ -38,9 +38,9 @@ public class ExtendedRepositoryFactory<T extends Repository<E, ID>, E, ID> exten
         protected RepositoryComposition.RepositoryFragments getRepositoryFragments(@NonNull RepositoryMetadata metadata) {
             RepositoryComposition.RepositoryFragments fragments = super.getRepositoryFragments(metadata);
 
-            if (ExtendedRepository.class.isAssignableFrom(metadata.getRepositoryInterface())) {
+            if (QueryDslSearchRepository.class.isAssignableFrom(metadata.getRepositoryInterface())) {
                 var implExtendedJpa = super.instantiateClass(
-                        ExtendedRepositoryImpl.class,
+                        QueryDslSearchRepositoryImpl.class,
                         this.getEntityInformation(metadata.getDomainType()),
                         this.em
                 );
