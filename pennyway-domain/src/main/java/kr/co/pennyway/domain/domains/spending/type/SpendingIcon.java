@@ -1,4 +1,4 @@
-package kr.co.pennyway.domain.domains.ledger.type;
+package kr.co.pennyway.domain.domains.spending.type;
 
 import kr.co.pennyway.domain.common.converter.LegacyCommonType;
 import lombok.Getter;

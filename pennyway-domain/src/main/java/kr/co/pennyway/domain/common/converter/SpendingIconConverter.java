@@ -1,7 +1,7 @@
 package kr.co.pennyway.domain.common.converter;
 
 import jakarta.persistence.Converter;
-import kr.co.pennyway.domain.domains.ledger.type.SpendingIcon;
+import kr.co.pennyway.domain.domains.spending.type.SpendingIcon;
 
 @Converter
 public class SpendingIconConverter extends AbstractLegacyEnumAttributeConverter<SpendingIcon> {
