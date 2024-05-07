@@ -41,7 +41,7 @@ public class QueryDslUtil {
     }
 
     /**
-     * OrderSpecifier를 생성할 때, Sort.Order의 정보를 이용하여 OrderSpecifier.NullHandling을 적용하는 메서드
+     * Sort.Order의 정보를 이용하여 OrderSpecifier.NullHandling을 반환하는 메서드
      *
      * @param order : {@link Sort.Order}
      * @return {@link OrderSpecifier.NullHandling}
