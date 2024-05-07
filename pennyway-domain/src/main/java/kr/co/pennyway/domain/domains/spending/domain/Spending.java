@@ -6,6 +6,7 @@ import kr.co.pennyway.domain.common.model.DateAuditable;
 import kr.co.pennyway.domain.domains.spending.type.SpendingIcon;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLDelete;
@@ -24,7 +25,7 @@ public class Spending extends DateAuditable {
 
     private Integer amount;
     @Convert(converter = SpendingIconConverter.class)
-    private SpendingIcon icon;
+    private SpendingIcon category;
     private LocalDateTime spendAt;
     private String accountName;
     private String memo;
@@ -34,4 +35,18 @@ public class Spending extends DateAuditable {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
+    private SpendingCategory spendingCategory;
+
+    @Builder
+    private Spending(Integer amount, SpendingIcon category, LocalDateTime spendAt, String accountName, String memo, User user, SpendingCategory spendingCategory) {
+        this.amount = amount;
+        this.category = category;
+        this.spendAt = spendAt;
+        this.accountName = accountName;
+        this.memo = memo;
+        this.user = user;
+        this.spendingCategory = spendingCategory;
+    }
 }
