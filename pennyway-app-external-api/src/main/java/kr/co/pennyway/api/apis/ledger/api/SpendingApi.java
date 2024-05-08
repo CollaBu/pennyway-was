@@ -1,4 +1,4 @@
-package kr.co.pennyway.api.apis.ledge.api;
+package kr.co.pennyway.api.apis.ledger.api;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

@@ -1,6 +1,6 @@
-package kr.co.pennyway.api.apis.ledge.controller;
+package kr.co.pennyway.api.apis.ledger.controller;
 
-import kr.co.pennyway.api.apis.ledge.api.SpendingApi;
+import kr.co.pennyway.api.apis.ledger.api.SpendingApi;
 import kr.co.pennyway.api.common.response.SuccessResponse;
 import kr.co.pennyway.api.common.security.authentication.SecurityUserDetails;
 import lombok.RequiredArgsConstructor;
