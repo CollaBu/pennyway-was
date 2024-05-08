@@ -21,8 +21,8 @@ public class SpendingFixture {
         Collection<Spending> spendings = getRandomSpendings(user, capacity);
 
         String sql = String.format("""
-                INSERT INTO `%s` (amount, category, spend_at, account_name, memo, user_id, spending_custom_category_id)
-                VALUES (:amount, :%s, :spendAt, :accountName, :memo, :user.id, :spendingCustomCategory.id)
+                INSERT INTO `%s` (amount, category, spend_at, account_name, memo, user_id, spending_custom_category_id, created_at, updated_at, deleted_at)
+                VALUES (:amount, %s, :spendAt, :accountName, :memo, :user.id, null, NOW(), NOW(), null)
                 """, SPENDING_TABLE, getRandomSpendingCategory());
         SqlParameterSource[] params = spendings.stream()
                 .map(BeanPropertySqlParameterSource::new)
