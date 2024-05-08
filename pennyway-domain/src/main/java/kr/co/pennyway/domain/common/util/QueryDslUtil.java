@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 /**
- * QueryDsl을 이용한 검색 조건을 처리하는 기본적인 메서드를 선언한 인터페이스
+ * QueryDsl의 편의 기능을 제공하는 유틸리티 클래스
  *
  * @author YANG JAESEO
  * @version 1.0

@@ -18,12 +18,6 @@ import org.springframework.util.Assert;
 import java.util.List;
 import java.util.Map;
 
-/**
- * QueryDSL을 이용한 검색 조건을 처리하는 기본적인 메서드를 선언한 인터페이스 <br/>
- *
- * @author YANG JAESEO
- * @version 1.0
- */
 public class QueryDslSearchRepositoryImpl<T> implements QueryDslSearchRepository<T> {
     private final EntityManager em;
     private final JPAQueryFactory queryFactory;
