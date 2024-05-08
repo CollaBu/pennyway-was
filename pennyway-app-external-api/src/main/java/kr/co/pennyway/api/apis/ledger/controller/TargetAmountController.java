@@ -27,7 +27,7 @@ public class TargetAmountController implements TargetAmountApi {
     private final TargetAmountUseCase targetAmountUseCase;
 
     @Override
-    @PutMapping
+    @PutMapping("")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> putTargetAmount(@Validated TargetAmountDto.UpdateParamReq request, @AuthenticationPrincipal SecurityUserDetails user) {
         if (!isValidDateForYearAndMonth(request.date()))
