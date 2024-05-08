@@ -41,12 +41,12 @@ public class TargetAmountControllerUnitTest {
     @DisplayName("당월 목표 금액 등록/수정")
     class PutTargetAmount {
         @Test
-        @DisplayName("date가 yyyy-MM 형식이 아닐 경우 422 Unprocessable Entity 에러 응답을 반환한다.")
+        @DisplayName("date가 'yyyy-MM-dd' 형식이 아닐 경우 422 Unprocessable Entity 에러 응답을 반환한다.")
         @WithMockUser
-        void putTargetAmount() throws Exception {
+        void putTargetAmountWithInvalidDateFormat() throws Exception {
             // given
             String date = "2024/05/08";
-            Integer amount = null;
+            Integer amount = 100000;
 
             // when
             ResultActions result = performPutTargetAmount(date, amount);
@@ -56,6 +56,45 @@ public class TargetAmountControllerUnitTest {
                     .andDo(print())
                     .andExpect(status().isUnprocessableEntity());
         }
+
+        @Test
+        @DisplayName("amount가 null 혹은 0 미만인 경우 422 Unprocessable Entity 에러 응답을 반환한다.")
+        @WithMockUser
+        void putTargetAmountWithInvalidAmountFormat() throws Exception {
+            // given
+            String date = "2024-05-08";
+            Integer negativeAmount = -100000;
+
+            // when
+            ResultActions result1 = performPutTargetAmount(date, null);
+            ResultActions result2 = performPutTargetAmount(date, negativeAmount);
+
+            // then
+            result1
+                    .andDo(print())
+                    .andExpect(status().isUnprocessableEntity());
+            result2
+                    .andDo(print())
+                    .andExpect(status().isUnprocessableEntity());
+        }
+
+        @Test
+        @DisplayName("정상적인 요청이 들어왔을 때 200 OK 응답을 반환한다.")
+        @WithMockUser
+        void putTargetAmountWithValidRequest() throws Exception {
+            // given
+            String date = "2024-05-08";
+            Integer amount = 100000;
+
+            // when
+            ResultActions result = performPutTargetAmount(date, amount);
+
+            // then
+            result
+                    .andDo(print())
+                    .andExpect(status().isOk());
+        }
+
 
         private ResultActions performPutTargetAmount(String date, Integer amount) throws Exception {
             return mockMvc.perform(put("/v2/targets")
