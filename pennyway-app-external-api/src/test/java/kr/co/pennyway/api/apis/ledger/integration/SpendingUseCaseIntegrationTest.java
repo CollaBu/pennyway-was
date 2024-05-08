@@ -47,12 +47,15 @@ public class SpendingUseCaseIntegrationTest extends ExternalApiDBTestConfig {
             SpendingFixture.bulkInsertSpending(user, 150, jdbcTemplate);
 
             // when
+            long before = System.currentTimeMillis();
             ResultActions resultActions = performGetSpendingListAtYearAndMonthSuccess();
+            long after = System.currentTimeMillis();
 
             // then
             resultActions
                     .andDo(print())
                     .andExpect(status().isOk());
+            log.debug("수행 시간: {}ms", after - before);
         }
 
         private ResultActions performGetSpendingListAtYearAndMonthSuccess() throws Exception {
