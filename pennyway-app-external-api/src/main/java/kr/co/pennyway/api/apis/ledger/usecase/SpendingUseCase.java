@@ -1,16 +1,11 @@
 package kr.co.pennyway.api.apis.ledger.usecase;
 
-import com.querydsl.core.types.Predicate;
 import kr.co.pennyway.api.apis.ledger.dto.SpendingSearchRes;
+import kr.co.pennyway.api.apis.ledger.service.SpendingSearchService;
 import kr.co.pennyway.common.annotation.UseCase;
-import kr.co.pennyway.domain.common.repository.QueryHandler;
-import kr.co.pennyway.domain.domains.spending.domain.QSpending;
 import kr.co.pennyway.domain.domains.spending.domain.Spending;
-import kr.co.pennyway.domain.domains.spending.service.SpendingService;
-import kr.co.pennyway.domain.domains.user.domain.QUser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -21,20 +16,12 @@ import java.util.stream.Collectors;
 @UseCase
 @RequiredArgsConstructor
 public class SpendingUseCase {
-    private SpendingService spendingService;
+    private final SpendingSearchService spendingSearchService;
 
     @Transactional(readOnly = true)
     public SpendingSearchRes.Month getSpendingsAtYearAndMonth(Long userId, int year, int month) {
         // 사용자의 해당 년/월 지출 내역을 조회.
-        QUser user = QUser.user;
-        QSpending spending = QSpending.spending;
-
-        Predicate predicate = spending.user.id.eq(userId)
-                .and(spending.spendAt.year().eq(year))
-                .and(spending.spendAt.month().eq(month));
-        QueryHandler queryHandler = query -> query.leftJoin(user).on(spending.user.eq(user));
-        Sort sort = Sort.by(Sort.Order.desc("spendAt"));
-        List<Spending> spendings = spendingService.readSpendings(predicate, queryHandler, sort);
+        List<Spending> spendings = spendingSearchService.readSpendings(userId, year, month);
 
         // 일 별로 지출 내역을 묶는 알고리즘 구현 (각 day별 지출 합계 계산)
         ConcurrentMap<Integer, List<Spending>> spendingMap = spendings.stream().collect(Collectors.groupingByConcurrent(Spending::getDay));
@@ -42,7 +29,8 @@ public class SpendingUseCase {
         // 일 별 지출 내역을 조회하여 일 별 지출 합계를 계산하여 SpendingSearchRes.Daily에 저장
         int monthlySum = spendingMap.values().stream().flatMap(List::stream).mapToInt(Spending::getAmount).sum();
         SpendingSearchRes.Month res = SpendingSearchRes.Month.builder()
-                .date(year + "-" + month)
+                .year(year)
+                .month(month)
                 .dailySpendings(
                         spendingMap.entrySet().stream()
                                 .map(entry -> {
@@ -55,7 +43,7 @@ public class SpendingUseCase {
                                     return SpendingSearchRes.Daily.builder()
                                             .day(day)
                                             .dailyTotalAmount(sum)
-                                            .spendings(spendingList.stream()
+                                            .individuals(spendingList.stream()
                                                     .map(s -> SpendingSearchRes.Individual.builder()
                                                             .id(s.getId())
                                                             .amount(s.getAmount())
