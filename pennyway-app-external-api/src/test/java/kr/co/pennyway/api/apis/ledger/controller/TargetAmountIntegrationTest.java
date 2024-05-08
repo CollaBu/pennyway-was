@@ -1,4 +1,4 @@
-package kr.co.pennyway.api.apis.ledge.controller;
+package kr.co.pennyway.api.apis.ledger.controller;
 
 import kr.co.pennyway.api.config.ExternalApiDBTestConfig;
 import kr.co.pennyway.api.config.ExternalApiIntegrationTest;

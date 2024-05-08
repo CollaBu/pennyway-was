@@ -1,8 +1,8 @@
-package kr.co.pennyway.api.apis.ledge.controller;
+package kr.co.pennyway.api.apis.ledger.controller;
 
-import kr.co.pennyway.api.apis.ledge.api.TargetAmountApi;
-import kr.co.pennyway.api.apis.ledge.dto.TargetAmountDto;
-import kr.co.pennyway.api.apis.ledge.usecase.TargetAmountUseCase;
+import kr.co.pennyway.api.apis.ledger.api.TargetAmountApi;
+import kr.co.pennyway.api.apis.ledger.dto.TargetAmountDto;
+import kr.co.pennyway.api.apis.ledger.usecase.TargetAmountUseCase;
 import kr.co.pennyway.api.common.response.SuccessResponse;
 import kr.co.pennyway.api.common.security.authentication.SecurityUserDetails;
 import kr.co.pennyway.domain.domains.target.exception.TargetAmountErrorCode;

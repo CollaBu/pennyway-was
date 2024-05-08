@@ -1,4 +1,4 @@
-package kr.co.pennyway.api.apis.ledge.service;
+package kr.co.pennyway.api.apis.ledger.service;
 
 import kr.co.pennyway.domain.domains.target.domain.TargetAmount;
 import kr.co.pennyway.domain.domains.target.service.TargetAmountService;

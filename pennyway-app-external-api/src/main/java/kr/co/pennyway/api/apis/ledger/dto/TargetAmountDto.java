@@ -1,4 +1,4 @@
-package kr.co.pennyway.api.apis.ledge.dto;
+package kr.co.pennyway.api.apis.ledger.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;

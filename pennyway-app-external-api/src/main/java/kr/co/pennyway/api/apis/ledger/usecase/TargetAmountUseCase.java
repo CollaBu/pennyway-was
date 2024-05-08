@@ -1,6 +1,6 @@
-package kr.co.pennyway.api.apis.ledge.usecase;
+package kr.co.pennyway.api.apis.ledger.usecase;
 
-import kr.co.pennyway.api.apis.ledge.service.TargetAmountSaveService;
+import kr.co.pennyway.api.apis.ledger.service.TargetAmountSaveService;
 import kr.co.pennyway.common.annotation.UseCase;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
