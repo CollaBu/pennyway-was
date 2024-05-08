@@ -17,7 +17,7 @@ public class TargetAmountService {
     private final TargetAmountRepository targetAmountRepository;
 
     @Transactional
-    public TargetAmount save(TargetAmount targetAmount) {
+    public TargetAmount createTargetAmount(TargetAmount targetAmount) {
         return targetAmountRepository.save(targetAmount);
     }
 
