@@ -3,6 +3,7 @@ package kr.co.pennyway.api.apis.ledge.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.pennyway.api.apis.ledge.usecase.TargetAmountUseCase;
 import kr.co.pennyway.api.config.supporter.WithSecurityMockUser;
+import kr.co.pennyway.domain.domains.target.exception.TargetAmountErrorCode;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -14,9 +15,13 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = {TargetAmountController.class})
@@ -80,6 +85,25 @@ public class TargetAmountControllerUnitTest {
         }
 
         @Test
+        @DisplayName("date가 당월 날짜가 아닌 경우 400 Bad Request 에러 응답을 반환한다.")
+        @WithMockUser
+        void putTargetAmountWithInvalidDate() throws Exception {
+            // given
+            String date = "1999-05-19";
+            Integer amount = 100000;
+
+            // when
+            ResultActions result = performPutTargetAmount(date, amount);
+
+            // then
+            result
+                    .andDo(print())
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.code").value(TargetAmountErrorCode.INVALID_TARGET_AMOUNT_DATE.causedBy().getCode()))
+                    .andExpect(jsonPath("$.message").value(TargetAmountErrorCode.INVALID_TARGET_AMOUNT_DATE.getExplainError()));
+        }
+
+        @Test
         @DisplayName("amount가 null인 경우 422 Unprocessable Entity 에러 응답을 반환한다.")
         @WithMockUser
         void putTargetAmountWithInvalidAmountFormat() throws Exception {
@@ -117,7 +141,7 @@ public class TargetAmountControllerUnitTest {
         @WithSecurityMockUser
         void putTargetAmountWithValidRequest() throws Exception {
             // given
-            String date = "2024-05-08";
+            String date = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
             Integer amount = 100000;
 
             // when
