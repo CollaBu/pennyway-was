@@ -22,7 +22,7 @@ public class TargetAmountService {
     }
 
     @Transactional(readOnly = true)
-    public Optional<TargetAmount> findTargetAmountThatMonth(Long userId, LocalDate date) {
-        return targetAmountRepository.findByUserIdAndDateThatMonth(userId, date);
+    public Optional<TargetAmount> readTargetAmountThatMonth(Long userId, LocalDate date) {
+        return targetAmountRepository.findByUserIdThatMonth(userId, date);
     }
 }

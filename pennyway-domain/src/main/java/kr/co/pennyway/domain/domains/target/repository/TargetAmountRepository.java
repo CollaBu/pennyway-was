@@ -9,5 +9,5 @@ import java.util.Optional;
 
 public interface TargetAmountRepository extends ExtendedRepository<TargetAmount, Long> {
     @Query("SELECT ta FROM TargetAmount ta WHERE ta.user.id = :userId AND YEAR(ta.createdAt) = YEAR(:date) AND MONTH(ta.createdAt) = MONTH(:date)")
-    Optional<TargetAmount> findByUserIdAndDateThatMonth(Long userId, LocalDate date);
+    Optional<TargetAmount> findByUserIdThatMonth(Long userId, LocalDate date);
 }
