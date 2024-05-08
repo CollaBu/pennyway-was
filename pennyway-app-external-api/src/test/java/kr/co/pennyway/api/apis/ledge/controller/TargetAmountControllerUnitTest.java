@@ -2,6 +2,7 @@ package kr.co.pennyway.api.apis.ledge.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.pennyway.api.apis.ledge.usecase.TargetAmountUseCase;
+import kr.co.pennyway.api.config.supporter.WithSecurityMockUser;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -75,7 +76,7 @@ public class TargetAmountControllerUnitTest {
             // then
             result
                     .andDo(print())
-                    .andExpect(status().isBadRequest());
+                    .andExpect(status().isUnprocessableEntity());
         }
 
         @Test
@@ -95,7 +96,7 @@ public class TargetAmountControllerUnitTest {
         }
 
         @Test
-        @DisplayName("amount가 0보다 작은 경우 400 Bad Request 에러 응답을 반환한다.")
+        @DisplayName("amount가 0보다 작은 경우 422 Unprocessable Entity 에러 응답을 반환한다.")
         @WithMockUser
         void putTargetAmountWithNegativeAmount() throws Exception {
             // given
@@ -108,12 +109,12 @@ public class TargetAmountControllerUnitTest {
             // then
             result
                     .andDo(print())
-                    .andExpect(status().isBadRequest());
+                    .andExpect(status().isUnprocessableEntity());
         }
 
         @Test
         @DisplayName("정상적인 요청이 들어왔을 때 200 OK 응답을 반환한다.")
-        @WithMockUser
+        @WithSecurityMockUser
         void putTargetAmountWithValidRequest() throws Exception {
             // given
             String date = "2024-05-08";
