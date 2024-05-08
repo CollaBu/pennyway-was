@@ -48,10 +48,16 @@ public class SpendingMapper {
                 .build();
     }
 
+    /**
+     * 월별 지출 내역의 총 금액을 계산하는 메서드
+     */
     private static int calculateMonthlyTotalAmount(ConcurrentMap<Integer, List<Spending>> spendings) {
         return spendings.values().stream().flatMap(List::stream).mapToInt(Spending::getAmount).sum();
     }
 
+    /**
+     * 하루 지출 내역의 총 금액을 계산하는 메서드
+     */
     private static int calculateDailyTotalAmount(List<Spending> spendings) {
         return spendings.stream().mapToInt(Spending::getAmount).sum();
     }
