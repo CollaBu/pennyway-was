@@ -69,7 +69,7 @@ public class TargetAmountControllerUnitTest {
         }
 
         @Test
-        @DisplayName("date가 null인 경우 400 Bad Request 에러 응답을 반환한다.")
+        @DisplayName("date가 null인 경우 422 Unprocessable Entity 에러 응답을 반환한다.")
         @WithMockUser
         void putTargetAmountWithNullDate() throws Exception {
             // given
