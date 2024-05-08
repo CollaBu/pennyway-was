@@ -16,11 +16,11 @@ public class SpendingSearchRes {
     @Builder
     @Schema(title = "월별 지출 내역 조회 응답")
     public record Month(
-            @Schema(description = "년도")
+            @Schema(description = "년도", example = "2024")
             int year,
-            @Schema(description = "월")
+            @Schema(description = "월", example = "5")
             int month,
-            @Schema(description = "월별 총 지출 금액")
+            @Schema(description = "월별 총 지출 금액", example = "100000")
             int monthlyTotalAmount,
             @Schema(description = "일별 지출 내역")
             List<Daily> dailySpendings
