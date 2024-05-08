@@ -14,7 +14,7 @@ public class SpendingService {
     private final SpendingRepository spendingRepository;
 
     @Transactional
-    public Spending save(Spending spending) {
+    public Spending createSpending(Spending spending) {
         return spendingRepository.save(spending);
     }
 }
