@@ -21,8 +21,5 @@ public interface TargetAmountApi {
                     }
                     """)
     }))
-    ResponseEntity<?> putTargetAmount(
-            TargetAmountDto.UpdateParamReq request,
-            @AuthenticationPrincipal SecurityUserDetails user
-    );
+    ResponseEntity<?> putTargetAmount(TargetAmountDto.UpdateParamReq request, @AuthenticationPrincipal SecurityUserDetails user);
 }
