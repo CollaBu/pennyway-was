@@ -1,9 +1,11 @@
 package kr.co.pennyway.api.apis.ledge.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import kr.co.pennyway.api.apis.ledge.usecase.TargetAmountUseCase;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -25,6 +27,9 @@ public class TargetAmountControllerUnitTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @MockBean
+    private TargetAmountUseCase targetAmountUseCase;
 
     @BeforeEach
     void setUp(WebApplicationContext webApplicationContext) {
