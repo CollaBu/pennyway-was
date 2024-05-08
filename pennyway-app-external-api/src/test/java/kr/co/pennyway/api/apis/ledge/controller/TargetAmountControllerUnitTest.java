@@ -58,24 +58,52 @@ public class TargetAmountControllerUnitTest {
         }
 
         @Test
-        @DisplayName("amount가 null 혹은 0 미만인 경우 422 Unprocessable Entity 에러 응답을 반환한다.")
+        @DisplayName("date가 null인 경우 400 Bad Request 에러 응답을 반환한다.")
+        @WithMockUser
+        void putTargetAmountWithNullDate() throws Exception {
+            // given
+            Integer amount = 100000;
+
+            // when
+            ResultActions result = performPutTargetAmount(null, amount);
+
+            // then
+            result
+                    .andDo(print())
+                    .andExpect(status().isBadRequest());
+        }
+
+        @Test
+        @DisplayName("amount가 null인 경우 422 Unprocessable Entity 에러 응답을 반환한다.")
         @WithMockUser
         void putTargetAmountWithInvalidAmountFormat() throws Exception {
             // given
             String date = "2024-05-08";
-            Integer negativeAmount = -100000;
 
             // when
             ResultActions result1 = performPutTargetAmount(date, null);
-            ResultActions result2 = performPutTargetAmount(date, negativeAmount);
 
             // then
             result1
                     .andDo(print())
                     .andExpect(status().isUnprocessableEntity());
-            result2
+        }
+
+        @Test
+        @DisplayName("amount가 0보다 작은 경우 400 Bad Request 에러 응답을 반환한다.")
+        @WithMockUser
+        void putTargetAmountWithNegativeAmount() throws Exception {
+            // given
+            String date = "2024-05-08";
+            Integer negativeAmount = -100000;
+
+            // when
+            ResultActions result = performPutTargetAmount(date, negativeAmount);
+
+            // then
+            result
                     .andDo(print())
-                    .andExpect(status().isUnprocessableEntity());
+                    .andExpect(status().isBadRequest());
         }
 
         @Test
