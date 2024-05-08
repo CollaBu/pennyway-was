@@ -3,53 +3,56 @@ package kr.co.pennyway.api.apis.ledger.mapper;
 import kr.co.pennyway.api.apis.ledger.dto.SpendingSearchRes;
 import kr.co.pennyway.common.annotation.Mapper;
 import kr.co.pennyway.domain.domains.spending.domain.Spending;
-import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
 
 @Mapper
-@RequiredArgsConstructor
 public class SpendingMapper {
     public static SpendingSearchRes.Month toSpendingSearchResMonth(List<Spending> spendings, int year, int month) {
-        // 일 별로 지출 내역을 묶는 알고리즘 구현 (각 day별 지출 합계 계산)
-        ConcurrentMap<Integer, List<Spending>> spendingMap = spendings.stream().collect(Collectors.groupingByConcurrent(Spending::getDay));
+        ConcurrentMap<Integer, List<Spending>> groupSpendingsByDay = spendings.stream().collect(Collectors.groupingByConcurrent(Spending::getDay));
 
-        // 일 별 지출 내역을 조회하여 일 별 지출 합계를 계산하여 SpendingSearchRes.Daily에 저장
-        int monthlySum = spendingMap.values().stream().flatMap(List::stream).mapToInt(Spending::getAmount).sum();
-        SpendingSearchRes.Month res = SpendingSearchRes.Month.builder()
+        List<SpendingSearchRes.Daily> dailySpendings = groupSpendingsByDay.entrySet().stream()
+                .map(entry -> toSpendingSearchResDaily(entry.getKey(), entry.getValue()))
+                .toList();
+
+        return SpendingSearchRes.Month.builder()
                 .year(year)
                 .month(month)
-                .dailySpendings(
-                        spendingMap.entrySet().stream()
-                                .map(entry -> {
-                                    int sum = 0;
-                                    int day = entry.getKey();
-                                    List<Spending> spendingList = entry.getValue();
-                                    int dailySum = spendingList.stream().mapToInt(Spending::getAmount).sum();
-                                    sum += dailySum;
-
-                                    return SpendingSearchRes.Daily.builder()
-                                            .day(day)
-                                            .dailyTotalAmount(sum)
-                                            .individuals(spendingList.stream()
-                                                    .map(s -> SpendingSearchRes.Individual.builder()
-                                                            .id(s.getId())
-                                                            .amount(s.getAmount())
-                                                            .icon(s.getCategory())
-                                                            .spendAt(s.getSpendAt())
-                                                            .accountName(s.getAccountName())
-                                                            .memo(s.getMemo())
-                                                            .build())
-                                                    .collect(Collectors.toList()))
-                                            .build();
-                                })
-                                .collect(Collectors.toList())
-                )
-                .monthlyTotalAmount(monthlySum)
+                .monthlyTotalAmount(calculateMonthlyTotalAmount(groupSpendingsByDay))
+                .dailySpendings(dailySpendings)
                 .build();
+    }
 
-        return res;
+    private static SpendingSearchRes.Daily toSpendingSearchResDaily(int day, List<Spending> spendings) {
+        List<SpendingSearchRes.Individual> individuals = spendings.stream()
+                .map(SpendingMapper::toSpendingSearchResIndividual)
+                .toList();
+
+        return SpendingSearchRes.Daily.builder()
+                .day(day)
+                .dailyTotalAmount(calculateDailyTotalAmount(spendings))
+                .individuals(individuals)
+                .build();
+    }
+
+    private static SpendingSearchRes.Individual toSpendingSearchResIndividual(Spending spending) {
+        return SpendingSearchRes.Individual.builder()
+                .id(spending.getId())
+                .amount(spending.getAmount())
+                .icon(spending.getCategory())
+                .spendAt(spending.getSpendAt())
+                .accountName(spending.getAccountName())
+                .memo(spending.getMemo())
+                .build();
+    }
+
+    private static int calculateMonthlyTotalAmount(ConcurrentMap<Integer, List<Spending>> spendings) {
+        return spendings.values().stream().flatMap(List::stream).mapToInt(Spending::getAmount).sum();
+    }
+
+    private static int calculateDailyTotalAmount(List<Spending> spendings) {
+        return spendings.stream().mapToInt(Spending::getAmount).sum();
     }
 }
