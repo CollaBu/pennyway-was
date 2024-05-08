@@ -50,4 +50,8 @@ public class Spending extends DateAuditable {
         this.user = user;
         this.spendingCustomCategory = spendingCustomCategory;
     }
+
+    public int getDay() {
+        return spendAt.getDayOfMonth();
+    }
 }
