@@ -22,8 +22,8 @@ public class SpendingFixture {
 
         String sql = String.format("""
                 INSERT INTO `%s` (amount, category, spend_at, account_name, memo, user_id, spending_custom_category_id, created_at, updated_at, deleted_at)
-                VALUES (:amount, %s, :spendAt, :accountName, :memo, :user.id, null, NOW(), NOW(), null)
-                """, SPENDING_TABLE, getRandomSpendingCategory());
+                VALUES (:amount, 1+FLOOR(RAND()*11), :spendAt, :accountName, :memo, :user.id, null, NOW(), NOW(), null)
+                """, SPENDING_TABLE);
         SqlParameterSource[] params = spendings.stream()
                 .map(BeanPropertySqlParameterSource::new)
                 .toArray(SqlParameterSource[]::new);
@@ -59,9 +59,5 @@ public class SpendingFixture {
     private static String getRandomAccountName() {
         List<String> accountNames = List.of("현금", "카드", "통장", "월급통장", "적금", "보험", "투자", "기타");
         return accountNames.get(ThreadLocalRandom.current().nextInt(0, accountNames.size()));
-    }
-
-    private static String getRandomSpendingCategory() {
-        return String.valueOf(ThreadLocalRandom.current().nextInt(1, 12));
     }
 }
