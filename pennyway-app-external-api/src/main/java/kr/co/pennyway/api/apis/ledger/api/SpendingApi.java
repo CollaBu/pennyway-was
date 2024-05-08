@@ -17,5 +17,5 @@ public interface SpendingApi {
             @Parameter(name = "year", description = "년도", required = true, in = ParameterIn.HEADER),
             @Parameter(name = "month", description = "월", required = true, in = ParameterIn.HEADER)
     })
-    ResponseEntity<?> getSpendingListAtMonth(@RequestParam("year") int year, @RequestParam("date") int month, @AuthenticationPrincipal SecurityUserDetails user);
+    ResponseEntity<?> getSpendingListAtYearAndMonth(@RequestParam("year") int year, @RequestParam("date") int month, @AuthenticationPrincipal SecurityUserDetails user);
 }
