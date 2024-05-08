@@ -1,11 +1,16 @@
 package kr.co.pennyway.api.apis.ledger.usecase;
 
+import com.querydsl.core.types.Predicate;
 import kr.co.pennyway.api.apis.ledger.dto.SpendingSearchRes;
 import kr.co.pennyway.common.annotation.UseCase;
+import kr.co.pennyway.domain.common.repository.QueryHandler;
+import kr.co.pennyway.domain.domains.spending.domain.QSpending;
 import kr.co.pennyway.domain.domains.spending.domain.Spending;
 import kr.co.pennyway.domain.domains.spending.service.SpendingService;
+import kr.co.pennyway.domain.domains.user.domain.QUser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -21,7 +26,15 @@ public class SpendingUseCase {
     @Transactional(readOnly = true)
     public SpendingSearchRes.Month getSpendingsAtYearAndMonth(Long userId, int year, int month) {
         // 사용자의 해당 년/월 지출 내역을 조회.
-        List<Spending> spendings = spendingService.readSpendingsAtYearAndMonth(userId, year, month);
+        QUser user = QUser.user;
+        QSpending spending = QSpending.spending;
+
+        Predicate predicate = spending.user.id.eq(userId)
+                .and(spending.spendAt.year().eq(year))
+                .and(spending.spendAt.month().eq(month));
+        QueryHandler queryHandler = query -> query.leftJoin(user).on(spending.user.eq(user));
+        Sort sort = Sort.by(Sort.Order.desc("spendAt"));
+        List<Spending> spendings = spendingService.readSpendings(predicate, queryHandler, sort);
 
         // 일 별로 지출 내역을 묶는 알고리즘 구현 (각 day별 지출 합계 계산)
         ConcurrentMap<Integer, List<Spending>> spendingMap = spendings.stream().collect(Collectors.groupingByConcurrent(Spending::getDay));
