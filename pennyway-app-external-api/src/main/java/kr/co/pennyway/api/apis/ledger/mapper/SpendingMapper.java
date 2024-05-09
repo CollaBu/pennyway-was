@@ -41,7 +41,7 @@ public class SpendingMapper {
         return SpendingSearchRes.Individual.builder()
                 .id(spending.getId())
                 .amount(spending.getAmount())
-                .category(spending.getCategory().icon())
+                .category(spending.getCategory())
                 .spendAt(spending.getSpendAt())
                 .accountName(spending.getAccountName())
                 .memo(spending.getMemo())
