@@ -1,7 +1,10 @@
 package kr.co.pennyway.api.apis.ledger.controller;
 
+import kr.co.pennyway.api.apis.ledger.dto.SpendingCategoryDto;
 import kr.co.pennyway.api.apis.ledger.usecase.SpendingCategoryUseCase;
 import kr.co.pennyway.api.config.supporter.WithSecurityMockUser;
+import kr.co.pennyway.domain.domains.spending.dto.CategoryInfo;
+import kr.co.pennyway.domain.domains.spending.type.SpendingCategory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,6 +17,8 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -52,6 +57,43 @@ public class SpendingCategoryControllerUnitTest {
         // then
         result1.andDo(print()).andExpect(status().isUnprocessableEntity());
         result2.andDo(print()).andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    @DisplayName("유효하지 않은 아이콘을 입력하면 422 Unprocessable Entity 에러 응답을 반환한다.")
+    @WithSecurityMockUser
+    void postSpendingCategoryWithInvalidIcon() throws Exception {
+        // given
+        String name = "식비";
+        String whiteSpaceIcon = " ";
+        String invalidIcon = "INVALID";
+        String lowerCaseIcon = "food";
+
+        // when
+        ResultActions result1 = performPostSpendingCategory(name, whiteSpaceIcon);
+        ResultActions result2 = performPostSpendingCategory(name, invalidIcon);
+        ResultActions result3 = performPostSpendingCategory(name, lowerCaseIcon);
+
+        // then
+        result1.andDo(print()).andExpect(status().isUnprocessableEntity());
+        result2.andDo(print()).andExpect(status().isUnprocessableEntity());
+        result3.andDo(print()).andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    @DisplayName("카테고리명과 아이콘을 입력하면 200 OK 응답을 반환한다.")
+    @WithSecurityMockUser
+    void postSpendingCategory() throws Exception {
+        // given
+        String name = "식비";
+        String icon = "FOOD";
+        given(spendingCategoryUseCase.createSpendingCategory(any(), any(), any())).willReturn(SpendingCategoryDto.Res.from(CategoryInfo.of(1L, name, SpendingCategory.FOOD)));
+
+        // when
+        ResultActions result = performPostSpendingCategory(name, icon);
+
+        // then
+        result.andDo(print()).andExpect(status().isOk());
     }
 
     private ResultActions performPostSpendingCategory(String name, String icon) throws Exception {
