@@ -11,8 +11,8 @@ dependencies {
     api group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: '3.2.3'
 
     /* QueryDsl */
-    implementation 'com.querydsl:querydsl-core:5.0.0'
-    implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+    api 'com.querydsl:querydsl-core:5.0.0'
+    api 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
     annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jakarta"
     annotationProcessor "jakarta.annotation:jakarta.annotation-api:2.1.1"
     annotationProcessor "jakarta.persistence:jakarta.persistence-api:3.1.0"

@@ -10,6 +10,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDateTime;
 
@@ -17,6 +18,7 @@ import java.time.LocalDateTime;
 @Getter
 @Table(name = "spending")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@SQLRestriction("deleted_at IS NULL")
 @SQLDelete(sql = "UPDATE spending SET deleted_at = NOW() WHERE id = ?")
 public class Spending extends DateAuditable {
     @Id
@@ -49,5 +51,9 @@ public class Spending extends DateAuditable {
         this.memo = memo;
         this.user = user;
         this.spendingCustomCategory = spendingCustomCategory;
+    }
+
+    public int getDay() {
+        return spendAt.getDayOfMonth();
     }
 }
