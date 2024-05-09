@@ -24,4 +24,9 @@ public class SpendingCustomCategoryService {
     public Optional<SpendingCustomCategory> readSpendingCustomCategory(Long id) {
         return spendingCustomCategoryRepository.findById(id);
     }
+
+    @Transactional(readOnly = true)
+    public boolean isExistsSpendingCustomCategory(Long userId, Long categoryId) {
+        return spendingCustomCategoryRepository.existsByIdAndUser_Id(categoryId, userId);
+    }
 }
