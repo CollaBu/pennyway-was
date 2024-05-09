@@ -7,6 +7,8 @@ import kr.co.pennyway.api.config.ExternalApiIntegrationTest;
 import kr.co.pennyway.api.config.fixture.SpendingFixture;
 import kr.co.pennyway.api.config.fixture.UserFixture;
 import kr.co.pennyway.api.config.supporter.WithSecurityMockUser;
+import kr.co.pennyway.domain.domains.spending.domain.SpendingCustomCategory;
+import kr.co.pennyway.domain.domains.spending.service.SpendingCustomCategoryService;
 import kr.co.pennyway.domain.domains.spending.type.SpendingCategory;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.service.UserService;
@@ -18,10 +20,12 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Slf4j
@@ -37,15 +41,20 @@ public class SpendingUseCaseIntegrationTest extends ExternalApiDBTestConfig {
     @Autowired
     private UserService userService;
     @Autowired
+    private SpendingCustomCategoryService spendingCustomCategoryService;
+    @Autowired
     private NamedParameterJdbcTemplate jdbcTemplate;
 
     @Order(1)
     @Nested
     @DisplayName("지출 내역 추가하기")
+    @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
     class CreateSpending {
+        @Order(1)
         @Test
         @DisplayName("request의 categoryId가 -1인 경우, spendingCustomCategory가 null인 Spending을 생성한다.")
         @WithSecurityMockUser(userId = "1")
+        @Transactional
         void createSpendingSuccess() throws Exception {
             // given
             userService.createUser(UserFixture.GENERAL_USER.toUser());
@@ -55,8 +64,33 @@ public class SpendingUseCaseIntegrationTest extends ExternalApiDBTestConfig {
             ResultActions resultActions = performCreateSpendingSuccess(request);
 
             // then
-            resultActions.andDo(print()).andExpect(status().isOk());
+            resultActions.andDo(print()).andExpect(status().isOk())
+                    .andExpect(jsonPath("$.data.spending.category.isCustom").value(false))
+                    .andExpect(jsonPath("$.data.spending.category.id").value(-1L))
+                    .andExpect(jsonPath("$.data.spending.category.icon").value("FOOD"));
         }
+
+        @Order(2)
+        @Test
+        @DisplayName("request의 categoryId가 -1이 아닌 경우, spendingCustomCategory를 참조하는 Spending을 생성한다.")
+        @WithSecurityMockUser(userId = "2")
+        @Transactional
+        void createSpendingWithCustomCategorySuccess() throws Exception {
+            // given
+            User user = userService.createUser(UserFixture.GENERAL_USER.toUser());
+            SpendingCustomCategory category = spendingCustomCategoryService.createSpendingCustomCategory(SpendingCustomCategory.of("잉여비", SpendingCategory.LIVING, user));
+            SpendingReq request = new SpendingReq(10000, category.getId(), category.getIcon(), LocalDate.now(), "소비처", "메모");
+
+            // when
+            ResultActions resultActions = performCreateSpendingSuccess(request);
+
+            // then
+            resultActions.andDo(print()).andExpect(status().isOk())
+                    .andExpect(jsonPath("$.data.spending.category.isCustom").value(true))
+                    .andExpect(jsonPath("$.data.spending.category.id").value(category.getId()))
+                    .andExpect(jsonPath("$.data.spending.category.icon").value(category.getIcon().name()));
+        }
+
 
         private ResultActions performCreateSpendingSuccess(SpendingReq req) throws Exception {
             return mockMvc.perform(MockMvcRequestBuilders
@@ -72,7 +106,8 @@ public class SpendingUseCaseIntegrationTest extends ExternalApiDBTestConfig {
     class GetSpendingListAtYearAndMonth {
         @Test
         @DisplayName("월별 지출 내역 조회")
-        @WithSecurityMockUser(userId = "2")
+        @WithSecurityMockUser(userId = "3")
+        @Transactional
         void getSpendingListAtYearAndMonthSuccess() throws Exception {
             // given
             User user = userService.createUser(UserFixture.GENERAL_USER.toUser());
