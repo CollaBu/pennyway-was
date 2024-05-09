@@ -24,7 +24,7 @@ public class SpendingController implements SpendingApi {
     private final SpendingUseCase spendingUseCase;
 
     @PostMapping("")
-    @PreAuthorize("isAuthenticated()") // categoryId가 -1이 아니면 사용자가 정의한 것인지 확인 필요함
+    @PreAuthorize("isAuthenticated() and @spendingCategoryManager.hasPermission(#user.getUserId(), #request.categoryId())")
     public ResponseEntity<?> postSpending(@RequestBody @Validated SpendingReq request, @AuthenticationPrincipal SecurityUserDetails user) {
         if (!isValidCategoryIdAndIcon(request.categoryId(), request.icon())) {
             throw new SpendingErrorException(SpendingErrorCode.INVALID_ICON_WITH_CATEGORY_ID);
