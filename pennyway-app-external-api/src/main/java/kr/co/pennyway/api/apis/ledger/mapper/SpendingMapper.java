@@ -37,7 +37,7 @@ public class SpendingMapper {
                 .build();
     }
 
-    private static SpendingSearchRes.Individual toSpendingSearchResIndividual(Spending spending) {
+    public static SpendingSearchRes.Individual toSpendingSearchResIndividual(Spending spending) {
         return SpendingSearchRes.Individual.builder()
                 .id(spending.getId())
                 .amount(spending.getAmount())
