@@ -7,6 +7,7 @@ import kr.co.pennyway.api.apis.ledger.service.SpendingSearchService;
 import kr.co.pennyway.common.annotation.UseCase;
 import kr.co.pennyway.domain.domains.spending.domain.Spending;
 import kr.co.pennyway.domain.domains.spending.domain.SpendingCustomCategory;
+import kr.co.pennyway.domain.domains.spending.exception.SpendingErrorCode;
 import kr.co.pennyway.domain.domains.spending.exception.SpendingErrorException;
 import kr.co.pennyway.domain.domains.spending.service.SpendingCustomCategoryService;
 import kr.co.pennyway.domain.domains.spending.service.SpendingService;

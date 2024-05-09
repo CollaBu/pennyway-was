@@ -11,7 +11,10 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum SpendingErrorCode implements BaseErrorCode {
     /* 400 Bad Request */
-    INVALID_ICON(StatusCode.BAD_REQUEST, ReasonCode.INVALID_REQUEST, "OTHER 아이콘은 커스텀 카테고리의 icon으로 사용할 수 없습니다.");
+    INVALID_ICON(StatusCode.BAD_REQUEST, ReasonCode.INVALID_REQUEST, "OTHER 아이콘은 커스텀 카테고리의 icon으로 사용할 수 없습니다."),
+
+    /* 404 Not Found */
+    NOT_FOUND_CUSTOM_CATEGORY(StatusCode.NOT_FOUND, ReasonCode.REQUESTED_RESOURCE_NOT_FOUND, "존재하지 않는 커스텀 카테고리입니다.");
 
     private final StatusCode statusCode;
     private final ReasonCode reasonCode;
