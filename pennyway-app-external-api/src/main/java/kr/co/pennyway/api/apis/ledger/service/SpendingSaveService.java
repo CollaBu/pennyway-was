@@ -24,7 +24,7 @@ public class SpendingSaveService {
     public Spending createSpending(User user, SpendingReq request) {
         Spending spending;
 
-        if (request.categoryId().equals(-1L)) {
+        if (!request.isCustomCategory()) {
             spending = spendingService.createSpending(request.toEntity(user));
         } else {
             SpendingCustomCategory customCategory = spendingCustomCategoryService.readSpendingCustomCategory(request.categoryId())

@@ -68,4 +68,8 @@ public record SpendingReq(
                 .spendingCustomCategory(spendingCustomCategory)
                 .build();
     }
+
+    public boolean isCustomCategory() {
+        return categoryId.equals(-1L);
+    }
 }
