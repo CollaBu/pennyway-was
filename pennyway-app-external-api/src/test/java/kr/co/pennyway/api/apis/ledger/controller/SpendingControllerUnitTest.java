@@ -1,6 +1,7 @@
 package kr.co.pennyway.api.apis.ledger.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import kr.co.pennyway.api.apis.ledger.dto.SpendingReq;
 import kr.co.pennyway.api.apis.ledger.usecase.SpendingUseCase;
 import kr.co.pennyway.api.config.supporter.WithSecurityMockUser;
 import kr.co.pennyway.domain.domains.spending.type.SpendingCategory;
