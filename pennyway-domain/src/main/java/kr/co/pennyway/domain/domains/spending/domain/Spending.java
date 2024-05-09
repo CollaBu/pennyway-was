@@ -61,6 +61,8 @@ public class Spending extends DateAuditable {
     /**
      * 지출 내역의 소비 카테고리를 조회하는 메서드 <br>
      * SpendingCategory가 OTHER일 경우 SpendingCustomCategory를 정보를 조회하여 반환한다.
+     *
+     * @return {@link CategoryInfo}
      */
     public CategoryInfo getCategory() {
         if (this.category.equals(SpendingCategory.OTHER)) {
@@ -68,6 +70,6 @@ public class Spending extends DateAuditable {
             return CategoryInfo.of(category.getId(), category.getName(), category.getIcon().name());
         }
 
-        return CategoryInfo.of(this.id, this.category.getType(), this.category.name());
+        return CategoryInfo.of(-1L, this.category.getType(), this.category.name());
     }
 }
