@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
@@ -79,6 +80,16 @@ public class GlobalExceptionHandler {
     @JsonView(CustomJsonView.Common.class)
     protected ErrorResponse handleMissingServletRequestParameterException(MissingServletRequestParameterException e) {
         log.warn("handleMissingServletRequestParameterException : {}", e.getMessage());
+        String code = String.valueOf(StatusCode.BAD_REQUEST.getCode() * 10 + ReasonCode.MISSING_REQUIRED_PARAMETER.getCode());
+
+        return ErrorResponse.of(code, e.getMessage());
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(HandlerMethodValidationException.class)
+    @JsonView(CustomJsonView.Common.class)
+    protected ErrorResponse handleHandlerMethodValidationException(HandlerMethodValidationException e) {
+        log.warn("handleHandlerMethodValidationException : {}", e.getMessage());
         String code = String.valueOf(StatusCode.BAD_REQUEST.getCode() * 10 + ReasonCode.MISSING_REQUIRED_PARAMETER.getCode());
 
         return ErrorResponse.of(code, e.getMessage());

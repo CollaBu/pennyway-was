@@ -8,31 +8,36 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLDelete;
 
-import java.time.LocalDateTime;
-
 @Entity
 @Getter
 @Table(name = "target_amount")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@SQLDelete(sql = "UPDATE target_amount SET deleted_at = NOW() WHERE id = ?")
+@SQLDelete(sql = "UPDATE target_amount SET amount = -1 WHERE id = ?")
 public class TargetAmount extends DateAuditable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Integer amount;
-    private LocalDateTime deletedAt;
+    private int amount;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
-    private TargetAmount(Integer amount, User user) {
+    private TargetAmount(int amount, User user) {
         this.amount = amount;
         this.user = user;
     }
 
-    public static TargetAmount of(Integer amount, User user) {
+    public static TargetAmount of(int amount, User user) {
         return new TargetAmount(amount, user);
+    }
+
+    public void updateAmount(Integer amount) {
+        this.amount = amount;
+    }
+
+    public boolean isAllocatedAmount() {
+        return this.amount >= 0;
     }
 }
