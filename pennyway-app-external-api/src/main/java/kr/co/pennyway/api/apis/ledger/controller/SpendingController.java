@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 public class SpendingController implements SpendingApi {
     private final SpendingUseCase spendingUseCase;
 
+    @Override
     @PostMapping("")
     @PreAuthorize("isAuthenticated() and @spendingCategoryManager.hasPermission(#user.getUserId(), #request.categoryId())")
     public ResponseEntity<?> postSpending(@RequestBody @Validated SpendingReq request, @AuthenticationPrincipal SecurityUserDetails user) {
