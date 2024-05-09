@@ -79,7 +79,7 @@ public class SpendingUseCaseIntegrationTest extends ExternalApiDBTestConfig {
             // given
             User user = userService.createUser(UserFixture.GENERAL_USER.toUser());
             SpendingCustomCategory category = spendingCustomCategoryService.createSpendingCustomCategory(SpendingCustomCategory.of("잉여비", SpendingCategory.LIVING, user));
-            SpendingReq request = new SpendingReq(10000, category.getId(), category.getIcon(), LocalDate.now(), "소비처", "메모");
+            SpendingReq request = new SpendingReq(10000, category.getId(), SpendingCategory.OTHER, LocalDate.now(), "소비처", "메모");
 
             // when
             ResultActions resultActions = performCreateSpendingSuccess(request);
