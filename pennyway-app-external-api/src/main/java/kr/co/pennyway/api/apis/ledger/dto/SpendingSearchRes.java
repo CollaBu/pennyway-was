@@ -48,9 +48,9 @@ public class SpendingSearchRes {
             @Schema(description = "지출 금액")
             @NotNull
             Integer amount,
-            @Schema(description = "지출 아이콘")
+            @Schema(description = "지출 카테고리 아이콘")
             @NotNull
-            SpendingCategory icon,
+            SpendingCategory category,
             @Schema(description = "지출 일시", example = "2024-05-09")
             @NotNull
             @JsonSerialize(using = LocalDateTimeSerializer.class)
@@ -61,10 +61,10 @@ public class SpendingSearchRes {
             @Schema(description = "메모. 없으면 빈 문자열")
             String memo
     ) {
-        public Individual(Long id, Integer amount, SpendingCategory icon, LocalDateTime spendAt, String accountName, String memo) {
+        public Individual(Long id, Integer amount, SpendingCategory category, LocalDateTime spendAt, String accountName, String memo) {
             this.id = id;
             this.amount = amount;
-            this.icon = icon;
+            this.category = category;
             this.spendAt = spendAt;
             this.accountName = Objects.toString(accountName, "");
             this.memo = Objects.toString(memo, "");

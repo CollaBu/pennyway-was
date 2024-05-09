@@ -14,7 +14,7 @@ public class SpendingCustomCategoryService {
     private final SpendingCustomCategoryRepository spendingCustomCategoryRepository;
 
     @Transactional
-    public SpendingCustomCategory save(SpendingCustomCategory spendingCustomCategory) {
+    public SpendingCustomCategory createSpendingCustomCategory(SpendingCustomCategory spendingCustomCategory) {
         return spendingCustomCategoryRepository.save(spendingCustomCategory);
     }
 }
