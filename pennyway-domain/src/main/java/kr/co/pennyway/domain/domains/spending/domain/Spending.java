@@ -67,9 +67,9 @@ public class Spending extends DateAuditable {
     public CategoryInfo getCategory() {
         if (this.category.equals(SpendingCategory.OTHER)) {
             SpendingCustomCategory category = getSpendingCustomCategory();
-            return CategoryInfo.of(category.getId(), category.getName(), category.getIcon().name());
+            return CategoryInfo.of(category.getId(), category.getName(), category.getIcon());
         }
 
-        return CategoryInfo.of(-1L, this.category.getType(), this.category.name());
+        return CategoryInfo.of(-1L, this.category.getType(), this.category);
     }
 }
