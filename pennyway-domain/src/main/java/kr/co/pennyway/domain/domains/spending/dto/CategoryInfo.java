@@ -37,6 +37,6 @@ public record CategoryInfo(
     }
 
     public static CategoryInfo of(Long id, String name, SpendingCategory icon) {
-        return new CategoryInfo(id != null, id, name, icon);
+        return new CategoryInfo(!id.equals(-1L), id, name, icon);
     }
 }
