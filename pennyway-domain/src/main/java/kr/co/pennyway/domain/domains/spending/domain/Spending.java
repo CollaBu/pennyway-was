@@ -3,6 +3,7 @@ package kr.co.pennyway.domain.domains.spending.domain;
 import jakarta.persistence.*;
 import kr.co.pennyway.domain.common.converter.SpendingIconConverter;
 import kr.co.pennyway.domain.common.model.DateAuditable;
+import kr.co.pennyway.domain.domains.spending.dto.CategoryInfo;
 import kr.co.pennyway.domain.domains.spending.type.SpendingCategory;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import lombok.AccessLevel;
@@ -55,5 +56,18 @@ public class Spending extends DateAuditable {
 
     public int getDay() {
         return spendAt.getDayOfMonth();
+    }
+
+    /**
+     * 지출 내역의 소비 카테고리를 조회하는 메서드 <br>
+     * SpendingCategory가 OTHER일 경우 SpendingCustomCategory를 정보를 조회하여 반환한다.
+     */
+    public CategoryInfo getCategory() {
+        if (this.category.equals(SpendingCategory.OTHER)) {
+            SpendingCustomCategory category = getSpendingCustomCategory();
+            return CategoryInfo.of(category.getId(), category.getName(), category.getIcon().name());
+        }
+
+        return CategoryInfo.of(this.id, this.category.getType(), this.category.name());
     }
 }
