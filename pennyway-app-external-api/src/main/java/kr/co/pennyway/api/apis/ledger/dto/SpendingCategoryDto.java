@@ -28,7 +28,7 @@ public class SpendingCategoryDto {
             Long id,
             @Schema(description = "카테고리 이름")
             String name,
-            @Schema(description = "카테고리 아이콘", examples = {"FOOD", "TRANSPORTATION", "BEAUTY_OR_FASHION", "CONVENIENCE_STORE", "EDUCATION", "LIVING", "HEALTH", "HOBBY", "TRAVEL", "ALCOHOL_OR_ENTERTAINMENT", "MEMBERSHIP_OR_FAMILY_EVENT"})
+            @Schema(description = "카테고리 아이콘", example = "FOOD", examples = {"FOOD", "TRANSPORTATION", "BEAUTY_OR_FASHION", "CONVENIENCE_STORE", "EDUCATION", "LIVING", "HEALTH", "HOBBY", "TRAVEL", "ALCOHOL_OR_ENTERTAINMENT", "MEMBERSHIP_OR_FAMILY_EVENT"})
             SpendingCategory icon
     ) {
         public Res {
