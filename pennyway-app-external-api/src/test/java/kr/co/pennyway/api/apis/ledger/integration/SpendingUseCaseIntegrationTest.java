@@ -2,6 +2,8 @@ package kr.co.pennyway.api.apis.ledger.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.pennyway.api.apis.ledger.dto.SpendingReq;
+import kr.co.pennyway.api.apis.ledger.dto.SpendingSearchRes;
+import kr.co.pennyway.api.apis.ledger.usecase.SpendingUseCase;
 import kr.co.pennyway.api.config.ExternalApiDBTestConfig;
 import kr.co.pennyway.api.config.ExternalApiIntegrationTest;
 import kr.co.pennyway.api.config.fixture.SpendingFixture;
@@ -24,8 +26,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 
+import static org.springframework.test.util.AssertionErrors.assertEquals;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Slf4j
@@ -40,6 +42,8 @@ public class SpendingUseCaseIntegrationTest extends ExternalApiDBTestConfig {
     private ObjectMapper objectMapper;
     @Autowired
     private UserService userService;
+    @Autowired
+    private SpendingUseCase spendingUseCase;
     @Autowired
     private SpendingCustomCategoryService spendingCustomCategoryService;
     @Autowired
@@ -57,17 +61,16 @@ public class SpendingUseCaseIntegrationTest extends ExternalApiDBTestConfig {
         @Transactional
         void createSpendingSuccess() throws Exception {
             // given
-            userService.createUser(UserFixture.GENERAL_USER.toUser());
+            User user = userService.createUser(UserFixture.GENERAL_USER.toUser());
             SpendingReq request = new SpendingReq(10000, -1L, SpendingCategory.FOOD, LocalDate.now(), "소비처", "메모");
 
             // when
-            ResultActions resultActions = performCreateSpendingSuccess(request);
+            SpendingSearchRes.Individual result = spendingUseCase.createSpending(user.getId(), request);
 
             // then
-            resultActions.andDo(print()).andExpect(status().isOk())
-                    .andExpect(jsonPath("$.data.spending.category.isCustom").value(false))
-                    .andExpect(jsonPath("$.data.spending.category.id").value(-1L))
-                    .andExpect(jsonPath("$.data.spending.category.icon").value("FOOD"));
+            assertEquals("isCustom이 false이어야 한다.", false, result.category().isCustom());
+            assertEquals("categoryId가 -1이어야 한다.", -1L, result.category().id());
+            assertEquals("icon이 FOOD이어야 한다.", SpendingCategory.FOOD, result.category().icon());
         }
 
         @Order(2)
@@ -82,13 +85,12 @@ public class SpendingUseCaseIntegrationTest extends ExternalApiDBTestConfig {
             SpendingReq request = new SpendingReq(10000, category.getId(), SpendingCategory.OTHER, LocalDate.now(), "소비처", "메모");
 
             // when
-            ResultActions resultActions = performCreateSpendingSuccess(request);
+            SpendingSearchRes.Individual result = spendingUseCase.createSpending(user.getId(), request);
 
             // then
-            resultActions.andDo(print()).andExpect(status().isOk())
-                    .andExpect(jsonPath("$.data.spending.category.isCustom").value(true))
-                    .andExpect(jsonPath("$.data.spending.category.id").value(category.getId()))
-                    .andExpect(jsonPath("$.data.spending.category.icon").value(category.getIcon().name()));
+            assertEquals("isCustom이 true이어야 한다.", true, result.category().isCustom());
+            assertEquals("categoryId가 spendingCustomCategory의 id와 같아야 한다.", category.getId(), result.category().id());
+            assertEquals("icon이 spendingCustomCategory의 icon과 같아야 한다.", category.getIcon(), result.category().icon());
         }
 
         @Order(3)
