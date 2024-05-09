@@ -25,7 +25,7 @@ public class SpendingCategoryUseCase {
     public SpendingCategoryDto.Res createSpendingCategory(Long userId, String categoryName, SpendingCategory icon) {
         User user = userService.readUser(userId).orElseThrow(() -> new UserErrorException(UserErrorCode.NOT_FOUND));
 
-        SpendingCustomCategory category = spendingCustomCategoryService.save(SpendingCustomCategory.of(categoryName, icon, user));
+        SpendingCustomCategory category = spendingCustomCategoryService.createSpendingCustomCategory(SpendingCustomCategory.of(categoryName, icon, user));
 
         return SpendingCategoryDto.Res.from(CategoryInfo.of(category.getId(), category.getName(), category.getIcon()));
     }
