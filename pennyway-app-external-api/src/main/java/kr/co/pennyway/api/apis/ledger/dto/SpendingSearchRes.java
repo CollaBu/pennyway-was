@@ -51,14 +51,14 @@ public class SpendingSearchRes {
             @Schema(description = "지출 카테고리 정보")
             @NotNull
             CategoryInfo category,
-            @Schema(description = "지출 일시", example = "2024-05-09")
+            @Schema(description = "지출 일시", pattern = "yyyy-MM-dd HH:mm:ss", example = "2021-08-01 00:00:00")
             @NotNull
             @JsonSerialize(using = LocalDateTimeSerializer.class)
-            @JsonFormat(pattern = "yyyy-MM-dd")
+            @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
             LocalDateTime spendAt,
-            @Schema(description = "계좌명. 없으면 빈 문자열")
+            @Schema(description = "계좌명. 없으면 빈 문자열", example = "카페인 수혈")
             String accountName,
-            @Schema(description = "메모. 없으면 빈 문자열")
+            @Schema(description = "메모. 없으면 빈 문자열", example = "아메리카노 1잔")
             String memo
     ) {
         public Individual(Long id, Integer amount, CategoryInfo category, LocalDateTime spendAt, String accountName, String memo) {
