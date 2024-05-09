@@ -91,6 +91,22 @@ public class SpendingUseCaseIntegrationTest extends ExternalApiDBTestConfig {
                     .andExpect(jsonPath("$.data.spending.category.icon").value(category.getIcon().name()));
         }
 
+        @Order(3)
+        @Test
+        @DisplayName("사용자가 categoryId에 해당하는 카테고리 정보의 소유자가 아닌 경우, 403 Forbidden을 반환한다.")
+        @WithSecurityMockUser(userId = "3")
+        @Transactional
+        void createSpendingWithInvalidCustomCategory() throws Exception {
+            // given
+            User user = userService.createUser(UserFixture.GENERAL_USER.toUser());
+            SpendingReq request = new SpendingReq(10000, 1000L, SpendingCategory.OTHER, LocalDate.now(), "소비처", "메모");
+
+            // when
+            ResultActions resultActions = performCreateSpendingSuccess(request);
+
+            // then
+            resultActions.andDo(print()).andExpect(status().isForbidden());
+        }
 
         private ResultActions performCreateSpendingSuccess(SpendingReq req) throws Exception {
             return mockMvc.perform(MockMvcRequestBuilders
@@ -106,7 +122,7 @@ public class SpendingUseCaseIntegrationTest extends ExternalApiDBTestConfig {
     class GetSpendingListAtYearAndMonth {
         @Test
         @DisplayName("월별 지출 내역 조회")
-        @WithSecurityMockUser(userId = "3")
+        @WithSecurityMockUser(userId = "4")
         @Transactional
         void getSpendingListAtYearAndMonthSuccess() throws Exception {
             // given
