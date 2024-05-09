@@ -1,7 +1,7 @@
 package kr.co.pennyway.api.apis.ledger.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import kr.co.pennyway.domain.domains.spending.dto.CategoryInfo;
@@ -12,7 +12,7 @@ import java.util.Objects;
 
 public class SpendingCategoryDto {
     public record CreateParamReq(
-            @NotEmpty(message = "카테고리 이름은 필수입니다.")
+            @NotBlank(message = "카테고리 이름은 필수입니다.")
             @Size(max = 15, message = "카테고리 이름은 15자 이하로 입력해주세요.")
             String name,
             @NotNull(message = "카테고리 아이콘은 필수입니다.")
