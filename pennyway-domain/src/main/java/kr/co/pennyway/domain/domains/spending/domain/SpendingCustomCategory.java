@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Getter
-@Table(name = "spending_category")
+@Table(name = "spending_custom_category")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @SQLRestriction("deleted_at IS NULL")
 @SQLDelete(sql = "UPDATE spending_category SET deleted_at = NOW() WHERE id = ?")
