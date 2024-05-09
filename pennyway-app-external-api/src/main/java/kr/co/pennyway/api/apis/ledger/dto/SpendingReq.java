@@ -32,10 +32,10 @@ public record SpendingReq(
         @PastOrPresent(message = "지출 일자는 과거 또는 현재여야 합니다.")
         LocalDate spendAt,
         @Schema(description = "소비처", example = "카페인 수혈")
-        @Size(max = 20, message = "소비처는 20자 이하로 입력해야 합니다.")
+        @Size(max = 20, message = "소비처는 null 혹은 20자 이하로 입력해야 합니다.")
         String accountName,
         @Schema(description = "메모", example = "아메리카노 1잔")
-        @Size(max = 100, message = "메모는 100자 이하로 입력해야 합니다.")
+        @Size(max = 100, message = "메모는 null 혹은 100자 이하로 입력해야 합니다.")
         String memo
 ) {
     public Spending toEntity() {

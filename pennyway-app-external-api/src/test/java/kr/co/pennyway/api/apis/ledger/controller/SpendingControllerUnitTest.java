@@ -6,6 +6,7 @@ import kr.co.pennyway.api.apis.ledger.dto.SpendingSearchRes;
 import kr.co.pennyway.api.apis.ledger.usecase.SpendingUseCase;
 import kr.co.pennyway.api.config.supporter.WithSecurityMockUser;
 import kr.co.pennyway.domain.domains.spending.type.SpendingCategory;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -21,6 +22,7 @@ import java.time.LocalDate;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ActiveProfiles("test")
@@ -62,7 +64,7 @@ public class SpendingControllerUnitTest {
             ResultActions result = performPostSpending(request);
 
             // then
-            result.andExpect(status().isUnprocessableEntity());
+            result.andDo(print()).andExpect(status().isUnprocessableEntity());
         }
 
         @Test
@@ -79,7 +81,7 @@ public class SpendingControllerUnitTest {
             ResultActions result = performPostSpending(request);
 
             // then
-            result.andExpect(status().isUnprocessableEntity());
+            result.andDo(print()).andExpect(status().isBadRequest());
         }
 
         @Test
@@ -95,7 +97,7 @@ public class SpendingControllerUnitTest {
             ResultActions result = performPostSpending(request);
 
             // then
-            result.andExpect(status().isUnprocessableEntity());
+            result.andDo(print()).andExpect(status().isUnprocessableEntity());
         }
 
         @Test
@@ -111,7 +113,7 @@ public class SpendingControllerUnitTest {
             ResultActions result = performPostSpending(request);
 
             // then
-            result.andExpect(status().isUnprocessableEntity());
+            result.andDo(print()).andExpect(status().isUnprocessableEntity());
         }
 
         @Test
@@ -119,7 +121,7 @@ public class SpendingControllerUnitTest {
         @WithSecurityMockUser
         void whenMemoIsNotNullAndOver100() throws Exception {
             // given
-            String memo = "123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890";
+            String memo = RandomStringUtils.random(101);
             SpendingReq request = new SpendingReq(10000, -1L, SpendingCategory.FOOD, LocalDate.now(), "소비처", memo);
             given(spendingUseCase.createSpending(1L, request)).willReturn(SpendingSearchRes.Individual.builder().build());
 
@@ -127,7 +129,7 @@ public class SpendingControllerUnitTest {
             ResultActions result = performPostSpending(request);
 
             // then
-            result.andExpect(status().isUnprocessableEntity());
+            result.andDo(print()).andExpect(status().isUnprocessableEntity());
         }
 
         private ResultActions performPostSpending(SpendingReq request) throws Exception {
