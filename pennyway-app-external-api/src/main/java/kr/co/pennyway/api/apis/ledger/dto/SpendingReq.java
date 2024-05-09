@@ -70,6 +70,6 @@ public record SpendingReq(
     }
 
     public boolean isCustomCategory() {
-        return categoryId.equals(-1L);
+        return !categoryId.equals(-1L);
     }
 }
