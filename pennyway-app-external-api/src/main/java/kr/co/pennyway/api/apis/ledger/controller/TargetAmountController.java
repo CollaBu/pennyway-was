@@ -30,8 +30,9 @@ public class TargetAmountController implements TargetAmountApi {
     @PutMapping("")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> putTargetAmount(@Validated TargetAmountDto.UpdateParamReq request, @AuthenticationPrincipal SecurityUserDetails user) {
-        if (!isValidDateForYearAndMonth(request.date()))
+        if (!isValidDateForYearAndMonth(request.date())) {
             throw new TargetAmountErrorException(TargetAmountErrorCode.INVALID_TARGET_AMOUNT_DATE);
+        }
 
         targetAmountUseCase.updateTargetAmount(user.getUserId(), request.date(), request.amount());
         return ResponseEntity.ok(SuccessResponse.noContent());
