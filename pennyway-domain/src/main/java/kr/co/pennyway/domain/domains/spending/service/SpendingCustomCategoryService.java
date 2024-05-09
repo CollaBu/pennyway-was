@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Slf4j
 @DomainService
 @RequiredArgsConstructor
@@ -16,5 +18,10 @@ public class SpendingCustomCategoryService {
     @Transactional
     public SpendingCustomCategory createSpendingCustomCategory(SpendingCustomCategory spendingCustomCategory) {
         return spendingCustomCategoryRepository.save(spendingCustomCategory);
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<SpendingCustomCategory> readSpendingCustomCategory(Long id) {
+        return spendingCustomCategoryRepository.findById(id);
     }
 }
