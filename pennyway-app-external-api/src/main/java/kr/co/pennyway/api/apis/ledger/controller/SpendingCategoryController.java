@@ -5,6 +5,7 @@ import kr.co.pennyway.api.apis.ledger.dto.SpendingCategoryDto;
 import kr.co.pennyway.api.apis.ledger.usecase.SpendingCategoryUseCase;
 import kr.co.pennyway.api.common.response.SuccessResponse;
 import kr.co.pennyway.api.common.security.authentication.SecurityUserDetails;
+import kr.co.pennyway.domain.domains.spending.type.SpendingCategory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +27,10 @@ public class SpendingCategoryController implements SpendingCategoryApi {
     @PostMapping("")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> postSpendingCategory(@Validated SpendingCategoryDto.CreateParamReq param, @AuthenticationPrincipal SecurityUserDetails user) {
+        if (param.icon().equals(SpendingCategory.OTHER)) {
+            throw new SpendingErrorException(SpendingErrorCode.INVALID_ICON);
+        }
+
         SpendingCategoryDto.Res spendingCategory = spendingCategoryUseCase.createSpendingCategory(user.getUserId(), param.name(), param.icon());
         return ResponseEntity.ok(SuccessResponse.from("spendingCategory", spendingCategory));
     }
