@@ -5,6 +5,8 @@ import kr.co.pennyway.api.apis.ledger.dto.SpendingCategoryDto;
 import kr.co.pennyway.api.apis.ledger.usecase.SpendingCategoryUseCase;
 import kr.co.pennyway.api.common.response.SuccessResponse;
 import kr.co.pennyway.api.common.security.authentication.SecurityUserDetails;
+import kr.co.pennyway.domain.domains.spending.exception.SpendingErrorCode;
+import kr.co.pennyway.domain.domains.spending.exception.SpendingErrorException;
 import kr.co.pennyway.domain.domains.spending.type.SpendingCategory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
