@@ -8,6 +8,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Size;
+import kr.co.pennyway.domain.domains.spending.domain.Spending;
 import kr.co.pennyway.domain.domains.spending.type.SpendingCategory;
 
 import java.time.LocalDate;
@@ -37,4 +38,13 @@ public record SpendingReq(
         @Size(max = 100, message = "메모는 100자 이하로 입력해야 합니다.")
         String memo
 ) {
+    public Spending toEntity() {
+        return Spending.builder()
+                .amount(amount)
+                .category(icon)
+                .spendAt(spendAt.atStartOfDay())
+                .accountName(accountName)
+                .memo(memo)
+                .build();
+    }
 }
