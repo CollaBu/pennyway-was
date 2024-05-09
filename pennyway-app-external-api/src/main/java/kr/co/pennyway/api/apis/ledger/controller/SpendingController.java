@@ -26,8 +26,8 @@ public class SpendingController implements SpendingApi {
     @PostMapping("")
     @PreAuthorize("isAuthenticated()") // categoryId가 -1이 아니면 사용자가 정의한 것인지 확인 필요함
     public ResponseEntity<?> postSpending(@RequestBody @Validated SpendingReq request, @AuthenticationPrincipal SecurityUserDetails user) {
-        if (request.icon().equals(SpendingCategory.OTHER) && request.categoryId().equals(-1L)) {
-            throw new SpendingErrorException(SpendingErrorCode.INVALID_ICON);
+        if (!isValidCategoryIdAndIcon(request.categoryId(), request.icon())) {
+            throw new SpendingErrorException(SpendingErrorCode.INVALID_ICON_WITH_CATEGORY_ID);
         }
 
         return ResponseEntity.ok(SuccessResponse.from("spending", spendingUseCase.createSpending(user.getUserId(), request)));
@@ -38,5 +38,16 @@ public class SpendingController implements SpendingApi {
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> getSpendingListAtYearAndMonth(@RequestParam("year") int year, @RequestParam("month") int month, @AuthenticationPrincipal SecurityUserDetails user) {
         return ResponseEntity.ok(SuccessResponse.from("spendings", spendingUseCase.getSpendingsAtYearAndMonth(user.getUserId(), year, month)));
+    }
+
+    /**
+     * categoryId가 -1이면 서비스에서 정의한 카테고리를 사용하므로 저장하려는 지출 내역의 icon은 OTHER가 될 수 없고, <br/>
+     * categoryId가 -1이 아니면 사용자가 정의한 카테고리를 사용하므로 저장하려는 지출 내역의 icon은 OTHER임을 확인한다.
+     *
+     * @param categoryId : 사용자가 정의한 카테고리 ID
+     * @param icon       : 지출 내역으로 저장하려는 카테고리의 아이콘
+     */
+    private boolean isValidCategoryIdAndIcon(Long categoryId, SpendingCategory icon) {
+        return (categoryId.equals(-1L) && !icon.equals(SpendingCategory.OTHER) || categoryId > 0 && icon.equals(SpendingCategory.OTHER));
     }
 }
