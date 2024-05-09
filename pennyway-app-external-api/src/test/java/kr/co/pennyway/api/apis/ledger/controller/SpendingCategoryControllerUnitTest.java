@@ -4,6 +4,7 @@ import kr.co.pennyway.api.apis.ledger.dto.SpendingCategoryDto;
 import kr.co.pennyway.api.apis.ledger.usecase.SpendingCategoryUseCase;
 import kr.co.pennyway.api.config.supporter.WithSecurityMockUser;
 import kr.co.pennyway.domain.domains.spending.dto.CategoryInfo;
+import kr.co.pennyway.domain.domains.spending.exception.SpendingErrorCode;
 import kr.co.pennyway.domain.domains.spending.type.SpendingCategory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -22,6 +23,7 @@ import static org.mockito.BDDMockito.given;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = {SpendingCategoryController.class})
@@ -79,6 +81,26 @@ public class SpendingCategoryControllerUnitTest {
         result2.andDo(print()).andExpect(status().isUnprocessableEntity());
         result3.andDo(print()).andExpect(status().isUnprocessableEntity());
     }
+
+    @Test
+    @DisplayName("OTHER 아이콘을 입력하면 400 BAD_REQUEST 에러 응답을 반환한다.")
+    @WithSecurityMockUser
+    void postSpendingCategoryWithOtherIcon() throws Exception {
+        // given
+        String name = "식비";
+        String icon = "OTHER";
+
+        // when
+        ResultActions result = performPostSpendingCategory(name, icon);
+
+        // then
+        result
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value(SpendingErrorCode.INVALID_ICON.causedBy().getCode()))
+                .andExpect(jsonPath("$.message").value(SpendingErrorCode.INVALID_ICON.getExplainError()));
+    }
+
 
     @Test
     @DisplayName("카테고리명과 아이콘을 입력하면 200 OK 응답을 반환한다.")
