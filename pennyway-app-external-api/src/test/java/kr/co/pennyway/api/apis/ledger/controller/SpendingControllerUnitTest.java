@@ -2,6 +2,7 @@ package kr.co.pennyway.api.apis.ledger.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.pennyway.api.apis.ledger.dto.SpendingReq;
+import kr.co.pennyway.api.apis.ledger.dto.SpendingSearchRes;
 import kr.co.pennyway.api.apis.ledger.usecase.SpendingUseCase;
 import kr.co.pennyway.api.config.supporter.WithSecurityMockUser;
 import kr.co.pennyway.domain.domains.spending.type.SpendingCategory;
@@ -12,14 +13,18 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
 import java.time.LocalDate;
 
+import static org.mockito.BDDMockito.given;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(controllers = SpendingController.class)
 @ActiveProfiles("test")
+@WebMvcTest(controllers = SpendingController.class)
 @TestClassOrder(ClassOrderer.OrderAnnotation.class)
 public class SpendingControllerUnitTest {
     @Autowired
@@ -30,6 +35,14 @@ public class SpendingControllerUnitTest {
 
     @MockBean
     private SpendingUseCase spendingUseCase;
+
+    @BeforeEach
+    void setUp(WebApplicationContext webApplicationContext) {
+        this.mockMvc = MockMvcBuilders
+                .webAppContextSetup(webApplicationContext)
+                .defaultRequest(post("/**").with(csrf()))
+                .build();
+    }
 
     @Order(1)
     @Nested
@@ -43,6 +56,7 @@ public class SpendingControllerUnitTest {
             // given
             int amount = 0;
             SpendingReq request = new SpendingReq(amount, -1L, SpendingCategory.FOOD, LocalDate.now(), "소비처", "메모");
+            given(spendingUseCase.createSpending(1L, request)).willReturn(SpendingSearchRes.Individual.builder().build());
 
             // when
             ResultActions result = performPostSpending(request);
@@ -59,6 +73,7 @@ public class SpendingControllerUnitTest {
             Long categoryId = -1L;
             SpendingCategory icon = SpendingCategory.OTHER;
             SpendingReq request = new SpendingReq(10000, categoryId, icon, LocalDate.now(), "소비처", "메모");
+            given(spendingUseCase.createSpending(1L, request)).willReturn(SpendingSearchRes.Individual.builder().build());
 
             // when
             ResultActions result = performPostSpending(request);
@@ -74,6 +89,7 @@ public class SpendingControllerUnitTest {
             // given
             LocalDate spendAt = LocalDate.now().plusDays(1);
             SpendingReq request = new SpendingReq(10000, -1L, SpendingCategory.FOOD, spendAt, "소비처", "메모");
+            given(spendingUseCase.createSpending(1L, request)).willReturn(SpendingSearchRes.Individual.builder().build());
 
             // when
             ResultActions result = performPostSpending(request);
@@ -89,6 +105,7 @@ public class SpendingControllerUnitTest {
             // given
             String accountName = "123456789012345678901";
             SpendingReq request = new SpendingReq(10000, -1L, SpendingCategory.FOOD, LocalDate.now(), accountName, "메모");
+            given(spendingUseCase.createSpending(1L, request)).willReturn(SpendingSearchRes.Individual.builder().build());
 
             // when
             ResultActions result = performPostSpending(request);
@@ -104,6 +121,7 @@ public class SpendingControllerUnitTest {
             // given
             String memo = "123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890";
             SpendingReq request = new SpendingReq(10000, -1L, SpendingCategory.FOOD, LocalDate.now(), "소비처", memo);
+            given(spendingUseCase.createSpending(1L, request)).willReturn(SpendingSearchRes.Individual.builder().build());
 
             // when
             ResultActions result = performPostSpending(request);
