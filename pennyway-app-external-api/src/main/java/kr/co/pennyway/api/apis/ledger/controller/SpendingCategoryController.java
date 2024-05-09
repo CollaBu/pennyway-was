@@ -2,6 +2,7 @@ package kr.co.pennyway.api.apis.ledger.controller;
 
 import kr.co.pennyway.api.apis.ledger.api.SpendingCategoryApi;
 import kr.co.pennyway.api.apis.ledger.dto.SpendingCategoryDto;
+import kr.co.pennyway.api.apis.ledger.usecase.SpendingCategoryUseCase;
 import kr.co.pennyway.api.common.response.SuccessResponse;
 import kr.co.pennyway.api.common.security.authentication.SecurityUserDetails;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,7 @@ public class SpendingCategoryController implements SpendingCategoryApi {
     @PostMapping("")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> postSpendingCategory(@Validated SpendingCategoryDto.CreateParamReq param, @AuthenticationPrincipal SecurityUserDetails user) {
-        return ResponseEntity.ok(SuccessResponse.from("spendingCategory", spendingCategoryUseCase.createSpendingCategory(user.getUserId(), param)));
+        SpendingCategoryDto.Res spendingCategory = spendingCategoryUseCase.createSpendingCategory(user.getUserId(), param.name(), param.icon());
+        return ResponseEntity.ok(SuccessResponse.from("spendingCategory", spendingCategory));
     }
 }
