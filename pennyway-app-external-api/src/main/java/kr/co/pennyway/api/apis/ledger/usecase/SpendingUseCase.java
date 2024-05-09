@@ -35,15 +35,14 @@ public class SpendingUseCase {
     public SpendingSearchRes.Individual createSpending(Long userId, SpendingReq request) {
         User user = userService.readUser(userId).orElseThrow(() -> new UserErrorException(UserErrorCode.NOT_FOUND));
 
-        Spending spending = request.toEntity(user);
+        Spending spending;
         if (request.categoryId().equals(-1L)) {
-            spendingService.createSpending(spending);
+            spending = spendingService.createSpending(request.toEntity(user));
         } else {
             SpendingCustomCategory customCategory = spendingCustomCategoryService.readSpendingCustomCategory(request.categoryId())
                     .orElseThrow(() -> new SpendingErrorException(SpendingErrorCode.NOT_FOUND_CUSTOM_CATEGORY));
 
-            spending.updateSpendingCustomCategory(customCategory);
-            spendingService.createSpending(spending);
+            spending = spendingService.createSpending(request.toEntity(user, customCategory));
         }
 
         return SpendingMapper.toSpendingSearchResIndividual(spending);

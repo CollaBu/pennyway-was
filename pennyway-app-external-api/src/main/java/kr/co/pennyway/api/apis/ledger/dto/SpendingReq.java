@@ -9,6 +9,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Size;
 import kr.co.pennyway.domain.domains.spending.domain.Spending;
+import kr.co.pennyway.domain.domains.spending.domain.SpendingCustomCategory;
 import kr.co.pennyway.domain.domains.spending.type.SpendingCategory;
 import kr.co.pennyway.domain.domains.user.domain.User;
 
@@ -39,6 +40,9 @@ public record SpendingReq(
         @Size(max = 100, message = "메모는 null 혹은 100자 이하로 입력해야 합니다.")
         String memo
 ) {
+    /**
+     * 서비스에서 제공하는 지출 카테고리를 사용하는 지출 내역으로 변환
+     */
     public Spending toEntity(User user) {
         return Spending.builder()
                 .amount(amount)
@@ -47,6 +51,21 @@ public record SpendingReq(
                 .accountName(accountName)
                 .memo(memo)
                 .user(user)
+                .build();
+    }
+
+    /**
+     * 사용자가 정의한 지출 카테고리를 사용하는 지출 내역으로 변환
+     */
+    public Spending toEntity(User user, SpendingCustomCategory spendingCustomCategory) {
+        return Spending.builder()
+                .amount(amount)
+                .category(icon)
+                .spendAt(spendAt.atStartOfDay())
+                .accountName(accountName)
+                .memo(memo)
+                .user(user)
+                .spendingCustomCategory(spendingCustomCategory)
                 .build();
     }
 }
