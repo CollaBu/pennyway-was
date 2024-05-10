@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -23,6 +24,11 @@ public class SpendingCustomCategoryService {
     @Transactional(readOnly = true)
     public Optional<SpendingCustomCategory> readSpendingCustomCategory(Long id) {
         return spendingCustomCategoryRepository.findById(id);
+    }
+
+    @Transactional(readOnly = true)
+    public List<SpendingCustomCategory> readSpendingCustomCategories(Long userId) {
+        return spendingCustomCategoryRepository.findAllByUser_Id(userId);
     }
 
     @Transactional(readOnly = true)
