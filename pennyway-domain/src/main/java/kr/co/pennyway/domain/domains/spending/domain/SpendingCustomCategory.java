@@ -1,6 +1,7 @@
 package kr.co.pennyway.domain.domains.spending.domain;
 
 import jakarta.persistence.*;
+import kr.co.pennyway.domain.common.converter.SpendingCategoryConverter;
 import kr.co.pennyway.domain.common.model.DateAuditable;
 import kr.co.pennyway.domain.domains.spending.type.SpendingCategory;
 import kr.co.pennyway.domain.domains.user.domain.User;
@@ -24,6 +25,7 @@ public class SpendingCustomCategory extends DateAuditable {
     private Long id;
 
     private String name;
+    @Convert(converter = SpendingCategoryConverter.class)
     private SpendingCategory icon;
     private LocalDateTime deletedAt;
 
