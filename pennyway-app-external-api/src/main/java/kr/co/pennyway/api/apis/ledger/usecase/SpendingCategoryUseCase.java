@@ -14,6 +14,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Slf4j
 @UseCase
 @RequiredArgsConstructor
@@ -28,5 +30,14 @@ public class SpendingCategoryUseCase {
         SpendingCustomCategory category = spendingCustomCategoryService.createSpendingCustomCategory(SpendingCustomCategory.of(categoryName, icon, user));
 
         return SpendingCategoryDto.Res.from(CategoryInfo.of(category.getId(), category.getName(), category.getIcon()));
+    }
+
+    @Transactional(readOnly = true)
+    public List<SpendingCategoryDto.Res> getSpendingCategories(Long userId) {
+        List<SpendingCustomCategory> categories = spendingCustomCategoryService.readSpendingCustomCategories(userId);
+
+        return categories.stream()
+                .map(category -> SpendingCategoryDto.Res.from(CategoryInfo.of(category.getId(), category.getName(), category.getIcon())))
+                .toList();
     }
 }
