@@ -4,10 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.ExampleObject;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.media.SchemaProperty;
+import io.swagger.v3.oas.annotations.media.*;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.co.pennyway.api.apis.ledger.dto.SpendingCategoryDto;
@@ -31,4 +28,8 @@ public interface SpendingCategoryApi {
     })
     @ApiResponse(responseCode = "200", description = "지출 카테고리 등록 성공", content = @Content(mediaType = "application/json", schemaProperties = @SchemaProperty(name = "spendingCategory", schema = @Schema(implementation = SpendingCategoryDto.Res.class))))
     ResponseEntity<?> postSpendingCategory(@Validated SpendingCategoryDto.CreateParamReq param, @AuthenticationPrincipal SecurityUserDetails user);
+
+    @Operation(summary = "사용자 정의 지출 카테고리 조회", method = "GET", description = "사용자가 생성한 지출 카테고리 목록을 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "지출 카테고리 조회 성공", content = @Content(mediaType = "application/json", schemaProperties = @SchemaProperty(name = "spendingCategories", array = @ArraySchema(schema = @Schema(implementation = SpendingCategoryDto.Res.class)))))
+    ResponseEntity<?> getSpendingCategories(@AuthenticationPrincipal SecurityUserDetails user);
 }
