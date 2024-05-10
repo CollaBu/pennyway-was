@@ -38,6 +38,7 @@ public class SpendingCategoryController implements SpendingCategoryApi {
         return ResponseEntity.ok(SuccessResponse.from("spendingCategory", spendingCategory));
     }
 
+    @Override
     @GetMapping("")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> getSpendingCategories(@AuthenticationPrincipal SecurityUserDetails user) {
