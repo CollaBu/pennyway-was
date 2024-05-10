@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -13,6 +14,7 @@ import java.util.Map;
  * QueryDsl을 이용한 검색 조건을 처리하는 기본적인 메서드를 선언한 인터페이스
  *
  * @author YANG JAESEO
+ * @version 1.1
  */
 public interface QueryDslSearchRepository<T> {
 
@@ -87,11 +89,13 @@ public interface QueryDslSearchRepository<T> {
     Page<T> findPage(Predicate predicate, QueryHandler queryHandler, Pageable pageable);
 
     /**
-     * 검색 조건에 해당하는 DTO 리스트를 조회하는 메서드
+     * 검색 조건에 해당하는 DTO 리스트를 조회하는 메서드 <br/>
+     * bindings가 {@link LinkedHashMap}을 구현체로 사용하는 경우 Dto 생성자 파라미터 순서에 맞게 삽입하면, Dto의 불변성을 유지할 수 있다. <br/>
+     * 만약 bindings가 삽입 순서를 보장하지 않을 경우, Dto는 기본 생성자와 setter 메서드를 제공해야 하며, 모든 필드의 final 키워드를 제거해야 한다.
      *
      * @param predicate : 검색 조건
      * @param type : 조회할 도메인(혹은 DTO) 타입
-     * @param bindings : 검색 조건에 해당하는 도메인(혹은 DTO)의 필드
+     * @param bindings : 검색 조건에 해당하는 도메인(혹은 DTO)의 필드. {@link LinkedHashMap}을 구현체로 사용하는 경우 Dto 생성자 파라미터 순서에 맞게 삽입해야 한다.
      * @param queryHandler : 검색 조건에 추가적으로 적용할 조건
      * @param sort : 정렬 조건
      *
@@ -134,10 +138,12 @@ public interface QueryDslSearchRepository<T> {
 
     /**
      * 검색 조건에 해당하는 DTO 페이지를 조회하는 메서드
+     * bindings가 {@link LinkedHashMap}을 구현체로 사용하는 경우 Dto 생성자 파라미터 순서에 맞게 삽입하면, Dto의 불변성을 유지할 수 있다. <br/>
+     * 만약 bindings가 삽입 순서를 보장하지 않을 경우, Dto는 기본 생성자와 setter 메서드를 제공해야 하며, 모든 필드의 final 키워드를 제거해야 한다.
      *
      * @param predicate : 검색 조건
      * @param type : 조회할 도메인(혹은 DTO) 타입
-     * @param bindings : 검색 조건에 해당하는 도메인(혹은 DTO)의 필드
+     * @param bindings : 검색 조건에 해당하는 도메인(혹은 DTO)의 필드. {@link LinkedHashMap}을 구현체로 사용하는 경우 Dto 생성자 파라미터 순서에 맞게 삽입해야 한다.
      * @param queryHandler : 검색 조건에 추가적으로 적용할 조건
      * @param pageable : 페이지 정보
      *
