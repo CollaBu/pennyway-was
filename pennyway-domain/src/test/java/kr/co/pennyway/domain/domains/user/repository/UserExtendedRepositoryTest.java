@@ -254,6 +254,17 @@ public class UserExtendedRepositoryTest extends ContainerMySqlTestConfig {
 
     public record UserAndOauthInfo(Long userId, String username, String name, String phone, Long oauthId,
                                    Provider provider) {
+        @Override
+        public String toString() {
+            return "UserAndOauthInfo{" +
+                    "userId=" + userId +
+                    ", username='" + username + '\'' +
+                    ", name='" + name + '\'' +
+                    ", phone='" + phone + '\'' +
+                    ", oauthId=" + oauthId +
+                    ", provider=" + provider +
+                    '}';
+        }
     }
 
     @Setter
@@ -267,6 +278,18 @@ public class UserExtendedRepositoryTest extends ContainerMySqlTestConfig {
         private Provider provider;
 
         public UserAndOauthInfoNotImmutable() {
+        }
+
+        @Override
+        public String toString() {
+            return "UserAndOauthInfoNotImmutable{" +
+                    "userId=" + userId +
+                    ", username='" + username + '\'' +
+                    ", name='" + name + '\'' +
+                    ", phone='" + phone + '\'' +
+                    ", oauthId=" + oauthId +
+                    ", provider=" + provider +
+                    '}';
         }
     }
 }
