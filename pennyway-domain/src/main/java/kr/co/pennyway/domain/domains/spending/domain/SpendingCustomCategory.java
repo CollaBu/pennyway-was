@@ -32,14 +32,16 @@ public class SpendingCustomCategory extends DateAuditable {
     private User user;
 
     private SpendingCustomCategory(String name, SpendingCategory icon, User user) {
+        if (icon.equals(SpendingCategory.OTHER)) {
+            throw new IllegalArgumentException("OTHER 아이콘은 커스텀 카테고리의 icon으로 사용할 수 없습니다.");
+        }
+
         this.name = name;
         this.icon = icon;
         this.user = user;
     }
 
     public static SpendingCustomCategory of(String name, SpendingCategory icon, User user) {
-        if (icon.equals(SpendingCategory.OTHER))
-            throw new IllegalArgumentException("OTHER 아이콘은 커스텀 카테고리의 icon으로 사용할 수 없습니다.");
         return new SpendingCustomCategory(name, icon, user);
     }
 }
