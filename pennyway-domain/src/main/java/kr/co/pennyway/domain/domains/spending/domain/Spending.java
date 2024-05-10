@@ -45,6 +45,12 @@ public class Spending extends DateAuditable {
 
     @Builder
     private Spending(Integer amount, SpendingCategory category, LocalDateTime spendAt, String accountName, String memo, User user, SpendingCustomCategory spendingCustomCategory) {
+        if (category.equals(SpendingCategory.OTHER) && spendingCustomCategory == null) {
+            throw new IllegalArgumentException("OTHER 아이콘의 경우 SpendingCustomCategory는 null일 수 없습니다.");
+        } else if (!category.equals(SpendingCategory.OTHER) && spendingCustomCategory != null) {
+            throw new IllegalArgumentException("OTHER 아이콘이 아닌 경우 SpendingCustomCategory는 null이어야 합니다.");
+        }
+
         this.amount = amount;
         this.category = category;
         this.spendAt = spendAt;
@@ -71,5 +77,15 @@ public class Spending extends DateAuditable {
         }
 
         return CategoryInfo.of(-1L, this.category.getType(), this.category);
+    }
+
+    public void updateSpendingCustomCategory(SpendingCustomCategory spendingCustomCategory) {
+        if (this.category.equals(SpendingCategory.OTHER) && spendingCustomCategory == null) {
+            throw new IllegalArgumentException("OTHER 아이콘의 경우 SpendingCustomCategory는 null일 수 없습니다.");
+        } else if (!this.category.equals(SpendingCategory.OTHER) && spendingCustomCategory != null) {
+            throw new IllegalArgumentException("OTHER 아이콘이 아닌 경우 SpendingCustomCategory는 null이어야 합니다.");
+        }
+
+        this.spendingCustomCategory = spendingCustomCategory;
     }
 }

@@ -24,7 +24,7 @@ public record CategoryInfo(
         Objects.requireNonNull(icon, "icon은 null일 수 없습니다.");
 
         if (isCustom && id < 0 || !isCustom && id != -1) {
-            throw new IllegalArgumentException("isCustom과 id 정보가 일치하지 않습니다.");
+            throw new IllegalArgumentException("isCustom이 " + isCustom + "일 때 id는 " + (isCustom ? "0 이상" : "-1") + "이어야 합니다.");
         }
 
         if (isCustom && icon.equals(SpendingCategory.OTHER)) {
@@ -37,6 +37,6 @@ public record CategoryInfo(
     }
 
     public static CategoryInfo of(Long id, String name, SpendingCategory icon) {
-        return new CategoryInfo(id != null, id, name, icon);
+        return new CategoryInfo(!id.equals(-1L), id, name, icon);
     }
 }
