@@ -29,7 +29,6 @@ public class UserOauthSignService {
     @Transactional(readOnly = true)
     public User readUser(String oauthId, Provider provider) {
         return oauthService.readOauthByOauthIdAndProvider(oauthId, provider)
-                .filter(o -> !o.isDeleted())
                 .map(Oauth::getUser)
                 .orElse(null);
     }
