@@ -399,8 +399,7 @@ public class UserAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
         @DisplayName("연동된 Oauth가 1개이고 일반 회원 이력이 있는 경우에는 연동 해제에 성공한다.")
         void unlinkWithGeneralSignedUser() throws Exception {
             // given
-            User user = UserFixture.GENERAL_USER.toUser();
-            userService.createUser(user);
+            User user = userService.createUser(UserFixture.GENERAL_USER.toUser());
 
             Oauth oauth = mappingOauthWithUser(user, Provider.KAKAO);
 
@@ -409,7 +408,7 @@ public class UserAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
 
             // then
             result.andExpect(status().isOk()).andDo(print());
-            assertTrue(oauthService.readOauthByOauthIdAndProvider(oauth.getOauthId(), Provider.KAKAO).get().isDeleted());
+            assertNull(oauthService.readOauthByOauthIdAndProvider(oauth.getOauthId(), Provider.KAKAO).orElse(null));
         }
 
         @Test
@@ -419,8 +418,7 @@ public class UserAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
         @DisplayName("연동된 Oauth가 2개 이상이고 일반 회원 이력이 없는 경우에는 연동 해제에 성공한다.")
         void unlinkWithMultipleOauthSignedUser() throws Exception {
             // given
-            User user = UserFixture.OAUTH_USER.toUser();
-            userService.createUser(user);
+            User user = userService.createUser(UserFixture.OAUTH_USER.toUser());
 
             Oauth kakao = mappingOauthWithUser(user, Provider.KAKAO);
             Oauth google = mappingOauthWithUser(user, Provider.GOOGLE);
@@ -430,7 +428,7 @@ public class UserAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
 
             // then
             result.andExpect(status().isOk()).andDo(print());
-            assertTrue(oauthService.readOauthByOauthIdAndProvider(kakao.getOauthId(), Provider.KAKAO).get().isDeleted());
+            assertNull(oauthService.readOauthByOauthIdAndProvider(kakao.getOauthId(), Provider.KAKAO).orElse(null));
         }
 
         private ResultActions performOauthUnlink(Provider provider) throws Exception {
