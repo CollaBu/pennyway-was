@@ -132,9 +132,43 @@ public class UserExtendedRepositoryTest extends ContainerMySqlTestConfig {
     @Test
     @DisplayName("""
             Dto selectList 테스트: 사용자 이름이 양재서인 사용자의 username, name, phone 그리고 연동된 Oauth 정보를 조회한다.
+            LinkedHashMap을 사용하여 Dto 생성자 파라미터 순서에 맞게 삽입하면, Dto의 불변성을 유지할 수 있다.
             """)
     @Transactional
-    public void selectList() {
+    public void selectListUseLinkedHashMap() {
+        // given
+        Predicate predicate = qUser.name.eq("양재서");
+
+        QueryHandler queryHandler = query -> query.leftJoin(qOauth).on(qUser.id.eq(qOauth.user.id));
+        Sort sort = null;
+
+        Map<String, Expression<?>> bindings = new LinkedHashMap<>();
+
+        bindings.put("userId", qUser.id);
+        bindings.put("username", qUser.username);
+        bindings.put("name", qUser.name);
+        bindings.put("phone", qUser.phone);
+        bindings.put("oauthId", qOauth.id);
+        bindings.put("provider", qOauth.provider);
+
+        // when
+        List<UserAndOauthInfo> userAndOauthInfos = userRepository.selectList(predicate, UserAndOauthInfo.class, bindings, queryHandler, sort);
+
+        // then
+        userAndOauthInfos.forEach(userAndOauthInfo -> {
+            log.debug("userAndOauthInfo: {}", userAndOauthInfo);
+            assertEquals("이름이 양재서인 사용자만 조회되어야 한다.", "양재서", userAndOauthInfo.name());
+            assertEquals("provider는 KAKAO여야 한다.", Provider.KAKAO, userAndOauthInfo.provider());
+        });
+    }
+
+    @Test
+    @DisplayName("""
+            Dto selectList 테스트: 사용자 이름이 양재서인 사용자의 username, name, phone 그리고 연동된 Oauth 정보를 조회한다.
+            HashMap을 사용하더라도 Dto의 setter를 명시하고 final 키워드를 제거하면 결과를 조회할 수 있다.
+            """)
+    @Transactional
+    public void selectListUseHashMap() {
         // given
         Predicate predicate = qUser.name.eq("양재서");
 
@@ -151,7 +185,7 @@ public class UserExtendedRepositoryTest extends ContainerMySqlTestConfig {
         bindings.put("provider", qOauth.provider);
 
         // when
-        List<UserAndOauthInfo> userAndOauthInfos = userRepository.selectList(predicate, UserAndOauthInfo.class, bindings, queryHandler, sort);
+        List<UserAndOauthInfoNotImmutable> userAndOauthInfos = userRepository.selectList(predicate, UserAndOauthInfoNotImmutable.class, bindings, queryHandler, sort);
 
         // then
         userAndOauthInfos.forEach(userAndOauthInfo -> {
@@ -218,9 +252,24 @@ public class UserExtendedRepositoryTest extends ContainerMySqlTestConfig {
         jdbcTemplate.batchUpdate(sql, params);
     }
 
+    public record UserAndOauthInfo(Long userId, String username, String name, String phone, Long oauthId,
+                                   Provider provider) {
+        @Override
+        public String toString() {
+            return "UserAndOauthInfo{" +
+                    "userId=" + userId +
+                    ", username='" + username + '\'' +
+                    ", name='" + name + '\'' +
+                    ", phone='" + phone + '\'' +
+                    ", oauthId=" + oauthId +
+                    ", provider=" + provider +
+                    '}';
+        }
+    }
+
     @Setter
     @Getter
-    public static class UserAndOauthInfo {
+    public static class UserAndOauthInfoNotImmutable {
         private Long userId;
         private String username;
         private String name;
@@ -228,21 +277,12 @@ public class UserExtendedRepositoryTest extends ContainerMySqlTestConfig {
         private Long oauthId;
         private Provider provider;
 
-        public UserAndOauthInfo() {
-        }
-
-        public UserAndOauthInfo(Long userId, String username, String name, String phone, Long oauthId, Provider provider) {
-            this.userId = userId;
-            this.username = username;
-            this.name = name;
-            this.phone = phone;
-            this.oauthId = oauthId;
-            this.provider = provider;
+        public UserAndOauthInfoNotImmutable() {
         }
 
         @Override
         public String toString() {
-            return "UserAndOauthInfo{" +
+            return "UserAndOauthInfoNotImmutable{" +
                     "userId=" + userId +
                     ", username='" + username + '\'' +
                     ", name='" + name + '\'' +

@@ -15,6 +15,7 @@ import org.springframework.data.querydsl.QSort;
 import org.springframework.data.querydsl.SimpleEntityPathResolver;
 import org.springframework.util.Assert;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -54,7 +55,13 @@ public class QueryDslSearchRepositoryImpl<T> implements QueryDslSearchRepository
 
     @Override
     public <P> List<P> selectList(Predicate predicate, Class<P> type, Map<String, Expression<?>> bindings, QueryHandler queryHandler, Sort sort) {
-        return this.buildWithoutSelect(predicate, bindings, queryHandler, sort).select(Projections.bean(type, bindings)).fetch();
+        JPAQuery<?> query = this.buildWithoutSelect(predicate, bindings, queryHandler, sort);
+
+        if (bindings instanceof LinkedHashMap) {
+            return query.select(Projections.constructor(type, bindings.values().toArray(new Expression<?>[0]))).fetch();
+        }
+
+        return query.select(Projections.bean(type, bindings)).fetch();
     }
 
     @Override
@@ -65,6 +72,10 @@ public class QueryDslSearchRepositoryImpl<T> implements QueryDslSearchRepository
 
         int totalSize = query.fetch().size();
         query = query.offset(pageable.getOffset()).limit(pageable.getPageSize());
+
+        if (bindings instanceof LinkedHashMap) {
+            return new PageImpl<>(query.select(Projections.constructor(type, bindings.values().toArray(new Expression<?>[0]))).fetch(), pageable, totalSize);
+        }
 
         return new PageImpl<>(query.select(Projections.bean(type, bindings)).fetch(), pageable, totalSize);
     }
