@@ -27,7 +27,7 @@ public class OauthService {
 
     @Transactional(readOnly = true)
     public Optional<Oauth> readOauthByOauthIdAndProvider(String oauthId, Provider provider) {
-        return oauthRepository.findByOauthIdAndProvider(oauthId, provider);
+        return oauthRepository.findByOauthIdAndProviderAndDeletedAtIsNull(oauthId, provider);
     }
 
     @Transactional(readOnly = true)
