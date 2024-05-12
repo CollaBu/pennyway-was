@@ -25,9 +25,12 @@ public class OauthService {
         return oauthRepository.findById(id);
     }
 
+    /**
+     * oauthId와 provider로 Oauth를 조회한다. 이 때, deletedAt이 null인 Oauth만 조회한다.
+     */
     @Transactional(readOnly = true)
     public Optional<Oauth> readOauthByOauthIdAndProvider(String oauthId, Provider provider) {
-        return oauthRepository.findByOauthIdAndProvider(oauthId, provider);
+        return oauthRepository.findByOauthIdAndProviderAndDeletedAtIsNull(oauthId, provider);
     }
 
     @Transactional(readOnly = true)
