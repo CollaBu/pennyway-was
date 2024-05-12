@@ -385,7 +385,7 @@ public class UserAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
 
             // then
             result.andExpect(status().isOk()).andDo(print());
-            assertTrue(oauthService.readOauthByOauthIdAndProvider(oauth.getOauthId(), Provider.KAKAO).get().isDeleted());
+            assertNull(oauthService.readOauthByOauthIdAndProvider(oauth.getOauthId(), Provider.KAKAO).orElse(null));
         }
 
         @Test
@@ -403,7 +403,7 @@ public class UserAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
 
             // then
             result.andExpect(status().isOk()).andDo(print());
-            assertTrue(oauthService.readOauthByOauthIdAndProvider(kakao.getOauthId(), Provider.KAKAO).get().isDeleted());
+            assertNull(oauthService.readOauthByOauthIdAndProvider(kakao.getOauthId(), Provider.KAKAO).orElse(null));
         }
 
         private ResultActions performOauthUnlink(Provider provider, User requestUser) throws Exception {

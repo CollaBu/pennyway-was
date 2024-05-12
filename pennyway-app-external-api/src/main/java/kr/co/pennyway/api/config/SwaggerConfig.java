@@ -8,6 +8,7 @@ import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
@@ -40,6 +41,56 @@ public class SwaggerConfig {
                 .addServersItem(new io.swagger.v3.oas.models.servers.Server().url(""))
                 .addSecurityItem(securityRequirement)
                 .components(securitySchemes());
+    }
+
+    @Bean
+    public GroupedOpenApi allApi() {
+        String[] targets = {"kr.co.pennyway.api.apis"};
+
+        return GroupedOpenApi.builder()
+                .packagesToScan(targets)
+                .group("전체 보기")
+                .build();
+    }
+
+    @Bean
+    public GroupedOpenApi authApi() {
+        String[] targets = {"kr.co.pennyway.api.apis.auth"};
+
+        return GroupedOpenApi.builder()
+                .packagesToScan(targets)
+                .group("사용자 인증")
+                .build();
+    }
+
+    @Bean
+    public GroupedOpenApi userApi() {
+        String[] targets = {"kr.co.pennyway.api.apis.users"};
+
+        return GroupedOpenApi.builder()
+                .packagesToScan(targets)
+                .group("사용자 기본 기능")
+                .build();
+    }
+
+    @Bean
+    public GroupedOpenApi ledgerApi() {
+        String[] targets = {"kr.co.pennyway.api.apis.ledger"};
+
+        return GroupedOpenApi.builder()
+                .packagesToScan(targets)
+                .group("지출 관리")
+                .build();
+    }
+
+    @Bean
+    public GroupedOpenApi backOfficeApi() {
+        String[] targets = {"kr.co.pennyway.api.apis.question"};
+
+        return GroupedOpenApi.builder()
+                .packagesToScan(targets)
+                .group("백오피스")
+                .build();
     }
 
     @Bean
