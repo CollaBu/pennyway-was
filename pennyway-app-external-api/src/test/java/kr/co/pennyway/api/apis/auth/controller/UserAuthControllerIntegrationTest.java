@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.Cookie;
 import kr.co.pennyway.api.apis.auth.dto.SignInReq;
 import kr.co.pennyway.api.apis.auth.helper.OauthOidcHelper;
+import kr.co.pennyway.api.common.security.authentication.SecurityUserDetails;
 import kr.co.pennyway.api.common.security.jwt.access.AccessTokenClaim;
 import kr.co.pennyway.api.common.security.jwt.access.AccessTokenProvider;
 import kr.co.pennyway.api.common.security.jwt.refresh.RefreshTokenClaim;
@@ -32,6 +33,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
@@ -42,6 +44,7 @@ import java.time.ZoneId;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -326,16 +329,15 @@ public class UserAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
     class OauthUnlinkTest {
         @Test
         @Order(1)
-        @WithSecurityMockUser(userId = "11")
         @Transactional
         @DisplayName("제공자로 연동한 이력이 존재하지 않으면 404 에러가 발생한다.")
         void unlinkWithNoOauth() throws Exception {
             // given
-            User user = UserFixture.GENERAL_USER.toUser();
-            userService.createUser(user);
+            User user = userService.createUser(UserFixture.GENERAL_USER.toUser());
+            UserDetails userDetails = SecurityUserDetails.from(user);
 
             // when
-            ResultActions result = performOauthUnlink(Provider.KAKAO);
+            ResultActions result = performOauthUnlink(Provider.KAKAO, userDetails);
 
             // then
             result
@@ -347,19 +349,18 @@ public class UserAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
 
         @Test
         @Order(2)
-        @WithSecurityMockUser(userId = "12")
         @Transactional
         @DisplayName("제공자로 연동한 이력이 soft delete 되어 있으면 404 에러가 발생한다.")
         void unlinkWithSoftDeletedOauth() throws Exception {
             // given
-            User user = UserFixture.GENERAL_USER.toUser();
-            userService.createUser(user);
+            User user = userService.createUser(UserFixture.GENERAL_USER.toUser());
+            UserDetails userDetails = SecurityUserDetails.from(user);
 
             Oauth oauth = mappingOauthWithUser(user, Provider.KAKAO);
             oauthService.deleteOauth(oauth);
 
             // when
-            ResultActions result = performOauthUnlink(Provider.KAKAO);
+            ResultActions result = performOauthUnlink(Provider.KAKAO, userDetails);
 
             // then
             result
@@ -376,13 +377,13 @@ public class UserAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
         @DisplayName("연동된 Oauth가 1개이고 일반 회원 이력이 없는 경우에는 409 에러가 발생한다.")
         void unlinkWithOnlyOauthSignedUser() throws Exception {
             // given
-            User user = UserFixture.OAUTH_USER.toUser();
-            userService.createUser(user);
+            User user = userService.createUser(UserFixture.OAUTH_USER.toUser());
+            UserDetails userDetails = SecurityUserDetails.from(user);
 
             mappingOauthWithUser(user, Provider.KAKAO);
 
             // when
-            ResultActions result = performOauthUnlink(Provider.KAKAO);
+            ResultActions result = performOauthUnlink(Provider.KAKAO, userDetails);
 
             // then
             result
@@ -394,18 +395,17 @@ public class UserAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
 
         @Test
         @Order(4)
-        @WithSecurityMockUser(userId = "14")
         @Transactional
         @DisplayName("연동된 Oauth가 1개이고 일반 회원 이력이 있는 경우에는 연동 해제에 성공한다.")
         void unlinkWithGeneralSignedUser() throws Exception {
             // given
-            User user = UserFixture.GENERAL_USER.toUser();
-            userService.createUser(user);
+            User user = userService.createUser(UserFixture.GENERAL_USER.toUser());
+            UserDetails userDetails = SecurityUserDetails.from(user);
 
             Oauth oauth = mappingOauthWithUser(user, Provider.KAKAO);
 
             // when
-            ResultActions result = performOauthUnlink(Provider.KAKAO);
+            ResultActions result = performOauthUnlink(Provider.KAKAO, userDetails);
 
             // then
             result.andExpect(status().isOk()).andDo(print());
@@ -414,27 +414,27 @@ public class UserAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
 
         @Test
         @Order(5)
-        @WithSecurityMockUser(userId = "15")
         @Transactional
         @DisplayName("연동된 Oauth가 2개 이상이고 일반 회원 이력이 없는 경우에는 연동 해제에 성공한다.")
         void unlinkWithMultipleOauthSignedUser() throws Exception {
             // given
-            User user = UserFixture.OAUTH_USER.toUser();
-            userService.createUser(user);
+            User user = userService.createUser(UserFixture.OAUTH_USER.toUser());
+            UserDetails userDetails = SecurityUserDetails.from(user);
 
             Oauth kakao = mappingOauthWithUser(user, Provider.KAKAO);
             Oauth google = mappingOauthWithUser(user, Provider.GOOGLE);
 
             // when
-            ResultActions result = performOauthUnlink(Provider.KAKAO);
+            ResultActions result = performOauthUnlink(Provider.KAKAO, userDetails);
 
             // then
             result.andExpect(status().isOk()).andDo(print());
             assertTrue(oauthService.readOauthByOauthIdAndProvider(kakao.getOauthId(), Provider.KAKAO).get().isDeleted());
         }
 
-        private ResultActions performOauthUnlink(Provider provider) throws Exception {
+        private ResultActions performOauthUnlink(Provider provider, UserDetails userDetails) throws Exception {
             return mockMvc.perform(MockMvcRequestBuilders.delete("/v1/link-oauth")
+                    .with(user(userDetails))
                     .param("provider", provider.name()));
         }
 
