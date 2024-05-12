@@ -57,7 +57,7 @@ public final class SecurityUserDetails implements UserDetails {
 
     @Override
     public String getPassword() {
-        throw new UnsupportedOperationException();
+        return null;
     }
 
     @Override
