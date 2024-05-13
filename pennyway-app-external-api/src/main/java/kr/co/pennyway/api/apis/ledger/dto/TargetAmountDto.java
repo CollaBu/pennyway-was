@@ -24,4 +24,15 @@ public class TargetAmountDto {
     ) {
 
     }
+
+    @Schema(title = "목표 금액 조회 요청 파라미터")
+    public record GetParamReq(
+            @Schema(description = "조회하려는 목표 금액 날짜 (당일)", example = "2024-05-08", requiredMode = Schema.RequiredMode.REQUIRED)
+            @NotNull(message = "date 값은 필수입니다.")
+            @JsonSerialize(using = LocalDateSerializer.class)
+            @JsonFormat(pattern = "yyyy-MM-dd")
+            LocalDate date
+    ) {
+
+    }
 }
