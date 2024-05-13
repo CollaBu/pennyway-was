@@ -17,7 +17,6 @@ public class TargetAmountDto {
             @NotNull(message = "date 값은 필수입니다.")
             @JsonSerialize(using = LocalDateSerializer.class)
             @JsonFormat(pattern = "yyyy-MM-dd")
-            @PastOrPresent(message = "date 값은 과거 또는 현재 날짜여야 합니다.")
             LocalDate date,
             @Schema(description = "등록하려는 목표 금액 (0이상의 정수)", example = "100000", requiredMode = Schema.RequiredMode.REQUIRED)
             @NotNull(message = "amount 값은 필수입니다.")

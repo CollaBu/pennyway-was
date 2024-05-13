@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -29,13 +30,25 @@ public class TargetAmountController implements TargetAmountApi {
     @Override
     @PutMapping("")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> putTargetAmount(@Validated TargetAmountDto.UpdateParamReq request, @AuthenticationPrincipal SecurityUserDetails user) {
-        if (!isValidDateForYearAndMonth(request.date())) {
+    public ResponseEntity<?> putTargetAmount(@Validated TargetAmountDto.UpdateParamReq param, @AuthenticationPrincipal SecurityUserDetails user) {
+        if (!isValidDateForYearAndMonth(param.date())) {
             throw new TargetAmountErrorException(TargetAmountErrorCode.INVALID_TARGET_AMOUNT_DATE);
         }
 
-        targetAmountUseCase.updateTargetAmount(user.getUserId(), request.date(), request.amount());
+        targetAmountUseCase.updateTargetAmount(user.getUserId(), param.date(), param.amount());
         return ResponseEntity.ok(SuccessResponse.noContent());
+    }
+
+    @GetMapping("")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> getTargetAmountAndTotalSpending(@Validated TargetAmountDto.GetParamReq param) {
+        return ResponseEntity.ok(SuccessResponse.from("targetAmount", targetAmountUseCase.getTargetAmountAndTotalSpending(param.date())));
+    }
+
+    @GetMapping
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> getTargetAmountsAndTotalSpendings(@Validated TargetAmountDto.GetParamReq param) {
+        return ResponseEntity.ok(SuccessResponse.from("targetAmounts", targetAmountUseCase.getTargetAmountsAndTotalSpendings(param.date())));
     }
 
     private boolean isValidDateForYearAndMonth(LocalDate date) {
