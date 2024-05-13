@@ -6,6 +6,7 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PastOrPresent;
 
 import java.time.LocalDate;
 
@@ -16,6 +17,7 @@ public class TargetAmountDto {
             @NotNull(message = "date 값은 필수입니다.")
             @JsonSerialize(using = LocalDateSerializer.class)
             @JsonFormat(pattern = "yyyy-MM-dd")
+            @PastOrPresent(message = "date 값은 과거 또는 현재 날짜여야 합니다.")
             LocalDate date,
             @Schema(description = "등록하려는 목표 금액 (0이상의 정수)", example = "100000", requiredMode = Schema.RequiredMode.REQUIRED)
             @NotNull(message = "amount 값은 필수입니다.")
@@ -31,6 +33,7 @@ public class TargetAmountDto {
             @NotNull(message = "date 값은 필수입니다.")
             @JsonSerialize(using = LocalDateSerializer.class)
             @JsonFormat(pattern = "yyyy-MM-dd")
+            @PastOrPresent(message = "date 값은 과거 또는 현재 날짜여야 합니다.")
             LocalDate date
     ) {
 
@@ -42,6 +45,7 @@ public class TargetAmountDto {
             @NotNull(message = "date 값은 필수입니다.")
             @JsonSerialize(using = LocalDateSerializer.class)
             @JsonFormat(pattern = "yyyy-MM-dd")
+            @PastOrPresent(message = "date 값은 과거 또는 현재 날짜여야 합니다.")
             LocalDate date,
             @Schema(description = "목표 금액", example = "50000", requiredMode = Schema.RequiredMode.REQUIRED)
             int targetAmount,
@@ -50,6 +54,6 @@ public class TargetAmountDto {
             @Schema(description = "목표 금액과 총 지출 금액의 차액(총 치줄 금액 - 목표 금액). 양수면 초과, 음수면 절약", example = "-50000", requiredMode = Schema.RequiredMode.REQUIRED)
             int diffAmount
     ) {
-        
+
     }
 }
