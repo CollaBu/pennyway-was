@@ -1,4 +1,4 @@
-package kr.co.pennyway.api.apis.auth.controller;
+package kr.co.pennyway.api.apis.auth.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.pennyway.api.apis.auth.dto.PhoneVerificationDto;

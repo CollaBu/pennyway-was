@@ -101,6 +101,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private UserDetails getUserDetails(String accessToken) {
         JwtClaims claims = accessTokenProvider.getJwtClaimsFromToken(accessToken);
         String userId = (String) claims.getClaims().get(AccessTokenClaimKeys.USER_ID.getValue());
+        log.debug("User ID: {}", userId);
 
         return userDetailService.loadUserByUsername(userId);
     }
