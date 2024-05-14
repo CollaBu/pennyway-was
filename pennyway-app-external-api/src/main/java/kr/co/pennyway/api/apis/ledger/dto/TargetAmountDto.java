@@ -49,11 +49,25 @@ public class TargetAmountDto {
             @NotNull(message = "month 값은 필수입니다.")
             Integer month,
             @Schema(description = "목표 금액", example = "50000", requiredMode = Schema.RequiredMode.REQUIRED)
-            Integer targetAmount,
+            @NotNull(message = "targetAmount 값은 필수입니다.")
+            TargetAmountInfo targetAmount,
             @Schema(description = "총 지출 금액", example = "100000", requiredMode = Schema.RequiredMode.REQUIRED)
+            @NotNull(message = "totalSpending 값은 필수입니다.")
             Integer totalSpending,
             @Schema(description = "목표 금액과 총 지출 금액의 차액(총 치줄 금액 - 목표 금액). 양수면 초과, 음수면 절약", example = "-50000", requiredMode = Schema.RequiredMode.REQUIRED)
             Integer diffAmount
     ) {
+    }
+
+    public record TargetAmountInfo(
+            @Schema(description = "목표 금액 pk. 실제 저장된 데이터가 아니라면 -1", example = "1", requiredMode = Schema.RequiredMode.REQUIRED)
+            Long id,
+            @Schema(description = "목표 금액. -1이면 설정한 목표 금액이 존재하지 않음을 의미한다.", example = "50000", requiredMode = Schema.RequiredMode.REQUIRED)
+            @NotNull(message = "amount 값은 필수입니다.")
+            Integer amount
+    ) {
+        public static TargetAmountInfo of(Long id, Integer amount) {
+            return new TargetAmountInfo(id, amount);
+        }
     }
 }
