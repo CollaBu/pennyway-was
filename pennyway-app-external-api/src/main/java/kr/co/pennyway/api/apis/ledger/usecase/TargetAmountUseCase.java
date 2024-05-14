@@ -6,6 +6,7 @@ import kr.co.pennyway.api.apis.ledger.service.TargetAmountSaveService;
 import kr.co.pennyway.common.annotation.UseCase;
 import kr.co.pennyway.domain.domains.spending.dto.TotalSpendingAmount;
 import kr.co.pennyway.domain.domains.spending.service.SpendingService;
+import kr.co.pennyway.domain.domains.target.domain.TargetAmount;
 import kr.co.pennyway.domain.domains.target.service.TargetAmountService;
 import kr.co.pennyway.domain.domains.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -33,21 +34,24 @@ public class TargetAmountUseCase {
 
     @Transactional(readOnly = true)
     public TargetAmountDto.GetResponse getTargetAmountAndTotalSpending(Long userId, LocalDate date) {
+        TargetAmount targetAmount = targetAmountService.readTargetAmountThatMonth(userId, date).orElse(null); // TODO: null 처리 다른 방식으로 해결
         TotalSpendingAmount totalSpending = spendingService.readTotalSpendingAmountByUserId(userId, date);
+
+        log.info("{}", targetAmount);
         log.info("{}", totalSpending);
 
-        return null;
+        return TargetAmountMapper.toGetResponse(targetAmount, totalSpending);
     }
 
     @Transactional(readOnly = true)
     public List<?> getTargetAmountsAndTotalSpendings(Long userId) {
-        List<TotalSpendingAmount> totalSpending = spendingService.readTotalSpendingsAmountByUserId(userId);
-        //
+        List<TargetAmount> targetAmounts = targetAmountService.readTargetAmountsByUserId(userId);
+        List<TotalSpendingAmount> totalSpendings = spendingService.readTotalSpendingsAmountByUserId(userId);
 
-        for (TotalSpendingAmount spending : totalSpending) {
+        for (TotalSpendingAmount spending : totalSpendings) {
             log.info("{}", spending);
         }
 
-        return totalSpending;
+        return TargetAmountMapper.toGetResponses(targetAmounts, totalSpendings);
     }
 }
