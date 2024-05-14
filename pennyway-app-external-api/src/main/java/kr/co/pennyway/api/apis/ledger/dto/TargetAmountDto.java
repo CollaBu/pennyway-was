@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
+import kr.co.pennyway.domain.domains.target.domain.TargetAmount;
 import lombok.Builder;
 
 import java.time.LocalDate;
@@ -61,13 +62,27 @@ public class TargetAmountDto {
 
     public record TargetAmountInfo(
             @Schema(description = "목표 금액 pk. 실제 저장된 데이터가 아니라면 -1", example = "1", requiredMode = Schema.RequiredMode.REQUIRED)
+            @NotNull(message = "id 값은 필수입니다.")
             Long id,
             @Schema(description = "목표 금액. -1이면 설정한 목표 금액이 존재하지 않음을 의미한다.", example = "50000", requiredMode = Schema.RequiredMode.REQUIRED)
             @NotNull(message = "amount 값은 필수입니다.")
             Integer amount
     ) {
-        public static TargetAmountInfo of(Long id, Integer amount) {
-            return new TargetAmountInfo(id, amount);
+        public TargetAmountInfo {
+            if (id == null) {
+                id = -1L;
+            }
+
+            if (amount == null) {
+                amount = -1;
+            }
+        }
+
+        public static TargetAmountInfo from(TargetAmount targetAmount) {
+            if (targetAmount == null) {
+                return new TargetAmountInfo(-1L, -1);
+            }
+            return new TargetAmountInfo(targetAmount.getId(), targetAmount.getAmount());
         }
     }
 }
