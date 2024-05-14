@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
+import lombok.Builder;
 
 import java.time.LocalDate;
 
@@ -38,21 +39,21 @@ public class TargetAmountDto {
 
     }
 
-    @Schema(title = "목표 금액 조회 응답")
-    public record GetResponse(
-            @Schema(description = "목표 금액 날짜", example = "2024-05-08", requiredMode = Schema.RequiredMode.REQUIRED)
-            @NotNull(message = "date 값은 필수입니다.")
-            @JsonSerialize(using = LocalDateSerializer.class)
-            @JsonFormat(pattern = "yyyy-MM-dd")
-            @PastOrPresent(message = "date 값은 과거 또는 현재 날짜여야 합니다.")
-            LocalDate date,
+    @Builder
+    @Schema(title = "목표 금액 및 총 지출 금액 조회 응답")
+    public record WithTotalSpendingRes(
+            @Schema(description = "조회 년도", example = "2024", requiredMode = Schema.RequiredMode.REQUIRED)
+            @NotNull(message = "year 값은 필수입니다.")
+            Integer year,
+            @Schema(description = "조회 월", example = "5", requiredMode = Schema.RequiredMode.REQUIRED)
+            @NotNull(message = "month 값은 필수입니다.")
+            Integer month,
             @Schema(description = "목표 금액", example = "50000", requiredMode = Schema.RequiredMode.REQUIRED)
-            int targetAmount,
+            Integer targetAmount,
             @Schema(description = "총 지출 금액", example = "100000", requiredMode = Schema.RequiredMode.REQUIRED)
-            int totalSpending,
+            Integer totalSpending,
             @Schema(description = "목표 금액과 총 지출 금액의 차액(총 치줄 금액 - 목표 금액). 양수면 초과, 음수면 절약", example = "-50000", requiredMode = Schema.RequiredMode.REQUIRED)
-            int diffAmount
+            Integer diffAmount
     ) {
-
     }
 }
