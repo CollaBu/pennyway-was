@@ -52,11 +52,12 @@ public enum UserFixture {
     public static void updateUserCreatedAt(User user, LocalDateTime createdAt, NamedParameterJdbcTemplate jdbcTemplate) {
         String sql = "UPDATE user SET created_at = :createdAt WHERE id = :id";
 
-        SqlParameterSource param = new MapSqlParameterSource()
+        SqlParameterSource[] params = new SqlParameterSource[1];
+        params[0] = new MapSqlParameterSource()
                 .addValue("createdAt", createdAt)
                 .addValue("id", user.getId());
 
-        jdbcTemplate.update(sql, param);
+        jdbcTemplate.batchUpdate(sql, params);
     }
 
     public User toUser() {

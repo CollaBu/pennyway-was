@@ -56,6 +56,7 @@ public class SpendingFixture {
         int year = ThreadLocalRandom.current().nextInt(startAt.getYear(), endAt.getYear() + 1);
         int month = (year == endAt.getYear()) ? ThreadLocalRandom.current().nextInt(1, endAt.getMonthValue() + 1) : ThreadLocalRandom.current().nextInt(1, 13);
         int day = ThreadLocalRandom.current().nextInt(1, 29);
+        
         return LocalDateTime.of(year, month, day, 0, 0, 0);
     }
 

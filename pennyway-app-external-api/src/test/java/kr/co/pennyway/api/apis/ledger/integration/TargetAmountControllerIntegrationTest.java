@@ -1,6 +1,7 @@
 package kr.co.pennyway.api.apis.ledger.integration;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import kr.co.pennyway.api.common.security.authentication.SecurityUserDetails;
 import kr.co.pennyway.api.config.ExternalApiDBTestConfig;
 import kr.co.pennyway.api.config.ExternalApiIntegrationTest;
@@ -21,6 +22,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -34,11 +36,22 @@ public class TargetAmountControllerIntegrationTest extends ExternalApiDBTestConf
     @Autowired
     private MockMvc mockMvc;
     @Autowired
-    private ObjectMapper objectMapper;
-    @Autowired
     private NamedParameterJdbcTemplate jdbcTemplate;
     @Autowired
     private UserService userService;
+    @PersistenceContext
+    private EntityManager em;
+
+    private User createUserWithCreatedAt(LocalDateTime createdAt, NamedParameterJdbcTemplate jdbcTemplate) {
+        User user = userService.createUser(UserFixture.GENERAL_USER.toUser());
+        Long userId = user.getId();
+
+        UserFixture.updateUserCreatedAt(user, createdAt, jdbcTemplate);
+        em.flush();
+        em.clear();
+
+        return userService.readUser(userId).orElseThrow();
+    }
 
     @Order(1)
     @Nested
@@ -49,8 +62,7 @@ public class TargetAmountControllerIntegrationTest extends ExternalApiDBTestConf
         @Transactional
         void getTargetAmountAndTotalSpending() throws Exception {
             // given
-            User user = userService.createUser(UserFixture.GENERAL_USER.toUser());
-            UserFixture.updateUserCreatedAt(user, user.getCreatedAt().minusMonths(10), jdbcTemplate);
+            User user = createUserWithCreatedAt(LocalDateTime.now().minusYears(2), jdbcTemplate);
             SpendingFixture.bulkInsertSpending(user, 300, jdbcTemplate);
             TargetAmountFixture.bulkInsertTargetAmount(user, jdbcTemplate);
 
@@ -72,15 +84,14 @@ public class TargetAmountControllerIntegrationTest extends ExternalApiDBTestConf
 
     @Order(2)
     @Nested
-    @DisplayName("사용자 목표 금액 및 지출 총합 조회")
+    @DisplayName("사용자 목표 금액 및 지출 총합 전체 기록 조회")
     class GetTargetAmountsAndTotalSpendings {
         @Test
         @DisplayName("사용자 목표 금액 및 지출 총합 조회")
         @Transactional
         void getTargetAmountsAndTotalSpendings() throws Exception {
             // given
-            User user = userService.createUser(UserFixture.GENERAL_USER.toUser());
-            UserFixture.updateUserCreatedAt(user, user.getCreatedAt().minusMonths(10), jdbcTemplate);
+            User user = createUserWithCreatedAt(LocalDateTime.now().minusYears(2).plusMonths(2), jdbcTemplate);
             SpendingFixture.bulkInsertSpending(user, 300, jdbcTemplate);
             TargetAmountFixture.bulkInsertTargetAmount(user, jdbcTemplate);
 

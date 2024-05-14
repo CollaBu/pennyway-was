@@ -1,7 +1,7 @@
 package kr.co.pennyway.api.config.fixture;
 
 import kr.co.pennyway.domain.domains.user.domain.User;
-import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 
@@ -23,7 +23,11 @@ public class TargetAmountFixture {
                 VALUES (:amount, :userId, :createdAt, :updatedAt)
                 """, TARGET_AMOUNT_TABLE);
         SqlParameterSource[] params = targetAmounts.stream()
-                .map(BeanPropertySqlParameterSource::new)
+                .map(mockTargetAmount -> new MapSqlParameterSource()
+                        .addValue("amount", mockTargetAmount.amount)
+                        .addValue("userId", mockTargetAmount.userId)
+                        .addValue("createdAt", mockTargetAmount.createdAt)
+                        .addValue("updatedAt", mockTargetAmount.updatedAt))
                 .toArray(SqlParameterSource[]::new);
         jdbcTemplate.batchUpdate(sql, params);
     }
@@ -34,9 +38,9 @@ public class TargetAmountFixture {
     private static List<MockTargetAmount> getRandomTargetAmounts(User user) {
         List<MockTargetAmount> targetAmounts = new ArrayList<>();
         LocalDate startAt = user.getCreatedAt().toLocalDate(), endAt = LocalDate.now();
-        int monthLength = startAt.until(endAt.plusMonths(1)).getMonths();
+        int monthLength = (endAt.getYear() - startAt.getYear()) * 12 + (endAt.getMonthValue() - startAt.getMonthValue());
 
-        for (int i = 0; i < monthLength; i += 2) {
+        for (int i = 0; i < monthLength + 1; i += 2) {
             targetAmounts.add(MockTargetAmount.of(
                     ThreadLocalRandom.current().nextInt(100, 10000001),
                     LocalDateTime.of(startAt.plusMonths(i).getYear(), startAt.plusMonths(i).getMonth(), 1, 0, 0, 0),
