@@ -18,6 +18,7 @@ import java.time.LocalDate;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Slf4j
 @DomainService
@@ -39,7 +40,7 @@ public class SpendingService {
     }
 
     @Transactional(readOnly = true)
-    public TotalSpendingAmount readTotalSpendingAmountByUserId(Long userId, LocalDate date) {
+    public Optional<TotalSpendingAmount> readTotalSpendingAmountByUserId(Long userId, LocalDate date) {
         return spendingRepository.findTotalSpendingAmountByUserId(userId, date.getYear(), date.getMonthValue());
     }
 

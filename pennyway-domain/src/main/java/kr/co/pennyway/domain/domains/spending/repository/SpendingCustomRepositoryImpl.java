@@ -8,6 +8,8 @@ import kr.co.pennyway.domain.domains.user.domain.QUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 @RequiredArgsConstructor
 public class SpendingCustomRepositoryImpl implements SpendingCustomRepository {
@@ -17,8 +19,8 @@ public class SpendingCustomRepositoryImpl implements SpendingCustomRepository {
     private final QSpending spending = QSpending.spending;
 
     @Override
-    public TotalSpendingAmount findTotalSpendingAmountByUserId(Long userId, int year, int month) {
-        return queryFactory.select(
+    public Optional<TotalSpendingAmount> findTotalSpendingAmountByUserId(Long userId, int year, int month) {
+        TotalSpendingAmount result = queryFactory.select(
                         Projections.constructor(
                                 TotalSpendingAmount.class,
                                 spending.spendAt.year(),
@@ -31,5 +33,7 @@ public class SpendingCustomRepositoryImpl implements SpendingCustomRepository {
                         .and(spending.spendAt.year().eq(year))
                         .and(spending.spendAt.month().eq(month)))
                 .fetchOne();
+
+        return Optional.ofNullable(result);
     }
 }
