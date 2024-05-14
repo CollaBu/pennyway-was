@@ -1,6 +1,7 @@
 package kr.co.pennyway.api.apis.ledger.usecase;
 
 import kr.co.pennyway.api.apis.ledger.dto.TargetAmountDto;
+import kr.co.pennyway.api.apis.ledger.mapper.TargetAmountMapper;
 import kr.co.pennyway.api.apis.ledger.service.SpendingSearchService;
 import kr.co.pennyway.api.apis.ledger.service.TargetAmountSaveService;
 import kr.co.pennyway.common.annotation.UseCase;
@@ -15,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @UseCase
@@ -33,18 +35,18 @@ public class TargetAmountUseCase {
     }
 
     @Transactional(readOnly = true)
-    public TargetAmountDto.GetResponse getTargetAmountAndTotalSpending(Long userId, LocalDate date) {
-        TargetAmount targetAmount = targetAmountService.readTargetAmountThatMonth(userId, date).orElse(null); // TODO: null 처리 다른 방식으로 해결
-        TotalSpendingAmount totalSpending = spendingService.readTotalSpendingAmountByUserId(userId, date);
+    public TargetAmountDto.WithTotalSpendingRes getTargetAmountAndTotalSpending(Long userId, LocalDate date) {
+        Optional<TargetAmount> targetAmount = targetAmountService.readTargetAmountThatMonth(userId, date); // TODO: null 처리 다른 방식으로 해결
+        Optional<TotalSpendingAmount> totalSpending = spendingService.readTotalSpendingAmountByUserId(userId, date);
 
-        log.info("{}", targetAmount);
-        log.info("{}", totalSpending);
+        log.info("targetAmount {}", targetAmount);
+        log.info("totalSpending {}", totalSpending);
 
-        return TargetAmountMapper.toGetResponse(targetAmount, totalSpending);
+        return TargetAmountMapper.toWithTotalSpendingRes(targetAmount, totalSpending, date);
     }
 
     @Transactional(readOnly = true)
-    public List<?> getTargetAmountsAndTotalSpendings(Long userId) {
+    public List<TargetAmountDto.WithTotalSpendingRes> getTargetAmountsAndTotalSpendings(Long userId) {
         List<TargetAmount> targetAmounts = targetAmountService.readTargetAmountsByUserId(userId);
         List<TotalSpendingAmount> totalSpendings = spendingService.readTotalSpendingsAmountByUserId(userId);
 
@@ -52,6 +54,6 @@ public class TargetAmountUseCase {
             log.info("{}", spending);
         }
 
-        return TargetAmountMapper.toGetResponses(targetAmounts, totalSpendings);
+        return TargetAmountMapper.toWithTotalSpendingsRes(targetAmounts, totalSpendings);
     }
 }
