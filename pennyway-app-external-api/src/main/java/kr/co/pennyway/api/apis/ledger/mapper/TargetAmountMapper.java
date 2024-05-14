@@ -36,7 +36,7 @@ public class TargetAmountMapper {
      * TargetAmount와 TotalSpendingAmount를 이용하여 WithTotalSpendingRes 리스트를 생성한다. <br/>
      * startAt부터 endAt까지의 날짜에 대한 WithTotalSpendingRes를 생성하며, 임의의 날짜에 대한 정보가 없을 경우 더미 데이터를 생성한다.
      *
-     * @param startAt : 조회 시작 날짜. 이유가 없다면 사용자 생성 날짜
+     * @param startAt : 조회 시작 날짜. 이유가 없다면 사용자 생성 날짜를 사용한다.
      * @param endAt   : 조회 종료 날짜. 이유가 없다면 현재 날짜이며, 클라이언트로 부터 받은 날짜를 사용한다.
      */
     public static List<TargetAmountDto.WithTotalSpendingRes> toWithTotalSpendingResponses(List<TargetAmount> targetAmounts, List<TotalSpendingAmount> totalSpendings, LocalDate startAt, LocalDate endAt) {
