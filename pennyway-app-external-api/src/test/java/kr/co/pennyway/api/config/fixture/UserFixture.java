@@ -5,7 +5,11 @@ import kr.co.pennyway.api.common.security.authentication.SecurityUserDetails;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.type.ProfileVisibility;
 import kr.co.pennyway.domain.domains.user.type.Role;
+import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public enum UserFixture {
@@ -52,5 +56,21 @@ public enum UserFixture {
                 .profileVisibility(profileVisibility)
                 .locked(locked)
                 .build();
+    }
+
+    /**
+     * 사용자의 가입일을 지정하여 DB에 저장하는 메서드
+     *
+     * @param joinedAt LocalDateTime : 가입일
+     */
+    public User insertUserJoinedAt(User user, LocalDateTime joinedAt, NamedParameterJdbcTemplate jdbcTemplate) {
+        String sql = String.format("""
+                INSERT INTO `user` (id, username, name, password, password_updated_at, profile_image_url, phone, role, profile_visibility, locked, created_at, updated_at, deleted_at, account_book_notify, feed_notify, chat_notify)
+                VALUES (:id, :username, :name, :password, %s, NULL, :phone, '1', '0', :locked, %s, NOW(), NULL, 1, 1, 1)
+                """, joinedAt, joinedAt);
+        SqlParameterSource param = new BeanPropertySqlParameterSource(user);
+        jdbcTemplate.update(sql, param);
+
+        return user;
     }
 }
