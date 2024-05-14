@@ -78,6 +78,10 @@ public class TargetAmountDto {
             }
         }
 
+        /**
+         * {@link TargetAmount} -> {@link TargetAmountInfo} 변환하는 메서드 <br/>
+         * 만약, 인자로 들어온 값이 null이라면 모든 값을 -1로 초기화한 더미 데이터를 반환한다.
+         */
         public static TargetAmountInfo from(TargetAmount targetAmount) {
             if (targetAmount == null) {
                 return new TargetAmountInfo(-1L, -1);
