@@ -1,5 +1,6 @@
 package kr.co.pennyway.api.apis.users.usecase;
 
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import kr.co.pennyway.api.apis.users.dto.DeviceDto;
 import kr.co.pennyway.api.apis.users.helper.PasswordEncoderHelper;
 import kr.co.pennyway.api.apis.users.service.DeviceRegisterService;
@@ -29,7 +30,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -47,7 +47,6 @@ import static org.springframework.test.util.AssertionErrors.*;
         JpaConfig.class, UserAccountUseCase.class, DeviceRegisterService.class, UserProfileUpdateService.class, UserDeleteService.class,
         UserService.class, DeviceService.class, OauthService.class})
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@ActiveProfiles("test")
 @TestClassOrder(ClassOrderer.OrderAnnotation.class)
 class UserAccountUseCaseTest extends ExternalApiDBTestConfig {
     @Autowired
@@ -64,6 +63,9 @@ class UserAccountUseCaseTest extends ExternalApiDBTestConfig {
 
     @MockBean
     private PasswordEncoderHelper passwordEncoderHelper;
+
+    @MockBean
+    private JPAQueryFactory queryFactory;
 
     @Order(1)
     @Nested
