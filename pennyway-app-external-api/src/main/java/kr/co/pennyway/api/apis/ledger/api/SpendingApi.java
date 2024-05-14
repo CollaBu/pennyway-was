@@ -17,6 +17,7 @@ import kr.co.pennyway.api.common.security.authentication.SecurityUserDetails;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -59,4 +60,30 @@ public interface SpendingApi {
     })
     @ApiResponse(responseCode = "200", content = @Content(schemaProperties = @SchemaProperty(name = "spendings", schema = @Schema(implementation = SpendingSearchRes.Month.class))))
     ResponseEntity<?> getSpendingListAtYearAndMonth(@RequestParam("year") int year, @RequestParam("date") int month, @AuthenticationPrincipal SecurityUserDetails user);
+
+    @Operation(summary = "지출 내역 상세 조회", method = "GET", description = "지출 내역의 ID값으로 해당 지출의 상세 내역을 반환합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", content = @Content(schemaProperties = @SchemaProperty(name = "spending", schema = @Schema(implementation = SpendingSearchRes.Individual.class)))),
+            @ApiResponse(responseCode = "403", description = "FORBIDDEN", content = @Content(examples = {
+                    @ExampleObject(name = "지출 상세 내역 권한 오류",
+                            value = """
+                                    {
+                                    "code" : "4030",
+                                    "message" : "접근할 수 없는 지출 내역입니다."
+                                    }
+                                    """
+                    )
+            })),
+            @ApiResponse(responseCode = "404", description = "NOT_FOUND", content = @Content(examples = {
+                    @ExampleObject(name = "지출 내역 조회 오류",
+                            value = """
+                                    {
+                                    "code": "4040",
+                                    "message": "존재하지 않는 지출 내역입니다."
+                                    }
+                                    """
+                    )
+            }))
+    })
+    ResponseEntity<?> getSpendingDetail(@PathVariable Long spendingId, @AuthenticationPrincipal SecurityUserDetails user);
 }
