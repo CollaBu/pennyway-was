@@ -51,7 +51,7 @@ public class SpendingService {
         QueryHandler queryHandler = query -> query.leftJoin(spending).on(user.id.eq(spending.user.id))
                 .groupBy(spending.spendAt.year(), spending.spendAt.month());
 
-        Sort sort = Sort.by(Sort.Order.desc("spendAt"));
+        Sort sort = Sort.by(Sort.Order.desc("year(spendAt)"), Sort.Order.desc("month(spendAt)"));
 
         Map<String, Expression<?>> bindings = new LinkedHashMap<>();
         bindings.put("year", spending.spendAt.year());

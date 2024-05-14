@@ -69,4 +69,35 @@ public class TargetAmountControllerIntegrationTest extends ExternalApiDBTestConf
                     .with(user(userDetails)));
         }
     }
+
+    @Order(2)
+    @Nested
+    @DisplayName("사용자 목표 금액 및 지출 총합 조회")
+    class GetTargetAmountsAndTotalSpendings {
+        @Test
+        @DisplayName("사용자 목표 금액 및 지출 총합 조회")
+        @Transactional
+        void getTargetAmountsAndTotalSpendings() throws Exception {
+            // given
+            User user = userService.createUser(UserFixture.GENERAL_USER.toUser());
+            UserFixture.updateUserCreatedAt(user, user.getCreatedAt().minusMonths(10), jdbcTemplate);
+            SpendingFixture.bulkInsertSpending(user, 300, jdbcTemplate);
+            TargetAmountFixture.bulkInsertTargetAmount(user, jdbcTemplate);
+
+            // when
+            ResultActions result = performGetTargetAmountsAndTotalSpendings(user, LocalDate.now());
+
+            // then
+            result.andDo(print())
+                    .andExpect(status().isOk());
+        }
+
+        private ResultActions performGetTargetAmountsAndTotalSpendings(User requestUser, LocalDate date) throws Exception {
+            UserDetails userDetails = SecurityUserDetails.from(requestUser);
+
+            return mockMvc.perform(MockMvcRequestBuilders.get("/v2/targets")
+                    .with(user(userDetails))
+                    .param("date", date.toString()));
+        }
+    }
 }
