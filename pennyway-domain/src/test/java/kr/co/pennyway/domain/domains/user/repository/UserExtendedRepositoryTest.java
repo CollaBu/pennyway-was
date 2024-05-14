@@ -5,6 +5,7 @@ import com.querydsl.core.types.Predicate;
 import kr.co.pennyway.domain.common.repository.QueryHandler;
 import kr.co.pennyway.domain.config.ContainerMySqlTestConfig;
 import kr.co.pennyway.domain.config.JpaConfig;
+import kr.co.pennyway.domain.config.TestJpaConfig;
 import kr.co.pennyway.domain.domains.oauth.domain.Oauth;
 import kr.co.pennyway.domain.domains.oauth.domain.QOauth;
 import kr.co.pennyway.domain.domains.oauth.type.Provider;
@@ -22,6 +23,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -39,10 +41,11 @@ import static java.time.LocalDateTime.now;
 import static org.springframework.test.util.AssertionErrors.*;
 
 @Slf4j
-@DataJpaTest(properties = {"spring.jpa.hibernate.ddl-auto=create", "logging.level.org.springframework.jdbc=debug"})
-@ContextConfiguration(classes = JpaConfig.class)
+@DataJpaTest(properties = {"spring.jpa.hibernate.ddl-auto=create"})
+@ContextConfiguration(classes = {JpaConfig.class})
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ActiveProfiles("test")
+@Import(TestJpaConfig.class)
 public class UserExtendedRepositoryTest extends ContainerMySqlTestConfig {
     private static final String USER_TABLE = "user";
     private static final String OAUTH_TABLE = "oauth";

@@ -1,5 +1,6 @@
 package kr.co.pennyway.domain.domains.oauth.repository;
 
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import kr.co.pennyway.domain.config.ContainerMySqlTestConfig;
 import kr.co.pennyway.domain.config.JpaConfig;
 import kr.co.pennyway.domain.domains.oauth.domain.Oauth;
@@ -14,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +33,9 @@ public class OauthRepositoryTest extends ContainerMySqlTestConfig {
 
     @Autowired
     private OauthRepository oauthRepository;
+
+    @MockBean
+    private JPAQueryFactory jpaQueryFactory;
 
     @Test
     @DisplayName("soft delete된 다른 user_id를 가지면서, 같은 oauth_id, provider를 갖는 정보가 존재해도, 하나의 결과만을 반환한다.")
