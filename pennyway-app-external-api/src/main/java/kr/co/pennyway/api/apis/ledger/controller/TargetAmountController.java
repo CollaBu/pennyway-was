@@ -36,12 +36,14 @@ public class TargetAmountController implements TargetAmountApi {
         return ResponseEntity.ok(SuccessResponse.noContent());
     }
 
+    @Override
     @GetMapping("/{date}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> getTargetAmountAndTotalSpending(@PathVariable LocalDate date, @AuthenticationPrincipal SecurityUserDetails user) {
         return ResponseEntity.ok(SuccessResponse.from("targetAmount", targetAmountUseCase.getTargetAmountAndTotalSpending(user.getUserId(), date)));
     }
 
+    @Override
     @GetMapping("")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> getTargetAmountsAndTotalSpendings(@Validated TargetAmountDto.GetParamReq param, @AuthenticationPrincipal SecurityUserDetails user) {

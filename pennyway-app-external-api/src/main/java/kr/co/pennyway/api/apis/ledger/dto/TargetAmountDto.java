@@ -49,7 +49,7 @@ public class TargetAmountDto {
             @Schema(description = "조회 월", example = "5", requiredMode = Schema.RequiredMode.REQUIRED)
             @NotNull(message = "month 값은 필수입니다.")
             Integer month,
-            @Schema(description = "목표 금액", example = "50000", requiredMode = Schema.RequiredMode.REQUIRED)
+            @Schema(description = "목표 금액", requiredMode = Schema.RequiredMode.REQUIRED)
             @NotNull(message = "targetAmount 값은 필수입니다.")
             TargetAmountInfo targetAmount,
             @Schema(description = "총 지출 금액", example = "100000", requiredMode = Schema.RequiredMode.REQUIRED)
@@ -61,6 +61,7 @@ public class TargetAmountDto {
     ) {
     }
 
+    @Schema(title = "목표 금액 상세 정보")
     public record TargetAmountInfo(
             @Schema(description = "목표 금액 pk. 실제 저장된 데이터가 아니라면 -1", example = "1", requiredMode = Schema.RequiredMode.REQUIRED)
             @NotNull(message = "id 값은 필수입니다.")
