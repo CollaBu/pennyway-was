@@ -37,7 +37,7 @@ public class SpendingFixture {
             spending.add(Spending.builder()
                     .amount(ThreadLocalRandom.current().nextInt(100, 10000001))
                     .category(SpendingCategory.FOOD)
-                    .spendAt(getRandomSpendAt())
+                    .spendAt(getRandomSpendAt(user))
                     .accountName(getRandomAccountName())
                     .memo((i % 5 == 0) ? "메모" : null)
                     .user(user)
@@ -49,10 +49,13 @@ public class SpendingFixture {
         return spending;
     }
 
-    private static LocalDateTime getRandomSpendAt() {
-        LocalDate now = LocalDate.now();
-        int year = now.getYear(), month = now.getMonthValue();
-        int day = ThreadLocalRandom.current().nextInt(1, now.lengthOfMonth() + 1);
+    private static LocalDateTime getRandomSpendAt(User user) {
+        LocalDate startAt = user.getCreatedAt().toLocalDate();
+        LocalDate endAt = LocalDate.now();
+
+        int year = ThreadLocalRandom.current().nextInt(startAt.getYear(), endAt.getYear() + 1);
+        int month = (year == endAt.getYear()) ? ThreadLocalRandom.current().nextInt(1, endAt.getMonthValue() + 1) : ThreadLocalRandom.current().nextInt(1, 13);
+        int day = ThreadLocalRandom.current().nextInt(1, 29);
         return LocalDateTime.of(year, month, day, 0, 0, 0);
     }
 
