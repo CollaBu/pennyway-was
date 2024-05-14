@@ -39,28 +39,19 @@ public class TargetAmountUseCase {
 
     @Transactional(readOnly = true)
     public TargetAmountDto.WithTotalSpendingRes getTargetAmountAndTotalSpending(Long userId, LocalDate date) {
-        Optional<TargetAmount> targetAmount = targetAmountService.readTargetAmountThatMonth(userId, date); // TODO: null 처리 다른 방식으로 해결
+        Optional<TargetAmount> targetAmount = targetAmountService.readTargetAmountThatMonth(userId, date);
         Optional<TotalSpendingAmount> totalSpending = spendingService.readTotalSpendingAmountByUserId(userId, date);
 
-        log.info("targetAmount {}", targetAmount);
-        log.info("totalSpending {}", totalSpending);
-
-        return TargetAmountMapper.toWithTotalSpendingRes(targetAmount, totalSpending, date);
+        return TargetAmountMapper.toWithTotalSpendingResponse(targetAmount.orElse(null), totalSpending.orElse(null), date);
     }
 
     @Transactional(readOnly = true)
     public List<TargetAmountDto.WithTotalSpendingRes> getTargetAmountsAndTotalSpendings(Long userId, LocalDate date) {
-        User user = userService.readUser(userId).orElseThrow(
-                () -> new UserErrorException(UserErrorCode.NOT_FOUND)
-        );
+        User user = userService.readUser(userId).orElseThrow(() -> new UserErrorException(UserErrorCode.NOT_FOUND));
 
         List<TargetAmount> targetAmounts = targetAmountService.readTargetAmountsByUserId(userId);
         List<TotalSpendingAmount> totalSpendings = spendingService.readTotalSpendingsAmountByUserId(userId);
 
-        for (TotalSpendingAmount spending : totalSpendings) {
-            log.info("{}", spending);
-        }
-
-        return TargetAmountMapper.toWithTotalSpendingsRes(targetAmounts, totalSpendings, user.getCreatedAt().toLocalDate(), date);
+        return TargetAmountMapper.toWithTotalSpendingResponses(targetAmounts, totalSpendings, user.getCreatedAt().toLocalDate(), date);
     }
 }
