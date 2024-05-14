@@ -39,16 +39,16 @@ public class TargetAmountController implements TargetAmountApi {
         return ResponseEntity.ok(SuccessResponse.noContent());
     }
 
-    @GetMapping("")
+    @GetMapping("/today")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> getTargetAmountAndTotalSpending(@Validated TargetAmountDto.GetParamReq param) {
-        return ResponseEntity.ok(SuccessResponse.from("targetAmount", targetAmountUseCase.getTargetAmountAndTotalSpending(param.date())));
+    public ResponseEntity<?> getTargetAmountAndTotalSpending(@Validated TargetAmountDto.GetParamReq param, @AuthenticationPrincipal SecurityUserDetails user) {
+        return ResponseEntity.ok(SuccessResponse.from(targetAmountUseCase.getTargetAmountAndTotalSpending(user.getUserId(), param.date())));
     }
 
-    @GetMapping
+    @GetMapping("")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> getTargetAmountsAndTotalSpendings(@Validated TargetAmountDto.GetParamReq param) {
-        return ResponseEntity.ok(SuccessResponse.from("targetAmounts", targetAmountUseCase.getTargetAmountsAndTotalSpendings(param.date())));
+    public ResponseEntity<?> getTargetAmountsAndTotalSpendings(@AuthenticationPrincipal SecurityUserDetails user) {
+        return ResponseEntity.ok(SuccessResponse.from("targetAmounts", targetAmountUseCase.getTargetAmountsAndTotalSpendings(user.getUserId())));
     }
 
     private boolean isValidDateForYearAndMonth(LocalDate date) {
