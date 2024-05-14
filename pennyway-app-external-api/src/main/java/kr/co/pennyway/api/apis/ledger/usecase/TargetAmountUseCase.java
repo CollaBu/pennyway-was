@@ -2,7 +2,6 @@ package kr.co.pennyway.api.apis.ledger.usecase;
 
 import kr.co.pennyway.api.apis.ledger.dto.TargetAmountDto;
 import kr.co.pennyway.api.apis.ledger.mapper.TargetAmountMapper;
-import kr.co.pennyway.api.apis.ledger.service.SpendingSearchService;
 import kr.co.pennyway.api.apis.ledger.service.TargetAmountSaveService;
 import kr.co.pennyway.common.annotation.UseCase;
 import kr.co.pennyway.domain.domains.spending.dto.TotalSpendingAmount;
@@ -30,7 +29,6 @@ public class TargetAmountUseCase {
     private final SpendingService spendingService;
 
     private final TargetAmountSaveService targetAmountSaveService;
-    private final SpendingSearchService spendingSearchService;
 
     @Transactional
     public void updateTargetAmount(Long userId, LocalDate date, Integer amount) {
