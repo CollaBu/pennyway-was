@@ -11,6 +11,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @DomainService
@@ -26,5 +27,10 @@ public class SpendingService {
     @Transactional(readOnly = true)
     public List<Spending> readSpendings(Predicate predicate, QueryHandler queryHandler, Sort sort) {
         return spendingRepository.findList(predicate, queryHandler, sort);
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<Spending> readSpending(Long spendingId) {
+        return spendingRepository.findById(spendingId);
     }
 }
