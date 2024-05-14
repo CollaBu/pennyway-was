@@ -32,6 +32,7 @@ public class SpendingCustomRepositoryImpl implements SpendingCustomRepository {
                 .where(user.id.eq(userId)
                         .and(spending.spendAt.year().eq(year))
                         .and(spending.spendAt.month().eq(month)))
+                .groupBy(spending.spendAt.year(), spending.spendAt.month())
                 .fetchOne();
 
         return Optional.ofNullable(result);
