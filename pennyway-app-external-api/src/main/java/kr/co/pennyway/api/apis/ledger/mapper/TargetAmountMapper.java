@@ -40,7 +40,7 @@ public class TargetAmountMapper {
      * @param endAt   : 조회 종료 날짜. 이유가 없다면 현재 날짜이며, 클라이언트로 부터 받은 날짜를 사용한다.
      */
     public static List<TargetAmountDto.WithTotalSpendingRes> toWithTotalSpendingResponses(List<TargetAmount> targetAmounts, List<TotalSpendingAmount> totalSpendings, LocalDate startAt, LocalDate endAt) {
-        int monthLength = startAt.until(endAt.plusMonths(1)).getMonths();
+        int monthLength = (endAt.getYear() - startAt.getYear()) * 12 + (endAt.getMonthValue() - startAt.getMonthValue());
 
         Map<YearMonth, TargetAmount> targetAmountsByDates = toYearMonthMap(targetAmounts, targetAmount -> YearMonth.of(targetAmount.getCreatedAt().getYear(), targetAmount.getCreatedAt().getMonthValue()), Function.identity());
         Map<YearMonth, Integer> totalSpendingAmounts = toYearMonthMap(totalSpendings, totalSpendingAmount -> YearMonth.of(totalSpendingAmount.year(), totalSpendingAmount.month()), TotalSpendingAmount::totalSpending);
