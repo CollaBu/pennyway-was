@@ -41,16 +41,16 @@ public class TargetAmountFixture {
                     ThreadLocalRandom.current().nextInt(100, 10000001),
                     LocalDateTime.of(startAt.plusMonths(i).getYear(), startAt.plusMonths(i).getMonth(), 1, 0, 0, 0),
                     LocalDateTime.of(startAt.plusMonths(i).getYear(), startAt.plusMonths(i).getMonth(), 1, 0, 0, 0),
-                    user
+                    user.getId()
             ));
         }
 
         return targetAmounts;
     }
 
-    private record MockTargetAmount(int amount, LocalDateTime createdAt, LocalDateTime updatedAt, User user) {
-        public static MockTargetAmount of(int amount, LocalDateTime createdAt, LocalDateTime updatedAt, User user) {
-            return new MockTargetAmount(amount, createdAt, updatedAt, user);
+    private record MockTargetAmount(int amount, LocalDateTime createdAt, LocalDateTime updatedAt, Long userId) {
+        public static MockTargetAmount of(int amount, LocalDateTime createdAt, LocalDateTime updatedAt, Long userId) {
+            return new MockTargetAmount(amount, createdAt, updatedAt, userId);
         }
     }
 }
