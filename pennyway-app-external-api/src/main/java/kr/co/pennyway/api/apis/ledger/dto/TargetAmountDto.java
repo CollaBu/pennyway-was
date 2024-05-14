@@ -56,6 +56,7 @@ public class TargetAmountDto {
             @NotNull(message = "totalSpending 값은 필수입니다.")
             Integer totalSpending,
             @Schema(description = "목표 금액과 총 지출 금액의 차액(총 치줄 금액 - 목표 금액). 양수면 초과, 음수면 절약", example = "-50000", requiredMode = Schema.RequiredMode.REQUIRED)
+            @NotNull(message = "diffAmount 값은 필수입니다.")
             Integer diffAmount
     ) {
     }
