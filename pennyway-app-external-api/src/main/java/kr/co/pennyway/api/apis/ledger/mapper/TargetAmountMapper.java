@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,37 +23,40 @@ public class TargetAmountMapper {
     }
 
     public static List<TargetAmountDto.WithTotalSpendingRes> toWithTotalSpendingsRes(List<TargetAmount> targetAmounts, List<TotalSpendingAmount> totalSpendings, LocalDate startAt, LocalDate endAt) {
-        // startAt부터 endAt까지의 날짜 리스트 생성
-        List<LocalDate> dates = startAt.datesUntil(endAt.plusDays(1)).toList();
-        log.info("dates : {}", dates);
+        // startAt부터 endAt까지의 월 길이 계산
+        int monthLength = (endAt.getYear() - startAt.getYear()) * 12 + endAt.getMonthValue() - startAt.getMonthValue() + 1;
+        log.info("monthLength : {}", monthLength);
 
-        // TargetAmount의 createdAt을 이용하여 startAt부터 endAt까지의 TargetAmount 리스트 생성. 없으면 null
-        List<TargetAmount> targetAmountsByDates = dates.stream()
-                .map(date -> targetAmounts.stream()
-                        .filter(targetAmount -> targetAmount.getCreatedAt().toLocalDate().isEqual(date))
-                        .findFirst()
-                        .orElse(null))
-                .toList();
-        log.info("targetAmountsByDates : {}", targetAmountsByDates);
+        // TargetAmount의 createdAt을 이용하여 startAt부터 endAt까지의 TargetAmount 리스트 생성. 없으면 null (day는 무시)
+        List<TargetAmount> targetAmountsByDates = new ArrayList<>();
+        for (int i = 0; i < monthLength; i++) {
+            LocalDate date = startAt.plusMonths(i);
+            targetAmountsByDates.add(targetAmounts.stream()
+                    .filter(targetAmount -> targetAmount.getCreatedAt().getYear() == date.getYear() && targetAmount.getCreatedAt().getMonth() == date.getMonth())
+                    .findFirst()
+                    .orElse(null));
+        }
 
-        // TotalSpendingAmount의 year과 month를 이용하여 startAt부터 endAt까지의 Integer 리스트 생성. 없으면 0
-        List<Integer> totalSpendingAmounts = dates.stream()
-                .map(date -> totalSpendings.stream()
-                        .filter(totalSpending -> totalSpending.year().equals(date.getYear()) && totalSpending.month().equals(date.getMonthValue()))
-                        .findFirst()
-                        .map(TotalSpendingAmount::totalSpending)
-                        .orElse(0))
-                .toList();
-        log.info("totalSpendingsByDates : {}", totalSpendingAmounts);
+        // TotalSpendingAmount의 year과 month를 이용하여 startAt부터 endAt까지의 Integer 리스트 생성. 없으면 0 (day는 무시)
+        List<Integer> totalSpendingAmounts = new ArrayList<>();
+        for (int i = 0; i < monthLength; i++) {
+            LocalDate date = startAt.plusMonths(i);
+            totalSpendingAmounts.add(totalSpendings.stream()
+                    .filter(totalSpendingAmount -> totalSpendingAmount.year() == date.getYear() && totalSpendingAmount.month() == date.getMonthValue())
+                    .findFirst()
+                    .map(TotalSpendingAmount::totalSpending)
+                    .orElse(0));
+        }
 
         // startAt부터 endAt까지의 TargetAmount와 TotalSpendingAmount를 이용하여 WithTotalSpendingRes 리스트 생성
-        return dates.stream()
-                .map(date -> {
-                    TargetAmount targetAmount = targetAmountsByDates.get(dates.indexOf(date));
-                    Integer totalSpending = totalSpendingAmounts.get(dates.indexOf(date));
-                    return createWithTotalSpendingRes(targetAmount, totalSpending, date);
-                })
-                .toList();
+        List<TargetAmountDto.WithTotalSpendingRes> withTotalSpendingResList = new ArrayList<>();
+        for (int i = 0; i < monthLength; i++) {
+            LocalDate date = startAt.plusMonths(i);
+            withTotalSpendingResList.add(createWithTotalSpendingRes(targetAmountsByDates.get(i), totalSpendingAmounts.get(i), date));
+        }
+
+        // WithTotalSpendingRes 리스트를 year, month 역순으로 정렬하여 반환
+        return withTotalSpendingResList;
     }
 
     private static TargetAmountDto.WithTotalSpendingRes createWithTotalSpendingRes(TargetAmount targetAmount, Integer totalSpendingAmount, LocalDate date) {
@@ -64,7 +68,7 @@ public class TargetAmountMapper {
                 .month(date.getMonthValue())
                 .targetAmount(targetAmountInfo)
                 .totalSpending(totalSpendingAmount)
-                .diffAmount(totalSpendingAmount - targetAmountInfo.amount())
+                .diffAmount((targetAmountInfo.amount() == -1) ? 0 : totalSpendingAmount - targetAmountInfo.amount())
                 .build();
     }
 }
