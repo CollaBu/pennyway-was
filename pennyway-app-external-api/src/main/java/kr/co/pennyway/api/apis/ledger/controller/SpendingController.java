@@ -43,7 +43,7 @@ public class SpendingController implements SpendingApi {
 
     @Override
     @GetMapping("/{spendingId}")
-    @PreAuthorize("isAuthenticated() and @spendingCategoryManager.hasPermission(#user.getUserId(), #spendingId)")
+    @PreAuthorize("isAuthenticated() and @spendingManager.hasPermission(#user.getUserId(), #spendingId)")
     public ResponseEntity<?> getSpendingDetail(@PathVariable Long spendingId, @AuthenticationPrincipal SecurityUserDetails user) {
         return ResponseEntity.ok(SuccessResponse.from("spending", spendingUseCase.getSpedingDetail(user.getUserId(), spendingId)));
     }

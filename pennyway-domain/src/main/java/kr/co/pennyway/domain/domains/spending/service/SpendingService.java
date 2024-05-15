@@ -36,7 +36,7 @@ public class SpendingService {
 
     @Transactional(readOnly = true)
     public boolean isExistsSpending(Long userId, Long spendingId) {
-        return spendingRepository.existsByIdAndUser_Id(userId, spendingId);
+        return spendingRepository.existsByIdAndUser_Id(spendingId, userId);
     }
 
 }
