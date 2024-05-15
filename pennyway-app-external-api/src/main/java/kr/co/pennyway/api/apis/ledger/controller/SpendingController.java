@@ -45,7 +45,7 @@ public class SpendingController implements SpendingApi {
     @GetMapping("/{spendingId}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> getSpendingDetail(@PathVariable Long spendingId, @AuthenticationPrincipal SecurityUserDetails user) {
-        return ResponseEntity.ok(SuccessResponse.from(spendingUseCase.getSpedingDetail(user.getUserId(), spendingId)));
+        return ResponseEntity.ok(SuccessResponse.from("spending", spendingUseCase.getSpedingDetail(user.getUserId(), spendingId)));
     }
 
     /**
