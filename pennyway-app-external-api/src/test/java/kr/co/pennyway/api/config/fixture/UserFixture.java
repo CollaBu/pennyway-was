@@ -5,7 +5,11 @@ import kr.co.pennyway.api.common.security.authentication.SecurityUserDetails;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.type.ProfileVisibility;
 import kr.co.pennyway.domain.domains.user.type.Role;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public enum UserFixture {
@@ -40,6 +44,20 @@ public enum UserFixture {
                 .authorities(List.of(new CustomGrantedAuthority(GENERAL_USER.role.getType())))
                 .accountNonLocked(false)
                 .build();
+    }
+
+    /**
+     * 사용자의 가입일을 수정하는 메서드
+     */
+    public static void updateUserCreatedAt(User user, LocalDateTime createdAt, NamedParameterJdbcTemplate jdbcTemplate) {
+        String sql = "UPDATE user SET created_at = :createdAt WHERE id = :id";
+
+        SqlParameterSource[] params = new SqlParameterSource[1];
+        params[0] = new MapSqlParameterSource()
+                .addValue("createdAt", createdAt)
+                .addValue("id", user.getId());
+
+        jdbcTemplate.batchUpdate(sql, params);
     }
 
     public User toUser() {

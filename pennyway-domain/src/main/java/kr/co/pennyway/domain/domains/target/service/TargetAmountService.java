@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -24,5 +25,10 @@ public class TargetAmountService {
     @Transactional(readOnly = true)
     public Optional<TargetAmount> readTargetAmountThatMonth(Long userId, LocalDate date) {
         return targetAmountRepository.findByUserIdThatMonth(userId, date);
+    }
+
+    @Transactional(readOnly = true)
+    public List<TargetAmount> readTargetAmountsByUserId(Long userId) {
+        return targetAmountRepository.findByUser_Id(userId);
     }
 }

@@ -40,4 +40,9 @@ public class TargetAmount extends DateAuditable {
     public boolean isAllocatedAmount() {
         return this.amount >= 0;
     }
+
+    @Override
+    public String toString() {
+        return "TargetAmount(id=" + this.getId() + ", amount=" + this.getAmount() + ")";
+    }
 }
