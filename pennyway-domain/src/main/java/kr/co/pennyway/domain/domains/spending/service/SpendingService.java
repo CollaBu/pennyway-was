@@ -33,4 +33,10 @@ public class SpendingService {
     public Optional<Spending> readSpending(Long spendingId) {
         return spendingRepository.findById(spendingId);
     }
+
+    @Transactional(readOnly = true)
+    public boolean isExistsSpending(Long userId, Long spendingId) {
+        return spendingRepository.existsByIdAndUser_Id(userId, spendingId);
+    }
+
 }
