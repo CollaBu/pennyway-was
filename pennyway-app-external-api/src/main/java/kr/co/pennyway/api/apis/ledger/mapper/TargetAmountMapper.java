@@ -4,7 +4,6 @@ import kr.co.pennyway.api.apis.ledger.dto.TargetAmountDto;
 import kr.co.pennyway.common.annotation.Mapper;
 import kr.co.pennyway.domain.domains.spending.dto.TotalSpendingAmount;
 import kr.co.pennyway.domain.domains.target.domain.TargetAmount;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDate;
@@ -18,7 +17,6 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Mapper
-@RequiredArgsConstructor
 public class TargetAmountMapper {
     /**
      * TargetAmount와 TotalSpendingAmount를 이용하여 WithTotalSpendingRes를 생성한다.
