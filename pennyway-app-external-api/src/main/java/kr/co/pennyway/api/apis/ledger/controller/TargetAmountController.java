@@ -36,6 +36,7 @@ public class TargetAmountController implements TargetAmountApi {
         return ResponseEntity.ok(SuccessResponse.noContent());
     }
 
+    @Override
     @DeleteMapping("/{date}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> deleteTargetAmount(@PathVariable LocalDate date, @AuthenticationPrincipal SecurityUserDetails user) {
