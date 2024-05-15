@@ -4,8 +4,6 @@ import com.querydsl.core.types.Predicate;
 import kr.co.pennyway.domain.common.repository.QueryHandler;
 import kr.co.pennyway.domain.domains.spending.domain.QSpending;
 import kr.co.pennyway.domain.domains.spending.domain.Spending;
-import kr.co.pennyway.domain.domains.spending.exception.SpendingErrorCode;
-import kr.co.pennyway.domain.domains.spending.exception.SpendingErrorException;
 import kr.co.pennyway.domain.domains.spending.service.SpendingService;
 import kr.co.pennyway.domain.domains.user.domain.QUser;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -40,16 +37,5 @@ public class SpendingSearchService {
         Sort sort = Sort.by(Sort.Order.desc("spendAt"));
 
         return spendingService.readSpendings(predicate, queryHandler, sort);
-    }
-
-    @Transactional(readOnly = true)
-    public Spending readSpending(Long spendingId) {
-        Optional<Spending> spending = spendingService.readSpending(spendingId);
-
-        if (!spending.isPresent()) {
-            throw new SpendingErrorException(SpendingErrorCode.NOT_FOUND_SPENDING);
-        }
-
-        return spending.get();
     }
 }
