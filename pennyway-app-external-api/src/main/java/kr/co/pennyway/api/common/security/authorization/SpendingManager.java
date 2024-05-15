@@ -19,7 +19,6 @@ public class SpendingManager {
      */
     @Transactional(readOnly = true)
     public boolean hasPermission(Long userId, Long spendingId) {
-        log.info("spending is Exists {}", spendingService.isExistsSpending(userId, spendingId));
         return spendingService.isExistsSpending(userId, spendingId);
     }
 }
