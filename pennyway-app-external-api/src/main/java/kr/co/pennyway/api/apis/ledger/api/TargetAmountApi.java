@@ -2,6 +2,7 @@ package kr.co.pennyway.api.apis.ledger.api;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.*;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -42,7 +43,7 @@ public interface TargetAmountApi {
     @ApiResponse(responseCode = "200", description = "목표 금액 및 총 사용 금액 리스트 조회 성공", content = @Content(
             schemaProperties = @SchemaProperty(name = "targetAmounts", array = @ArraySchema(schema = @Schema(implementation = TargetAmountDto.WithTotalSpendingRes.class)))))
     ResponseEntity<?> getTargetAmountsAndTotalSpendings(@Validated TargetAmountDto.GetParamReq param, @AuthenticationPrincipal SecurityUserDetails user);
-      
+
     @Operation(summary = "당월 목표 금액 삭제", method = "DELETE")
     @Parameter(name = "date", description = "삭제하려는 목표 금액 날짜 (yyyy-MM-dd)", required = true, example = "2024-05-08", in = ParameterIn.PATH)
     @ApiResponse(responseCode = "400", content = @Content(mediaType = "application/json", examples = {
