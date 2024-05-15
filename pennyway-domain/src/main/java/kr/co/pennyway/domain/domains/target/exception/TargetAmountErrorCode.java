@@ -10,7 +10,9 @@ import lombok.RequiredArgsConstructor;
 public enum TargetAmountErrorCode implements BaseErrorCode {
     /* 400 BAD_REQUEST */
     INVALID_TARGET_AMOUNT_DATE(StatusCode.BAD_REQUEST, ReasonCode.INVALID_REQUEST, "당월 목표 금액에 대한 요청이 아닙니다."),
-    ;
+
+    /* 404 NOT_FOUND */
+    NOT_FOUND_TARGET_AMOUNT(StatusCode.NOT_FOUND, ReasonCode.REQUESTED_RESOURCE_NOT_FOUND, "해당 달의 목표 금액이 존재하지 않습니다.");
 
     private final StatusCode statusCode;
     private final ReasonCode reasonCode;
