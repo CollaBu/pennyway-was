@@ -25,4 +25,9 @@ public class TargetAmountService {
     public Optional<TargetAmount> readTargetAmountThatMonth(Long userId, LocalDate date) {
         return targetAmountRepository.findByUserIdThatMonth(userId, date);
     }
+
+    @Transactional
+    public void deleteTargetAmount(TargetAmount targetAmount) {
+        targetAmountRepository.delete(targetAmount);
+    }
 }
