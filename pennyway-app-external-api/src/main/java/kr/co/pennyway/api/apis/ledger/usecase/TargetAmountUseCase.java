@@ -4,10 +4,12 @@ import kr.co.pennyway.api.apis.ledger.dto.TargetAmountDto;
 import kr.co.pennyway.api.apis.ledger.mapper.TargetAmountMapper;
 import kr.co.pennyway.api.apis.ledger.service.TargetAmountSaveService;
 import kr.co.pennyway.common.annotation.UseCase;
+import kr.co.pennyway.domain.domains.target.domain.TargetAmount;
+import kr.co.pennyway.domain.domains.target.exception.TargetAmountErrorCode;
+import kr.co.pennyway.domain.domains.target.exception.TargetAmountErrorException;
+import kr.co.pennyway.domain.domains.target.service.TargetAmountService;
 import kr.co.pennyway.domain.domains.spending.dto.TotalSpendingAmount;
 import kr.co.pennyway.domain.domains.spending.service.SpendingService;
-import kr.co.pennyway.domain.domains.target.domain.TargetAmount;
-import kr.co.pennyway.domain.domains.target.service.TargetAmountService;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorCode;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorException;
@@ -51,5 +53,14 @@ public class TargetAmountUseCase {
         List<TotalSpendingAmount> totalSpendings = spendingService.readTotalSpendingsAmountByUserId(userId);
 
         return TargetAmountMapper.toWithTotalSpendingResponses(targetAmounts, totalSpendings, user.getCreatedAt().toLocalDate(), date);
+    }
+  
+    @Transactional
+    public void deleteTargetAmount(Long userId, LocalDate date) {
+        TargetAmount targetAmount = targetAmountService.readTargetAmountThatMonth(userId, date)
+                .filter(TargetAmount::isAllocatedAmount)
+                .orElseThrow(() -> new TargetAmountErrorException(TargetAmountErrorCode.NOT_FOUND_TARGET_AMOUNT));
+
+        targetAmountService.deleteTargetAmount(targetAmount);
     }
 }

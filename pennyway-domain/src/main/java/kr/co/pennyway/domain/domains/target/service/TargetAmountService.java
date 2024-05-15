@@ -31,4 +31,9 @@ public class TargetAmountService {
     public List<TargetAmount> readTargetAmountsByUserId(Long userId) {
         return targetAmountRepository.findByUser_Id(userId);
     }
+  
+    @Transactional
+    public void deleteTargetAmount(TargetAmount targetAmount) {
+        targetAmountRepository.delete(targetAmount);
+    }
 }

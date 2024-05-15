@@ -50,6 +50,18 @@ public class TargetAmountController implements TargetAmountApi {
         return ResponseEntity.ok(SuccessResponse.from("targetAmounts", targetAmountUseCase.getTargetAmountsAndTotalSpendings(user.getUserId(), param.date())));
     }
 
+    @Override
+    @DeleteMapping("/{date}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> deleteTargetAmount(@PathVariable LocalDate date, @AuthenticationPrincipal SecurityUserDetails user) {
+        if (!isValidDateForYearAndMonth(date)) {
+            throw new TargetAmountErrorException(TargetAmountErrorCode.INVALID_TARGET_AMOUNT_DATE);
+        }
+
+        targetAmountUseCase.deleteTargetAmount(user.getUserId(), date);
+        return ResponseEntity.ok(SuccessResponse.noContent());  
+    }
+  
     private boolean isValidDateForYearAndMonth(LocalDate date) {
         LocalDate now = LocalDate.now();
         return date.getYear() == now.getYear() && date.getMonth() == now.getMonth();

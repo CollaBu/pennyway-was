@@ -43,4 +43,22 @@ public interface TargetAmountApi {
     @ApiResponse(responseCode = "200", description = "목표 금액 및 총 사용 금액 리스트 조회 성공", content = @Content(
             schemaProperties = @SchemaProperty(name = "targetAmounts", array = @ArraySchema(schema = @Schema(implementation = TargetAmountDto.WithTotalSpendingRes.class)))))
     ResponseEntity<?> getTargetAmountsAndTotalSpendings(@Validated TargetAmountDto.GetParamReq param, @AuthenticationPrincipal SecurityUserDetails user);
+
+    @Operation(summary = "당월 목표 금액 삭제", method = "DELETE")
+    @Parameter(name = "date", description = "삭제하려는 목표 금액 날짜 (yyyy-MM-dd)", required = true, example = "2024-05-08", in = ParameterIn.PATH)
+    @ApiResponse(responseCode = "400", content = @Content(mediaType = "application/json", examples = {
+            @ExampleObject(name = "목표 금액 삭제 실패", value = """
+                    {
+                        "code": "4004",
+                        "message": "당월 목표 금액에 대한 요청이 아닙니다."
+                    }
+                    """),
+            @ExampleObject(name = "목표 금액 조회 실패", description = "목표 금액 데이터가 없거나, 이미 삭제(amount=-1)인 경우", value = """
+                    {
+                        "code": "4040",
+                        "message": "해당 월의 목표 금액이 존재하지 않습니다."
+                    }
+                    """)
+    }))
+    ResponseEntity<?> deleteTargetAmount(@PathVariable LocalDate date, @AuthenticationPrincipal SecurityUserDetails user);
 }
