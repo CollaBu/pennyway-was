@@ -35,8 +35,8 @@ public class SpendingService {
     }
 
     @Transactional(readOnly = true)
-    public List<Spending> readSpendings(Predicate predicate, QueryHandler queryHandler, Sort sort) {
-        return spendingRepository.findList(predicate, queryHandler, sort);
+    public Optional<Spending> readSpending(Long spendingId) {
+        return spendingRepository.findById(spendingId);
     }
 
     @Transactional(readOnly = true)
@@ -44,6 +44,11 @@ public class SpendingService {
         return spendingRepository.findTotalSpendingAmountByUserId(userId, date.getYear(), date.getMonthValue());
     }
 
+    @Transactional(readOnly = true)
+    public List<Spending> readSpendings(Predicate predicate, QueryHandler queryHandler, Sort sort) {
+        return spendingRepository.findList(predicate, queryHandler, sort);
+    }  
+  
     @Transactional(readOnly = true)
     public List<TotalSpendingAmount> readTotalSpendingsAmountByUserId(Long userId) {
         Predicate predicate = user.id.eq(userId);
@@ -59,5 +64,10 @@ public class SpendingService {
         bindings.put("totalSpending", spending.amount.sum());
 
         return spendingRepository.selectList(predicate, TotalSpendingAmount.class, bindings, queryHandler, sort);
+    }
+
+    @Transactional(readOnly = true)
+    public boolean isExistsSpending(Long userId, Long spendingId) {
+        return spendingRepository.existsByIdAndUser_Id(spendingId, userId);
     }
 }

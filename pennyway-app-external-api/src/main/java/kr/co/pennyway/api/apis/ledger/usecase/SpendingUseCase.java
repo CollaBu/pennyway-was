@@ -7,6 +7,9 @@ import kr.co.pennyway.api.apis.ledger.service.SpendingSaveService;
 import kr.co.pennyway.api.apis.ledger.service.SpendingSearchService;
 import kr.co.pennyway.common.annotation.UseCase;
 import kr.co.pennyway.domain.domains.spending.domain.Spending;
+import kr.co.pennyway.domain.domains.spending.exception.SpendingErrorCode;
+import kr.co.pennyway.domain.domains.spending.exception.SpendingErrorException;
+import kr.co.pennyway.domain.domains.spending.service.SpendingService;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorCode;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorException;
@@ -23,6 +26,7 @@ import java.util.List;
 public class SpendingUseCase {
     private final SpendingSaveService spendingSaveService;
     private final SpendingSearchService spendingSearchService;
+    private final SpendingService spendingService;
 
     private final UserService userService;
 
@@ -41,5 +45,13 @@ public class SpendingUseCase {
         List<Spending> spendings = spendingSearchService.readSpendings(userId, year, month);
 
         return SpendingMapper.toSpendingSearchResMonth(spendings, year, month);
+    }
+
+    @Transactional(readOnly = true)
+    public SpendingSearchRes.Individual getSpedingDetail(Long userId, Long spendingId) {
+        Spending spending = spendingService.readSpending(spendingId)
+                .orElseThrow(() -> new SpendingErrorException(SpendingErrorCode.NOT_FOUND_SPENDING));
+
+        return SpendingMapper.toSpendingSearchResIndividual(spending);
     }
 }
