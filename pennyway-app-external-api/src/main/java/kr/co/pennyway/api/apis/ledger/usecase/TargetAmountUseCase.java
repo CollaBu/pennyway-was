@@ -28,11 +28,8 @@ public class TargetAmountUseCase {
     @Transactional
     public void deleteTargetAmount(Long userId, LocalDate date) {
         TargetAmount targetAmount = targetAmountService.readTargetAmountThatMonth(userId, date)
+                .filter(target -> !target.isAllocatedAmount())
                 .orElseThrow(() -> new TargetAmountErrorException(TargetAmountErrorCode.NOT_FOUND_TARGET_AMOUNT));
-
-        if (!targetAmount.isAllocatedAmount()) {
-            throw new TargetAmountErrorException(TargetAmountErrorCode.NOT_FOUND_TARGET_AMOUNT);
-        }
 
         targetAmountService.deleteTargetAmount(targetAmount);
     }
