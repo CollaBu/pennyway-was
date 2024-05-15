@@ -13,9 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 
@@ -35,6 +33,17 @@ public class TargetAmountController implements TargetAmountApi {
         }
 
         targetAmountUseCase.updateTargetAmount(user.getUserId(), request.date(), request.amount());
+        return ResponseEntity.ok(SuccessResponse.noContent());
+    }
+
+    @DeleteMapping("/{date}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> deleteTargetAmount(@PathVariable LocalDate date, @AuthenticationPrincipal SecurityUserDetails user) {
+        if (!isValidDateForYearAndMonth(date)) {
+            throw new TargetAmountErrorException(TargetAmountErrorCode.INVALID_TARGET_AMOUNT_DATE);
+        }
+
+        targetAmountUseCase.deleteTargetAmount(user.getUserId(), date);
         return ResponseEntity.ok(SuccessResponse.noContent());
     }
 
