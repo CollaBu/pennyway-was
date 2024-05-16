@@ -38,7 +38,7 @@ public class SpendingController implements SpendingApi {
     @GetMapping("")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> getSpendingListAtYearAndMonth(@RequestParam("year") int year, @RequestParam("month") int month, @AuthenticationPrincipal SecurityUserDetails user) {
-        return ResponseEntity.ok(SuccessResponse.from("spendings", spendingUseCase.getSpendingsAtYearAndMonth(user.getUserId(), year, month)));
+        return ResponseEntity.ok(SuccessResponse.from("spending", spendingUseCase.getSpendingsAtYearAndMonth(user.getUserId(), year, month)));
     }
 
     @Override
