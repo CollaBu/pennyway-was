@@ -55,13 +55,14 @@ public interface SpendingApi {
 
     @Operation(summary = "지출 내역 조회", method = "GET", description = "사용자의 해당 년/월 지출 내역을 조회하고 월/일별 지출 총합을 반환합니다.")
     @Parameters({
-            @Parameter(name = "year", description = "년도", required = true, in = ParameterIn.HEADER),
-            @Parameter(name = "month", description = "월", required = true, in = ParameterIn.HEADER)
+            @Parameter(name = "year", description = "년도", example = "2024", required = true, in = ParameterIn.QUERY),
+            @Parameter(name = "month", description = "월", example = "5", required = true, in = ParameterIn.QUERY)
     })
     @ApiResponse(responseCode = "200", content = @Content(schemaProperties = @SchemaProperty(name = "spendings", schema = @Schema(implementation = SpendingSearchRes.Month.class))))
     ResponseEntity<?> getSpendingListAtYearAndMonth(@RequestParam("year") int year, @RequestParam("date") int month, @AuthenticationPrincipal SecurityUserDetails user);
 
     @Operation(summary = "지출 내역 상세 조회", method = "GET", description = "지출 내역의 ID값으로 해당 지출의 상세 내역을 반환합니다.")
+    @Parameter(name = "spendingId", description = "지출 내역 ID", example = "1", required = true, in = ParameterIn.PATH)
     @ApiResponses({
             @ApiResponse(responseCode = "200", content = @Content(schemaProperties = @SchemaProperty(name = "spending", schema = @Schema(implementation = SpendingSearchRes.Individual.class)))),
             @ApiResponse(responseCode = "404", description = "NOT_FOUND", content = @Content(examples = {
