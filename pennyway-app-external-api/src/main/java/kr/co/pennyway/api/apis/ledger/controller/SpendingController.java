@@ -48,6 +48,7 @@ public class SpendingController implements SpendingApi {
         return ResponseEntity.ok(SuccessResponse.from("spending", spendingUseCase.getSpedingDetail(spendingId)));
     }
 
+    @Override
     @PutMapping("/{spendingId}")
     @PreAuthorize("isAuthenticated() and @spendingManager.hasPermission(#user.getUserId(), #spendingId)")
     public ResponseEntity<?> updateSpending(@PathVariable Long spendingId, @RequestBody @Validated SpendingReq request, @AuthenticationPrincipal SecurityUserDetails user) {
