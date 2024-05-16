@@ -45,7 +45,17 @@ public class SpendingController implements SpendingApi {
     @GetMapping("/{spendingId}")
     @PreAuthorize("isAuthenticated() and @spendingManager.hasPermission(#user.getUserId(), #spendingId)")
     public ResponseEntity<?> getSpendingDetail(@PathVariable Long spendingId, @AuthenticationPrincipal SecurityUserDetails user) {
-        return ResponseEntity.ok(SuccessResponse.from("spending", spendingUseCase.getSpedingDetail(user.getUserId(), spendingId)));
+        return ResponseEntity.ok(SuccessResponse.from("spending", spendingUseCase.getSpedingDetail(spendingId)));
+    }
+
+    @PutMapping("/{spendingId}")
+    @PreAuthorize("isAuthenticated() and @spendingManager.hasPermission(#user.getUserId(), #spendingId)")
+    public ResponseEntity<?> updateSpending(@PathVariable Long spendingId, @RequestBody @Validated SpendingReq request, @AuthenticationPrincipal SecurityUserDetails user) {
+        if (!isValidCategoryIdAndIcon(request.categoryId(), request.icon())) {
+            throw new SpendingErrorException(SpendingErrorCode.INVALID_ICON_WITH_CATEGORY_ID);
+        }
+
+        return ResponseEntity.ok(SuccessResponse.from("spending", spendingUseCase.updateSpending(user.getUserId(), spendingId, request)));
     }
 
     /**
