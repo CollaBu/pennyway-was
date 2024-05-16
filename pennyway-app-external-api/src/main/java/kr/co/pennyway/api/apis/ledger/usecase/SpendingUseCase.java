@@ -48,10 +48,12 @@ public class SpendingUseCase {
     }
 
     @Transactional(readOnly = true)
-    public SpendingSearchRes.Individual getSpedingDetail(Long userId, Long spendingId) {
+    public SpendingSearchRes.Individual getSpedingDetail(Long spendingId) {
         Spending spending = spendingService.readSpending(spendingId)
                 .orElseThrow(() -> new SpendingErrorException(SpendingErrorCode.NOT_FOUND_SPENDING));
 
         return SpendingMapper.toSpendingSearchResIndividual(spending);
     }
+
+
 }
