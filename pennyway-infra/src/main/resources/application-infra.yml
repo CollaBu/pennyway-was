@@ -25,6 +25,11 @@ app:
     port: 587
     username: ${MAIL_USERNAME:pennyway}
     password: ${MAIL_PASSWORD:password}
+  firebase:
+    config:
+      file: ${FIREBASE_CONFIG_FILE:firebase-adminsdk.json}
+    project:
+      id: ${FIREBASE_PROJECT_ID:pennyway-12345}
 
 pennyway:
   server:
