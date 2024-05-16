@@ -7,8 +7,6 @@ import kr.co.pennyway.domain.common.repository.QueryHandler;
 import kr.co.pennyway.domain.domains.spending.domain.QSpending;
 import kr.co.pennyway.domain.domains.spending.domain.Spending;
 import kr.co.pennyway.domain.domains.spending.dto.TotalSpendingAmount;
-import kr.co.pennyway.domain.domains.spending.exception.SpendingErrorCode;
-import kr.co.pennyway.domain.domains.spending.exception.SpendingErrorException;
 import kr.co.pennyway.domain.domains.spending.repository.SpendingRepository;
 import kr.co.pennyway.domain.domains.user.domain.QUser;
 import lombok.RequiredArgsConstructor;
@@ -71,14 +69,5 @@ public class SpendingService {
     @Transactional(readOnly = true)
     public boolean isExistsSpending(Long userId, Long spendingId) {
         return spendingRepository.existsByIdAndUser_Id(spendingId, userId);
-    }
-
-    @Transactional
-    public Spending updateSpending(Long spendingId, Spending updatedSpending) {
-        Spending spending = spendingRepository.findById(spendingId)
-                .orElseThrow(() -> new SpendingErrorException(SpendingErrorCode.NOT_FOUND_SPENDING));
-        spending.update(updatedSpending);
-
-        return spending;
     }
 }

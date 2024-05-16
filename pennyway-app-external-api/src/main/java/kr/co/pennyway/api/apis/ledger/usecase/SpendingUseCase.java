@@ -5,6 +5,7 @@ import kr.co.pennyway.api.apis.ledger.dto.SpendingSearchRes;
 import kr.co.pennyway.api.apis.ledger.mapper.SpendingMapper;
 import kr.co.pennyway.api.apis.ledger.service.SpendingSaveService;
 import kr.co.pennyway.api.apis.ledger.service.SpendingSearchService;
+import kr.co.pennyway.api.apis.ledger.service.SpendingUpdateService;
 import kr.co.pennyway.common.annotation.UseCase;
 import kr.co.pennyway.domain.domains.spending.domain.Spending;
 import kr.co.pennyway.domain.domains.spending.exception.SpendingErrorCode;
@@ -26,6 +27,7 @@ import java.util.List;
 public class SpendingUseCase {
     private final SpendingSaveService spendingSaveService;
     private final SpendingSearchService spendingSearchService;
+    private final SpendingUpdateService spendingUpdateService;
     private final SpendingService spendingService;
 
 
@@ -50,8 +52,7 @@ public class SpendingUseCase {
 
     @Transactional(readOnly = true)
     public SpendingSearchRes.Individual getSpedingDetail(Long spendingId) {
-        Spending spending = spendingService.readSpending(spendingId)
-                .orElseThrow(() -> new SpendingErrorException(SpendingErrorCode.NOT_FOUND_SPENDING));
+        Spending spending = readSpendingOrThrow(spendingId);
 
         return SpendingMapper.toSpendingSearchResIndividual(spending);
     }
@@ -59,7 +60,9 @@ public class SpendingUseCase {
     @Transactional
     public SpendingSearchRes.Individual updateSpending(Long userId, Long spendingId, SpendingReq request) {
         User user = readUserOrThrow(userId);
-        Spending updatedSpending = spendingService.updateSpending(spendingId, request.toEntity(user));
+        Spending spending = readSpendingOrThrow(spendingId);
+
+        Spending updatedSpending = spendingUpdateService.updateSpending(user, spending, request);
 
         return SpendingMapper.toSpendingSearchResIndividual(updatedSpending);
     }
@@ -67,7 +70,15 @@ public class SpendingUseCase {
     private User readUserOrThrow(Long userId) {
         return userService.readUser(userId).orElseThrow(
                 () -> {
-                    return new UserErrorException(UserErrorCode.NOT_FOUND);
+                    throw new UserErrorException(UserErrorCode.NOT_FOUND);
+                }
+        );
+    }
+
+    private Spending readSpendingOrThrow(Long spendingId) {
+        return spendingService.readSpending(spendingId).orElseThrow(
+                () -> {
+                    throw new SpendingErrorException(SpendingErrorCode.NOT_FOUND_SPENDING);
                 }
         );
     }
