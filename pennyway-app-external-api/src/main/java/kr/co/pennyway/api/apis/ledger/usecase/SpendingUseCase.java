@@ -58,11 +58,10 @@ public class SpendingUseCase {
     }
 
     @Transactional
-    public SpendingSearchRes.Individual updateSpending(Long userId, Long spendingId, SpendingReq request) {
-        User user = readUserOrThrow(userId);
+    public SpendingSearchRes.Individual updateSpending(Long spendingId, SpendingReq request) {
         Spending spending = readSpendingOrThrow(spendingId);
 
-        Spending updatedSpending = spendingUpdateService.updateSpending(user, spending, request);
+        Spending updatedSpending = spendingUpdateService.updateSpending(spending, request);
 
         return SpendingMapper.toSpendingSearchResIndividual(updatedSpending);
     }
