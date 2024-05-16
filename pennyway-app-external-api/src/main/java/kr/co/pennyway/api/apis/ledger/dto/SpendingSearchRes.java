@@ -20,8 +20,6 @@ public class SpendingSearchRes {
             int year,
             @Schema(description = "월", example = "5")
             int month,
-            @Schema(description = "월별 총 지출 금액", example = "100000")
-            int monthlyTotalAmount,
             @Schema(description = "일별 지출 내역")
             List<Daily> dailySpendings
     ) {

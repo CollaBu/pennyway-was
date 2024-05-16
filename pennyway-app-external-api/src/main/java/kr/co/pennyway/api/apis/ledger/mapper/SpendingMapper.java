@@ -20,7 +20,6 @@ public class SpendingMapper {
         return SpendingSearchRes.Month.builder()
                 .year(year)
                 .month(month)
-                .monthlyTotalAmount(calculateMonthlyTotalAmount(groupSpendingsByDay))
                 .dailySpendings(dailySpendings)
                 .build();
     }
@@ -46,13 +45,6 @@ public class SpendingMapper {
                 .accountName(spending.getAccountName())
                 .memo(spending.getMemo())
                 .build();
-    }
-
-    /**
-     * 월별 지출 내역의 총 금액을 계산하는 메서드
-     */
-    private static int calculateMonthlyTotalAmount(ConcurrentMap<Integer, List<Spending>> spendings) {
-        return spendings.values().stream().flatMap(List::stream).mapToInt(Spending::getAmount).sum();
     }
 
     /**
