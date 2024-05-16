@@ -28,12 +28,13 @@ public class SpendingUseCase {
     private final SpendingSearchService spendingSearchService;
     private final SpendingService spendingService;
 
+
     private final UserService userService;
 
 
     @Transactional
     public SpendingSearchRes.Individual createSpending(Long userId, SpendingReq request) {
-        User user = userService.readUser(userId).orElseThrow(() -> new UserErrorException(UserErrorCode.NOT_FOUND));
+        User user = readUserOrThrow(userId);
 
         Spending spending = spendingSaveService.createSpending(user, request);
 
@@ -55,5 +56,19 @@ public class SpendingUseCase {
         return SpendingMapper.toSpendingSearchResIndividual(spending);
     }
 
+    @Transactional
+    public SpendingSearchRes.Individual updateSpending(Long userId, Long spendingId, SpendingReq request) {
+        User user = readUserOrThrow(userId);
+        Spending updatedSpending = spendingService.updateSpending(spendingId, request.toEntity(user));
 
+        return SpendingMapper.toSpendingSearchResIndividual(updatedSpending);
+    }
+
+    private User readUserOrThrow(Long userId) {
+        return userService.readUser(userId).orElseThrow(
+                () -> {
+                    return new UserErrorException(UserErrorCode.NOT_FOUND);
+                }
+        );
+    }
 }
