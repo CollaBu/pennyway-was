@@ -48,6 +48,15 @@ public class SpendingController implements SpendingApi {
         return ResponseEntity.ok(SuccessResponse.from("spending", spendingUseCase.getSpedingDetail(user.getUserId(), spendingId)));
     }
 
+    @Override
+    @DeleteMapping("/{spendingId}")
+    @PreAuthorize("isAuthenticated() and @spendingManager.hasPermission(#user.getUserId(), #spendingId)")
+    public ResponseEntity<?> deleteSpending(@PathVariable Long spendingId, @AuthenticationPrincipal SecurityUserDetails user) {
+        spendingUseCase.deleteSpending(user.getUserId(), spendingId);
+
+        return ResponseEntity.ok(SuccessResponse.noContent());
+    }
+
     /**
      * categoryId가 -1이면 서비스에서 정의한 카테고리를 사용하므로 저장하려는 지출 내역의 icon은 OTHER가 될 수 없고, <br/>
      * categoryId가 -1이 아니면 사용자가 정의한 카테고리를 사용하므로 저장하려는 지출 내역의 icon은 OTHER임을 확인한다.

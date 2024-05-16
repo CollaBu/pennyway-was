@@ -47,8 +47,8 @@ public class SpendingService {
     @Transactional(readOnly = true)
     public List<Spending> readSpendings(Predicate predicate, QueryHandler queryHandler, Sort sort) {
         return spendingRepository.findList(predicate, queryHandler, sort);
-    }  
-  
+    }
+
     @Transactional(readOnly = true)
     public List<TotalSpendingAmount> readTotalSpendingsAmountByUserId(Long userId) {
         Predicate predicate = user.id.eq(userId);
@@ -69,5 +69,10 @@ public class SpendingService {
     @Transactional(readOnly = true)
     public boolean isExistsSpending(Long userId, Long spendingId) {
         return spendingRepository.existsByIdAndUser_Id(spendingId, userId);
+    }
+
+    @Transactional
+    public void deleteSpending(Spending spending) {
+        spendingRepository.delete(spending);
     }
 }
