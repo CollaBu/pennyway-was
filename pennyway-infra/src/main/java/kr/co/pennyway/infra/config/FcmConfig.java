@@ -16,6 +16,7 @@ import java.io.IOException;
 
 @Slf4j
 @Profile({"local", "dev", "prod"})
+// TODO: 2024.05.17 우선 테스트 통과를 위해 임시로 처리함. Push Notification 기능 테스트 시 문제가 발생하면 수정이 필요함.
 public class FcmConfig implements PennywayInfraConfig {
     private final ClassPathResource firebaseResource;
     private final String projectId;
