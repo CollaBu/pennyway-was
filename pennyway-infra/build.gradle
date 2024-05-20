@@ -28,4 +28,7 @@ dependencies {
 
     /* mail */
     implementation 'org.springframework.boot:spring-boot-starter-mail:3.2.3'
+
+    /* firebase */
+    implementation 'com.google.firebase:firebase-admin:9.2.0'
 }
