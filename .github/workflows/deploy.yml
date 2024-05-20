@@ -2,7 +2,7 @@ name: Continuous Deployment
 
 on:
   push:
-    branches: [ "dev", "feat/PW-322-push-notification-infra" ]
+    branches: [ "dev" ]
   workflow_dispatch:
     inputs:
       logLevel:
