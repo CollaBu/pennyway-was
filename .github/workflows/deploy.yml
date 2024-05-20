@@ -48,8 +48,9 @@ jobs:
       - name: Create Json
         uses: jsdaniell/create-json@v1.2.2
         with:
-          name: ${{ secrets.FIREBASE_ADMIN_SDK_FILE_PATH }}
+          name: ${{ secrets.FIREBASE_ADMIN_SDK_FILE }}
           json: ${{ secrets.FIREBASE_ADMIN_SDK }}
+          dir: ${{ secrets.FIREBASE_ADMIN_SDK_DIR }}
 
       # 4. Build Gradle
       - name: Build Gradle
