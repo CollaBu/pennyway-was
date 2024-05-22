@@ -6,6 +6,7 @@ import kr.co.pennyway.api.apis.auth.dto.UserSyncDto;
 import kr.co.pennyway.api.apis.auth.helper.JwtAuthHelper;
 import kr.co.pennyway.api.apis.auth.helper.OauthOidcHelper;
 import kr.co.pennyway.api.apis.auth.service.UserOauthSignService;
+import kr.co.pennyway.api.common.security.jwt.JwtClaimsParserUtil;
 import kr.co.pennyway.api.common.security.jwt.access.AccessTokenClaimKeys;
 import kr.co.pennyway.common.annotation.UseCase;
 import kr.co.pennyway.domain.domains.oauth.domain.Oauth;
@@ -33,7 +34,7 @@ public class UserAuthUseCase {
     public AuthStateDto isSignIn(String authHeader) {
         String accessToken = accessTokenProvider.resolveToken(authHeader);
         JwtClaims claims = accessTokenProvider.getJwtClaimsFromToken(accessToken);
-        Long userId = jwtAuthHelper.getClaimsValue(claims, AccessTokenClaimKeys.USER_ID.getValue(), Long::parseLong);
+        Long userId = JwtClaimsParserUtil.getClaimsValue(claims, AccessTokenClaimKeys.USER_ID.getValue(), Long::parseLong);
 
         log.info("auth_id {} 사용자는 로그인 중입니다.", userId);
 
