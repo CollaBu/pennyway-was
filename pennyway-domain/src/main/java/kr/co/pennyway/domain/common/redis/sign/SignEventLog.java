@@ -14,14 +14,18 @@ public class SignEventLog {
     private final Long userId;
     private final LocalDateTime signedAt;
     private final String ipAddress;
+    private final String ipAddressHeader;
+    private final String appVersion;
     private final String deviceModel;
     private final String os;
 
     @Builder
-    private SignEventLog(Long userId, LocalDateTime signedAt, String ipAddress, String deviceModel, String os) {
+    public SignEventLog(Long userId, LocalDateTime signedAt, String ipAddress, String ipAddressHeader, String appVersion, String deviceModel, String os) {
         this.userId = userId;
         this.signedAt = signedAt;
         this.ipAddress = ipAddress;
+        this.ipAddressHeader = ipAddressHeader;
+        this.appVersion = appVersion;
         this.deviceModel = deviceModel;
         this.os = os;
     }
@@ -32,6 +36,8 @@ public class SignEventLog {
                 "userId=" + userId +
                 ", signedAt=" + signedAt +
                 ", ipAddress='" + ipAddress + '\'' +
+                ", ipAddressHeader='" + ipAddressHeader + '\'' +
+                ", appVersion='" + appVersion + '\'' +
                 ", deviceModel='" + deviceModel + '\'' +
                 ", os='" + os + '\'' +
                 '}';
