@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Getter
+@Entity
 @Table(name = "sign_in_log")
 @IdClass(SignInLogId.class)
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
