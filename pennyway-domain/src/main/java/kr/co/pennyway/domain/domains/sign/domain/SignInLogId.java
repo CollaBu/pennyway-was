@@ -5,11 +5,14 @@ import jakarta.persistence.Transient;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Getter
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
-public class SignInLogId {
+public class SignInLogId implements Serializable {
+    @Serial
     @Transient
     private static final long serialVersionUID = 1L;
 
