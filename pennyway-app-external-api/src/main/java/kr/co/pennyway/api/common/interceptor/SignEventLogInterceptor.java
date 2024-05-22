@@ -111,5 +111,15 @@ public class SignEventLogInterceptor implements HandlerInterceptor {
             String deviceModel,
             String os
     ) {
+        @Override
+        public String toString() {
+            return "UserAgentInfo{" +
+                    "appName='" + appName + '\'' +
+                    ", appVersion='" + appVersion + '\'' +
+                    ", platform='" + platform + '\'' +
+                    ", deviceModel='" + deviceModel + '\'' +
+                    ", os='" + os + '\'' +
+                    '}';
+        }
     }
 }
