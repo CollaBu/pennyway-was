@@ -37,7 +37,7 @@ public class SignEventLogInterceptor implements HandlerInterceptor {
 
     @Override
     public void postHandle(@NonNull HttpServletRequest request, HttpServletResponse response, @NonNull Object handler, ModelAndView modelAndView) {
-        if (response.getStatus() != 200) {
+        if (response.getStatus() != 200 || response.getHeader(HttpHeaders.AUTHORIZATION) == null) {
             return;
         }
 
