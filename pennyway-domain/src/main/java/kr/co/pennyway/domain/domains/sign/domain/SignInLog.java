@@ -1,6 +1,8 @@
 package kr.co.pennyway.domain.domains.sign.domain;
 
 import jakarta.persistence.*;
+import kr.co.pennyway.domain.common.converter.IpAddressHeaderConverter;
+import kr.co.pennyway.domain.domains.sign.type.IpAddressHeader;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,15 +23,19 @@ public class SignInLog {
 
     private Long userId;
     private String ipAddress;
+    @Convert(converter = IpAddressHeaderConverter.class)
+    private IpAddressHeader ipAddressHeader;
+    private String appVersion;
     private String deviceModel;
     private String os;
 
     @Builder
-    private SignInLog(LocalDateTime signedAt, Long id, Long userId, String ipAddress, String deviceModel, String os) {
+    public SignInLog(LocalDateTime signedAt, Long userId, String ipAddress, IpAddressHeader ipAddressHeader, String appVersion, String deviceModel, String os) {
         this.signedAt = signedAt;
-        this.id = id;
         this.userId = userId;
         this.ipAddress = ipAddress;
+        this.ipAddressHeader = ipAddressHeader;
+        this.appVersion = appVersion;
         this.deviceModel = deviceModel;
         this.os = os;
     }
