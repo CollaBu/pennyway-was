@@ -33,6 +33,8 @@ public @interface DistributedLock {
 
     /**
      * 동일한 트랜잭션에서 Lock을 획득할지 여부 (DEFAULT: false) <br/>
+     * true면 Propagation.MANDATORY 전파 방식을 사용하여 동일한 트랜잭션에서 Lock을 획득한다. <br/>
+     * false면 Propagation.REQUIRES_NEW 전파 방식을 사용하여 새로운 트랜잭션에서 Lock을 획득한다.
      */
     boolean needSameTransaction() default false;
 }
