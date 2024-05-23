@@ -2,12 +2,15 @@ package kr.co.pennyway.api.apis.ledger.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.pennyway.api.apis.ledger.usecase.TargetAmountUseCase;
+import kr.co.pennyway.api.config.WebConfig;
 import kr.co.pennyway.api.config.supporter.WithSecurityMockUser;
 import kr.co.pennyway.domain.domains.target.exception.TargetAmountErrorCode;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -24,7 +27,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(controllers = {TargetAmountController.class})
+@WebMvcTest(controllers = {TargetAmountController.class}, excludeFilters = {
+        @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = WebConfig.class)})
 @ActiveProfiles("test")
 @TestClassOrder(ClassOrderer.OrderAnnotation.class)
 public class TargetAmountControllerUnitTest {

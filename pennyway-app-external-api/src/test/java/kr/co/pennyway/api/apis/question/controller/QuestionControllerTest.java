@@ -3,6 +3,7 @@ package kr.co.pennyway.api.apis.question.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.pennyway.api.apis.question.dto.QuestionReq;
 import kr.co.pennyway.api.apis.question.usecase.QuestionUseCase;
+import kr.co.pennyway.api.config.WebConfig;
 import kr.co.pennyway.domain.domains.question.domain.QuestionCategory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -10,6 +11,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -22,7 +25,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(controllers = QuestionController.class)
+@WebMvcTest(controllers = QuestionController.class, excludeFilters = {
+        @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = WebConfig.class)})
 @ActiveProfiles("local")
 public class QuestionControllerTest {
 
