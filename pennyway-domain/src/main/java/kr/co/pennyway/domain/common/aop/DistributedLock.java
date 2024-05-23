@@ -17,7 +17,7 @@ public @interface DistributedLock {
     /**
      * Lock 유지 시간 (초)
      */
-    TimeUnit unit() default TimeUnit.SECONDS;
+    TimeUnit timeUnit() default TimeUnit.SECONDS;
 
     /**
      * Lock 유지 시간 (DEFAULT: 5초)
