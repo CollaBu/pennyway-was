@@ -30,4 +30,9 @@ public @interface DistributedLock {
      * LOCK 획득 이후 leaseTime이 지나면 LOCK을 해제한다.
      */
     long leaseTime() default 3L;
+
+    /**
+     * 동일한 트랜잭션에서 Lock을 획득할지 여부 (DEFAULT: false) <br/>
+     */
+    boolean needSameTransaction() default false;
 }
