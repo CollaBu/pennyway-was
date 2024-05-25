@@ -1,6 +1,7 @@
 package kr.co.pennyway.api.apis.storage.api;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -8,6 +9,7 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import kr.co.pennyway.api.apis.storage.dto.PresignedUrlDto;
 
 @Tag(name = "[S3 이미지 저장을 위한 Presigned URL 발급 API]")
 public interface StorageApi {
@@ -24,5 +26,5 @@ public interface StorageApi {
 							""")
 			}))
 	})
-	ResponseEntity<?> getPresignedUrl();
+	ResponseEntity<?> getPresignedUrl(@Validated PresignedUrlDto.PresignedUrlReq req);
 }
