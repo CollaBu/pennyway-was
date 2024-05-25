@@ -81,5 +81,15 @@ public interface SpendingApi {
 
     @Operation(summary = "지출 내역 삭제", method = "DELETE", description = "지출 내역의 ID값으로 해당 지출 내역을 삭제 합니다.")
     @Parameter(name = "spendingId", description = "지출 내역 ID", example = "1", required = true, in = ParameterIn.PATH)
+    @ApiResponse(responseCode = "403", description = "지출 카테고리에 대한 권한이 없습니다.", content = @Content(examples = {
+            @ExampleObject(name = "지출 카테고리 권한 오류", description = "지출 카테고리에 대한 권한이 없습니다.",
+                    value = """
+                            {
+                            "code": "4030",
+                            "message": "ACCESS_TO_THE_REQUESTED_RESOURCE_IS_FORBIDDEN"
+                            }
+                            """
+            )
+    }))
     ResponseEntity<?> deleteSpending(@PathVariable Long spendingId, @AuthenticationPrincipal SecurityUserDetails user);
 }
