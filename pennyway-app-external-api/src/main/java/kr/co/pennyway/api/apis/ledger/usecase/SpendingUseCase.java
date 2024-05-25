@@ -56,7 +56,7 @@ public class SpendingUseCase {
     }
 
     @Transactional
-    public void deleteSpending(Long userId, Long spendingId) {
+    public void deleteSpending(Long spendingId) {
         Spending spending = spendingService.readSpending(spendingId)
                 .orElseThrow(() -> new SpendingErrorException(SpendingErrorCode.NOT_FOUND_SPENDING));
 

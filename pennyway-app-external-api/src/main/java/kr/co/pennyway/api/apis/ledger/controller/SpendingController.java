@@ -52,7 +52,7 @@ public class SpendingController implements SpendingApi {
     @DeleteMapping("/{spendingId}")
     @PreAuthorize("isAuthenticated() and @spendingManager.hasPermission(#user.getUserId(), #spendingId)")
     public ResponseEntity<?> deleteSpending(@PathVariable Long spendingId, @AuthenticationPrincipal SecurityUserDetails user) {
-        spendingUseCase.deleteSpending(user.getUserId(), spendingId);
+        spendingUseCase.deleteSpending(spendingId);
 
         return ResponseEntity.ok(SuccessResponse.noContent());
     }
