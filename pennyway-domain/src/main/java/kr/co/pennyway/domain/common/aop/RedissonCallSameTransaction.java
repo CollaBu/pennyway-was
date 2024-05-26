@@ -16,6 +16,6 @@ public class RedissonCallSameTransaction implements CallTransaction {
     @Override
     @Transactional(propagation = Propagation.MANDATORY, timeout = 2)
     public Object proceed(ProceedingJoinPoint joinPoint) throws Throwable {
-        return null;
+        return joinPoint.proceed();
     }
 }

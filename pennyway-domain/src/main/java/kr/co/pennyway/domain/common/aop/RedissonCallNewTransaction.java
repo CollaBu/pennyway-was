@@ -16,6 +16,6 @@ public class RedissonCallNewTransaction implements CallTransaction {
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public Object proceed(ProceedingJoinPoint joinPoint) throws Throwable {
-        return null;
+        return joinPoint.proceed();
     }
 }
