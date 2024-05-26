@@ -1,5 +1,7 @@
 package kr.co.pennyway.api.apis.storage.dto;
 
+import java.net.URI;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 
@@ -24,14 +26,14 @@ public class PresignedUrlDto {
 	@Schema(title = "S3 이미지 저장을 위한 Presigned URL 발급 응답 DTO", description = "S3에 이미지를 저장하기 위한 Presigned URL을 발급 응답을 위한 DTO")
 	public record PresignedUrlRes(
 			@Schema(description = "Presigned URL")
-			String presignedUrl
+			URI presignedUrl
 	) {
 		/**
 		 * Presigned URL 발급 응답 객체 생성
 		 *
 		 * @param presignedUrl String : Presigned URL
 		 */
-		public static PresignedUrlRes of(String presignedUrl) {
+		public static PresignedUrlRes of(URI presignedUrl) {
 			return new PresignedUrlRes(presignedUrl);
 		}
 	}
