@@ -16,7 +16,7 @@ public class StorageException extends GlobalErrorException {
 		return errorCode.causedBy();
 	}
 
-	public String getExplainError() {
-		return errorCode.getExplainError();
+	public StorageErrorCode getErrorCode() {
+		return errorCode;
 	}
 }
