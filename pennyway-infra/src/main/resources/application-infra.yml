@@ -22,7 +22,9 @@ spring:
           access-key: ${AWS_S3_ACCESS_KEY:access-key}
           secret-key: ${AWS_S3_SECRET_KEY:secret-key}
         region:
-          static: ${AWS_SNS_REGION:ap-northeast-2}
+          static: ${AWS_S3_REGION:ap-northeast-2}
+        bucket:
+          name: ${AWS_S3_BUCKET_NAME:pennyway}
 
 app:
   question-address: ${ADMIN_ADDRESS:team.collabu@gmail.com}

@@ -17,15 +17,22 @@ public class AwsS3Config {
 	private final String accessKey;
 	private final String secretKey;
 	private final String region;
+	private final String bucketName;
 
 	public AwsS3Config(
 			@Value("${spring.cloud.aws.s3.credentials.access-key}") String accessKey,
 			@Value("${spring.cloud.aws.s3.credentials.secret-key}") String secretKey,
-			@Value("${spring.cloud.aws.s3.region.static}") String region
+			@Value("${spring.cloud.aws.s3.region.static}") String region,
+			@Value("${spring.cloud.aws.s3.bucket.name}") String bucketName
 	) {
 		this.accessKey = accessKey;
 		this.secretKey = secretKey;
 		this.region = region;
+		this.bucketName = bucketName;
+	}
+
+	public String getBucketName() {
+		return bucketName;
 	}
 
 	@Bean
