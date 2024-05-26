@@ -47,6 +47,7 @@ public class DistributedLockAop {
             throw new InterruptedException("Failed to acquire lock: " + key);
         } finally {
             try {
+                log.info("{} : Redisson Lock 해제 : {} {}", Thread.currentThread().getId(), method.getName(), key);
                 rLock.unlock();
             } catch (IllegalMonitorStateException ignored) {
                 log.error("Redisson lock is already unlocked: {} {}", method.getName(), key);
