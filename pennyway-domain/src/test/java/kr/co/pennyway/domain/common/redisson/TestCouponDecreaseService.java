@@ -7,7 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class TestCouponDecreaseService {
     private final EntityManager em;
 
-    TestCouponDecreaseService(EntityManager em) {
+    public TestCouponDecreaseService(EntityManager em) {
         this.em = em;
     }
 
