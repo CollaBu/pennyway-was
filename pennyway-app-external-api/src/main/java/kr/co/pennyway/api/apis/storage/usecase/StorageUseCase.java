@@ -1,4 +1,4 @@
-package kr.co.pennyway.api.apis.auth.usecase;
+package kr.co.pennyway.api.apis.storage.usecase;
 
 import kr.co.pennyway.api.apis.storage.dto.PresignedUrlDto;
 import kr.co.pennyway.api.apis.storage.service.StorageService;
