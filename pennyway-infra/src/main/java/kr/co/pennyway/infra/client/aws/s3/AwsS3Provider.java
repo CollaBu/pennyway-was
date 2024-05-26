@@ -25,25 +25,20 @@ public class AwsS3Provider {
 	private final AwsS3Config awsS3Config;
 	private final S3Presigner s3Presigner;
 
-	public URI generatedPresignedUrl(String type, String ext, String userId, String chatId, String chatroomId) {
-		try {
-			if (!extensionSet.contains(ext)) {
-				throw new IllegalArgumentException("지원하지 않는 확장자입니다.");
-			}
-
-			PutObjectRequest putObjectRequest = PutObjectRequest.builder()
-					.bucket(awsS3Config.getBucketName())
-					.key(generateObjectKey(type, ext, userId, chatId, chatroomId))
-					.build();
-
-			PresignedPutObjectRequest presignedRequest = s3Presigner.presignPutObject(r -> r.putObjectRequest(putObjectRequest)
-					.signatureDuration(Duration.ofMinutes(10)));
-
-			return presignedRequest.url().toURI();
-		} catch (Exception e) {
-			log.error("S3 PreSigned URL 생성 실패: {}", e.getMessage());
-			throw new RuntimeException("S3 PreSigned URL 생성에 실패했습니다.");
+	public URI generatedPresignedUrl(String type, String ext, String userId, String chatId, String chatroomId) throws Exception {
+		if (!extensionSet.contains(ext)) {
+			throw new IllegalArgumentException("지원하지 않는 확장자입니다.");
 		}
+
+		PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+				.bucket(awsS3Config.getBucketName())
+				.key(generateObjectKey(type, ext, userId, chatId, chatroomId))
+				.build();
+
+		PresignedPutObjectRequest presignedRequest = s3Presigner.presignPutObject(r -> r.putObjectRequest(putObjectRequest)
+				.signatureDuration(Duration.ofMinutes(10)));
+
+		return presignedRequest.url().toURI();
 	}
 
 	/**
@@ -72,7 +67,8 @@ public class AwsS3Provider {
 	 * @param chatroomId
 	 * @return
 	 */
-	private Map<String, String> generateObjectKeyVariables(String type, String ext, String userId, String chatId, String chatroomId) {
+	private Map<String, String> generateObjectKeyVariables(String type, String ext, String userId, String chatId, String chatroomId) throws
+			IllegalArgumentException {
 		Map<String, String> variablesMap = new HashMap<>();
 		variablesMap.put("uuid", UUIDUtil.generateUUID());
 		variablesMap.put("timestamp", String.valueOf(System.currentTimeMillis()));
