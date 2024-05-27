@@ -3,9 +3,11 @@ package kr.co.pennyway.domain.domains.coupon;
 import kr.co.pennyway.domain.common.aop.DistributedLock;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 @Component
+@ActiveProfiles("test")
 @RequiredArgsConstructor
 public class TestCouponDecreaseService {
     private final TestCouponRepository couponRepository;
