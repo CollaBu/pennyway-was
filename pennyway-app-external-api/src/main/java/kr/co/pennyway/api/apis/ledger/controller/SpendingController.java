@@ -56,7 +56,7 @@ public class SpendingController implements SpendingApi {
             throw new SpendingErrorException(SpendingErrorCode.INVALID_ICON_WITH_CATEGORY_ID);
         }
 
-        return ResponseEntity.ok(SuccessResponse.from("spending", spendingUseCase.updateSpending(user.getUserId(), spendingId, request)));
+        return ResponseEntity.ok(SuccessResponse.from("spending", spendingUseCase.updateSpending(spendingId, request)));
     }
 
     /**
