@@ -14,7 +14,7 @@ public class TestJpaConfig {
 
     @Bean
     @ConditionalOnMissingBean
-    public JPAQueryFactory jpaQueryFactory() {
+    public JPAQueryFactory testJpaQueryFactory() {
         return new JPAQueryFactory(em);
     }
 }

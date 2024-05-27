@@ -2,6 +2,7 @@ package kr.co.pennyway.domain.common.redisson;
 
 import kr.co.pennyway.domain.config.ContainerDBTestConfig;
 import kr.co.pennyway.domain.config.DomainIntegrationTest;
+import kr.co.pennyway.domain.config.TestJpaConfig;
 import kr.co.pennyway.domain.domains.coupon.TestCoupon;
 import kr.co.pennyway.domain.domains.coupon.TestCouponDecreaseService;
 import kr.co.pennyway.domain.domains.coupon.TestCouponRepository;
@@ -10,6 +11,7 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.context.annotation.Import;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -22,6 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @EntityScan(basePackageClasses = {TestCoupon.class})
+@Import(TestJpaConfig.class)
 public class CouponDecreaseLockTest extends ContainerDBTestConfig {
     @Autowired
     private TestCouponDecreaseService testCouponDecreaseService;
