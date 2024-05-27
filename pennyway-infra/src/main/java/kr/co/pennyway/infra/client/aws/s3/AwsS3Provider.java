@@ -7,6 +7,8 @@ import java.util.Set;
 
 import org.springframework.stereotype.Component;
 
+import kr.co.pennyway.infra.common.exception.StorageErrorCode;
+import kr.co.pennyway.infra.common.exception.StorageException;
 import kr.co.pennyway.infra.config.AwsS3Config;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,20 +34,25 @@ public class AwsS3Provider {
 	 * @return Presigned URL
 	 * @throws Exception
 	 */
-	public URI generatedPresignedUrl(String type, String ext, String userId, String chatroomId) throws Exception {
-		if (!extensionSet.contains(ext)) {
-			throw new IllegalArgumentException("지원하지 않는 확장자입니다.");
+	public URI generatedPresignedUrl(String type, String ext, String userId, String chatroomId) {
+		try {
+			if (!extensionSet.contains(ext)) {
+				throw new StorageException(StorageErrorCode.INVALID_EXTENSION);
+			}
+
+			PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+					.bucket(awsS3Config.getBucketName())
+					.key(generateObjectKey(type, ext, userId, chatroomId))
+					.build();
+
+			PresignedPutObjectRequest presignedRequest = s3Presigner.presignPutObject(r -> r.putObjectRequest(putObjectRequest)
+					.signatureDuration(Duration.ofMinutes(10)));
+
+			return presignedRequest.url().toURI();
+		} catch (Exception e) {
+			log.error("Presigned URL 생성 중 오류 발생", e);
+			throw new StorageException(StorageErrorCode.MISSING_REQUIRED_PARAMETER);
 		}
-
-		PutObjectRequest putObjectRequest = PutObjectRequest.builder()
-				.bucket(awsS3Config.getBucketName())
-				.key(generateObjectKey(type, ext, userId, chatroomId))
-				.build();
-
-		PresignedPutObjectRequest presignedRequest = s3Presigner.presignPutObject(r -> r.putObjectRequest(putObjectRequest)
-				.signatureDuration(Duration.ofMinutes(10)));
-
-		return presignedRequest.url().toURI();
 	}
 
 	/**
@@ -72,13 +79,12 @@ public class AwsS3Provider {
 	 * @param chatroomId : 채팅방 ID (PK) - CHATROOM_PROFILE, CHAT, CHAT_PROFILE
 	 * @return
 	 */
-	private Map<String, String> generateObjectKeyVariables(String type, String ext, String userId, String chatroomId) throws
-			IllegalArgumentException {
+	private Map<String, String> generateObjectKeyVariables(String type, String ext, String userId, String chatroomId) {
 		ObjectKeyType objectType;
 		try {
 			objectType = ObjectKeyType.valueOf(type);
 		} catch (IllegalArgumentException e) {
-			throw new IllegalArgumentException("Invalid type provided: " + type, e);
+			throw new StorageException(StorageErrorCode.INVALID_TYPE);
 		}
 
 		UrlGenerator urlGenerator = UrlGeneratorFactory.getUrlGenerator(objectType);

@@ -1,5 +1,8 @@
 package kr.co.pennyway.infra.client.aws.s3;
 
+import kr.co.pennyway.infra.common.exception.StorageErrorCode;
+import kr.co.pennyway.infra.common.exception.StorageException;
+
 public class UrlGeneratorFactory {
 	public static UrlGenerator getUrlGenerator(ObjectKeyType type) {
 		switch (type) {
@@ -14,7 +17,7 @@ public class UrlGeneratorFactory {
 			case CHAT_PROFILE:
 				return new ChatProfileUrlGenerator();
 			default:
-				throw new IllegalArgumentException("Invalid type: " + type);
+				throw new StorageException(StorageErrorCode.INVALID_TYPE);
 		}
 	}
 }

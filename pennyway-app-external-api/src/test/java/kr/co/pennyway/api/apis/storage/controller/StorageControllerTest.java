@@ -19,8 +19,8 @@ import org.springframework.web.context.WebApplicationContext;
 
 import kr.co.pennyway.api.apis.storage.dto.PresignedUrlDto;
 import kr.co.pennyway.api.apis.storage.usecase.StorageUseCase;
-import kr.co.pennyway.api.common.exception.StorageErrorCode;
-import kr.co.pennyway.api.common.exception.StorageException;
+import kr.co.pennyway.infra.common.exception.StorageErrorCode;
+import kr.co.pennyway.infra.common.exception.StorageException;
 
 @WebMvcTest(controllers = {StorageController.class})
 @ActiveProfiles("local")
@@ -43,7 +43,7 @@ class StorageControllerTest {
 	@DisplayName("Type이 PROFILE이고, UserId가 NULL일 때 400 응답을 반환한다.")
 	void getPresignedUrlWithNullUserId() throws Exception {
 		// given
-		PresignedUrlDto.PresignedUrlReq request = new PresignedUrlDto.PresignedUrlReq("PROFILE", "jpg", null, null, null);
+		PresignedUrlDto.PresignedUrlReq request = new PresignedUrlDto.PresignedUrlReq("PROFILE", "jpg", null, null);
 		given(storageUseCase.getPresignedUrl(request)).willThrow(new StorageException(StorageErrorCode.MISSING_REQUIRED_PARAMETER));
 
 		// when
@@ -57,7 +57,7 @@ class StorageControllerTest {
 	@DisplayName("Type이 CHAT이고, ChatroomId가 NULL일 때 400 응답을 반환한다.")
 	void getPresignedUrlWithNullChatroomId() throws Exception {
 		// given
-		PresignedUrlDto.PresignedUrlReq request = new PresignedUrlDto.PresignedUrlReq("CHAT", "jpg", "userId", null, null);
+		PresignedUrlDto.PresignedUrlReq request = new PresignedUrlDto.PresignedUrlReq("CHAT", "jpg", "userId", null);
 		given(storageUseCase.getPresignedUrl(request)).willThrow(new StorageException(StorageErrorCode.MISSING_REQUIRED_PARAMETER));
 
 		// when
@@ -71,7 +71,7 @@ class StorageControllerTest {
 	@DisplayName("Type이 CHATROOM_PROFILE이고, ChatroomId가 NULL일 때 400 응답을 반환한다.")
 	void getPresignedUrlWithNullChatroomIdForChatroomProfile() throws Exception {
 		// given
-		PresignedUrlDto.PresignedUrlReq request = new PresignedUrlDto.PresignedUrlReq("CHATROOM_PROFILE", "jpg", "userId", null, null);
+		PresignedUrlDto.PresignedUrlReq request = new PresignedUrlDto.PresignedUrlReq("CHATROOM_PROFILE", "jpg", "userId", null);
 		given(storageUseCase.getPresignedUrl(request)).willThrow(new StorageException(StorageErrorCode.MISSING_REQUIRED_PARAMETER));
 
 		// when
@@ -86,7 +86,6 @@ class StorageControllerTest {
 				.param("type", request.type())
 				.param("ext", request.ext())
 				.param("userId", request.userId())
-				.param("chatRoomId", request.chatroomId())
-				.param("chatId", request.chatId()));
+				.param("chatRoomId", request.chatroomId()));
 	}
 }
