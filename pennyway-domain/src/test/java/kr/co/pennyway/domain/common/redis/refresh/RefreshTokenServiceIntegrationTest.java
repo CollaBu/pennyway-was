@@ -2,7 +2,6 @@ package kr.co.pennyway.domain.common.redis.refresh;
 
 import kr.co.pennyway.domain.config.ContainerRedisTestConfig;
 import kr.co.pennyway.domain.config.RedisConfig;
-import kr.co.pennyway.domain.config.RedisUnitTest;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -17,9 +16,8 @@ import static org.springframework.test.util.AssertionErrors.assertEquals;
 import static org.springframework.test.util.AssertionErrors.assertFalse;
 
 @Slf4j
-@RedisUnitTest
 @DataRedisTest(properties = "spring.config.location=classpath:application-domain.yml")
-@ContextConfiguration(classes = {RedisConfig.class})
+@ContextConfiguration(classes = {RedisConfig.class, RefreshTokenServiceImpl.class})
 @ActiveProfiles("test")
 public class RefreshTokenServiceIntegrationTest extends ContainerRedisTestConfig {
     @Autowired
