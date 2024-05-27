@@ -26,7 +26,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -171,15 +170,8 @@ public class SpendingControllerIntegrationTest extends ExternalApiDBTestConfig {
         void deleteSpendingSuccess() throws Exception {
             // given
             User user = userService.createUser(UserFixture.GENERAL_USER.toUser());
-            Spending spending = spendingService.createSpending(Spending.builder()
-                    .amount(10000)
-                    .category(SpendingCategory.FOOD)
-                    .spendAt(LocalDateTime.now())
-                    .accountName("소비처")
-                    .memo("메모")
-                    .user(user)
-                    .spendingCustomCategory(null)
-                    .build());
+            Spending spending = SpendingFixture.toSpending(user);
+            spendingService.createSpending(spending);
 
             // when
             ResultActions resultActions = performDeleteSpendingSuccess(user, spending.getId());
@@ -188,6 +180,7 @@ public class SpendingControllerIntegrationTest extends ExternalApiDBTestConfig {
             resultActions
                     .andDo(print())
                     .andExpect(status().isOk());
+            Assertions.assertTrue(spendingService.readSpending(spending.getId()).isEmpty());
         }
 
         @Test
@@ -196,15 +189,8 @@ public class SpendingControllerIntegrationTest extends ExternalApiDBTestConfig {
         void deleteSpendingForbidden() throws Exception {
             // given
             User user1 = userService.createUser(UserFixture.GENERAL_USER.toUser());
-            Spending spending = spendingService.createSpending(Spending.builder()
-                    .amount(10000)
-                    .category(SpendingCategory.FOOD)
-                    .spendAt(LocalDateTime.now())
-                    .accountName("소비처")
-                    .memo("메모")
-                    .user(user1)
-                    .spendingCustomCategory(null)
-                    .build());
+            Spending spending = SpendingFixture.toSpending(user1);
+            spendingService.createSpending(spending);
             User user2 = userService.createUser(UserFixture.GENERAL_USER.toUser());
 
             // when
