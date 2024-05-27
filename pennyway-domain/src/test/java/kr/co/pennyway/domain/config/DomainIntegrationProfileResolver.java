@@ -7,6 +7,6 @@ public class DomainIntegrationProfileResolver implements ActiveProfilesResolver 
     @Override
     @NonNull
     public String[] resolve(@NonNull Class<?> testClass) {
-        return new String[]{"common"};
+        return new String[]{"common", "domain"};
     }
 }

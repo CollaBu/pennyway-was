@@ -1,20 +1,16 @@
 package kr.co.pennyway.domain.common.redisson;
 
 import jakarta.persistence.EntityManager;
-import kr.co.pennyway.domain.common.aop.DistributedLockAop;
-import kr.co.pennyway.domain.common.aop.RedissonCallNewTransaction;
-import kr.co.pennyway.domain.config.*;
+import kr.co.pennyway.domain.config.ContainerDBTestConfig;
+import kr.co.pennyway.domain.config.DomainIntegrationTest;
+import kr.co.pennyway.domain.domains.coupon.TestCoupon;
+import kr.co.pennyway.domain.domains.coupon.TestCouponDecreaseService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.context.annotation.EnableAspectJAutoProxy;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -23,25 +19,18 @@ import java.util.concurrent.Executors;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Slf4j
-@ActiveProfiles("test")
-@DataJpaTest(properties = "spring.jpa.hibernate.ddl-auto=create")
+@DomainIntegrationTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@ContextConfiguration(classes = {JpaConfig.class, RedisConfig.class, RedissonConfig.class, RedissonCallNewTransaction.class})
-@EnableAspectJAutoProxy
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-@Import({TestJpaConfig.class})
+@EntityScan(basePackageClasses = {TestCoupon.class})
 public class CouponDecreaseLockTest extends ContainerDBTestConfig {
     @Autowired
-    private TestEntityManager testEntityManager;
     private EntityManager em;
     private TestCouponDecreaseService testCouponDecreaseService;
     private TestCoupon coupon;
 
     @BeforeEach
-    void setUp(AnnotationConfigApplicationContext context) {
-        context.register(DistributedLockAop.class);
-
-        em = testEntityManager.getEntityManager();
+    void setUp() {
         testCouponDecreaseService = new TestCouponDecreaseService(em);
 
         coupon = new TestCoupon("COUPON_001", 300L);
@@ -51,6 +40,7 @@ public class CouponDecreaseLockTest extends ContainerDBTestConfig {
 
     @Test
     @Order(1)
+    @Transactional
     void 쿠폰차감_분산락_적용_동시성_300명_테스트() throws InterruptedException {
         // given
         int threadCount = 300;

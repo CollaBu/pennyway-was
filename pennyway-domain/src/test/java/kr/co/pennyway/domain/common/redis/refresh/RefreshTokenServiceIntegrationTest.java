@@ -21,7 +21,7 @@ import static org.springframework.test.util.AssertionErrors.assertFalse;
 @DataRedisTest(properties = "spring.config.location=classpath:application-domain.yml")
 @ContextConfiguration(classes = {RedisConfig.class})
 @ActiveProfiles("test")
-public class RefreshTokenServiceUnitTest extends ContainerRedisTestConfig {
+public class RefreshTokenServiceIntegrationTest extends ContainerRedisTestConfig {
     @Autowired
     private RefreshTokenRepository refreshTokenRepository;
     private RefreshTokenService refreshTokenService;

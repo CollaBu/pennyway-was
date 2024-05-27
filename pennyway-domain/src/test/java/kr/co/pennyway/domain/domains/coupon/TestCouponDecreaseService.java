@@ -1,4 +1,4 @@
-package kr.co.pennyway.domain.common.redisson;
+package kr.co.pennyway.domain.domains.coupon;
 
 import jakarta.persistence.EntityManager;
 import kr.co.pennyway.domain.common.aop.DistributedLock;
