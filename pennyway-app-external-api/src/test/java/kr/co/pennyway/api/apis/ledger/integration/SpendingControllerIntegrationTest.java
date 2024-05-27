@@ -7,8 +7,10 @@ import kr.co.pennyway.api.config.ExternalApiDBTestConfig;
 import kr.co.pennyway.api.config.ExternalApiIntegrationTest;
 import kr.co.pennyway.api.config.fixture.SpendingFixture;
 import kr.co.pennyway.api.config.fixture.UserFixture;
+import kr.co.pennyway.domain.domains.spending.domain.Spending;
 import kr.co.pennyway.domain.domains.spending.domain.SpendingCustomCategory;
 import kr.co.pennyway.domain.domains.spending.service.SpendingCustomCategoryService;
+import kr.co.pennyway.domain.domains.spending.service.SpendingService;
 import kr.co.pennyway.domain.domains.spending.type.SpendingCategory;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.service.UserService;
@@ -24,6 +26,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -43,9 +46,12 @@ public class SpendingControllerIntegrationTest extends ExternalApiDBTestConfig {
     @Autowired
     private UserService userService;
     @Autowired
+    private SpendingService spendingService;
+    @Autowired
     private SpendingCustomCategoryService spendingCustomCategoryService;
     @Autowired
     private NamedParameterJdbcTemplate jdbcTemplate;
+
 
     @Order(1)
     @Nested
@@ -142,6 +148,7 @@ public class SpendingControllerIntegrationTest extends ExternalApiDBTestConfig {
             log.debug("수행 시간: {}ms", after - before);
         }
 
+
         private ResultActions performGetSpendingListAtYearAndMonthSuccess(User requestUser) throws Exception {
             UserDetails userDetails = SecurityUserDetails.from(requestUser);
             LocalDate now = LocalDate.now();
@@ -152,4 +159,69 @@ public class SpendingControllerIntegrationTest extends ExternalApiDBTestConfig {
                     .param("month", String.valueOf(now.getMonthValue())));
         }
     }
+
+    @Order(4)
+    @Nested
+    @DisplayName("지출 내역 삭제")
+    class DeleteSpending {
+
+        @Test
+        @DisplayName("지출 내역 삭제 성공")
+        @Transactional
+        void deleteSpendingSuccess() throws Exception {
+            // given
+            User user = userService.createUser(UserFixture.GENERAL_USER.toUser());
+            Spending spending = spendingService.createSpending(Spending.builder()
+                    .amount(10000)
+                    .category(SpendingCategory.FOOD)
+                    .spendAt(LocalDateTime.now())
+                    .accountName("소비처")
+                    .memo("메모")
+                    .user(user)
+                    .spendingCustomCategory(null)
+                    .build());
+
+            // when
+            ResultActions resultActions = performDeleteSpendingSuccess(user, spending.getId());
+
+            // then
+            resultActions
+                    .andDo(print())
+                    .andExpect(status().isOk());
+        }
+
+        @Test
+        @DisplayName("권한이 없는 사용자의 지출 내역 삭제")
+        @Transactional
+        void deleteSpendingForbidden() throws Exception {
+            // given
+            User user1 = userService.createUser(UserFixture.GENERAL_USER.toUser());
+            Spending spending = spendingService.createSpending(Spending.builder()
+                    .amount(10000)
+                    .category(SpendingCategory.FOOD)
+                    .spendAt(LocalDateTime.now())
+                    .accountName("소비처")
+                    .memo("메모")
+                    .user(user1)
+                    .spendingCustomCategory(null)
+                    .build());
+            User user2 = userService.createUser(UserFixture.GENERAL_USER.toUser());
+
+            // when
+            ResultActions resultActions = performDeleteSpendingSuccess(user2, spending.getId());
+
+            // then
+            resultActions
+                    .andDo(print())
+                    .andExpect(status().isForbidden());
+        }
+
+        private ResultActions performDeleteSpendingSuccess(User requestUser, Long spendingId) throws Exception {
+            UserDetails userDetails = SecurityUserDetails.from(requestUser);
+
+            return mockMvc.perform(MockMvcRequestBuilders.delete("/v2/spendings/{spendingId}", spendingId)
+                    .with(user(userDetails)));
+        }
+    }
+
 }
