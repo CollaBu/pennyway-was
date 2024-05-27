@@ -5,6 +5,7 @@ import kr.co.pennyway.domain.config.ContainerDBTestConfig;
 import kr.co.pennyway.domain.config.DomainIntegrationTest;
 import kr.co.pennyway.domain.domains.coupon.TestCoupon;
 import kr.co.pennyway.domain.domains.coupon.TestCouponDecreaseService;
+import kr.co.pennyway.domain.domains.coupon.TestCouponRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,16 +27,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class CouponDecreaseLockTest extends ContainerDBTestConfig {
     @Autowired
     private EntityManager em;
+    @Autowired
     private TestCouponDecreaseService testCouponDecreaseService;
+    @Autowired
+    private TestCouponRepository testCouponRepository;
     private TestCoupon coupon;
 
     @BeforeEach
     void setUp() {
-        testCouponDecreaseService = new TestCouponDecreaseService(em);
-
         coupon = new TestCoupon("COUPON_001", 300L);
-        em.persist(coupon);
-        em.flush();
+        testCouponRepository.save(coupon);
     }
 
     @Test
