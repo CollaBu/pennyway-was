@@ -17,17 +17,6 @@ import java.util.concurrent.ThreadLocalRandom;
 public class SpendingFixture {
     private static final String SPENDING_TABLE = "spending";
 
-    public static Spending toSpending() {
-        return Spending.builder()
-                .amount(10000)
-                .category(SpendingCategory.FOOD)
-                .spendAt(LocalDateTime.now())
-                .accountName("카페인 수혈")
-                .memo("아메리카노 1잔")
-                .user(UserFixture.GENERAL_USER.toUser())
-                .build();
-    }
-
     public static Spending toSpending(User user) {
         return Spending.builder()
                 .amount(10000)
