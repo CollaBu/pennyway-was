@@ -1,5 +1,6 @@
 package kr.co.pennyway.domain.config;
 
+import kr.co.pennyway.domain.DomainPackageLocation;
 import kr.co.pennyway.domain.common.annotation.DomainRedisCacheManager;
 import kr.co.pennyway.domain.common.annotation.DomainRedisConnectionFactory;
 import kr.co.pennyway.domain.common.annotation.DomainRedisTemplate;
@@ -23,7 +24,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import java.time.Duration;
 
 @Configuration
-@EnableRedisRepositories
+@EnableRedisRepositories(basePackageClasses = DomainPackageLocation.class)
 @EnableTransactionManagement
 public class RedisConfig {
     private final String host;
