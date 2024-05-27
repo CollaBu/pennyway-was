@@ -17,6 +17,17 @@ import java.util.concurrent.ThreadLocalRandom;
 public class SpendingFixture {
     private static final String SPENDING_TABLE = "spending";
 
+    public static Spending toSpending(User user) {
+        return Spending.builder()
+                .amount(10000)
+                .category(SpendingCategory.FOOD)
+                .spendAt(LocalDateTime.now())
+                .accountName("카페인 수혈")
+                .memo("아메리카노 1잔")
+                .user(user)
+                .build();
+    }
+
     public static void bulkInsertSpending(User user, int capacity, NamedParameterJdbcTemplate jdbcTemplate) {
         Collection<Spending> spendings = getRandomSpendings(user, capacity);
 
@@ -56,7 +67,7 @@ public class SpendingFixture {
         int year = ThreadLocalRandom.current().nextInt(startAt.getYear(), endAt.getYear() + 1);
         int month = (year == endAt.getYear()) ? ThreadLocalRandom.current().nextInt(1, endAt.getMonthValue() + 1) : ThreadLocalRandom.current().nextInt(1, 13);
         int day = ThreadLocalRandom.current().nextInt(1, 29);
-        
+
         return LocalDateTime.of(year, month, day, 0, 0, 0);
     }
 
