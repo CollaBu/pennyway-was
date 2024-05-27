@@ -18,6 +18,6 @@ public class StorageUseCase {
 		String userId = request.userId();
 		String chatId = request.chatId();
 		String chatroomId = request.chatroomId();
-		return PresignedUrlDto.PresignedUrlRes.of(storageService.getPresignedUrl(type, ext, userId, chatId, chatroomId));
+		return PresignedUrlDto.PresignedUrlRes.of(storageService.getPresignedUrl(type, ext, userId, chatroomId));
 	}
 }

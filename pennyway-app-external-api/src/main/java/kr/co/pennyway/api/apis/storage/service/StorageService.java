@@ -16,9 +16,9 @@ import lombok.extern.slf4j.Slf4j;
 public class StorageService {
 	private final AwsS3Provider awsS3Provider;
 
-	public URI getPresignedUrl(String type, String ext, String userId, String chatId, String chatroomId) {
+	public URI getPresignedUrl(String type, String ext, String userId, String chatroomId) {
 		try {
-			return awsS3Provider.generatedPresignedUrl(type, ext, userId, chatId, chatroomId);
+			return awsS3Provider.generatedPresignedUrl(type, ext, userId, chatroomId);
 		} catch (IllegalArgumentException e) {
 			throw new StorageException(StorageErrorCode.MISSING_REQUIRED_PARAMETER);
 		} catch (Exception e) {

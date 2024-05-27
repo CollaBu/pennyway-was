@@ -25,14 +25,23 @@ public class AwsS3Provider {
 	private final AwsS3Config awsS3Config;
 	private final S3Presigner s3Presigner;
 
-	public URI generatedPresignedUrl(String type, String ext, String userId, String chatId, String chatroomId) throws Exception {
+	/**
+	 * type에 해당하는 확장자를 가진 파일을 S3에 저장하기 위한 Presigned URL을 생성한다.
+	 * @param type
+	 * @param ext
+	 * @param userId
+	 * @param chatroomId
+	 * @return
+	 * @throws Exception
+	 */
+	public URI generatedPresignedUrl(String type, String ext, String userId, String chatroomId) throws Exception {
 		if (!extensionSet.contains(ext)) {
 			throw new IllegalArgumentException("지원하지 않는 확장자입니다.");
 		}
 
 		PutObjectRequest putObjectRequest = PutObjectRequest.builder()
 				.bucket(awsS3Config.getBucketName())
-				.key(generateObjectKey(type, ext, userId, chatId, chatroomId))
+				.key(generateObjectKey(type, ext, userId, chatroomId))
 				.build();
 
 		PresignedPutObjectRequest presignedRequest = s3Presigner.presignPutObject(r -> r.putObjectRequest(putObjectRequest)
@@ -42,32 +51,30 @@ public class AwsS3Provider {
 	}
 
 	/**
-	 * ObjectKey를 생성한다.
+	 * type에 해당하는 ObjectKeyTemplate을 적용하여 ObjectKey(S3에 저장하기 위한 정적 파일의 경로 및 이름)를 생성한다.
 	 * @param type
 	 * @param ext
 	 * @param userId
-	 * @param chatId
 	 * @param chatroomId
-	 * @return
+	 * @return ObjectKey
 	 */
-	private String generateObjectKey(String type, String ext, String userId, String chatId, String chatroomId) {
+	private String generateObjectKey(String type, String ext, String userId, String chatroomId) {
 		ObjectKeyTemplate objectKeyTemplate = new ObjectKeyTemplate(ObjectKeyType.valueOf(type).getTemplate());
-		Map<String, String> variables = generateObjectKeyVariables(type, ext, userId, chatId, chatroomId);
+		Map<String, String> variables = generateObjectKeyVariables(type, ext, userId, chatroomId);
 		String objectKey = objectKeyTemplate.apply(variables);
 		return objectKey;
 
 	}
 
 	/**
-	 * ObjectKey에 사용될 변수들을 생성한다.
-	 * @param type
-	 * @param ext
-	 * @param userId
-	 * @param chatId
-	 * @param chatroomId
+	 * ObjectKey에 사용될 변수들을 Template에 적용하기 위한 Map에 담아 반환한다.
+	 * @param type : ObjectKeyType (PROFILE, FEED, CHATROOM_PROFILE, CHAT, CHAT_PROFILE)
+	 * @param ext : 파일 확장자 (jpg, png, jpeg)
+	 * @param userId : 사용자 ID (PK) - PROFILE, CHAT_PROFILE
+	 * @param chatroomId : 채팅방 ID (PK) - CHATROOM_PROFILE, CHAT, CHAT_PROFILE
 	 * @return
 	 */
-	private Map<String, String> generateObjectKeyVariables(String type, String ext, String userId, String chatId, String chatroomId) throws
+	private Map<String, String> generateObjectKeyVariables(String type, String ext, String userId, String chatroomId) throws
 			IllegalArgumentException {
 		Map<String, String> variablesMap = new HashMap<>();
 		variablesMap.put("uuid", UUIDUtil.generateUUID());
