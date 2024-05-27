@@ -25,11 +25,11 @@ public class AwsS3Provider {
 
 	/**
 	 * type에 해당하는 확장자를 가진 파일을 S3에 저장하기 위한 Presigned URL을 생성한다.
-	 * @param type
-	 * @param ext
-	 * @param userId
-	 * @param chatroomId
-	 * @return
+	 * @param type : ObjectKeyType (PROFILE, FEED, CHATROOM_PROFILE, CHAT, CHAT_PROFILE)
+	 * @param ext : 파일 확장자 (jpg, png, jpeg)
+	 * @param userId : 사용자 ID (PK) - PROFILE, CHAT_PROFILE
+	 * @param chatroomId : 채팅방 ID (PK) - CHATROOM_PROFILE, CHAT, CHAT_PROFILE
+	 * @return Presigned URL
 	 * @throws Exception
 	 */
 	public URI generatedPresignedUrl(String type, String ext, String userId, String chatroomId) throws Exception {
@@ -50,10 +50,10 @@ public class AwsS3Provider {
 
 	/**
 	 * type에 해당하는 ObjectKeyTemplate을 적용하여 ObjectKey(S3에 저장하기 위한 정적 파일의 경로 및 이름)를 생성한다.
-	 * @param type
-	 * @param ext
-	 * @param userId
-	 * @param chatroomId
+	 * @param type : ObjectKeyType (PROFILE, FEED, CHATROOM_PROFILE, CHAT, CHAT_PROFILE)
+	 * @param ext : 파일 확장자 (jpg, png, jpeg)
+	 * @param userId : 사용자 ID (PK) - PROFILE, CHAT_PROFILE
+	 * @param chatroomId : 채팅방 ID (PK) - CHATROOM_PROFILE, CHAT, CHAT_PROFILE
 	 * @return ObjectKey
 	 */
 	private String generateObjectKey(String type, String ext, String userId, String chatroomId) {
