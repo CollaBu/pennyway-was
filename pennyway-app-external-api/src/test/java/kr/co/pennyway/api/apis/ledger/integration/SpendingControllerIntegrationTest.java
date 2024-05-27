@@ -7,8 +7,10 @@ import kr.co.pennyway.api.config.ExternalApiDBTestConfig;
 import kr.co.pennyway.api.config.ExternalApiIntegrationTest;
 import kr.co.pennyway.api.config.fixture.SpendingFixture;
 import kr.co.pennyway.api.config.fixture.UserFixture;
+import kr.co.pennyway.domain.domains.spending.domain.Spending;
 import kr.co.pennyway.domain.domains.spending.domain.SpendingCustomCategory;
 import kr.co.pennyway.domain.domains.spending.service.SpendingCustomCategoryService;
+import kr.co.pennyway.domain.domains.spending.service.SpendingService;
 import kr.co.pennyway.domain.domains.spending.type.SpendingCategory;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.service.UserService;
@@ -44,6 +46,8 @@ public class SpendingControllerIntegrationTest extends ExternalApiDBTestConfig {
     private UserService userService;
     @Autowired
     private SpendingCustomCategoryService spendingCustomCategoryService;
+    @Autowired
+    private SpendingService spendingService;
     @Autowired
     private NamedParameterJdbcTemplate jdbcTemplate;
 
@@ -151,5 +155,113 @@ public class SpendingControllerIntegrationTest extends ExternalApiDBTestConfig {
                     .param("year", String.valueOf(now.getYear()))
                     .param("month", String.valueOf(now.getMonthValue())));
         }
+    }
+
+    @Order(3)
+    @Nested
+    @DisplayName("지출 내역 상세 조회")
+    class GetSpendingDetail {
+        @Test
+        @DisplayName("지출 내역 상세 조회 성공")
+        @Transactional
+        void getSpendingDetailSuccess() throws Exception {
+            // given
+            User user = userService.createUser(UserFixture.GENERAL_USER.toUser());
+            Spending spending = SpendingFixture.toSpending(user);
+            spendingService.createSpending(spending);
+
+            // when
+            ResultActions resultActions = performGetSpendingDetailSuccess(user, spending.getId());
+
+            // then
+            resultActions
+                    .andDo(print())
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.data.spending.id").value(spending.getId()));
+        }
+
+        @Test
+        @DisplayName("권한이 없는 사용자가 해당 지출 내역 조회시 403 Forbidden을 반환한다.")
+        @Transactional
+        void getSpendingDetailForbidden() throws Exception {
+            // given
+            User user1 = userService.createUser(UserFixture.GENERAL_USER.toUser());
+
+            Spending spending = SpendingFixture.toSpending(user1);
+            spendingService.createSpending(spending);
+            User user2 = userService.createUser(UserFixture.GENERAL_USER.toUser());
+
+            // when
+            ResultActions resultActions = performGetSpendingDetailSuccess(user2, spending.getId());
+
+            // then
+            resultActions
+                    .andDo(print())
+                    .andExpect(status().isForbidden());
+        }
+
+        private ResultActions performGetSpendingDetailSuccess(User requestUser, Long spendingId) throws Exception {
+            UserDetails userDetails = SecurityUserDetails.from(requestUser);
+
+            return mockMvc.perform(MockMvcRequestBuilders.get("/v2/spendings/{spendingId}", spendingId)
+                    .with(user(userDetails)));
+        }
+    }
+
+    @Order(4)
+    @Nested
+    @DisplayName("지출 내역 수정")
+    class UpdateSpending {
+        @Test
+        @DisplayName("지출 내역 수정 성공")
+        void updateSpendingSuccess() throws Exception {
+            // given
+            User user = userService.createUser(UserFixture.GENERAL_USER.toUser());
+            Spending spending = SpendingFixture.toSpending(user);
+
+            SpendingReq request = new SpendingReq(20000, -1L, SpendingCategory.LIVING, LocalDate.now(), "수정된 소비처", "수정된 메모");
+            spendingService.createSpending(spending);
+
+            // when
+            ResultActions resultActions = performUpdateSpending(request, user, spending.getId());
+
+            // then
+            resultActions
+                    .andDo(print())
+                    .andExpect(status().isOk());
+
+            Spending updatedSpending = spendingService.readSpending(spending.getId()).get();
+            Assertions.assertEquals("수정된 메모", updatedSpending.getMemo());
+        }
+
+        @Test
+        @DisplayName("권한이 없는 사용자가 해당 지출 내역 수정시 403 Forbidden을 반환한다.")
+        @Transactional
+        void updateSpendingForbidden() throws Exception {
+            // given
+            User user1 = userService.createUser(UserFixture.GENERAL_USER.toUser());
+            Spending spending = SpendingFixture.toSpending(user1);
+            spendingService.createSpending(spending);
+            User user2 = userService.createUser(UserFixture.GENERAL_USER.toUser());
+            SpendingReq request = new SpendingReq(20000, -1L, SpendingCategory.LIVING, LocalDate.now(), "수정된 소비처", "수정된 메모");
+
+            // when
+            ResultActions resultActions = performUpdateSpending(request, user2, spending.getId());
+
+            // then
+            resultActions
+                    .andDo(print())
+                    .andExpect(status().isForbidden());
+        }
+
+        private ResultActions performUpdateSpending(SpendingReq req, User requestUser, Long spendingId) throws Exception {
+            UserDetails userDetails = SecurityUserDetails.from(requestUser);
+
+            return mockMvc.perform(MockMvcRequestBuilders.put("/v2/spendings/{spendingId}", spendingId)
+                    .contentType("application/json")
+                    .with(user(userDetails))
+                    .content(objectMapper.writeValueAsString(req)));
+        }
+
     }
 }
