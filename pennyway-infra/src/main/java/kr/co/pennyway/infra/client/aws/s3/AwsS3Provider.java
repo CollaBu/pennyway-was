@@ -2,13 +2,11 @@ package kr.co.pennyway.infra.client.aws.s3;
 
 import java.net.URI;
 import java.time.Duration;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 import org.springframework.stereotype.Component;
 
-import kr.co.pennyway.common.util.UUIDUtil;
 import kr.co.pennyway.infra.config.AwsS3Config;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -76,42 +74,14 @@ public class AwsS3Provider {
 	 */
 	private Map<String, String> generateObjectKeyVariables(String type, String ext, String userId, String chatroomId) throws
 			IllegalArgumentException {
-		Map<String, String> variablesMap = new HashMap<>();
-		variablesMap.put("uuid", UUIDUtil.generateUUID());
-		variablesMap.put("timestamp", String.valueOf(System.currentTimeMillis()));
-		variablesMap.put("ext", ext);
-		switch (ObjectKeyType.valueOf(type)) {
-			case PROFILE:
-				if (userId == null) {
-					throw new IllegalArgumentException("userId는 필수입니다.");
-				}
-				variablesMap.put("userId", userId);
-				variablesMap.put("uuid", UUIDUtil.generateUUID());
-				break;
-			case FEED:
-				variablesMap.put("feed_id", UUIDUtil.generateUUID());
-				break;
-			case CHATROOM_PROFILE:
-				if (chatroomId == null) {
-					chatroomId = UUIDUtil.generateUUID();
-				}
-				variablesMap.put("chatroom_id", chatroomId);
-				break;
-			case CHAT:
-				variablesMap.put("chatroom_id", chatroomId);
-				variablesMap.put("chat_id", UUIDUtil.generateUUID());
-				break;
-			case CHAT_PROFILE:
-				if (userId == null) {
-					throw new IllegalArgumentException("userId는 필수입니다.");
-				}
-				if (chatroomId == null) {
-					chatroomId = UUIDUtil.generateUUID();
-				}
-				variablesMap.put("chatroom_id", chatroomId);
-				variablesMap.put("user_id", userId);
-				break;
+		ObjectKeyType objectType;
+		try {
+			objectType = ObjectKeyType.valueOf(type);
+		} catch (IllegalArgumentException e) {
+			throw new IllegalArgumentException("Invalid type provided: " + type, e);
 		}
-		return variablesMap;
+
+		UrlGenerator urlGenerator = UrlGeneratorFactory.getUrlGenerator(objectType);
+		return urlGenerator.generate(type, ext, userId, chatroomId);
 	}
 }
