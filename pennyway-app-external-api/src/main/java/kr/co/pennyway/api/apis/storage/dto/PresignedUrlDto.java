@@ -23,7 +23,7 @@ public class PresignedUrlDto {
 	) {
 	}
 
-	@Schema(title = "S3 이미지 저장을 위한 Presigned URL 발급 응답 DTO", description = "S3에 이미지를 저장하기 위한 Presigned URL을 발급 응답을 위한 DTO")
+	@Schema(title = "S3 이미지 저장을 위한 Presigned URL 발급 응답 DTO")
 	public record PresignedUrlRes(
 			@Schema(description = "Presigned URL")
 			URI presignedUrl
