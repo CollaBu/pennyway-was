@@ -46,5 +46,5 @@ public interface StorageApi {
 							""")
 			})),
 	})
-	ResponseEntity<?> getPresignedUrl(@Validated PresignedUrlDto.PresignedUrlReq req);
+	ResponseEntity<?> getPresignedUrl(@Validated PresignedUrlDto.Req req);
 }

@@ -23,7 +23,7 @@ public class StorageController implements StorageApi {
 	@Override
 	@GetMapping("/presigned-url")
 	@PreAuthorize("isAuthenticated()")
-	public ResponseEntity<?> getPresignedUrl(@Validated PresignedUrlDto.PresignedUrlReq request) {
+	public ResponseEntity<?> getPresignedUrl(@Validated PresignedUrlDto.Req request) {
 		return ResponseEntity.ok(storageUseCase.getPresignedUrl(request));
 	}
 }

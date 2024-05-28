@@ -43,7 +43,7 @@ class StorageControllerTest {
 	@DisplayName("Type이 PROFILE이고, UserId가 NULL일 때 400 응답을 반환한다.")
 	void getPresignedUrlWithNullUserId() throws Exception {
 		// given
-		PresignedUrlDto.PresignedUrlReq request = new PresignedUrlDto.PresignedUrlReq("PROFILE", "jpg", null, null);
+		PresignedUrlDto.Req request = new PresignedUrlDto.Req("PROFILE", "jpg", null, null);
 		given(storageUseCase.getPresignedUrl(request)).willThrow(new StorageException(StorageErrorCode.MISSING_REQUIRED_PARAMETER));
 
 		// when
@@ -57,7 +57,7 @@ class StorageControllerTest {
 	@DisplayName("Type이 CHAT이고, ChatroomId가 NULL일 때 400 응답을 반환한다.")
 	void getPresignedUrlWithNullChatroomId() throws Exception {
 		// given
-		PresignedUrlDto.PresignedUrlReq request = new PresignedUrlDto.PresignedUrlReq("CHAT", "jpg", "userId", null);
+		PresignedUrlDto.Req request = new PresignedUrlDto.Req("CHAT", "jpg", "userId", null);
 		given(storageUseCase.getPresignedUrl(request)).willThrow(new StorageException(StorageErrorCode.MISSING_REQUIRED_PARAMETER));
 
 		// when
@@ -71,7 +71,7 @@ class StorageControllerTest {
 	@DisplayName("Type이 CHATROOM_PROFILE이고, ChatroomId가 NULL일 때 400 응답을 반환한다.")
 	void getPresignedUrlWithNullChatroomIdForChatroomProfile() throws Exception {
 		// given
-		PresignedUrlDto.PresignedUrlReq request = new PresignedUrlDto.PresignedUrlReq("CHATROOM_PROFILE", "jpg", "userId", null);
+		PresignedUrlDto.Req request = new PresignedUrlDto.Req("CHATROOM_PROFILE", "jpg", "userId", null);
 		given(storageUseCase.getPresignedUrl(request)).willThrow(new StorageException(StorageErrorCode.MISSING_REQUIRED_PARAMETER));
 
 		// when
@@ -81,7 +81,7 @@ class StorageControllerTest {
 		resultActions.andExpect(status().isBadRequest());
 	}
 
-	private ResultActions getPresignedUrlRequest(PresignedUrlDto.PresignedUrlReq request) throws Exception {
+	private ResultActions getPresignedUrlRequest(PresignedUrlDto.Req request) throws Exception {
 		return mockMvc.perform(get("/v1/storage/presigned-url")
 				.param("type", request.type())
 				.param("ext", request.ext())

@@ -7,7 +7,7 @@ import jakarta.validation.constraints.NotBlank;
 
 public class PresignedUrlDto {
 	@Schema(title = "S3 이미지 저장을 위한 Presigned URL 발급 요청 DTO", description = "S3에 이미지를 저장하기 위한 Presigned URL을 발급 요청을 위한 DTO")
-	public record PresignedUrlReq(
+	public record Req(
 			@Schema(description = "이미지 종류", example = "PROFILE/FEED/CHATROOM_PROFILE/CHAT/CHAT_PROFILE")
 			@NotBlank(message = "이미지 종류는 필수입니다.")
 			String type,
@@ -22,7 +22,7 @@ public class PresignedUrlDto {
 	}
 
 	@Schema(title = "S3 이미지 저장을 위한 Presigned URL 발급 응답 DTO")
-	public record PresignedUrlRes(
+	public record Res(
 			@Schema(description = "Presigned URL")
 			URI presignedUrl
 	) {
@@ -31,8 +31,8 @@ public class PresignedUrlDto {
 		 *
 		 * @param presignedUrl String : Presigned URL
 		 */
-		public static PresignedUrlRes of(URI presignedUrl) {
-			return new PresignedUrlRes(presignedUrl);
+		public static Res of(URI presignedUrl) {
+			return new Res(presignedUrl);
 		}
 	}
 }

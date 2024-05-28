@@ -12,7 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 public class StorageUseCase {
 	private final AwsS3Provider awsS3Provider;
 
-	public PresignedUrlDto.PresignedUrlRes getPresignedUrl(PresignedUrlDto.PresignedUrlReq request) {
+	public PresignedUrlDto.PresignedUrlRes getPresignedUrl(PresignedUrlDto.Req request) {
 		return PresignedUrlDto.PresignedUrlRes.of(
 				awsS3Provider.generatedPresignedUrl(request.type(), request.ext(), request.userId(), request.chatroomId())
 		);
