@@ -16,4 +16,7 @@ dependencies {
     implementation project(':pennyway-common')
     implementation project(':pennyway-domain')
     implementation project(':pennyway-infra')
+
+    implementation 'org.springframework.boot:spring-boot-starter-batch:3.3.0'
+    testImplementation('org.springframework.batch:spring-batch-test:5.1.2')
 }
