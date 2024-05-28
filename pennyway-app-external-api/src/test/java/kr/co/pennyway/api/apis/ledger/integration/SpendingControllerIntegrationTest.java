@@ -170,7 +170,7 @@ public class SpendingControllerIntegrationTest extends ExternalApiDBTestConfig {
         void deleteSpendingSuccess() throws Exception {
             // given
             User user = userService.createUser(UserFixture.GENERAL_USER.toUser());
-            Spending spending = SpendingFixture.toSpending(user);
+            Spending spending = SpendingFixture.GENERAL_SPENDING.toSpending(user);
             spendingService.createSpending(spending);
 
             // when
@@ -184,12 +184,12 @@ public class SpendingControllerIntegrationTest extends ExternalApiDBTestConfig {
         }
 
         @Test
-        @DisplayName("권한이 없는 사용자의 지출 내역 삭제")
+        @DisplayName("사용자가 spendingId에 해당하는 지출 내역의 소유자가 아닌 경우, 403 Forbidden을 반환한다.")
         @Transactional
         void deleteSpendingForbidden() throws Exception {
             // given
             User user1 = userService.createUser(UserFixture.GENERAL_USER.toUser());
-            Spending spending = SpendingFixture.toSpending(user1);
+            Spending spending = SpendingFixture.GENERAL_SPENDING.toSpending(user1);
             spendingService.createSpending(spending);
             User user2 = userService.createUser(UserFixture.GENERAL_USER.toUser());
 
