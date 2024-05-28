@@ -23,7 +23,7 @@ import kr.co.pennyway.infra.common.exception.StorageErrorCode;
 import kr.co.pennyway.infra.common.exception.StorageException;
 
 @WebMvcTest(controllers = {StorageController.class})
-@ActiveProfiles("local")
+@ActiveProfiles("test")
 class StorageControllerTest {
 	@Autowired
 	private MockMvc mockMvc;
