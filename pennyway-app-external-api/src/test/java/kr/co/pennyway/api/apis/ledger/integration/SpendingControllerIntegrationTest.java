@@ -181,7 +181,7 @@ public class SpendingControllerIntegrationTest extends ExternalApiDBTestConfig {
         }
 
         @Test
-        @DisplayName("권한이 없는 사용자가 해당 지출 내역 조회시 403 Forbidden을 반환한다.")
+        @DisplayName("사용자가 spendingId에 해당하는 지출내역의 작성자가 아닌 수정시 403 Forbidden을 반환한다.")
         @Transactional
         void getSpendingDetailForbidden() throws Exception {
             // given
@@ -231,11 +231,11 @@ public class SpendingControllerIntegrationTest extends ExternalApiDBTestConfig {
                     .andExpect(status().isOk());
 
             Spending updatedSpending = spendingService.readSpending(spending.getId()).get();
-            Assertions.assertEquals("수정된 메모", updatedSpending.getMemo());
+            Assertions.assertEquals(request.memo(), updatedSpending.getMemo());
         }
 
         @Test
-        @DisplayName("권한이 없는 사용자가 해당 지출 내역 수정시 403 Forbidden을 반환한다.")
+        @DisplayName("사용자가 spendingId에 해당하는 지출내역의 작성자가 아닌 수정시 403 Forbidden을 반환한다.")
         @Transactional
         void updateSpendingForbidden() throws Exception {
             // given
