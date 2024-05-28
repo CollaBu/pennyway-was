@@ -167,7 +167,7 @@ public class SpendingControllerIntegrationTest extends ExternalApiDBTestConfig {
         void getSpendingDetailSuccess() throws Exception {
             // given
             User user = userService.createUser(UserFixture.GENERAL_USER.toUser());
-            Spending spending = SpendingFixture.toSpending(user);
+            Spending spending = SpendingFixture.GENERAL_SPENDING.toSpending(user);
             spendingService.createSpending(spending);
 
             // when
@@ -187,7 +187,7 @@ public class SpendingControllerIntegrationTest extends ExternalApiDBTestConfig {
             // given
             User user1 = userService.createUser(UserFixture.GENERAL_USER.toUser());
 
-            Spending spending = SpendingFixture.toSpending(user1);
+            Spending spending = SpendingFixture.GENERAL_SPENDING.toSpending(user1);
             spendingService.createSpending(spending);
             User user2 = userService.createUser(UserFixture.GENERAL_USER.toUser());
 
@@ -217,7 +217,7 @@ public class SpendingControllerIntegrationTest extends ExternalApiDBTestConfig {
         void updateSpendingSuccess() throws Exception {
             // given
             User user = userService.createUser(UserFixture.GENERAL_USER.toUser());
-            Spending spending = SpendingFixture.toSpending(user);
+            Spending spending = SpendingFixture.GENERAL_SPENDING.toSpending(user);
 
             SpendingReq request = new SpendingReq(20000, -1L, SpendingCategory.LIVING, LocalDate.now(), "수정된 소비처", "수정된 메모");
             spendingService.createSpending(spending);
@@ -240,10 +240,10 @@ public class SpendingControllerIntegrationTest extends ExternalApiDBTestConfig {
         void updateSpendingForbidden() throws Exception {
             // given
             User user1 = userService.createUser(UserFixture.GENERAL_USER.toUser());
-            Spending spending = SpendingFixture.toSpending(user1);
+            Spending spending = SpendingFixture.GENERAL_SPENDING.toSpending(user1);
             spendingService.createSpending(spending);
             User user2 = userService.createUser(UserFixture.GENERAL_USER.toUser());
-            SpendingReq request = new SpendingReq(20000, -1L, SpendingCategory.LIVING, LocalDate.now(), "수정된 소비처", "수정된 메모");
+            SpendingReq request = SpendingFixture.toSpendingReq(user2);
 
             // when
             ResultActions resultActions = performUpdateSpending(request, user2, spending.getId());
