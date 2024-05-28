@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -35,16 +36,7 @@ public interface StorageApi {
 			@Parameter(name = "request", hidden = true)
 	})
 	@ApiResponses({
-			@ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", examples = {
-					@ExampleObject(name = "Presigned URL 발급 성공", value = """
-							    {
-							        "code": "2000",
-							        "data": {
-							            "presignedUrl": "https://pennyway-s3-presigned-url.s3.ap-northeast-2.amazonaws.com/..."
-							        }
-							    }
-							""")
-			})),
+			@ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = PresignedUrlDto.PresignedUrlRes.class))),
 			@ApiResponse(responseCode = "400", content = @Content(mediaType = "application/json", examples = {
 					@ExampleObject(name = "필수 파라미터 누락", value = """
 							    {

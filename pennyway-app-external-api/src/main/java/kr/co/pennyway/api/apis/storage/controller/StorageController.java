@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RestController;
 import kr.co.pennyway.api.apis.storage.api.StorageApi;
 import kr.co.pennyway.api.apis.storage.dto.PresignedUrlDto;
 import kr.co.pennyway.api.apis.storage.usecase.StorageUseCase;
-import kr.co.pennyway.api.common.response.SuccessResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -25,6 +24,6 @@ public class StorageController implements StorageApi {
 	@GetMapping("/presigned-url")
 	@PreAuthorize("isAuthenticated()")
 	public ResponseEntity<?> getPresignedUrl(@Validated PresignedUrlDto.PresignedUrlReq request) {
-		return ResponseEntity.ok(SuccessResponse.from(storageUseCase.getPresignedUrl(request)));
+		return ResponseEntity.ok(storageUseCase.getPresignedUrl(request));
 	}
 }
