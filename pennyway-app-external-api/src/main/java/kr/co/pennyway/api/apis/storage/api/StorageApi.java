@@ -36,7 +36,7 @@ public interface StorageApi {
 			@Parameter(name = "request", hidden = true)
 	})
 	@ApiResponses({
-			@ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = PresignedUrlDto.PresignedUrlRes.class))),
+			@ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = PresignedUrlDto.Res.class))),
 			@ApiResponse(responseCode = "400", content = @Content(mediaType = "application/json", examples = {
 					@ExampleObject(name = "필수 파라미터 누락", value = """
 							    {
