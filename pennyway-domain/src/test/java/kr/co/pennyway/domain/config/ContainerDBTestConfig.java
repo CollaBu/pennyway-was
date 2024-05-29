@@ -1,4 +1,4 @@
-package kr.co.pennyway.api.config;
+package kr.co.pennyway.domain.config;
 
 import com.redis.testcontainers.RedisContainer;
 import org.springframework.test.context.ActiveProfiles;
@@ -10,7 +10,7 @@ import org.testcontainers.utility.DockerImageName;
 
 @Testcontainers
 @ActiveProfiles("test")
-public abstract class ExternalApiDBTestConfig {
+public class ContainerDBTestConfig {
     private static final String REDIS_CONTAINER_IMAGE = "redis:7.2.4-alpine";
     private static final String MYSQL_CONTAINER_IMAGE = "mysql:8.0.26";
 

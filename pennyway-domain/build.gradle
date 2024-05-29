@@ -23,6 +23,9 @@ dependencies {
     testImplementation "org.testcontainers:testcontainers:1.19.7"
     testImplementation "org.testcontainers:mysql:1.19.7"
     testImplementation "com.redis.testcontainers:testcontainers-redis-junit:1.6.4"
+
+    /* Redission */
+    implementation 'org.redisson:redisson-spring-boot-starter:3.30.0'
 }
 
 def querydslDir = 'src/main/generated'

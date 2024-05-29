@@ -45,6 +45,7 @@ public class CacheConfig {
     }
 
     @Bean
+    @Primary
     @InfraRedisConnectionFactory
     public RedisConnectionFactory infraRedisConnectionFactory() {
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(host, port);

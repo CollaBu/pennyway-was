@@ -3,8 +3,8 @@ package kr.co.pennyway.domain.config;
 import kr.co.pennyway.domain.common.annotation.DomainRedisCacheManager;
 import kr.co.pennyway.domain.common.annotation.DomainRedisConnectionFactory;
 import kr.co.pennyway.domain.common.annotation.DomainRedisTemplate;
+import kr.co.pennyway.domain.common.redis.RedisPackageLocation;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -24,7 +24,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import java.time.Duration;
 
 @Configuration
-@EnableRedisRepositories
+@EnableRedisRepositories(basePackageClasses = RedisPackageLocation.class)
 @EnableTransactionManagement
 public class RedisConfig {
     private final String host;
@@ -65,7 +65,7 @@ public class RedisConfig {
 
     @Bean
     @DomainRedisCacheManager
-    public CacheManager redisCacheManager(@DomainRedisConnectionFactory RedisConnectionFactory cf) {
+    public RedisCacheManager redisCacheManager(@DomainRedisConnectionFactory RedisConnectionFactory cf) {
         RedisCacheConfiguration redisCacheConfiguration =
                 RedisCacheConfiguration.defaultCacheConfig()
                         .serializeKeysWith(
