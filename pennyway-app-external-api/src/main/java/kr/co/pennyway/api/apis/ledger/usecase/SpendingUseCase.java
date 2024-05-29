@@ -5,6 +5,7 @@ import kr.co.pennyway.api.apis.ledger.dto.SpendingSearchRes;
 import kr.co.pennyway.api.apis.ledger.mapper.SpendingMapper;
 import kr.co.pennyway.api.apis.ledger.service.SpendingSaveService;
 import kr.co.pennyway.api.apis.ledger.service.SpendingSearchService;
+import kr.co.pennyway.api.apis.ledger.service.SpendingUpdateService;
 import kr.co.pennyway.common.annotation.UseCase;
 import kr.co.pennyway.domain.domains.spending.domain.Spending;
 import kr.co.pennyway.domain.domains.spending.exception.SpendingErrorCode;
@@ -26,14 +27,16 @@ import java.util.List;
 public class SpendingUseCase {
     private final SpendingSaveService spendingSaveService;
     private final SpendingSearchService spendingSearchService;
+    private final SpendingUpdateService spendingUpdateService;
     private final SpendingService spendingService;
+
 
     private final UserService userService;
 
 
     @Transactional
     public SpendingSearchRes.Individual createSpending(Long userId, SpendingReq request) {
-        User user = userService.readUser(userId).orElseThrow(() -> new UserErrorException(UserErrorCode.NOT_FOUND));
+        User user = readUserOrThrow(userId);
 
         Spending spending = spendingSaveService.createSpending(user, request);
 
@@ -48,11 +51,19 @@ public class SpendingUseCase {
     }
 
     @Transactional(readOnly = true)
-    public SpendingSearchRes.Individual getSpedingDetail(Long userId, Long spendingId) {
-        Spending spending = spendingService.readSpending(spendingId)
-                .orElseThrow(() -> new SpendingErrorException(SpendingErrorCode.NOT_FOUND_SPENDING));
+    public SpendingSearchRes.Individual getSpedingDetail(Long spendingId) {
+        Spending spending = readSpendingOrThrow(spendingId);
 
         return SpendingMapper.toSpendingSearchResIndividual(spending);
+    }
+
+    @Transactional
+    public SpendingSearchRes.Individual updateSpending(Long spendingId, SpendingReq request) {
+        Spending spending = readSpendingOrThrow(spendingId);
+
+        Spending updatedSpending = spendingUpdateService.updateSpending(spending, request);
+
+        return SpendingMapper.toSpendingSearchResIndividual(updatedSpending);
     }
 
     @Transactional
@@ -61,5 +72,21 @@ public class SpendingUseCase {
                 .orElseThrow(() -> new SpendingErrorException(SpendingErrorCode.NOT_FOUND_SPENDING));
 
         spendingService.deleteSpending(spending);
+    }
+
+    private User readUserOrThrow(Long userId) {
+        return userService.readUser(userId).orElseThrow(
+                () -> {
+                    throw new UserErrorException(UserErrorCode.NOT_FOUND);
+                }
+        );
+    }
+
+    private Spending readSpendingOrThrow(Long spendingId) {
+        return spendingService.readSpending(spendingId).orElseThrow(
+                () -> {
+                    throw new SpendingErrorException(SpendingErrorCode.NOT_FOUND_SPENDING);
+                }
+        );
     }
 }
