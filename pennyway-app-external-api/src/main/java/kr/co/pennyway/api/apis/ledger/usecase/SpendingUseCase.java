@@ -56,7 +56,7 @@ public class SpendingUseCase {
 
         return SpendingMapper.toSpendingSearchResIndividual(spending);
     }
-  
+
     @Transactional
     public SpendingSearchRes.Individual updateSpending(Long spendingId, SpendingReq request) {
         Spending spending = readSpendingOrThrow(spendingId);
@@ -65,7 +65,7 @@ public class SpendingUseCase {
 
         return SpendingMapper.toSpendingSearchResIndividual(updatedSpending);
     }
-  
+
     @Transactional
     public void deleteSpending(Long spendingId) {
         Spending spending = spendingService.readSpending(spendingId)
@@ -88,4 +88,5 @@ public class SpendingUseCase {
                     throw new SpendingErrorException(SpendingErrorCode.NOT_FOUND_SPENDING);
                 }
         );
+    }
 }

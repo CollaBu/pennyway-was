@@ -49,8 +49,6 @@ public class SpendingControllerIntegrationTest extends ExternalApiDBTestConfig {
     @Autowired
     private SpendingCustomCategoryService spendingCustomCategoryService;
     @Autowired
-    private SpendingService spendingService;
-    @Autowired
     private NamedParameterJdbcTemplate jdbcTemplate;
 
 
