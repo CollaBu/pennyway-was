@@ -45,11 +45,14 @@ public class SpendingControllerIntegrationTest extends ExternalApiDBTestConfig {
     @Autowired
     private UserService userService;
     @Autowired
+    private SpendingService spendingService;
+    @Autowired
     private SpendingCustomCategoryService spendingCustomCategoryService;
     @Autowired
     private SpendingService spendingService;
     @Autowired
     private NamedParameterJdbcTemplate jdbcTemplate;
+
 
     @Order(1)
     @Nested
@@ -145,6 +148,7 @@ public class SpendingControllerIntegrationTest extends ExternalApiDBTestConfig {
                     .andExpect(status().isOk());
             log.debug("수행 시간: {}ms", after - before);
         }
+
 
         private ResultActions performGetSpendingListAtYearAndMonthSuccess(User requestUser) throws Exception {
             UserDetails userDetails = SecurityUserDetails.from(requestUser);
@@ -262,6 +266,58 @@ public class SpendingControllerIntegrationTest extends ExternalApiDBTestConfig {
                     .with(user(userDetails))
                     .content(objectMapper.writeValueAsString(req)));
         }
+    }
 
+    @Order(5)
+    @Nested
+    @DisplayName("지출 내역 삭제")
+    class DeleteSpending {
+
+        @Test
+        @DisplayName("지출 내역 삭제 성공")
+        @Transactional
+        void deleteSpendingSuccess() throws Exception {
+            // given
+            User user = userService.createUser(UserFixture.GENERAL_USER.toUser());
+            Spending spending = SpendingFixture.GENERAL_SPENDING.toSpending(user);
+            spendingService.createSpending(spending);
+
+            // when
+            ResultActions resultActions = performDeleteSpendingSuccess(user, spending.getId());
+
+            // then
+            resultActions
+                    .andDo(print())
+                    .andExpect(status().isOk());
+
+            Assertions.assertTrue(spendingService.readSpending(spending.getId()).isEmpty());
+        }
+
+        @Test
+        @DisplayName("사용자가 spendingId에 해당하는 지출 내역의 소유자가 아닌 경우, 403 Forbidden을 반환한다.")
+        @Transactional
+        void deleteSpendingForbidden() throws Exception {
+
+            // given
+            User user1 = userService.createUser(UserFixture.GENERAL_USER.toUser());
+            Spending spending = SpendingFixture.GENERAL_SPENDING.toSpending(user1);
+            spendingService.createSpending(spending);
+            User user2 = userService.createUser(UserFixture.GENERAL_USER.toUser());
+
+            // when
+            ResultActions resultActions = performDeleteSpendingSuccess(user2, spending.getId());
+
+            // then
+            resultActions
+                    .andDo(print())
+                    .andExpect(status().isForbidden());
+        }
+
+        private ResultActions performDeleteSpendingSuccess(User requestUser, Long spendingId) throws Exception {
+            UserDetails userDetails = SecurityUserDetails.from(requestUser);
+
+            return mockMvc.perform(MockMvcRequestBuilders.delete("/v2/spendings/{spendingId}", spendingId)
+                    .with(user(userDetails)));
+        }
     }
 }

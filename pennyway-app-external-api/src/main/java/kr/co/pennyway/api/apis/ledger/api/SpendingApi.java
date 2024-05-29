@@ -55,13 +55,14 @@ public interface SpendingApi {
 
     @Operation(summary = "지출 내역 조회", method = "GET", description = "사용자의 해당 년/월 지출 내역을 조회하고 월/일별 지출 총합을 반환합니다.")
     @Parameters({
-            @Parameter(name = "year", description = "년도", required = true, in = ParameterIn.HEADER),
-            @Parameter(name = "month", description = "월", required = true, in = ParameterIn.HEADER)
+            @Parameter(name = "year", description = "년도", example = "2024", required = true, in = ParameterIn.QUERY),
+            @Parameter(name = "month", description = "월", example = "5", required = true, in = ParameterIn.QUERY)
     })
-    @ApiResponse(responseCode = "200", content = @Content(schemaProperties = @SchemaProperty(name = "spendings", schema = @Schema(implementation = SpendingSearchRes.Month.class))))
+    @ApiResponse(responseCode = "200", content = @Content(schemaProperties = @SchemaProperty(name = "spending", schema = @Schema(implementation = SpendingSearchRes.Month.class))))
     ResponseEntity<?> getSpendingListAtYearAndMonth(@RequestParam("year") int year, @RequestParam("date") int month, @AuthenticationPrincipal SecurityUserDetails user);
 
     @Operation(summary = "지출 내역 상세 조회", method = "GET", description = "지출 내역의 ID값으로 해당 지출의 상세 내역을 반환합니다.")
+    @Parameter(name = "spendingId", description = "지출 내역 ID", example = "1", required = true, in = ParameterIn.PATH)
     @ApiResponses({
             @ApiResponse(responseCode = "200", content = @Content(schemaProperties = @SchemaProperty(name = "spending", schema = @Schema(implementation = SpendingSearchRes.Individual.class)))),
             @ApiResponse(responseCode = "404", description = "NOT_FOUND", content = @Content(examples = {
@@ -77,7 +78,6 @@ public interface SpendingApi {
     })
     ResponseEntity<?> getSpendingDetail(@PathVariable Long spendingId, @AuthenticationPrincipal SecurityUserDetails user);
 
-
     @Operation(summary = "지출 내역 수정", method = "PUT", description = """
             사용자의 지출 내역을 수정하고 수정된 지출 내역을 반환합니다. <br/>
             서비스에서 제공하는 지출 카테고리를 사용하는 경우 categoryId는 -1이어야 하며, icon은 OTHER가 될 수 없습니다. <br/>
@@ -85,4 +85,18 @@ public interface SpendingApi {
             """)
     @ApiResponse(responseCode = "200", content = @Content(schemaProperties = @SchemaProperty(name = "spending", schema = @Schema(implementation = SpendingSearchRes.Individual.class))))
     ResponseEntity<?> updateSpending(@PathVariable Long spendingId, @RequestBody @Validated SpendingReq request, @AuthenticationPrincipal SecurityUserDetails user);
+               
+    @Operation(summary = "지출 내역 삭제", method = "DELETE", description = "지출 내역의 ID값으로 해당 지출 내역을 삭제 합니다.")
+    @Parameter(name = "spendingId", description = "지출 내역 ID", example = "1", required = true, in = ParameterIn.PATH)
+    @ApiResponse(responseCode = "403", description = "지출 카테고리에 대한 권한이 없습니다.", content = @Content(examples = {
+            @ExampleObject(name = "지출 카테고리 권한 오류", description = "지출 카테고리에 대한 권한이 없습니다.",
+                    value = """
+                            {
+                            "code": "4030",
+                            "message": "ACCESS_TO_THE_REQUESTED_RESOURCE_IS_FORBIDDEN"
+                            }
+                            """
+            )
+    }))
+    ResponseEntity<?> deleteSpending(@PathVariable Long spendingId, @AuthenticationPrincipal SecurityUserDetails user);
 }

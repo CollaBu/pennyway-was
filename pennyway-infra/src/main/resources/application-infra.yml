@@ -17,6 +17,14 @@ spring:
           secret-key: ${AWS_SNS_SECRET_KEY:secret-key}
         region:
           static: ${AWS_SNS_REGION:republic-of-korea-1}
+      s3:
+        credentials:
+          access-key: ${AWS_S3_ACCESS_KEY:access-key}
+          secret-key: ${AWS_S3_SECRET_KEY:secret-key}
+        region:
+          static: ${AWS_S3_REGION:ap-northeast-2}
+        bucket:
+          name: ${AWS_S3_BUCKET_NAME:pennyway}
 
 app:
   question-address: ${ADMIN_ADDRESS:team.collabu@gmail.com}
@@ -25,6 +33,11 @@ app:
     port: 587
     username: ${MAIL_USERNAME:pennyway}
     password: ${MAIL_PASSWORD:password}
+  firebase:
+    config:
+      file: ${FIREBASE_CONFIG_FILE:firebase-adminsdk.json}
+    project:
+      id: ${FIREBASE_PROJECT_ID:pennyway-12345}
 
 pennyway:
   server:

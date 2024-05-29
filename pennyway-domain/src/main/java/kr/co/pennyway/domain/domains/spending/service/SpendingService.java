@@ -70,4 +70,9 @@ public class SpendingService {
     public boolean isExistsSpending(Long userId, Long spendingId) {
         return spendingRepository.existsByIdAndUser_Id(spendingId, userId);
     }
+
+    @Transactional
+    public void deleteSpending(Spending spending) {
+        spendingRepository.delete(spending);
+    }
 }
