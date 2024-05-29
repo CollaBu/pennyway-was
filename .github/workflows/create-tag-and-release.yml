@@ -1,0 +1,54 @@
+name: Tag and Release
+
+on:
+  pull_request:
+    types: [ closed ]
+
+jobs:
+  extract-info:
+    if: github.event.pull_request.merged == true
+
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      repository-projects: write
+
+    steps:
+      - name: Checkout PR
+        uses: actions/checkout@v4
+
+      - name: extract PR info
+        id: module_prefix
+        run: |
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          echo "PR title : $PR_TITLE"
+          if [[ "$PR_TITLE" =~ ^(Api|Batch|Admin|Socket): ]]; then
+            PREFIX="${BASH_REMATCH[1]}"
+            echo "Prefix: $PREFIX"
+            echo "module=$PREFIX" >> $GITHUB_OUTPUT
+          else
+            echo "PR title does not match the pattern"
+            exit 1
+          fi
+
+      - name: version and tag
+        id: tag_version
+        uses: mathieudutour/github-tag-action@v6.2
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          default_bump: patch
+          custom_release_rules: release:major, feat:minor:Features, refactor:minor:Refactoring, fix:patch:Bug Fixes, hotfix:patch:Hotfixes, docs:patch:Documentation, style:patch:Styles, perf:patch:Performance Improvements, test:patch:Tests, ci:patch:Continuous Integration, chore:patch:Chores, revert:patch:Reverts
+          tag_prefix: '${{ steps.module_prefix.outputs.module }}-v'
+
+      - name: check output
+        run: |
+          echo "new_tag : ${{ steps.tag_version.outputs.new_tag }}"
+          echo "change_log : ${{ steps.tag_version.outputs.changelog }}"
+
+      - name: Create a GitHub release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ steps.tag_version.outputs.new_tag }}
+          name: ${{ steps.tag_version.outputs.new_tag }}
+          body: ${{ steps.tag_version.outputs.changelog }}
