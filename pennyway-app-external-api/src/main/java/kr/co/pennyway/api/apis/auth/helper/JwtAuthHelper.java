@@ -2,6 +2,7 @@ package kr.co.pennyway.api.apis.auth.helper;
 
 import kr.co.pennyway.api.common.annotation.AccessTokenStrategy;
 import kr.co.pennyway.api.common.annotation.RefreshTokenStrategy;
+import kr.co.pennyway.api.common.security.jwt.JwtClaimsParserUtil;
 import kr.co.pennyway.api.common.security.jwt.Jwts;
 import kr.co.pennyway.api.common.security.jwt.access.AccessTokenClaim;
 import kr.co.pennyway.api.common.security.jwt.refresh.RefreshTokenClaim;
@@ -20,7 +21,6 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.function.Function;
 
 @Slf4j
 @Helper
@@ -43,34 +43,6 @@ public class JwtAuthHelper {
     }
 
     /**
-     * JwtClaims에서 key에 해당하는 값을 반환하는 메서드
-     *
-     * @return key에 해당하는 값이 없거나, 타입이 일치하지 않을 경우 null을 반환한다.
-     */
-    @SuppressWarnings("unchecked")
-    public <T> T getClaimsValue(JwtClaims claims, String key, Class<T> type) {
-        Object value = claims.getClaims().get(key);
-        if (value != null && type.isAssignableFrom(value.getClass())) {
-            return (T) value;
-        }
-        return null;
-    }
-
-    /**
-     * JwtClaims에서 valueConverter를 이용하여 key에 해당하는 값을 반환하는 메서드
-     *
-     * @param valueConverter : String 타입의 값을 T 타입으로 변환하는 함수
-     * @return key에 해당하는 값이 없을 경우 null을 반환한다.
-     */
-    public <T> T getClaimsValue(JwtClaims claims, String key, Function<String, T> valueConverter) {
-        Object value = claims.getClaims().get(key);
-        if (value != null) {
-            return valueConverter.apply((String) value);
-        }
-        return null;
-    }
-
-    /**
      * 사용자 정보 기반으로 access token과 refresh token을 생성하는 메서드 <br/>
      * refresh token은 redis에 저장된다.
      *
@@ -88,8 +60,8 @@ public class JwtAuthHelper {
     public Pair<Long, Jwts> refresh(String refreshToken) {
         JwtClaims claims = refreshTokenProvider.getJwtClaimsFromToken(refreshToken);
 
-        Long userId = getClaimsValue(claims, RefreshTokenClaimKeys.USER_ID.getValue(), Long::parseLong);
-        String role = getClaimsValue(claims, RefreshTokenClaimKeys.ROLE.getValue(), String.class);
+        Long userId = JwtClaimsParserUtil.getClaimsValue(claims, RefreshTokenClaimKeys.USER_ID.getValue(), Long::parseLong);
+        String role = JwtClaimsParserUtil.getClaimsValue(claims, RefreshTokenClaimKeys.ROLE.getValue(), String.class);
         log.debug("refresh token userId : {}, role : {}", userId, role);
 
         RefreshToken newRefreshToken;

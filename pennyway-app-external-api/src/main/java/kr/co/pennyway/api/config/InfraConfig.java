@@ -1,5 +1,7 @@
 package kr.co.pennyway.api.config;
 
+import kr.co.pennyway.infra.common.importer.EnablePennywayInfraConfig;
+import kr.co.pennyway.infra.common.importer.PennywayInfraConfigGroup;
 import kr.co.pennyway.infra.common.properties.AppleOidcProperties;
 import kr.co.pennyway.infra.common.properties.GoogleOidcProperties;
 import kr.co.pennyway.infra.common.properties.KakaoOidcProperties;
@@ -13,6 +15,9 @@ import org.springframework.context.annotation.Configuration;
         AppleOidcProperties.class,
         GoogleOidcProperties.class,
         KakaoOidcProperties.class
+})
+@EnablePennywayInfraConfig({
+        PennywayInfraConfigGroup.FCM
 })
 public class InfraConfig {
 }

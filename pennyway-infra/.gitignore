@@ -40,3 +40,6 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+
+### Firebase admin credentials ###
+**/resources/firebase/pennyway**
