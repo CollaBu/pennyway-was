@@ -59,7 +59,7 @@ jobs:
           docker build -t pennyway/pennyway-batch ./pennyway-batch
           docker push pennyway/pennyway-batch
 
-      # 6. AWS SSM을 통한 Run-Command (Docker 이미지 pull 후 docker-compose를 통한 실행)
+      # 5. AWS SSM을 통한 Run-Command (Docker 이미지 pull 후 docker-compose를 통한 실행)
       - name: AWS SSM Send-Command
         uses: peterkimzz/aws-ssm-send-command@master
         id: ssm
