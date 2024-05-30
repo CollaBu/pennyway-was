@@ -45,7 +45,7 @@ jobs:
       - name: Get Version
         id: get_version
         run: |
-          RELEASE_VERSION_WITHOUT_V="$(cut -d'v' -f2 <<< ${GITHUB_REF#refs/*/})"
+          RELEASE_VERSION_WITHOUT_V="$(cut -d'v' -f2 <<< ${{ inputs.tags }})"
           echo "VERSION=$RELEASE_VERSION_WITHOUT_V" >> $GITHUB_OUTPUT
 
       # 3. 자바 환경 설정
