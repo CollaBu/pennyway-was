@@ -1,9 +1,12 @@
 name: Continuous Deployment - External API
 
 on:
-  push:
-    tags:
-      - Batch-v*.*.*
+  workflow_call:
+    inputs:
+      tags:
+        description: '배포할 Batch 모듈 태그 정보 (Batch-v*.*.*)'
+        required: true
+        type: string
   workflow_dispatch:
     inputs:
       logLevel:

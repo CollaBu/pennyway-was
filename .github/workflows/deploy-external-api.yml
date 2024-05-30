@@ -1,9 +1,12 @@
 name: Continuous Deployment - External API
 
 on:
-  push:
-    tags:
-      - Api-v*.*.*
+  workflow_call:
+    inputs:
+      tags:
+        description: '배포할 Api 모듈 태그 정보 (Api-v*.*.*)'
+        required: true
+        type: string
   workflow_dispatch:
     inputs:
       logLevel:
