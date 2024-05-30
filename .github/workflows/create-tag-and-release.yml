@@ -2,7 +2,7 @@ name: Tag and Release
 
 on:
   pull_request:
-    types: [ closed ]
+    types: [ opened, closed ]
 
 jobs:
   extract-info:
