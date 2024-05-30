@@ -63,7 +63,8 @@ jobs:
       - name: docker build and push
         run: |
           docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-          docker build -t pennyway/pennyway-batch ./pennyway-batch
+          docker build -t pennyway/pennyway-batch:${{ steps.get_version.outputs.VERSION }} ./pennyway-batch
+          docker build -t pennyway/pennyway-batch:latest ./pennyway-batch
           docker push pennyway/pennyway-batch:${{ steps.get_version.outputs.VERSION }}
           docker push pennyway/pennyway-batch:latest
 

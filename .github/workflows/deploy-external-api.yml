@@ -71,7 +71,8 @@ jobs:
       - name: docker build and push
         run: |
           docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-          docker build -t pennyway/pennyway-was ./pennyway-app-external-api
+          docker build -t pennyway/pennyway-was:${{ steps.get_version.outputs.VERSION }} ./pennyway-app-external-api
+          docker build -t pennyway/pennyway-was:latest ./pennyway-app-external-api
           docker push pennyway/pennyway-was:${{ steps.get_version.outputs.VERSION }}
           docker push pennyway/pennyway-was:latest
 
