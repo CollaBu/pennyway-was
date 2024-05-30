@@ -65,11 +65,11 @@ jobs:
     if: ${{ needs.extract-info.outputs.module == 'Api' }}
     uses: ./.github/workflows/deploy-external-api.yml
     with:
-      tags: ${{ needs.extract-info.outputs.version }}
+      tags: ${{ needs.extract-info.outputs.tag }}
 
   call-batch-deploy:
     needs: extract-info
     if: ${{ needs.extract-info.outputs.module == 'Batch' }}
     uses: ./.github/workflows/deploy-batch.yml
     with:
-      tags: ${{ needs.extract-info.outputs.version }}
+      tags: ${{ needs.extract-info.outputs.tag }}
