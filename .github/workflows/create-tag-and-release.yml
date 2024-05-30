@@ -2,11 +2,12 @@ name: Tag and Release
 
 on:
   pull_request:
-    types: [ closed, synchronize, edited ]
+    types: [ closed ]
 
 jobs:
   extract-info:
     # PR이 merge 되었을 때만 실행 (merge가 아닌 close는 제외)
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     permissions:
       contents: write
