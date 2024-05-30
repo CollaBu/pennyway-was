@@ -1,4 +1,4 @@
-name: Continuous Deployment - External API
+name: Continuous Deployment - Batch
 
 on:
   workflow_call:
