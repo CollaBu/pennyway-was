@@ -64,6 +64,7 @@ jobs:
     needs: extract-info
     if: ${{ needs.extract-info.outputs.module == 'Api' }}
     uses: ./.github/workflows/deploy-external-api.yml
+    secrets: inherit
     with:
       tags: ${{ needs.extract-info.outputs.tag }}
 
@@ -71,5 +72,6 @@ jobs:
     needs: extract-info
     if: ${{ needs.extract-info.outputs.module == 'Batch' }}
     uses: ./.github/workflows/deploy-batch.yml
+    secrets: inherit
     with:
       tags: ${{ needs.extract-info.outputs.tag }}
