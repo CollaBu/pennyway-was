@@ -7,25 +7,6 @@ on:
         description: '배포할 Batch 모듈 태그 정보 (Batch-v*.*.*)'
         required: true
         type: string
-  workflow_dispatch:
-    inputs:
-      logLevel:
-        description: 'Log level'
-        required: true
-        default: 'warning'
-        type: choice
-        options:
-          - info
-          - warning
-          - debug
-      tags:
-        description: 'Test scenario tags'
-        required: false
-        type: boolean
-      environment:
-        description: 'Environment to run tests against'
-        type: environment
-        required: false
 
 permissions:
   contents: read
