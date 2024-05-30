@@ -21,6 +21,7 @@ public abstract class ExternalApiDBTestConfig {
         REDIS_CONTAINER =
                 new RedisContainer(DockerImageName.parse(REDIS_CONTAINER_IMAGE))
                         .withExposedPorts(6379)
+                        .withCommand("redis-server", "--requirepass testpass")
                         .withReuse(true);
         MYSQL_CONTAINER =
                 new MySQLContainer<>(DockerImageName.parse(MYSQL_CONTAINER_IMAGE))
@@ -37,6 +38,7 @@ public abstract class ExternalApiDBTestConfig {
     public static void setRedisProperties(DynamicPropertyRegistry registry) {
         registry.add("spring.data.redis.host", REDIS_CONTAINER::getHost);
         registry.add("spring.data.redis.port", () -> String.valueOf(REDIS_CONTAINER.getMappedPort(6379)));
+        registry.add("spring.data.redis.password", () -> "testpass");
         registry.add("spring.datasource.url", () -> String.format("jdbc:mysql://%s:%s/pennyway?serverTimezone=UTC&characterEncoding=utf8", MYSQL_CONTAINER.getHost(), MYSQL_CONTAINER.getMappedPort(3306)));
         registry.add("spring.datasource.username", () -> "root");
         registry.add("spring.datasource.password", () -> "testpass");

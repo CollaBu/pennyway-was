@@ -1,5 +1,6 @@
 package kr.co.pennyway.api.config.fixture;
 
+import kr.co.pennyway.api.apis.ledger.dto.SpendingReq;
 import kr.co.pennyway.domain.domains.spending.domain.Spending;
 import kr.co.pennyway.domain.domains.spending.type.SpendingCategory;
 import kr.co.pennyway.domain.domains.user.domain.User;
@@ -14,8 +15,28 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class SpendingFixture {
-    private static final String SPENDING_TABLE = "spending";
+public enum SpendingFixture {
+    GENERAL_SPENDING(10000, SpendingCategory.FOOD, LocalDateTime.now(), "카페인 수혈", "아메리카노 1잔", UserFixture.GENERAL_USER.toUser());
+
+    private final int amount;
+    private final SpendingCategory category;
+    private final LocalDateTime spendAt;
+    private final String accountName;
+    private final String memo;
+    private final User user;
+
+    SpendingFixture(int amount, SpendingCategory category, LocalDateTime spendAt, String accountName, String memo, User user) {
+        this.amount = amount;
+        this.category = category;
+        this.spendAt = spendAt;
+        this.accountName = accountName;
+        this.memo = memo;
+        this.user = user;
+    }
+
+    public static SpendingReq toSpendingReq(User user) {
+        return new SpendingReq(10000, -1L, SpendingCategory.FOOD, LocalDate.now(), "카페인 수혈", "아메리카노 1잔");
+    }
 
     public static void bulkInsertSpending(User user, int capacity, NamedParameterJdbcTemplate jdbcTemplate) {
         Collection<Spending> spendings = getRandomSpendings(user, capacity);
@@ -23,7 +44,7 @@ public class SpendingFixture {
         String sql = String.format("""
                 INSERT INTO `%s` (amount, category, spend_at, account_name, memo, user_id, spending_custom_category_id, created_at, updated_at, deleted_at)
                 VALUES (:amount, 1+FLOOR(RAND()*11), :spendAt, :accountName, :memo, :user.id, null, NOW(), NOW(), null)
-                """, SPENDING_TABLE);
+                """, "spending");
         SqlParameterSource[] params = spendings.stream()
                 .map(BeanPropertySqlParameterSource::new)
                 .toArray(SqlParameterSource[]::new);
@@ -56,12 +77,23 @@ public class SpendingFixture {
         int year = ThreadLocalRandom.current().nextInt(startAt.getYear(), endAt.getYear() + 1);
         int month = (year == endAt.getYear()) ? ThreadLocalRandom.current().nextInt(1, endAt.getMonthValue() + 1) : ThreadLocalRandom.current().nextInt(1, 13);
         int day = ThreadLocalRandom.current().nextInt(1, 29);
-        
+
         return LocalDateTime.of(year, month, day, 0, 0, 0);
     }
 
     private static String getRandomAccountName() {
         List<String> accountNames = List.of("현금", "카드", "통장", "월급통장", "적금", "보험", "투자", "기타");
         return accountNames.get(ThreadLocalRandom.current().nextInt(0, accountNames.size()));
+    }
+
+    public Spending toSpending(User user) {
+        return Spending.builder()
+                .amount(amount)
+                .category(category)
+                .spendAt(spendAt)
+                .accountName(accountName)
+                .memo(memo)
+                .user(user)
+                .build();
     }
 }

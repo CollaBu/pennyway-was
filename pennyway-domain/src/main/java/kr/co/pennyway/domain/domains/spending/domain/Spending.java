@@ -88,4 +88,13 @@ public class Spending extends DateAuditable {
 
         this.spendingCustomCategory = spendingCustomCategory;
     }
+
+    public void update(Spending spending) {
+        this.amount = spending.amount;
+        this.category = spending.category;
+        this.spendAt = spending.spendAt;
+        this.accountName = spending.accountName;
+        this.memo = spending.memo;
+        this.spendingCustomCategory = spending.spendingCustomCategory;
+    }
 }
