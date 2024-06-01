@@ -1,28 +1,12 @@
-name: Continuous Deployment - External API
+name: Continuous Deployment - Batch
 
 on:
-  push:
-    tags:
-      - Batch-v*.*.*
-  workflow_dispatch:
+  workflow_call:
     inputs:
-      logLevel:
-        description: 'Log level'
-        required: true
-        default: 'warning'
-        type: choice
-        options:
-          - info
-          - warning
-          - debug
       tags:
-        description: 'Test scenario tags'
-        required: false
-        type: boolean
-      environment:
-        description: 'Environment to run tests against'
-        type: environment
-        required: false
+        description: '배포할 Batch 모듈 태그 정보 (Batch-v*.*.*)'
+        required: true
+        type: string
 
 permissions:
   contents: read
@@ -42,7 +26,7 @@ jobs:
       - name: Get Version
         id: get_version
         run: |
-          RELEASE_VERSION_WITHOUT_V="$(cut -d'v' -f2 <<< ${GITHUB_REF#refs/*/})"
+          RELEASE_VERSION_WITHOUT_V="$(cut -d'v' -f2 <<< ${{ inputs.tags }})"
           echo "VERSION=$RELEASE_VERSION_WITHOUT_V" >> $GITHUB_OUTPUT
 
       # 3. 자바 환경 설정
@@ -63,7 +47,8 @@ jobs:
       - name: docker build and push
         run: |
           docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-          docker build -t pennyway/pennyway-batch ./pennyway-batch
+          docker build -t pennyway/pennyway-batch:${{ steps.get_version.outputs.VERSION }} ./pennyway-batch
+          docker build -t pennyway/pennyway-batch:latest ./pennyway-batch
           docker push pennyway/pennyway-batch:${{ steps.get_version.outputs.VERSION }}
           docker push pennyway/pennyway-batch:latest
 
