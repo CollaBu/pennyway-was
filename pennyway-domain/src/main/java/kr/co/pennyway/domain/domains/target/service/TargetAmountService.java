@@ -22,8 +22,8 @@ public class TargetAmountService {
         return targetAmountRepository.save(targetAmount);
     }
 
-    @Transactional
-    public boolean isExitsTargetAmountThatMonth(Long userId, LocalDate date) {
+    @Transactional(readOnly = true)
+    public boolean isExistsTargetAmountThatMonth(Long userId, LocalDate date) {
         return targetAmountRepository.existsByUserIdThatMonth(userId, date);
     }
 
