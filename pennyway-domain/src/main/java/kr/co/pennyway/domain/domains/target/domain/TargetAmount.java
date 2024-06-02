@@ -12,13 +12,14 @@ import org.hibernate.annotations.SQLDelete;
 @Getter
 @Table(name = "target_amount")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@SQLDelete(sql = "UPDATE target_amount SET amount = -1 WHERE id = ?")
+@SQLDelete(sql = "UPDATE target_amount SET amount = -1, is_read = 1 WHERE id = ?")
 public class TargetAmount extends DateAuditable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private int amount;
+    private boolean isRead;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
@@ -27,6 +28,7 @@ public class TargetAmount extends DateAuditable {
     private TargetAmount(int amount, User user) {
         this.amount = amount;
         this.user = user;
+        this.isRead = false;
     }
 
     public static TargetAmount of(int amount, User user) {
@@ -35,6 +37,7 @@ public class TargetAmount extends DateAuditable {
 
     public void updateAmount(Integer amount) {
         this.amount = amount;
+        this.isRead = true;
     }
 
     public boolean isAllocatedAmount() {
