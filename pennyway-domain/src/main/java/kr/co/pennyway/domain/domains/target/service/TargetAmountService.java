@@ -43,8 +43,8 @@ public class TargetAmountService {
     }
 
     @Transactional(readOnly = true)
-    public boolean isExistsTargetAmountByIdAndUserId(Long userId, Long targetAmountId) {
-        return targetAmountRepository.existsByIdAndUser_Id(targetAmountId, userId);
+    public boolean isExistsTargetAmountByIdAndUserId(Long id, Long userId) {
+        return targetAmountRepository.existsByIdAndUser_Id(id, userId);
     }
 
 

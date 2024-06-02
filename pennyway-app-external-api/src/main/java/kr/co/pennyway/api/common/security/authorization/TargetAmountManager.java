@@ -12,8 +12,15 @@ import org.springframework.transaction.annotation.Transactional;
 public class TargetAmountManager {
     private final TargetAmountService targetAmountService;
 
+    /**
+     * 사용자가 해당 TargetAmount에 대한 권한이 있는지 확인한다.
+     *
+     * @param userId         사용자 ID
+     * @param targetAmountId TargetAmount ID
+     * @return 권한 여부
+     */
     @Transactional(readOnly = true)
     public boolean hasPermission(Long userId, Long targetAmountId) {
-        return targetAmountService.isExistsTargetAmountByIdAndUserId(userId, targetAmountId);
+        return targetAmountService.isExistsTargetAmountByIdAndUserId(targetAmountId, userId);
     }
 }
