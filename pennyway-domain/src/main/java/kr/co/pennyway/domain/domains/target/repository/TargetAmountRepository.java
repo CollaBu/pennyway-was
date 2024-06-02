@@ -19,4 +19,7 @@ public interface TargetAmountRepository extends ExtendedRepository<TargetAmount,
 
     @Transactional(readOnly = true)
     List<TargetAmount> findByUser_Id(Long userId);
+
+    @Transactional(readOnly = true)
+    boolean existsByIdAndUser_Id(Long targetAmountId, Long userId);
 }
