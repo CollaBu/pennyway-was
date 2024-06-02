@@ -9,7 +9,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-public interface TargetAmountRepository extends ExtendedRepository<TargetAmount, Long> {
+public interface TargetAmountRepository extends ExtendedRepository<TargetAmount, Long>, TargetAmountCustomRepository {
     @Transactional(readOnly = true)
     @Query("SELECT ta FROM TargetAmount ta WHERE ta.user.id = :userId AND YEAR(ta.createdAt) = YEAR(:date) AND MONTH(ta.createdAt) = MONTH(:date)")
     Optional<TargetAmount> findByUserIdThatMonth(Long userId, LocalDate date);
