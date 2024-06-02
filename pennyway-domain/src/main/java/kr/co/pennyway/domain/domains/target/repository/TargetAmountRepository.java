@@ -15,9 +15,6 @@ public interface TargetAmountRepository extends ExtendedRepository<TargetAmount,
     Optional<TargetAmount> findByUserIdThatMonth(Long userId, LocalDate date);
 
     @Transactional(readOnly = true)
-    Optional<TargetAmount> findByIdAndUser_Id(Long id, Long userId);
-
-    @Transactional(readOnly = true)
     List<TargetAmount> findByUser_Id(Long userId);
 
     @Transactional(readOnly = true)

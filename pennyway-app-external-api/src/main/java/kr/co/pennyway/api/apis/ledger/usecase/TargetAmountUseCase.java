@@ -65,9 +65,8 @@ public class TargetAmountUseCase {
     }
 
     @Transactional
-    public void updateTargetAmount(Long userId, LocalDate date, Integer amount) {
-        targetAmountSaveService.saveTargetAmount(userId, date, amount);
-    }
+    public TargetAmountDto.WithTotalSpendingRes updateTargetAmount(Long userId, LocalDate date, Integer amount) {
+        TargetAmount targetAmount = targetAmountService.readTargetAmount()
 
     @Transactional
     public void deleteTargetAmount(Long userId, LocalDate date) {

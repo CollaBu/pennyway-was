@@ -23,13 +23,13 @@ public class TargetAmountService {
     }
 
     @Transactional(readOnly = true)
-    public Optional<TargetAmount> readTargetAmountThatMonth(Long userId, LocalDate date) {
-        return targetAmountRepository.findByUserIdThatMonth(userId, date);
+    public Optional<TargetAmount> readTargetAmount(Long id) {
+        return targetAmountRepository.findById(id);
     }
 
     @Transactional(readOnly = true)
-    public Optional<TargetAmount> readTargetAmountByIdAndUserId(Long id, Long userId) {
-        return targetAmountRepository.findByIdAndUser_Id(id, userId);
+    public Optional<TargetAmount> readTargetAmountThatMonth(Long userId, LocalDate date) {
+        return targetAmountRepository.findByUserIdThatMonth(userId, date);
     }
 
     @Transactional(readOnly = true)
