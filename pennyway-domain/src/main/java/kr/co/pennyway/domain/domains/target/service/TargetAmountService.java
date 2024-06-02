@@ -33,6 +33,11 @@ public class TargetAmountService {
     }
 
     @Transactional(readOnly = true)
+    public Optional<TargetAmount> readTargetAmountByIdAndUserId(Long id, Long userId) {
+        return targetAmountRepository.findByIdAndUser_Id(id, userId);
+    }
+
+    @Transactional(readOnly = true)
     public List<TargetAmount> readTargetAmountsByUserId(Long userId) {
         return targetAmountRepository.findByUser_Id(userId);
     }
