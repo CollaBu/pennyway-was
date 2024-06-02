@@ -4,12 +4,12 @@ import kr.co.pennyway.api.apis.ledger.dto.TargetAmountDto;
 import kr.co.pennyway.api.apis.ledger.mapper.TargetAmountMapper;
 import kr.co.pennyway.api.apis.ledger.service.TargetAmountSaveService;
 import kr.co.pennyway.common.annotation.UseCase;
+import kr.co.pennyway.domain.domains.spending.dto.TotalSpendingAmount;
+import kr.co.pennyway.domain.domains.spending.service.SpendingService;
 import kr.co.pennyway.domain.domains.target.domain.TargetAmount;
 import kr.co.pennyway.domain.domains.target.exception.TargetAmountErrorCode;
 import kr.co.pennyway.domain.domains.target.exception.TargetAmountErrorException;
 import kr.co.pennyway.domain.domains.target.service.TargetAmountService;
-import kr.co.pennyway.domain.domains.spending.dto.TotalSpendingAmount;
-import kr.co.pennyway.domain.domains.spending.service.SpendingService;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorCode;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorException;
@@ -33,8 +33,17 @@ public class TargetAmountUseCase {
     private final TargetAmountSaveService targetAmountSaveService;
 
     @Transactional
-    public void updateTargetAmount(Long userId, LocalDate date, Integer amount) {
-        targetAmountSaveService.saveTargetAmount(userId, date, amount);
+    public TargetAmountDto.TargetAmountInfo createTargetAmount(Long userId, int year, int month) {
+        LocalDate date = LocalDate.of(year, month, 1);
+
+        if (targetAmountService.isExistsTargetAmountThatMonth(userId, date)) {
+            throw new TargetAmountErrorException(TargetAmountErrorCode.ALREADY_EXIST_TARGET_AMOUNT);
+        }
+
+        User user = userService.readUser(userId).orElseThrow(() -> new UserErrorException(UserErrorCode.NOT_FOUND));
+        TargetAmount targetAmount = targetAmountService.createTargetAmount(TargetAmount.of(-1, user));
+
+        return TargetAmountDto.TargetAmountInfo.from(targetAmount);
     }
 
     @Transactional(readOnly = true)
@@ -54,7 +63,12 @@ public class TargetAmountUseCase {
 
         return TargetAmountMapper.toWithTotalSpendingResponses(targetAmounts, totalSpendings, user.getCreatedAt().toLocalDate(), date);
     }
-  
+
+    @Transactional
+    public void updateTargetAmount(Long userId, LocalDate date, Integer amount) {
+        targetAmountSaveService.saveTargetAmount(userId, date, amount);
+    }
+
     @Transactional
     public void deleteTargetAmount(Long userId, LocalDate date) {
         TargetAmount targetAmount = targetAmountService.readTargetAmountThatMonth(userId, date)
