@@ -2,6 +2,7 @@ package kr.co.pennyway.api.apis.ledger.usecase;
 
 import kr.co.pennyway.api.apis.ledger.dto.TargetAmountDto;
 import kr.co.pennyway.api.apis.ledger.mapper.TargetAmountMapper;
+import kr.co.pennyway.api.apis.ledger.service.TargetAmountSaveService;
 import kr.co.pennyway.common.annotation.UseCase;
 import kr.co.pennyway.domain.domains.spending.dto.TotalSpendingAmount;
 import kr.co.pennyway.domain.domains.spending.service.SpendingService;
@@ -29,16 +30,13 @@ public class TargetAmountUseCase {
     private final TargetAmountService targetAmountService;
     private final SpendingService spendingService;
 
+    private final TargetAmountSaveService targetAmountSaveService;
+
     @Transactional
     public TargetAmountDto.TargetAmountInfo createTargetAmount(Long userId, int year, int month) {
-        LocalDate date = LocalDate.of(year, month, 1);
-
-        if (targetAmountService.isExistsTargetAmountThatMonth(userId, date)) {
-            throw new TargetAmountErrorException(TargetAmountErrorCode.ALREADY_EXIST_TARGET_AMOUNT);
-        }
-
         User user = userService.readUser(userId).orElseThrow(() -> new UserErrorException(UserErrorCode.NOT_FOUND));
-        TargetAmount targetAmount = targetAmountService.createTargetAmount(TargetAmount.of(-1, user));
+
+        TargetAmount targetAmount = targetAmountSaveService.createTargetAmount(user, LocalDate.of(year, month, 1));
 
         return TargetAmountDto.TargetAmountInfo.from(targetAmount);
     }
