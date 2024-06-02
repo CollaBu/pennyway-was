@@ -13,6 +13,9 @@ jobs:
       contents: write
       pull-requests: write
       repository-projects: write
+    outputs:
+      module: ${{ steps.module_prefix.outputs.module }}
+      tag: ${{ steps.tag_version.outputs.new_tag }}
 
     steps:
       - name: Checkout PR
@@ -57,3 +60,19 @@ jobs:
           tag: ${{ steps.tag_version.outputs.new_tag }}
           name: ${{ steps.tag_version.outputs.new_tag }}
           body: ${{ steps.tag_version.outputs.changelog }}
+
+  call-external-api-deploy:
+    needs: extract-info
+    if: ${{ needs.extract-info.outputs.module == 'Api' }}
+    uses: ./.github/workflows/deploy-external-api.yml
+    secrets: inherit
+    with:
+      tags: ${{ needs.extract-info.outputs.tag }}
+
+  call-batch-deploy:
+    needs: extract-info
+    if: ${{ needs.extract-info.outputs.module == 'Batch' }}
+    uses: ./.github/workflows/deploy-batch.yml
+    secrets: inherit
+    with:
+      tags: ${{ needs.extract-info.outputs.tag }}
