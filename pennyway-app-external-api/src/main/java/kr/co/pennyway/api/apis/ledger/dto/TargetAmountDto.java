@@ -63,7 +63,9 @@ public class TargetAmountDto {
             Long id,
             @Schema(description = "목표 금액. -1이면 설정한 목표 금액이 존재하지 않음을 의미한다.", example = "50000", requiredMode = Schema.RequiredMode.REQUIRED)
             @NotNull(message = "amount 값은 필수입니다.")
-            Integer amount
+            Integer amount,
+            @Schema(description = "사용자 확인 여부", example = "true", requiredMode = Schema.RequiredMode.REQUIRED)
+            boolean isRead
     ) {
         public TargetAmountInfo {
             if (id == null) {
@@ -81,9 +83,9 @@ public class TargetAmountDto {
          */
         public static TargetAmountInfo from(TargetAmount targetAmount) {
             if (targetAmount == null) {
-                return new TargetAmountInfo(-1L, -1);
+                return new TargetAmountInfo(-1L, -1, false);
             }
-            return new TargetAmountInfo(targetAmount.getId(), targetAmount.getAmount());
+            return new TargetAmountInfo(targetAmount.getId(), targetAmount.getAmount(), targetAmount.isRead());
         }
     }
 }
