@@ -16,24 +16,24 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.time.YearMonth;
 
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/v2/targets")
+@RequestMapping("/v2/target-amounts")
 public class TargetAmountController implements TargetAmountApi {
     private final TargetAmountUseCase targetAmountUseCase;
 
     @Override
-    @PutMapping("")
+    @PostMapping("")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> putTargetAmount(@Validated TargetAmountDto.UpdateParamReq param, @AuthenticationPrincipal SecurityUserDetails user) {
-        if (!isValidDateForYearAndMonth(param.date())) {
+    public ResponseEntity<?> postTargetAmount(@RequestParam int year, @RequestParam int month, @AuthenticationPrincipal SecurityUserDetails user) {
+        if (YearMonth.of(year, month).isAfter(YearMonth.now())) {
             throw new TargetAmountErrorException(TargetAmountErrorCode.INVALID_TARGET_AMOUNT_DATE);
         }
 
-        targetAmountUseCase.updateTargetAmount(user.getUserId(), param.date(), param.amount());
-        return ResponseEntity.ok(SuccessResponse.noContent());
+        return ResponseEntity.ok(SuccessResponse.from("targetAmount", targetAmountUseCase.createTargetAmount(user.getUserId(), year, month)));
     }
 
     @Override
@@ -46,24 +46,23 @@ public class TargetAmountController implements TargetAmountApi {
     @Override
     @GetMapping("")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> getTargetAmountsAndTotalSpendings(@Validated TargetAmountDto.GetParamReq param, @AuthenticationPrincipal SecurityUserDetails user) {
+    public ResponseEntity<?> getTargetAmountsAndTotalSpendings(@Validated TargetAmountDto.DateParam param, @AuthenticationPrincipal SecurityUserDetails user) {
         return ResponseEntity.ok(SuccessResponse.from("targetAmounts", targetAmountUseCase.getTargetAmountsAndTotalSpendings(user.getUserId(), param.date())));
     }
 
     @Override
-    @DeleteMapping("/{date}")
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> deleteTargetAmount(@PathVariable LocalDate date, @AuthenticationPrincipal SecurityUserDetails user) {
-        if (!isValidDateForYearAndMonth(date)) {
-            throw new TargetAmountErrorException(TargetAmountErrorCode.INVALID_TARGET_AMOUNT_DATE);
-        }
-
-        targetAmountUseCase.deleteTargetAmount(user.getUserId(), date);
-        return ResponseEntity.ok(SuccessResponse.noContent());  
+    @PatchMapping("/{target_amount_id}")
+    @PreAuthorize("isAuthenticated() and @targetAmountManager.hasPermission(#user.getUserId(), #targetAmountId)")
+    public ResponseEntity<?> patchTargetAmount(TargetAmountDto.AmountParam param, @PathVariable Long targetAmountId, @AuthenticationPrincipal SecurityUserDetails user) {
+        targetAmountUseCase.updateTargetAmount(user.getUserId(), targetAmountId, param.amount());
+        return ResponseEntity.ok(SuccessResponse.noContent());
     }
-  
-    private boolean isValidDateForYearAndMonth(LocalDate date) {
-        LocalDate now = LocalDate.now();
-        return date.getYear() == now.getYear() && date.getMonth() == now.getMonth();
+
+    @Override
+    @DeleteMapping("/{target_amount_id}")
+    @PreAuthorize("isAuthenticated() and @targetAmountManager.hasPermission(#user.getUserId(), #targetAmountId)")
+    public ResponseEntity<?> deleteTargetAmount(@PathVariable Long targetAmountId, @AuthenticationPrincipal SecurityUserDetails user) {
+        targetAmountUseCase.deleteTargetAmount(user.getUserId(), targetAmountId);
+        return ResponseEntity.ok(SuccessResponse.noContent());
     }
 }
