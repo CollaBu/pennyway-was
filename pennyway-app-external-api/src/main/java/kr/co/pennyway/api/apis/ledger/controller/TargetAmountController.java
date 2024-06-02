@@ -52,17 +52,16 @@ public class TargetAmountController implements TargetAmountApi {
 
     @Override
     @PatchMapping("/{target_amount_id}")
-    @PreAuthorize("isAuthenticated() and @targetAmountManager.hasPermission(#user.getUserId(), #targetAmountId)")
-    public ResponseEntity<?> patchTargetAmount(TargetAmountDto.AmountParam param, @PathVariable Long targetAmountId, @AuthenticationPrincipal SecurityUserDetails user) {
-        targetAmountUseCase.updateTargetAmount(user.getUserId(), targetAmountId, param.amount());
-        return ResponseEntity.ok(SuccessResponse.noContent());
+    @PreAuthorize("isAuthenticated() and @targetAmountManager.hasPermission(principal.userId, #targetAmountId)")
+    public ResponseEntity<?> patchTargetAmount(TargetAmountDto.AmountParam param, @PathVariable("target_amount_id") Long targetAmountId) {
+        return ResponseEntity.ok(SuccessResponse.from("targetAmount", targetAmountUseCase.updateTargetAmount(targetAmountId, param.amount())));
     }
 
     @Override
     @DeleteMapping("/{target_amount_id}")
-    @PreAuthorize("isAuthenticated() and @targetAmountManager.hasPermission(#user.getUserId(), #targetAmountId)")
-    public ResponseEntity<?> deleteTargetAmount(@PathVariable Long targetAmountId, @AuthenticationPrincipal SecurityUserDetails user) {
-        targetAmountUseCase.deleteTargetAmount(user.getUserId(), targetAmountId);
+    @PreAuthorize("isAuthenticated() and @targetAmountManager.hasPermission(principal.userId, #targetAmountId)")
+    public ResponseEntity<?> deleteTargetAmount(@PathVariable("target_amount_id") Long targetAmountId) {
+        targetAmountUseCase.deleteTargetAmount(targetAmountId);
         return ResponseEntity.ok(SuccessResponse.noContent());
     }
 }

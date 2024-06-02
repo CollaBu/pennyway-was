@@ -65,7 +65,7 @@ public interface TargetAmountApi {
             @Parameter(name = "amount", description = "수정하려는 목표 금액", required = true, in = ParameterIn.QUERY, example = "100000"),
             @Parameter(name = "param", hidden = true)
     })
-    ResponseEntity<?> patchTargetAmount(TargetAmountDto.AmountParam param, @PathVariable Long targetAmountId, @AuthenticationPrincipal SecurityUserDetails user);
+    ResponseEntity<?> patchTargetAmount(TargetAmountDto.AmountParam param, @PathVariable Long targetAmountId);
 
     @Operation(summary = "당월 목표 금액 삭제", method = "DELETE")
     @Parameter(name = "targetAmountId", description = "삭제하려는 목표 금액 ID", required = true, example = "1", in = ParameterIn.PATH)
@@ -77,5 +77,5 @@ public interface TargetAmountApi {
                     }
                     """)
     }))
-    ResponseEntity<?> deleteTargetAmount(@PathVariable Long targetAmountId, @AuthenticationPrincipal SecurityUserDetails user);
+    ResponseEntity<?> deleteTargetAmount(@PathVariable Long targetAmountId);
 }
