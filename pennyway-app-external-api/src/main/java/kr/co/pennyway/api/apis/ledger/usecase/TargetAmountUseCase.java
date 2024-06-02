@@ -2,7 +2,6 @@ package kr.co.pennyway.api.apis.ledger.usecase;
 
 import kr.co.pennyway.api.apis.ledger.dto.TargetAmountDto;
 import kr.co.pennyway.api.apis.ledger.mapper.TargetAmountMapper;
-import kr.co.pennyway.api.apis.ledger.service.TargetAmountSaveService;
 import kr.co.pennyway.common.annotation.UseCase;
 import kr.co.pennyway.domain.domains.spending.dto.TotalSpendingAmount;
 import kr.co.pennyway.domain.domains.spending.service.SpendingService;
@@ -29,8 +28,6 @@ public class TargetAmountUseCase {
     private final UserService userService;
     private final TargetAmountService targetAmountService;
     private final SpendingService spendingService;
-
-    private final TargetAmountSaveService targetAmountSaveService;
 
     @Transactional
     public TargetAmountDto.TargetAmountInfo createTargetAmount(Long userId, int year, int month) {
@@ -65,12 +62,18 @@ public class TargetAmountUseCase {
     }
 
     @Transactional
-    public TargetAmountDto.WithTotalSpendingRes updateTargetAmount(Long userId, LocalDate date, Integer amount) {
-        TargetAmount targetAmount = targetAmountService.readTargetAmount()
+    public TargetAmountDto.TargetAmountInfo updateTargetAmount(Long targetAmountId, Integer amount) {
+        TargetAmount targetAmount = targetAmountService.readTargetAmount(targetAmountId).orElseThrow(() -> new TargetAmountErrorException(TargetAmountErrorCode.NOT_FOUND_TARGET_AMOUNT));
+        targetAmount.updateAmount(amount);
+
+        targetAmountService.createTargetAmount(targetAmount);
+
+        return TargetAmountDto.TargetAmountInfo.from(targetAmount);
+    }
 
     @Transactional
-    public void deleteTargetAmount(Long userId, LocalDate date) {
-        TargetAmount targetAmount = targetAmountService.readTargetAmountThatMonth(userId, date)
+    public void deleteTargetAmount(Long targetAmountId) {
+        TargetAmount targetAmount = targetAmountService.readTargetAmount(targetAmountId)
                 .filter(TargetAmount::isAllocatedAmount)
                 .orElseThrow(() -> new TargetAmountErrorException(TargetAmountErrorCode.NOT_FOUND_TARGET_AMOUNT));
 
