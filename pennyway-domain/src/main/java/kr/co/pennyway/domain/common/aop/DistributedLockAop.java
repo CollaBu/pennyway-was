@@ -1,5 +1,6 @@
 package kr.co.pennyway.domain.common.aop;
 
+import kr.co.pennyway.domain.common.redisson.DistributedLock;
 import kr.co.pennyway.domain.common.util.CustomSpringELParser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +27,7 @@ public class DistributedLockAop {
     private final RedissonClient redissonClient;
     private final CallTransactionFactory callTransactionFactory;
 
-    @Around("@annotation(kr.co.pennyway.domain.common.aop.DistributedLock)")
+    @Around("@annotation(kr.co.pennyway.domain.common.redisson.DistributedLock)")
     public Object lock(final ProceedingJoinPoint joinPoint) throws Throwable {
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         Method method = signature.getMethod();

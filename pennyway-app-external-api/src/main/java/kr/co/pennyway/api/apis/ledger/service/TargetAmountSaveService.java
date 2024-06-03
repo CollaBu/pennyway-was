@@ -1,6 +1,6 @@
 package kr.co.pennyway.api.apis.ledger.service;
 
-import kr.co.pennyway.domain.common.aop.DistributedLock;
+import kr.co.pennyway.domain.common.redisson.DistributedLock;
 import kr.co.pennyway.domain.domains.target.domain.TargetAmount;
 import kr.co.pennyway.domain.domains.target.exception.TargetAmountErrorCode;
 import kr.co.pennyway.domain.domains.target.exception.TargetAmountErrorException;
