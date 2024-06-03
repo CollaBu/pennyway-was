@@ -50,7 +50,7 @@ public interface TargetAmountApi {
             @ApiResponse(responseCode = "200", description = "목표 금액 및 총 사용 금액 조회 성공", content = @Content(
                     schemaProperties = @SchemaProperty(name = "targetAmount", schema = @Schema(implementation = TargetAmountDto.WithTotalSpendingRes.class)))),
             @ApiResponse(responseCode = "404", content = @Content(mediaType = "application/json", examples = {
-                    @ExampleObject(name = "목표 금액 조회 실패", description = "목표 금액 데이터가 없거나, 이미 삭제(amount=-1)인 경우", value = """
+                    @ExampleObject(name = "목표 금액 조회 실패", description = "목표 금액 데이터가 존재하지 않는 경우. 클라이언트는 POST 호출 시나리오를 진행해야 한다.", value = """
                             {
                                 "code": "4040",
                                 "message": "해당 월의 목표 금액이 존재하지 않습니다."
@@ -74,18 +74,42 @@ public interface TargetAmountApi {
             @Parameter(name = "amount", description = "수정하려는 목표 금액", required = true, in = ParameterIn.QUERY, example = "100000"),
             @Parameter(name = "param", hidden = true)
     })
-    @ApiResponse(responseCode = "200", description = "목표 금액 수정 성공", content = @Content(schemaProperties = @SchemaProperty(name = "targetAmount", schema = @Schema(implementation = TargetAmountDto.TargetAmountInfo.class))))
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "목표 금액 수정 성공", content = @Content(schemaProperties = @SchemaProperty(name = "targetAmount", schema = @Schema(implementation = TargetAmountDto.TargetAmountInfo.class)))),
+            @ApiResponse(responseCode = "400", content = @Content(mediaType = "application/json", examples = {
+                    @ExampleObject(name = "목표 금액 수정 실패", description = "해당 월의 목표 금액이 아닌 경우", value = """
+                            {
+                                "code": "4004",
+                                "message": "당월 목표 금액에 대한 요청이 아닙니다."
+                            }
+                            """)})),
+            @ApiResponse(responseCode = "404", content = @Content(mediaType = "application/json", examples = {
+                    @ExampleObject(name = "목표 금액 조회 실패", description = "목표 금액 데이터가 없거나, 이미 삭제(amount=-1)인 경우", value = """
+                            {
+                                "code": "4040",
+                                "message": "해당 월의 목표 금액이 존재하지 않습니다."
+                            }
+                            """)}))
+    })
     ResponseEntity<?> patchTargetAmount(TargetAmountDto.AmountParam param, @PathVariable Long targetAmountId);
 
     @Operation(summary = "당월 목표 금액 삭제", method = "DELETE")
     @Parameter(name = "targetAmountId", description = "삭제하려는 목표 금액 ID", required = true, example = "1", in = ParameterIn.PATH)
-    @ApiResponse(responseCode = "404", content = @Content(mediaType = "application/json", examples = {
-            @ExampleObject(name = "목표 금액 조회 실패", description = "목표 금액 데이터가 없거나, 이미 삭제(amount=-1)인 경우", value = """
-                    {
-                        "code": "4040",
-                        "message": "해당 월의 목표 금액이 존재하지 않습니다."
-                    }
-                    """)
-    }))
+    @ApiResponses({
+            @ApiResponse(responseCode = "400", content = @Content(mediaType = "application/json", examples = {
+                    @ExampleObject(name = "목표 금액 삭제 실패", description = "해당 월의 목표 금액이 아닌 경우", value = """
+                            {
+                                "code": "4004",
+                                "message": "당월 목표 금액에 대한 요청이 아닙니다."
+                            }
+                            """)})),
+            @ApiResponse(responseCode = "404", content = @Content(mediaType = "application/json", examples = {
+                    @ExampleObject(name = "목표 금액 삭제 실패", description = "목표 금액 데이터가 없거나, 이미 삭제(amount=-1)인 경우", value = """
+                            {
+                                "code": "4040",
+                                "message": "해당 월의 목표 금액이 존재하지 않습니다."
+                            }
+                            """)}))
+    })
     ResponseEntity<?> deleteTargetAmount(@PathVariable Long targetAmountId);
 }
