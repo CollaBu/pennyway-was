@@ -23,7 +23,7 @@ public class TargetAmountDto {
 
     }
 
-    @Schema(title = "목표 금액의 date 유효ㅓㅇ 검사를 위한 요청 파라미터", hidden = true)
+    @Schema(title = "목표 금액의 date 유효성 검사를 위한 요청 파라미터", hidden = true)
     public record DateParam(
             @Schema(description = "조회하려는 목표 금액 날짜 (당일)", example = "2024-05-08", requiredMode = Schema.RequiredMode.REQUIRED)
             @NotNull(message = "date 값은 필수입니다.")
