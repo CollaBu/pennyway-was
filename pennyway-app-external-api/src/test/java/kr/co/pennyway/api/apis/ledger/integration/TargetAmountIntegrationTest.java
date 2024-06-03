@@ -8,6 +8,9 @@ import kr.co.pennyway.api.config.ExternalApiIntegrationTest;
 import kr.co.pennyway.api.config.fixture.SpendingFixture;
 import kr.co.pennyway.api.config.fixture.TargetAmountFixture;
 import kr.co.pennyway.api.config.fixture.UserFixture;
+import kr.co.pennyway.api.config.supporter.WithSecurityMockUser;
+import kr.co.pennyway.domain.domains.target.domain.TargetAmount;
+import kr.co.pennyway.domain.domains.target.service.TargetAmountService;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.service.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -23,8 +26,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -32,15 +39,19 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExternalApiIntegrationTest
 @AutoConfigureMockMvc
 @TestClassOrder(ClassOrderer.OrderAnnotation.class)
-public class TargetAmountControllerIntegrationTest extends ExternalApiDBTestConfig {
+public class TargetAmountIntegrationTest extends ExternalApiDBTestConfig {
     @Autowired
     private MockMvc mockMvc;
-    @Autowired
-    private NamedParameterJdbcTemplate jdbcTemplate;
+
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private TargetAmountService targetAmountService;
     @PersistenceContext
     private EntityManager em;
+    @Autowired
+    private NamedParameterJdbcTemplate jdbcTemplate;
 
     private User createUserWithCreatedAt(LocalDateTime createdAt, NamedParameterJdbcTemplate jdbcTemplate) {
         User user = userService.createUser(UserFixture.GENERAL_USER.toUser());
@@ -53,7 +64,56 @@ public class TargetAmountControllerIntegrationTest extends ExternalApiDBTestConf
         return userService.readUser(userId).orElseThrow();
     }
 
-    @Order(1)
+    @Nested
+    @DisplayName("당월 목표 금액 등록/수정")
+    @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+    class PutTargetAmount {
+        @Test
+        @DisplayName("당월 목표 금액 entity가 존재하지 않을 경우 새로 생성한다.")
+        @WithSecurityMockUser
+        @Transactional
+        void putTargetAmountNotFound() throws Exception {
+            // given
+            User user = UserFixture.GENERAL_USER.toUser();
+            userService.createUser(user);
+            String date = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+
+            // when
+            ResultActions result = performPutTargetAmount(date, 100000, user);
+
+            // then
+            result.andExpect(status().isOk());
+            assertNotNull(targetAmountService.readTargetAmountThatMonth(user.getId(), LocalDate.now()).orElse(null));
+        }
+
+        @Test
+        @DisplayName("당월 목표 금액 entity가 존재하는 경우 amount를 수정한다.")
+        @WithSecurityMockUser
+        @Transactional
+        void putTargetAmountFound() throws Exception {
+            // given
+            User user = userService.createUser(UserFixture.GENERAL_USER.toUser());
+            TargetAmount targetAmount = targetAmountService.createTargetAmount(TargetAmount.of(100000, user));
+
+            String date = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+
+            // when
+            ResultActions result = performPutTargetAmount(date, 200000, user);
+
+            // then
+            result.andExpect(status().isOk());
+            assertEquals(200000, targetAmount.getAmount());
+        }
+
+        private ResultActions performPutTargetAmount(String date, Integer amount, User requestUser) throws Exception {
+            UserDetails userDetails = SecurityUserDetails.from(requestUser);
+            return mockMvc.perform(put("/v2/target-amounts")
+                    .with(user(userDetails))
+                    .param("date", date)
+                    .param("amount", amount.toString()));
+        }
+    }
+
     @Nested
     @DisplayName("임의의 년/월에 대한 사용자 목표 금액 및 지출 총합 조회")
     class GetTargetAmountAndTotalSpending {
@@ -77,12 +137,11 @@ public class TargetAmountControllerIntegrationTest extends ExternalApiDBTestConf
         private ResultActions performGetTargetAmountAndTotalSpending(User requestUser, LocalDate date) throws Exception {
             UserDetails userDetails = SecurityUserDetails.from(requestUser);
 
-            return mockMvc.perform(MockMvcRequestBuilders.get("/v2/targets/{date}", date)
+            return mockMvc.perform(MockMvcRequestBuilders.get("/v2/target-amounts/{date}", date)
                     .with(user(userDetails)));
         }
     }
 
-    @Order(2)
     @Nested
     @DisplayName("사용자 목표 금액 및 지출 총합 전체 기록 조회")
     class GetTargetAmountsAndTotalSpendings {
@@ -106,7 +165,7 @@ public class TargetAmountControllerIntegrationTest extends ExternalApiDBTestConf
         private ResultActions performGetTargetAmountsAndTotalSpendings(User requestUser, LocalDate date) throws Exception {
             UserDetails userDetails = SecurityUserDetails.from(requestUser);
 
-            return mockMvc.perform(MockMvcRequestBuilders.get("/v2/targets")
+            return mockMvc.perform(MockMvcRequestBuilders.get("/v2/target-amounts")
                     .with(user(userDetails))
                     .param("date", date.toString()));
         }

@@ -19,8 +19,8 @@ public class TargetAmountFixture {
         Collection<MockTargetAmount> targetAmounts = getRandomTargetAmounts(user);
 
         String sql = String.format("""
-                INSERT INTO `%s` (amount, user_id, created_at, updated_at)
-                VALUES (:amount, :userId, :createdAt, :updatedAt)
+                INSERT INTO `%s` (amount, is_read, user_id, created_at, updated_at)
+                VALUES (:amount, true, :userId, :createdAt, :updatedAt)
                 """, TARGET_AMOUNT_TABLE);
         SqlParameterSource[] params = targetAmounts.stream()
                 .map(mockTargetAmount -> new MapSqlParameterSource()

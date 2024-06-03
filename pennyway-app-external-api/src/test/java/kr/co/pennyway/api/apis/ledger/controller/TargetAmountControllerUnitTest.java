@@ -159,7 +159,7 @@ public class TargetAmountControllerUnitTest {
 
 
         private ResultActions performPutTargetAmount(String date, Integer amount) throws Exception {
-            return mockMvc.perform(put("/v2/targets")
+            return mockMvc.perform(put("/v2/target-amounts")
                     .param("date", date)
                     .param("amount", String.valueOf(amount))
             );
