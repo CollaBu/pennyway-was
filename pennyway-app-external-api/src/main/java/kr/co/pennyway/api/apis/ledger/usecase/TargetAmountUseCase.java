@@ -61,9 +61,14 @@ public class TargetAmountUseCase {
 
     @Transactional
     public TargetAmountDto.TargetAmountInfo updateTargetAmount(Long targetAmountId, Integer amount) {
-        TargetAmount targetAmount = targetAmountService.readTargetAmount(targetAmountId).orElseThrow(() -> new TargetAmountErrorException(TargetAmountErrorCode.NOT_FOUND_TARGET_AMOUNT));
-        targetAmount.updateAmount(amount);
+        TargetAmount targetAmount = targetAmountService.readTargetAmount(targetAmountId)
+                .orElseThrow(() -> new TargetAmountErrorException(TargetAmountErrorCode.NOT_FOUND_TARGET_AMOUNT));
 
+        if (!targetAmount.isThatMonth()) {
+            throw new TargetAmountErrorException(TargetAmountErrorCode.INVALID_TARGET_AMOUNT_DATE);
+        }
+
+        targetAmount.updateAmount(amount);
         targetAmount = targetAmountService.createTargetAmount(targetAmount);
 
         return TargetAmountDto.TargetAmountInfo.from(targetAmount);
@@ -74,6 +79,10 @@ public class TargetAmountUseCase {
         TargetAmount targetAmount = targetAmountService.readTargetAmount(targetAmountId)
                 .filter(TargetAmount::isAllocatedAmount)
                 .orElseThrow(() -> new TargetAmountErrorException(TargetAmountErrorCode.NOT_FOUND_TARGET_AMOUNT));
+
+        if (!targetAmount.isThatMonth()) {
+            throw new TargetAmountErrorException(TargetAmountErrorCode.INVALID_TARGET_AMOUNT_DATE);
+        }
 
         targetAmountService.deleteTargetAmount(targetAmount);
     }
