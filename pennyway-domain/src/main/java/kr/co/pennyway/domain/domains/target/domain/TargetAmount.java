@@ -58,6 +58,6 @@ public class TargetAmount extends DateAuditable {
 
     @Override
     public String toString() {
-        return "TargetAmount(id=" + this.getId() + ", amount=" + this.getAmount() + ")";
+        return "TargetAmount(id=" + this.getId() + ", amount=" + this.getAmount() + ", year = " + this.getCreatedAt().getYear() + ", month = " + this.getCreatedAt().getMonthValue() + ")";
     }
 }
