@@ -72,6 +72,10 @@ public enum TargetAmountFixture {
         em.clear();
     }
 
+    public TargetAmount toTargetAmount(User user) {
+        return TargetAmount.of(amount, user);
+    }
+
     private record MockTargetAmount(int amount, LocalDateTime createdAt, LocalDateTime updatedAt, Long userId) {
         public static MockTargetAmount of(int amount, LocalDateTime createdAt, LocalDateTime updatedAt, Long userId) {
             return new MockTargetAmount(amount, createdAt, updatedAt, userId);

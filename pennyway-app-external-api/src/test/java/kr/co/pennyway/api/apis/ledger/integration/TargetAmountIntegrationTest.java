@@ -8,7 +8,6 @@ import kr.co.pennyway.api.config.ExternalApiIntegrationTest;
 import kr.co.pennyway.api.config.fixture.SpendingFixture;
 import kr.co.pennyway.api.config.fixture.TargetAmountFixture;
 import kr.co.pennyway.api.config.fixture.UserFixture;
-import kr.co.pennyway.api.config.supporter.WithSecurityMockUser;
 import kr.co.pennyway.domain.domains.target.domain.TargetAmount;
 import kr.co.pennyway.domain.domains.target.service.TargetAmountService;
 import kr.co.pennyway.domain.domains.user.domain.User;
@@ -61,6 +60,50 @@ public class TargetAmountIntegrationTest extends ExternalApiDBTestConfig {
         em.clear();
 
         return userService.readUser(userId).orElseThrow();
+    }
+
+    @Nested
+    @DisplayName("당월 목표 금액 등록")
+    class PostTargetAmount {
+        @Test
+        @DisplayName("사용자에게 당월 목표 기록이 존재할 시 409 Conflict 에러 응답을 반환한다.")
+        @Transactional
+        void postTargetAmountConflict() throws Exception {
+            // given
+            User user = userService.createUser(UserFixture.GENERAL_USER.toUser());
+            TargetAmountFixture.GENERAL_TARGET_AMOUNT.toTargetAmount(user);
+
+            // when
+            ResultActions result = performPostTargetAmount(user, LocalDate.now());
+
+            // then
+            result.andDo(print())
+                    .andExpect(status().isConflict());
+        }
+
+        @Test
+        @DisplayName("사용자에게 당월 목표 기록이 존재하지 않을 시 200 OK 응답을 반환한다.")
+        @Transactional
+        void postTargetAmountOk() throws Exception {
+            // given
+            User user = userService.createUser(UserFixture.GENERAL_USER.toUser());
+
+            // when
+            ResultActions result = performPostTargetAmount(user, LocalDate.now());
+
+            // then
+            result.andDo(print())
+                    .andExpect(status().isOk());
+        }
+
+        private ResultActions performPostTargetAmount(User requestUser, LocalDate date) throws Exception {
+            UserDetails userDetails = SecurityUserDetails.from(requestUser);
+
+            return mockMvc.perform(MockMvcRequestBuilders.post("/v2/target-amounts")
+                    .with(user(userDetails))
+                    .param("year", String.valueOf(date.getYear()))
+                    .param("month", String.valueOf(date.getMonthValue())));
+        }
     }
 
     @Nested
@@ -126,7 +169,6 @@ public class TargetAmountIntegrationTest extends ExternalApiDBTestConfig {
     class PutTargetAmount {
         @Test
         @DisplayName("당월 목표 금액 pk에 대한 접근 권한이 없는 경우 403 Forbidden 에러 응답을 반환한다.")
-        @WithSecurityMockUser
         @Transactional
         void putTargetAmountForbidden() throws Exception {
             // given
@@ -141,7 +183,6 @@ public class TargetAmountIntegrationTest extends ExternalApiDBTestConfig {
 
         @Test
         @DisplayName("당월 목표 금액 pk에 대한 접근 권한이 있지만, 당월 데이터가 아닌 경우 400 Bad Request 에러 응답을 반환한다.")
-        @WithSecurityMockUser
         @Transactional
         void putTargetAmountNotThatMonth() throws Exception {
             // given
@@ -159,7 +200,6 @@ public class TargetAmountIntegrationTest extends ExternalApiDBTestConfig {
 
         @Test
         @DisplayName("당월 목표 금액 pk에 대한 접근 권한이 있고, 당월 데이터인 경우 200 OK 응답을 반환한다.")
-        @WithSecurityMockUser
         @Transactional
         void putTargetAmountCorrect() throws Exception {
             // given
