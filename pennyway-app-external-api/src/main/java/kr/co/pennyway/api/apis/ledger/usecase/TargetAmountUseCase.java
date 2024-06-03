@@ -70,8 +70,7 @@ public class TargetAmountUseCase {
         }
 
         targetAmount.updateAmount(amount);
-        targetAmount = targetAmountService.createTargetAmount(targetAmount);
-
+        
         return TargetAmountDto.TargetAmountInfo.from(targetAmount);
     }
 
