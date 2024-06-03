@@ -165,16 +165,16 @@ public class TargetAmountIntegrationTest extends ExternalApiDBTestConfig {
     @Nested
     @DisplayName("당월 목표 금액 수정")
     @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-    class PutTargetAmount {
+    class PatchTargetAmount {
         @Test
         @DisplayName("당월 목표 금액 pk에 대한 접근 권한이 없는 경우 403 Forbidden 에러 응답을 반환한다.")
         @Transactional
-        void putTargetAmountForbidden() throws Exception {
+        void patchTargetAmountForbidden() throws Exception {
             // given
             User user = userService.createUser(UserFixture.GENERAL_USER.toUser());
 
             // when
-            ResultActions result = performPutTargetAmount(1000L, 100000, user);
+            ResultActions result = performPatchTargetAmount(1000L, 100000, user);
 
             // then
             result.andDo(print()).andExpect(status().isForbidden());
@@ -183,7 +183,7 @@ public class TargetAmountIntegrationTest extends ExternalApiDBTestConfig {
         @Test
         @DisplayName("당월 목표 금액 pk에 대한 접근 권한이 있지만, 당월 데이터가 아닌 경우 400 Bad Request 에러 응답을 반환한다.")
         @Transactional
-        void putTargetAmountNotThatMonth() throws Exception {
+        void patchTargetAmountNotThatMonth() throws Exception {
             // given
             User user = userService.createUser(UserFixture.GENERAL_USER.toUser());
             TargetAmount targetAmount = targetAmountService.createTargetAmount(TargetAmount.of(100000, user));
@@ -191,7 +191,7 @@ public class TargetAmountIntegrationTest extends ExternalApiDBTestConfig {
             targetAmount = targetAmountService.readTargetAmount(targetAmount.getId()).orElseThrow();
 
             // when
-            ResultActions result = performPutTargetAmount(targetAmount.getId(), 200000, user);
+            ResultActions result = performPatchTargetAmount(targetAmount.getId(), 200000, user);
 
             // then
             result.andDo(print()).andExpect(status().isBadRequest());
@@ -200,20 +200,20 @@ public class TargetAmountIntegrationTest extends ExternalApiDBTestConfig {
         @Test
         @DisplayName("당월 목표 금액 pk에 대한 접근 권한이 있고, 당월 데이터인 경우 200 OK 응답을 반환한다.")
         @Transactional
-        void putTargetAmountCorrect() throws Exception {
+        void patchTargetAmountCorrect() throws Exception {
             // given
             User user = userService.createUser(UserFixture.GENERAL_USER.toUser());
             TargetAmount targetAmount = targetAmountService.createTargetAmount(TargetAmount.of(100000, user));
 
             // when
-            ResultActions result = performPutTargetAmount(targetAmount.getId(), 200000, user);
+            ResultActions result = performPatchTargetAmount(targetAmount.getId(), 200000, user);
 
             // then
             result.andDo(print()).andExpect(status().isOk());
             assertEquals(200000, targetAmountService.readTargetAmount(targetAmount.getId()).orElseThrow().getAmount());
         }
 
-        private ResultActions performPutTargetAmount(Long targetAmountId, Integer amount, User requestUser) throws Exception {
+        private ResultActions performPatchTargetAmount(Long targetAmountId, Integer amount, User requestUser) throws Exception {
             UserDetails userDetails = SecurityUserDetails.from(requestUser);
             return mockMvc.perform(patch("/v2/target-amounts/{target_amount_id}", targetAmountId)
                     .with(user(userDetails))
