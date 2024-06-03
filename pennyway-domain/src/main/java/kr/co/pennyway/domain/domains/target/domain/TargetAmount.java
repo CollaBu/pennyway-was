@@ -8,6 +8,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLDelete;
 
+import java.time.YearMonth;
+
 @Entity
 @Getter
 @Table(name = "target_amount")
@@ -42,6 +44,16 @@ public class TargetAmount extends DateAuditable {
 
     public boolean isAllocatedAmount() {
         return this.amount >= 0;
+    }
+
+    /**
+     * 해당 TargetAmount가 당월 데이터인지 확인한다.
+     *
+     * @return 당월 데이터라면 true, 아니라면 false
+     */
+    public boolean isThatMonth() {
+        YearMonth yearMonth = YearMonth.now();
+        return this.getCreatedAt().getYear() == yearMonth.getYear() && this.getCreatedAt().getMonth() == yearMonth.getMonth();
     }
 
     @Override
