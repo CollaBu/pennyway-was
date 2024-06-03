@@ -220,4 +220,75 @@ public class TargetAmountIntegrationTest extends ExternalApiDBTestConfig {
                     .param("amount", amount.toString()));
         }
     }
+
+    @Nested
+    @DisplayName("당월 목표 금액 삭제")
+    class DeleteTargetAmount {
+        @Test
+        @DisplayName("당월 목표 금액 pk에 대한 접근 권한이 없는 경우 403 Forbidden 에러 응답을 반환한다.")
+        @Transactional
+        void deleteTargetAmountForbidden() throws Exception {
+            // given
+            User user = userService.createUser(UserFixture.GENERAL_USER.toUser());
+
+            // when
+            ResultActions result = performDeleteTargetAmount(1000L, user);
+
+            // then
+            result.andDo(print()).andExpect(status().isForbidden());
+        }
+
+        @Test
+        @DisplayName("당월 목표 금액 pk에 대한 접근 권한이 있지만, 당월 데이터가 아닌 경우 400 Bad Request 에러 응답을 반환한다.")
+        @Transactional
+        void deleteTargetAmountNotThatMonth() throws Exception {
+            // given
+            User user = userService.createUser(UserFixture.GENERAL_USER.toUser());
+            TargetAmount targetAmount = targetAmountService.createTargetAmount(TargetAmount.of(100000, user));
+            TargetAmountFixture.convertCreatedAt(targetAmount, LocalDateTime.now().minusMonths(1), jdbcTemplate, em);
+            targetAmount = targetAmountService.readTargetAmount(targetAmount.getId()).orElseThrow();
+
+            // when
+            ResultActions result = performDeleteTargetAmount(targetAmount.getId(), user);
+
+            // then
+            result.andDo(print()).andExpect(status().isBadRequest());
+        }
+
+        @Test
+        @DisplayName("당월 목표 금액 pk에 대한 접근 권한이 있지만, amount가 이미 -1인 경우 404 Not Found 에러 응답을 반환한다.")
+        @Transactional
+        void deleteTargetAmountNotFound() throws Exception {
+            // given
+            User user = userService.createUser(UserFixture.GENERAL_USER.toUser());
+            TargetAmount targetAmount = targetAmountService.createTargetAmount(TargetAmount.of(-1, user));
+
+            // when
+            ResultActions result = performDeleteTargetAmount(targetAmount.getId(), user);
+
+            // then
+            result.andDo(print()).andExpect(status().isNotFound());
+        }
+
+        @Test
+        @DisplayName("당월 목표 금액 pk에 대한 접근 권한이 있고, 당월 데이터인 경우 200 OK 응답을 반환한다.")
+        @Transactional
+        void deleteTargetAmountCorrect() throws Exception {
+            // given
+            User user = userService.createUser(UserFixture.GENERAL_USER.toUser());
+            TargetAmount targetAmount = targetAmountService.createTargetAmount(TargetAmount.of(100000, user));
+
+            // when
+            ResultActions result = performDeleteTargetAmount(targetAmount.getId(), user);
+
+            // then
+            result.andDo(print()).andExpect(status().isOk());
+        }
+
+        private ResultActions performDeleteTargetAmount(Long targetAmountId, User requestUser) throws Exception {
+            UserDetails userDetails = SecurityUserDetails.from(requestUser);
+            return mockMvc.perform(MockMvcRequestBuilders.delete("/v2/target-amounts/{target_amount_id}", targetAmountId)
+                    .with(user(userDetails)));
+        }
+    }
 }
