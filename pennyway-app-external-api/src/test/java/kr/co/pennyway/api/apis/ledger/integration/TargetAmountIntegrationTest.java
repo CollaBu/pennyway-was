@@ -125,6 +125,20 @@ public class TargetAmountIntegrationTest extends ExternalApiDBTestConfig {
                     .andExpect(status().isOk());
         }
 
+        @Test
+        @DisplayName("특정 년/월에 대한 사용자 목표 금액이 존재하지 않는 경우, 404 Not Found 에러 응답을 반환한다.")
+        @Transactional
+        void getTargetAmountAndTotalSpendingNotFound() throws Exception {
+            // given
+            User user = userService.createUser(UserFixture.GENERAL_USER.toUser());
+
+            // when
+            ResultActions result = performGetTargetAmountAndTotalSpending(user, LocalDate.now());
+
+            // then
+            result.andDo(print()).andExpect(status().isNotFound());
+        }
+
         private ResultActions performGetTargetAmountAndTotalSpending(User requestUser, LocalDate date) throws Exception {
             UserDetails userDetails = SecurityUserDetails.from(requestUser);
 
