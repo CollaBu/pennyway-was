@@ -64,7 +64,7 @@ public class TargetAmountUseCase {
         TargetAmount targetAmount = targetAmountService.readTargetAmount(targetAmountId).orElseThrow(() -> new TargetAmountErrorException(TargetAmountErrorCode.NOT_FOUND_TARGET_AMOUNT));
         targetAmount.updateAmount(amount);
 
-        targetAmountService.createTargetAmount(targetAmount);
+        targetAmount = targetAmountService.createTargetAmount(targetAmount);
 
         return TargetAmountDto.TargetAmountInfo.from(targetAmount);
     }
