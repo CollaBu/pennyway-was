@@ -24,7 +24,6 @@ public class TargetAmountSaveService {
             log.info("{}에 대한 날짜의 목표 금액이 이미 존재합니다.", date);
             throw new TargetAmountErrorException(TargetAmountErrorCode.ALREADY_EXIST_TARGET_AMOUNT);
         }
-        log.info("{}에 대한 날짜의 목표 금액을 생성합니다.", date);
 
         return targetAmountService.createTargetAmount(TargetAmount.of(-1, user));
     }
