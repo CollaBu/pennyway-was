@@ -29,7 +29,7 @@ public class TargetAmountController implements TargetAmountApi {
     @PostMapping("")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> postTargetAmount(@RequestParam int year, @RequestParam int month, @AuthenticationPrincipal SecurityUserDetails user) {
-        if (YearMonth.of(year, month).isAfter(YearMonth.now())) {
+        if (!(year == YearMonth.now().getYear() && month == YearMonth.now().getMonthValue())) {
             throw new TargetAmountErrorException(TargetAmountErrorCode.INVALID_TARGET_AMOUNT_DATE);
         }
 
