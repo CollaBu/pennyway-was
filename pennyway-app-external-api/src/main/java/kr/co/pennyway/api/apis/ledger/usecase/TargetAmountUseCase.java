@@ -44,10 +44,10 @@ public class TargetAmountUseCase {
 
     @Transactional(readOnly = true)
     public TargetAmountDto.WithTotalSpendingRes getTargetAmountAndTotalSpending(Long userId, LocalDate date) {
-        Optional<TargetAmount> targetAmount = targetAmountService.readTargetAmountThatMonth(userId, date);
+        TargetAmount targetAmount = targetAmountService.readTargetAmountThatMonth(userId, date).orElseThrow(() -> new TargetAmountErrorException(TargetAmountErrorCode.NOT_FOUND_TARGET_AMOUNT));
         Optional<TotalSpendingAmount> totalSpending = spendingService.readTotalSpendingAmountByUserId(userId, date);
 
-        return TargetAmountMapper.toWithTotalSpendingResponse(targetAmount.orElse(null), totalSpending.orElse(null), date);
+        return TargetAmountMapper.toWithTotalSpendingResponse(targetAmount, totalSpending.orElse(null), date);
     }
 
     @Transactional(readOnly = true)
@@ -70,7 +70,7 @@ public class TargetAmountUseCase {
         }
 
         targetAmount.updateAmount(amount);
-        
+
         return TargetAmountDto.TargetAmountInfo.from(targetAmount);
     }
 
