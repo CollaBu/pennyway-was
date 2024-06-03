@@ -23,6 +23,8 @@ import java.time.YearMonth;
 @RequiredArgsConstructor
 @RequestMapping("/v2/target-amounts")
 public class TargetAmountController implements TargetAmountApi {
+    private static final String TARGET_AMOUNT = "targetAmount";
+    private static final String TARGET_AMOUNTS = "targetAmounts";
     private final TargetAmountUseCase targetAmountUseCase;
 
     @Override
@@ -33,28 +35,28 @@ public class TargetAmountController implements TargetAmountApi {
             throw new TargetAmountErrorException(TargetAmountErrorCode.INVALID_TARGET_AMOUNT_DATE);
         }
 
-        return ResponseEntity.ok(SuccessResponse.from("targetAmount", targetAmountUseCase.createTargetAmount(user.getUserId(), year, month)));
+        return ResponseEntity.ok(SuccessResponse.from(TARGET_AMOUNT, targetAmountUseCase.createTargetAmount(user.getUserId(), year, month)));
     }
 
     @Override
     @GetMapping("/{date}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> getTargetAmountAndTotalSpending(@PathVariable LocalDate date, @AuthenticationPrincipal SecurityUserDetails user) {
-        return ResponseEntity.ok(SuccessResponse.from("targetAmount", targetAmountUseCase.getTargetAmountAndTotalSpending(user.getUserId(), date)));
+        return ResponseEntity.ok(SuccessResponse.from(TARGET_AMOUNT, targetAmountUseCase.getTargetAmountAndTotalSpending(user.getUserId(), date)));
     }
 
     @Override
     @GetMapping("")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> getTargetAmountsAndTotalSpendings(@Validated TargetAmountDto.DateParam param, @AuthenticationPrincipal SecurityUserDetails user) {
-        return ResponseEntity.ok(SuccessResponse.from("targetAmounts", targetAmountUseCase.getTargetAmountsAndTotalSpendings(user.getUserId(), param.date())));
+        return ResponseEntity.ok(SuccessResponse.from(TARGET_AMOUNTS, targetAmountUseCase.getTargetAmountsAndTotalSpendings(user.getUserId(), param.date())));
     }
 
     @Override
     @PatchMapping("/{target_amount_id}")
     @PreAuthorize("isAuthenticated() and @targetAmountManager.hasPermission(principal.userId, #targetAmountId)")
     public ResponseEntity<?> patchTargetAmount(@Validated TargetAmountDto.AmountParam param, @PathVariable("target_amount_id") Long targetAmountId) {
-        return ResponseEntity.ok(SuccessResponse.from("targetAmount", targetAmountUseCase.updateTargetAmount(targetAmountId, param.amount())));
+        return ResponseEntity.ok(SuccessResponse.from(TARGET_AMOUNT, targetAmountUseCase.updateTargetAmount(targetAmountId, param.amount())));
     }
 
     @Override
