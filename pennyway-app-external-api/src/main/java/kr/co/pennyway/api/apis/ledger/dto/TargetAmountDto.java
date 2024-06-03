@@ -45,8 +45,8 @@ public class TargetAmountDto {
             @NotNull(message = "month 값은 필수입니다.")
             Integer month,
             @Schema(description = "목표 금액", requiredMode = Schema.RequiredMode.REQUIRED)
-            @NotNull(message = "targetAmount 값은 필수입니다.")
-            TargetAmountInfo targetAmount,
+            @NotNull(message = "targetAmountDetail 값은 필수입니다.")
+            TargetAmountInfo targetAmountDetail,
             @Schema(description = "총 지출 금액", example = "100000", requiredMode = Schema.RequiredMode.REQUIRED)
             @NotNull(message = "totalSpending 값은 필수입니다.")
             Integer totalSpending,

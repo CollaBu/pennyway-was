@@ -71,7 +71,7 @@ public class TargetAmountIntegrationTest extends ExternalApiDBTestConfig {
             // given
             User user = userService.createUser(UserFixture.GENERAL_USER.toUser());
             TargetAmount targetAmount = targetAmountService.createTargetAmount(TargetAmountFixture.GENERAL_TARGET_AMOUNT.toTargetAmount(user));
-            log.debug("targetAmount: {}", targetAmount);
+            log.debug("targetAmountInfo: {}", targetAmount);
 
             // when
             ResultActions result = performPostTargetAmount(user, LocalDate.now());
@@ -163,7 +163,7 @@ public class TargetAmountIntegrationTest extends ExternalApiDBTestConfig {
     }
 
     @Nested
-    @DisplayName("당월 목표 금액 등록/수정")
+    @DisplayName("당월 목표 금액 수정")
     @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
     class PutTargetAmount {
         @Test
