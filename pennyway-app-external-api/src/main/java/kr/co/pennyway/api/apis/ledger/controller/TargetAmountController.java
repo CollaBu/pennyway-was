@@ -53,7 +53,7 @@ public class TargetAmountController implements TargetAmountApi {
     @Override
     @PatchMapping("/{target_amount_id}")
     @PreAuthorize("isAuthenticated() and @targetAmountManager.hasPermission(principal.userId, #targetAmountId)")
-    public ResponseEntity<?> patchTargetAmount(TargetAmountDto.AmountParam param, @PathVariable("target_amount_id") Long targetAmountId) {
+    public ResponseEntity<?> patchTargetAmount(@Validated TargetAmountDto.AmountParam param, @PathVariable("target_amount_id") Long targetAmountId) {
         return ResponseEntity.ok(SuccessResponse.from("targetAmount", targetAmountUseCase.updateTargetAmount(targetAmountId, param.amount())));
     }
 
