@@ -18,6 +18,7 @@ import software.amazon.awssdk.services.s3.model.HeadObjectRequest;
 import software.amazon.awssdk.services.s3.model.HeadObjectResponse;
 import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.model.StorageClass;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequest;
 
@@ -132,6 +133,7 @@ public class AwsS3Provider {
 					.sourceKey(sourceKey)
 					.destinationBucket(awsS3Config.getBucketName())
 					.destinationKey(type.convertDeleteKeyToOriginKey(sourceKey))
+					.storageClass(StorageClass.DEEP_ARCHIVE)
 					.build();
 
 			s3Client.copyObject(copyObjRequest);
