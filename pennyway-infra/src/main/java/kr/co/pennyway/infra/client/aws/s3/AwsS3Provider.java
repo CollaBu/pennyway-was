@@ -13,6 +13,7 @@ import kr.co.pennyway.infra.config.AwsS3Config;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.CopyObjectRequest;
 import software.amazon.awssdk.services.s3.model.HeadObjectRequest;
 import software.amazon.awssdk.services.s3.model.HeadObjectResponse;
 import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
@@ -69,7 +70,7 @@ public class AwsS3Provider {
 	 * @return ObjectKey
 	 */
 	private String generateObjectKey(String type, String ext, String userId, String chatroomId) {
-		ObjectKeyTemplate objectKeyTemplate = new ObjectKeyTemplate(ObjectKeyType.valueOf(type).getTemplate());
+		ObjectKeyTemplate objectKeyTemplate = new ObjectKeyTemplate(ObjectKeyType.valueOf(type).getDeleteTemplate());
 		Map<String, String> variables = generateObjectKeyVariables(type, ext, userId, chatroomId);
 		String objectKey = objectKeyTemplate.apply(variables);
 		return objectKey;
@@ -118,4 +119,25 @@ public class AwsS3Provider {
 		}
 	}
 
+	/**
+	 * S3에 저장된 파일을 복사한다.
+	 * @param type : ObjectKeyType (PROFILE, FEED, CHATROOM_PROFILE, CHAT, CHAT_PROFILE)
+	 * @param sourceKey : 복사할 파일의 키
+	 * @return 복사된 파일의 키
+	 */
+	public void copyObject(ObjectKeyType type, String sourceKey) {
+		try {
+			CopyObjectRequest copyObjRequest = CopyObjectRequest.builder()
+					.sourceBucket(awsS3Config.getBucketName())
+					.sourceKey(sourceKey)
+					.destinationBucket(awsS3Config.getBucketName())
+					.destinationKey(type.convertDeleteKeyToOriginKey(sourceKey))
+					.build();
+
+			s3Client.copyObject(copyObjRequest);
+		} catch (Exception e) {
+			log.error("파일 복사 중 오류 발생", e);
+			throw new StorageException(StorageErrorCode.INVALID_FILE);
+		}
+	}
 }
