@@ -133,7 +133,7 @@ public class AwsS3Provider {
 					.sourceKey(sourceKey)
 					.destinationBucket(awsS3Config.getBucketName())
 					.destinationKey(type.convertDeleteKeyToOriginKey(sourceKey))
-					.storageClass(StorageClass.DEEP_ARCHIVE)
+					.storageClass(StorageClass.ONEZONE_IA)
 					.build();
 
 			s3Client.copyObject(copyObjRequest);
