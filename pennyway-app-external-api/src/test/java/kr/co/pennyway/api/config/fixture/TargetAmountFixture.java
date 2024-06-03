@@ -1,5 +1,7 @@
 package kr.co.pennyway.api.config.fixture;
 
+import jakarta.persistence.EntityManager;
+import kr.co.pennyway.domain.domains.target.domain.TargetAmount;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -12,8 +14,17 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class TargetAmountFixture {
+public enum TargetAmountFixture {
+    GENERAL_TARGET_AMOUNT(10000, true);
+
     private static final String TARGET_AMOUNT_TABLE = "target_amount";
+    private final int amount;
+    private final boolean isRead;
+
+    TargetAmountFixture(int amount, boolean isRead) {
+        this.amount = amount;
+        this.isRead = isRead;
+    }
 
     public static void bulkInsertTargetAmount(User user, NamedParameterJdbcTemplate jdbcTemplate) {
         Collection<MockTargetAmount> targetAmounts = getRandomTargetAmounts(user);
@@ -50,6 +61,15 @@ public class TargetAmountFixture {
         }
 
         return targetAmounts;
+    }
+
+    public static void convertCreatedAt(TargetAmount targetAmount, LocalDateTime dateTime, NamedParameterJdbcTemplate jdbcTemplate, EntityManager em) {
+        String sql = String.format("UPDATE `%s` SET created_at = :createdAt WHERE id = :id", TARGET_AMOUNT_TABLE);
+        SqlParameterSource param = new MapSqlParameterSource()
+                .addValue("createdAt", dateTime)
+                .addValue("id", targetAmount.getId());
+        jdbcTemplate.update(sql, param);
+        em.clear();
     }
 
     private record MockTargetAmount(int amount, LocalDateTime createdAt, LocalDateTime updatedAt, Long userId) {

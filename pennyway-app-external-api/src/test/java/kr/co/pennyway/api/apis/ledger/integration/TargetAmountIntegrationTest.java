@@ -26,12 +26,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -50,6 +48,7 @@ public class TargetAmountIntegrationTest extends ExternalApiDBTestConfig {
     private TargetAmountService targetAmountService;
     @PersistenceContext
     private EntityManager em;
+
     @Autowired
     private NamedParameterJdbcTemplate jdbcTemplate;
 
@@ -62,56 +61,6 @@ public class TargetAmountIntegrationTest extends ExternalApiDBTestConfig {
         em.clear();
 
         return userService.readUser(userId).orElseThrow();
-    }
-
-    @Nested
-    @DisplayName("당월 목표 금액 등록/수정")
-    @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-    class PutTargetAmount {
-        @Test
-        @DisplayName("당월 목표 금액 entity가 존재하지 않을 경우 새로 생성한다.")
-        @WithSecurityMockUser
-        @Transactional
-        void putTargetAmountNotFound() throws Exception {
-            // given
-            User user = UserFixture.GENERAL_USER.toUser();
-            userService.createUser(user);
-            String date = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-
-            // when
-            ResultActions result = performPutTargetAmount(date, 100000, user);
-
-            // then
-            result.andExpect(status().isOk());
-            assertNotNull(targetAmountService.readTargetAmountThatMonth(user.getId(), LocalDate.now()).orElse(null));
-        }
-
-        @Test
-        @DisplayName("당월 목표 금액 entity가 존재하는 경우 amount를 수정한다.")
-        @WithSecurityMockUser
-        @Transactional
-        void putTargetAmountFound() throws Exception {
-            // given
-            User user = userService.createUser(UserFixture.GENERAL_USER.toUser());
-            TargetAmount targetAmount = targetAmountService.createTargetAmount(TargetAmount.of(100000, user));
-
-            String date = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-
-            // when
-            ResultActions result = performPutTargetAmount(date, 200000, user);
-
-            // then
-            result.andExpect(status().isOk());
-            assertEquals(200000, targetAmount.getAmount());
-        }
-
-        private ResultActions performPutTargetAmount(String date, Integer amount, User requestUser) throws Exception {
-            UserDetails userDetails = SecurityUserDetails.from(requestUser);
-            return mockMvc.perform(put("/v2/target-amounts")
-                    .with(user(userDetails))
-                    .param("date", date)
-                    .param("amount", amount.toString()));
-        }
     }
 
     @Nested
@@ -168,6 +117,68 @@ public class TargetAmountIntegrationTest extends ExternalApiDBTestConfig {
             return mockMvc.perform(MockMvcRequestBuilders.get("/v2/target-amounts")
                     .with(user(userDetails))
                     .param("date", date.toString()));
+        }
+    }
+
+    @Nested
+    @DisplayName("당월 목표 금액 등록/수정")
+    @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+    class PutTargetAmount {
+        @Test
+        @DisplayName("당월 목표 금액 pk에 대한 접근 권한이 없는 경우 403 Forbidden 에러 응답을 반환한다.")
+        @WithSecurityMockUser
+        @Transactional
+        void putTargetAmountForbidden() throws Exception {
+            // given
+            User user = userService.createUser(UserFixture.GENERAL_USER.toUser());
+
+            // when
+            ResultActions result = performPutTargetAmount(1000L, 100000, user);
+
+            // then
+            result.andDo(print()).andExpect(status().isForbidden());
+        }
+
+        @Test
+        @DisplayName("당월 목표 금액 pk에 대한 접근 권한이 있지만, 당월 데이터가 아닌 경우 400 Bad Request 에러 응답을 반환한다.")
+        @WithSecurityMockUser
+        @Transactional
+        void putTargetAmountNotThatMonth() throws Exception {
+            // given
+            User user = userService.createUser(UserFixture.GENERAL_USER.toUser());
+            TargetAmount targetAmount = targetAmountService.createTargetAmount(TargetAmount.of(100000, user));
+            TargetAmountFixture.convertCreatedAt(targetAmount, LocalDateTime.now().minusMonths(1), jdbcTemplate, em);
+            targetAmount = targetAmountService.readTargetAmount(targetAmount.getId()).orElseThrow();
+
+            // when
+            ResultActions result = performPutTargetAmount(targetAmount.getId(), 200000, user);
+
+            // then
+            result.andDo(print()).andExpect(status().isBadRequest());
+        }
+
+        @Test
+        @DisplayName("당월 목표 금액 pk에 대한 접근 권한이 있고, 당월 데이터인 경우 200 OK 응답을 반환한다.")
+        @WithSecurityMockUser
+        @Transactional
+        void putTargetAmountCorrect() throws Exception {
+            // given
+            User user = userService.createUser(UserFixture.GENERAL_USER.toUser());
+            TargetAmount targetAmount = targetAmountService.createTargetAmount(TargetAmount.of(100000, user));
+
+            // when
+            ResultActions result = performPutTargetAmount(targetAmount.getId(), 200000, user);
+
+            // then
+            result.andDo(print()).andExpect(status().isOk());
+            assertEquals(200000, targetAmountService.readTargetAmount(targetAmount.getId()).orElseThrow().getAmount());
+        }
+
+        private ResultActions performPutTargetAmount(Long targetAmountId, Integer amount, User requestUser) throws Exception {
+            UserDetails userDetails = SecurityUserDetails.from(requestUser);
+            return mockMvc.perform(patch("/v2/target-amounts/{target_amount_id}", targetAmountId)
+                    .with(user(userDetails))
+                    .param("amount", amount.toString()));
         }
     }
 }
