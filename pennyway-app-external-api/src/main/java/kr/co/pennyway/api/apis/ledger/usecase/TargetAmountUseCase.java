@@ -4,6 +4,7 @@ import kr.co.pennyway.api.apis.ledger.dto.TargetAmountDto;
 import kr.co.pennyway.api.apis.ledger.mapper.TargetAmountMapper;
 import kr.co.pennyway.api.apis.ledger.service.TargetAmountSaveService;
 import kr.co.pennyway.common.annotation.UseCase;
+import kr.co.pennyway.domain.common.redisson.DistributedLockPrefix;
 import kr.co.pennyway.domain.domains.spending.dto.TotalSpendingAmount;
 import kr.co.pennyway.domain.domains.spending.service.SpendingService;
 import kr.co.pennyway.domain.domains.target.domain.TargetAmount;
@@ -36,7 +37,7 @@ public class TargetAmountUseCase {
     public TargetAmountDto.TargetAmountInfo createTargetAmount(Long userId, int year, int month) {
         User user = userService.readUser(userId).orElseThrow(() -> new UserErrorException(UserErrorCode.NOT_FOUND));
 
-        TargetAmount targetAmount = targetAmountSaveService.createTargetAmount(user, LocalDate.of(year, month, 1));
+        TargetAmount targetAmount = targetAmountSaveService.createTargetAmount(DistributedLockPrefix.TARGET_AMOUNT_USER, user, LocalDate.of(year, month, 1));
 
         return TargetAmountDto.TargetAmountInfo.from(targetAmount);
     }

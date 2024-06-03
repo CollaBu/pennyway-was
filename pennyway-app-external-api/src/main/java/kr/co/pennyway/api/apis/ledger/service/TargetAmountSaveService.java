@@ -1,7 +1,6 @@
 package kr.co.pennyway.api.apis.ledger.service;
 
 import kr.co.pennyway.domain.common.redisson.DistributedLock;
-import kr.co.pennyway.domain.common.redisson.DistributedLockPrefix;
 import kr.co.pennyway.domain.domains.target.domain.TargetAmount;
 import kr.co.pennyway.domain.domains.target.exception.TargetAmountErrorCode;
 import kr.co.pennyway.domain.domains.target.exception.TargetAmountErrorException;
@@ -19,11 +18,13 @@ import java.time.LocalDate;
 public class TargetAmountSaveService {
     private final TargetAmountService targetAmountService;
 
-    @DistributedLock(key = DistributedLockPrefix.TARGET_AMOUNT_USER + "#user.id")
-    public TargetAmount createTargetAmount(User user, LocalDate date) {
+    @DistributedLock(key = "#key.concat(#user.getId()).concat('_').concat(#date.toString())")
+    public TargetAmount createTargetAmount(String key, User user, LocalDate date) {
         if (targetAmountService.isExistsTargetAmountThatMonth(user.getId(), date)) {
+            log.info("{}에 대한 날짜의 목표 금액이 이미 존재합니다.", date);
             throw new TargetAmountErrorException(TargetAmountErrorCode.ALREADY_EXIST_TARGET_AMOUNT);
         }
+        log.info("{}에 대한 날짜의 목표 금액을 생성합니다.", date);
 
         return targetAmountService.createTargetAmount(TargetAmount.of(-1, user));
     }

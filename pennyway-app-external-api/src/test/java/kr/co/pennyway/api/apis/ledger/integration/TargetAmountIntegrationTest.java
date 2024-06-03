@@ -67,11 +67,11 @@ public class TargetAmountIntegrationTest extends ExternalApiDBTestConfig {
     class PostTargetAmount {
         @Test
         @DisplayName("사용자에게 당월 목표 기록이 존재할 시 409 Conflict 에러 응답을 반환한다.")
-        @Transactional
         void postTargetAmountConflict() throws Exception {
             // given
             User user = userService.createUser(UserFixture.GENERAL_USER.toUser());
-            TargetAmountFixture.GENERAL_TARGET_AMOUNT.toTargetAmount(user);
+            TargetAmount targetAmount = targetAmountService.createTargetAmount(TargetAmountFixture.GENERAL_TARGET_AMOUNT.toTargetAmount(user));
+            log.debug("targetAmount: {}", targetAmount);
 
             // when
             ResultActions result = performPostTargetAmount(user, LocalDate.now());
@@ -83,7 +83,6 @@ public class TargetAmountIntegrationTest extends ExternalApiDBTestConfig {
 
         @Test
         @DisplayName("사용자에게 당월 목표 기록이 존재하지 않을 시 200 OK 응답을 반환한다.")
-        @Transactional
         void postTargetAmountOk() throws Exception {
             // given
             User user = userService.createUser(UserFixture.GENERAL_USER.toUser());
