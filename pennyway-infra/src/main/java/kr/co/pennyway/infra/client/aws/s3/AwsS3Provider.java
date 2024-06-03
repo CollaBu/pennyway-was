@@ -12,6 +12,10 @@ import kr.co.pennyway.infra.common.exception.StorageException;
 import kr.co.pennyway.infra.config.AwsS3Config;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.HeadObjectRequest;
+import software.amazon.awssdk.services.s3.model.HeadObjectResponse;
+import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequest;
@@ -24,6 +28,7 @@ public class AwsS3Provider {
 
 	private final AwsS3Config awsS3Config;
 	private final S3Presigner s3Presigner;
+	private final S3Client s3Client;
 
 	/**
 	 * type에 해당하는 확장자를 가진 파일을 S3에 저장하기 위한 Presigned URL을 생성한다.
@@ -90,4 +95,27 @@ public class AwsS3Provider {
 		UrlGenerator urlGenerator = UrlGeneratorFactory.getUrlGenerator(objectType);
 		return urlGenerator.generate(type, ext, userId, chatroomId);
 	}
+
+	/**
+	 * S3에 파일이 존재하는지 확인한다.
+	 * @param key : S3 버킷 내의 파일 키
+	 * @return 파일이 존재하면 true, 존재하지 않으면 false
+	 */
+	public boolean doesObjectExist(String key) {
+		try {
+			HeadObjectRequest headObjectRequest = HeadObjectRequest.builder()
+					.bucket(awsS3Config.getBucketName())
+					.key(key)
+					.build();
+
+			HeadObjectResponse headObjectResponse = s3Client.headObject(headObjectRequest);
+			return true;
+		} catch (NoSuchKeyException e) {
+			return false;
+		} catch (Exception e) {
+			log.error("파일 존재 여부 확인 중 오류 발생", e);
+			throw new StorageException(StorageErrorCode.NOT_FOUND);
+		}
+	}
+
 }
