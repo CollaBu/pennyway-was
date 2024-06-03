@@ -65,6 +65,7 @@ public interface TargetAmountApi {
             @Parameter(name = "amount", description = "수정하려는 목표 금액", required = true, in = ParameterIn.QUERY, example = "100000"),
             @Parameter(name = "param", hidden = true)
     })
+    @ApiResponse(responseCode = "200", description = "목표 금액 수정 성공", content = @Content(schemaProperties = @SchemaProperty(name = "targetAmount", schema = @Schema(implementation = TargetAmountDto.TargetAmountInfo.class))))
     ResponseEntity<?> patchTargetAmount(TargetAmountDto.AmountParam param, @PathVariable Long targetAmountId);
 
     @Operation(summary = "당월 목표 금액 삭제", method = "DELETE")
