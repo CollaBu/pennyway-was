@@ -6,7 +6,7 @@ import kr.co.pennyway.domain.domains.user.domain.User;
 
 public enum DeviceFixture {
     INIT("originToken", "originToken"),
-    ONLY_TOKEN_CHANGED("originToken", "newToken");
+    CHANGED_TOKEN("originToken", "newToken");
 
     private final String originToken;
     private final String newToken;
