@@ -43,8 +43,11 @@ public class UserAccountUseCase {
     public DeviceDto.RegisterRes registerDevice(Long userId, DeviceDto.RegisterReq request) {
         User user = readUserOrThrow(userId);
 
-        Device device = deviceService.readDeviceByUserIdAndToken(user.getId(), request.token())
-                .orElseGet(() -> deviceService.createDevice(request.toEntity(user)));
+        Device device = getOrCreateDevice(user, request);
+
+        if (!device.isActivated()) {
+            throw new DeviceErrorException(DeviceErrorCode.NOT_ACTIVATED_DEVICE);
+        }
 
         return DeviceDto.RegisterRes.of(device.getId(), device.getToken());
     }
@@ -123,6 +126,11 @@ public class UserAccountUseCase {
         // TODO: [2024-05-03] 하나라도 채팅방의 방장으로 참여하는 경우 삭제 불가능 처리
 
         userDeleteService.deleteUser(userId);
+    }
+
+    private Device getOrCreateDevice(User user, DeviceDto.RegisterReq request) {
+        return deviceService.readDeviceByUserIdAndToken(user.getId(), request.token())
+                .orElseGet(() -> deviceService.createDevice(request.toEntity(user)));
     }
 
     private User readUserOrThrow(Long userId) {
