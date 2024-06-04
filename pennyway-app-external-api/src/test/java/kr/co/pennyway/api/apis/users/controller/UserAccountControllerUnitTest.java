@@ -71,15 +71,15 @@ public class UserAccountControllerUnitTest {
             given(userAccountUseCase.registerDeviceToken(1L, request)).willReturn(expectedResponse);
 
             // when
-            ResultActions result = mockMvc.perform(put("/v2/users/me/devices")
+            ResultActions result = mockMvc.perform(put("/v2/users/me/device-tokens")
                     .contentType("application/json")
                     .content(objectMapper.writeValueAsString(request)));
 
             // then
             result.andExpect(status().isOk())
                     .andExpect(jsonPath("$.code").value("2000"))
-                    .andExpect(jsonPath("$.data.device.id").value(expectedResponse.id()))
-                    .andExpect(jsonPath("$.data.device.token").value(expectedResponse.token()))
+                    .andExpect(jsonPath("$.data.deviceToken.id").value(expectedResponse.id()))
+                    .andExpect(jsonPath("$.data.deviceToken.token").value(expectedResponse.token()))
                     .andDo(print());
         }
     }
