@@ -65,7 +65,7 @@ public class UserAccountControllerUnitTest {
         @WithSecurityMockUser
         void putDevice() throws Exception {
             // given
-            DeviceDto.RegisterReq request = new DeviceDto.RegisterReq("newToken", "newToken", "modelA", "Windows");
+            DeviceDto.RegisterReq request = new DeviceDto.RegisterReq("newToken", "newToken");
             DeviceDto.RegisterRes expectedResponse = new DeviceDto.RegisterRes(2L, "newToken");
             given(userAccountUseCase.registerDevice(1L, request)).willReturn(expectedResponse);
 

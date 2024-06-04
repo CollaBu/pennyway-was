@@ -24,10 +24,10 @@ public enum DeviceFixture {
     }
 
     public Device toDevice(User user) {
-        return Device.of(originToken, model, os, user);
+        return Device.of(originToken, user);
     }
 
     public DeviceDto.RegisterReq toRegisterReq() {
-        return new DeviceDto.RegisterReq(originToken, newToken, model, os);
+        return new DeviceDto.RegisterReq(originToken, newToken);
     }
 }
