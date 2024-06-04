@@ -24,14 +24,14 @@ public class UserAccountController implements UserAccountApi {
     private final UserAccountUseCase userAccountUseCase;
 
     @Override
-    @PutMapping("/devices")
+    @PutMapping("/device-tokens")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> putDevice(@RequestBody @Validated DeviceTokenDto.RegisterReq request, @AuthenticationPrincipal SecurityUserDetails user) {
         return ResponseEntity.ok(SuccessResponse.from("deviceToken", userAccountUseCase.registerDeviceToken(user.getUserId(), request)));
     }
 
     @Override
-    @DeleteMapping("/devices")
+    @DeleteMapping("/device-tokens")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> deleteDevice(@RequestParam("token") @Validated @NotBlank String token, @AuthenticationPrincipal SecurityUserDetails user) {
         userAccountUseCase.unregisterDeviceToken(user.getUserId(), token);
