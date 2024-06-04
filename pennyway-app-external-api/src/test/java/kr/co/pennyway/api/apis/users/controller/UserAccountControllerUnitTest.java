@@ -556,7 +556,7 @@ public class UserAccountControllerUnitTest {
 		}
 
 		private ResultActions performRegisterProfileImageRequest(String profileImageUrl) throws Exception {
-			return mockMvc.perform(post("/v2/users/me/profile-image")
+			return mockMvc.perform(put("/v2/users/me/profile-image")
 					.contentType("application/json")
 					.content(objectMapper.writeValueAsString(new UserProfileUpdateDto.ProfileImageReq(profileImageUrl))));
 		}

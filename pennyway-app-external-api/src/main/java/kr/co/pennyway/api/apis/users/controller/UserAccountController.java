@@ -109,7 +109,7 @@ public class UserAccountController implements UserAccountApi {
 	}
 
 	@Override
-	@PostMapping("/profile-image")
+	@PutMapping("/profile-image")
 	@PreAuthorize("isAuthenticated()")
 	public ResponseEntity<?> postProfileImage(UserProfileUpdateDto.ProfileImageReq request, SecurityUserDetails user) {
 		userAccountUseCase.updateProfileImage(user.getUserId(), request);
