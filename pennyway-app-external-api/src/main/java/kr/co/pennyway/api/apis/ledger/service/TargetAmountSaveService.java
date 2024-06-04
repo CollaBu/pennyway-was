@@ -18,7 +18,7 @@ import java.time.LocalDate;
 public class TargetAmountSaveService {
     private final TargetAmountService targetAmountService;
 
-    @DistributedLock(key = "#key.concat(#user.getId()).concat('_').concat(#date.toString())")
+    @DistributedLock(key = "#key.concat(#user.getId()).concat('_').concat(#date.getYear()).concat('-').concat(#date.getMonthValue())")
     public TargetAmount createTargetAmount(String key, User user, LocalDate date) {
         if (targetAmountService.isExistsTargetAmountThatMonth(user.getId(), date)) {
             log.info("{}에 대한 날짜의 목표 금액이 이미 존재합니다.", date);
