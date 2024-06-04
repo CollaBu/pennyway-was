@@ -7,13 +7,11 @@ import kr.co.pennyway.api.apis.users.helper.PasswordEncoderHelper;
 import kr.co.pennyway.api.apis.users.mapper.DeviceTokenMapper;
 import kr.co.pennyway.api.apis.users.mapper.UserProfileMapper;
 import kr.co.pennyway.api.apis.users.service.DeviceTokenRegisterService;
+import kr.co.pennyway.api.apis.users.service.DeviceTokenUnregisterService;
 import kr.co.pennyway.api.apis.users.service.UserDeleteService;
 import kr.co.pennyway.api.apis.users.service.UserProfileUpdateService;
 import kr.co.pennyway.common.annotation.UseCase;
 import kr.co.pennyway.domain.domains.device.domain.DeviceToken;
-import kr.co.pennyway.domain.domains.device.exception.DeviceTokenErrorCode;
-import kr.co.pennyway.domain.domains.device.exception.DeviceTokenErrorException;
-import kr.co.pennyway.domain.domains.device.service.DeviceTokenService;
 import kr.co.pennyway.domain.domains.oauth.domain.Oauth;
 import kr.co.pennyway.domain.domains.oauth.service.OauthService;
 import kr.co.pennyway.domain.domains.user.domain.NotifySetting;
@@ -34,9 +32,9 @@ import java.util.stream.Collectors;
 public class UserAccountUseCase {
     private final UserService userService;
     private final OauthService oauthService;
-    private final DeviceTokenService deviceTokenService;
 
     private final DeviceTokenRegisterService deviceTokenRegisterService;
+    private final DeviceTokenUnregisterService deviceTokenUnregisterService;
 
     private final UserProfileUpdateService userProfileUpdateService;
     private final UserDeleteService userDeleteService;
@@ -52,13 +50,7 @@ public class UserAccountUseCase {
 
     @Transactional
     public void unregisterDeviceToken(Long userId, String token) {
-        User user = readUserOrThrow(userId);
-
-        DeviceToken deviceToken = deviceTokenService.readDeviceByUserIdAndToken(user.getId(), token).orElseThrow(
-                () -> new DeviceTokenErrorException(DeviceTokenErrorCode.NOT_FOUND_DEVICE)
-        );
-
-        deviceTokenService.deleteDevice(deviceToken);
+        deviceTokenUnregisterService.execute(userId, token);
     }
 
     @Transactional(readOnly = true)
