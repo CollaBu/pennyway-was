@@ -18,8 +18,6 @@ public class Device extends DateAuditable {
     private Long id;
 
     private String token;
-    private String model;
-    private String os;
     @ColumnDefault("true")
     private Boolean activated;
 
@@ -27,16 +25,14 @@ public class Device extends DateAuditable {
     @JoinColumn(name = "user_id")
     private User user;
 
-    private Device(String token, String model, String os, Boolean activated, User user) {
+    private Device(String token, Boolean activated, User user) {
         this.token = token;
-        this.model = model;
-        this.os = os;
         this.activated = activated;
         this.user = user;
     }
 
-    public static Device of(String token, String model, String os, User user) {
-        return new Device(token, model, os, Boolean.TRUE, user);
+    public static Device of(String token, User user) {
+        return new Device(token, Boolean.TRUE, user);
     }
 
     public Boolean isActivated() {
@@ -55,18 +51,11 @@ public class Device extends DateAuditable {
         this.token = token;
     }
 
-    public void updateDeviceInfo(String model, String os) {
-        this.model = model;
-        this.os = os;
-    }
-
     @Override
     public String toString() {
         return "Device{" +
                 "id=" + id +
                 ", token='" + token + '\'' +
-                ", model='" + model + '\'' +
-                ", os='" + os + '\'' +
                 ", activated=" + activated + '}';
     }
 }
