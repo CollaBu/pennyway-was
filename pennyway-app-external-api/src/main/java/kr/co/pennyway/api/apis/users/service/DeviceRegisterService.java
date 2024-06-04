@@ -29,13 +29,13 @@ public class DeviceRegisterService {
 
         Device originDevice = getDeviceOrThrow(device);
 
-        log.info("디바이스 토큰 갱신: 사용자 {} - model {} - os {}", user, request.model(), request.os());
-        return updateExistingDevice(originDevice, request);
+        return updateDeviceToken(originDevice, request.newToken());
     }
 
     private Device createDevice(User user, DeviceDto.RegisterReq request) {
-        log.info("신규 디바이스 등록: 사용자 {} - model {} - os {}", user, request.model(), request.os());
         Device newDevice = request.toEntity(user);
+        log.debug("신규 디바이스 등록 {}", newDevice);
+
         return deviceService.createDevice(newDevice);
     }
 
@@ -49,35 +49,12 @@ public class DeviceRegisterService {
     }
 
     /**
-     * 기존에 등록된 사용자의 디바이스 토큰을 갱신한다.
-     */
-    private Device updateExistingDevice(Device device, DeviceDto.RegisterReq request) {
-        if (!isMatchOriginDeviceInfo(device, request)) {
-            log.warn("사용자 디바이스 정보 변경됨 : model {} - os {}", request.model(), request.os());
-            device.updateDeviceInfo(request.model(), request.os());
-        }
-
-        return updateDeviceToken(device, request.newToken());
-    }
-
-    /**
-     * 요청한 디바이스 정보가 기존 디바이스 정보와 일치하는지 확인한다.
-     */
-    private boolean isMatchOriginDeviceInfo(Device device, DeviceDto.RegisterReq request) {
-        return device.getOs().equals(request.os()) && device.getModel().equals(request.model());
-    }
-
-    /**
      * 디바이스 토큰을 newToken으로 갱신하고, 만약 비활성화 토큰이라면 활성화 상태로 되돌린다.
      */
     private Device updateDeviceToken(Device device, String newToken) {
         log.debug("디바이스 토큰 갱신: {} -> {}", device.getToken(), newToken);
 
         device.updateToken(newToken);
-
-        if (!device.isActivated()) {
-            device.activate();
-        }
 
         return device;
     }
