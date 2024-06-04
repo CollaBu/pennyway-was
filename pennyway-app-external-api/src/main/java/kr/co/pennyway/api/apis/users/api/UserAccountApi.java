@@ -203,5 +203,32 @@ public interface UserAccountApi {
 	ResponseEntity<?> deleteAccount(@AuthenticationPrincipal SecurityUserDetails user);
 
 	@Operation(summary = "사용자 프로필 사진 등록", description = "사용자의 프로필 사진을 수정합니다.")
+	@Parameter(name = "profileImageUrl", description = "프로필 이미지 URL", required = true, in = ParameterIn.QUERY, example = "delete/profile/1/154aa3bd-da02-4311-a735-3bf7e4bb68d2_1717446100295.jpeg")
+	@ApiResponses({
+			@ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", examples = {
+					@ExampleObject(name = "프로필 사진 등록 성공", value = """
+							{
+							    "code": "2000",
+							    "data": {}
+							}
+							""")
+			})),
+			@ApiResponse(responseCode = "400", content = @Content(mediaType = "application/json", examples = {
+					@ExampleObject(name = "프로필 사진 URL이 유효하지 않은 경우", value = """
+							{
+							    "code": "4000",
+							    "message": "프로필 이미지 URL이 유효하지 않습니다."
+							}
+							""")
+			})),
+			@ApiResponse(responseCode = "404", content = @Content(mediaType = "application/json", examples = {
+					@ExampleObject(name = "프로필 사진 URL이 존재하지 않는 경우", value = """
+							{
+							    "code": "4040",
+							    "message": "프로필 이미지 URL이 존재하지 않습니다."
+							}
+							""")
+			}))
+	})
 	ResponseEntity<?> postProfileImage(@RequestBody @Validated UserProfileUpdateDto.ProfileImageReq request, @AuthenticationPrincipal SecurityUserDetails user);
 }
