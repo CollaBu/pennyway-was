@@ -32,7 +32,7 @@ public class PasswordUpdateService {
         validateGeneralSignedUpUser(user);
         validatePasswordMatch(oldPassword, user.getPassword());
 
-        updatePassword(user, oldPassword, newPassword);
+        updatePassword(user, newPassword);
     }
 
     private User readUserOrThrow(Long userId) {
@@ -58,7 +58,7 @@ public class PasswordUpdateService {
         }
     }
 
-    private void updatePassword(User user, String oldPassword, String newPassword) {
+    private void updatePassword(User user, String newPassword) {
         if (passwordEncoderHelper.isSamePassword(user.getPassword(), newPassword)) {
             log.info("기존과 동일한 비밀번호로는 변경할 수 없습니다.");
             throw new UserErrorException(UserErrorCode.PASSWORD_NOT_CHANGED);
