@@ -7,7 +7,7 @@ import kr.co.pennyway.common.exception.StatusCode;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public enum DeviceErrorCode implements BaseErrorCode {
+public enum DeviceTokenErrorCode implements BaseErrorCode {
     /* 400 BAD_REQUEST */
     NOT_ACTIVATED_DEVICE(StatusCode.BAD_REQUEST, ReasonCode.CLIENT_ERROR, "활성화되지 않은 디바이스 토큰 정보입니다."),
 

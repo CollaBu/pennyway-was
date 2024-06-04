@@ -1,7 +1,7 @@
 package kr.co.pennyway.api.apis.users.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kr.co.pennyway.api.apis.users.dto.DeviceDto;
+import kr.co.pennyway.api.apis.users.dto.DeviceTokenDto;
 import kr.co.pennyway.api.apis.users.dto.UserProfileUpdateDto;
 import kr.co.pennyway.api.apis.users.usecase.UserAccountUseCase;
 import kr.co.pennyway.api.config.WebConfig;
@@ -60,15 +60,15 @@ public class UserAccountControllerUnitTest {
     @Nested
     @Order(1)
     @DisplayName("[1] 디바이스 요청 테스트")
-    class DeviceRequestTest {
+    class DeviceTokenRequestTest {
         @DisplayName("디바이스가 정상적으로 저장되었을 때, 디바이스 pk와 등록된 토큰을 반환한다.")
         @Test
         @WithSecurityMockUser
         void putDevice() throws Exception {
             // given
-            DeviceDto.RegisterReq request = DeviceFixture.INIT.toRegisterReq();
-            DeviceDto.RegisterRes expectedResponse = new DeviceDto.RegisterRes(2L, "originToken");
-            given(userAccountUseCase.registerDevice(1L, request)).willReturn(expectedResponse);
+            DeviceTokenDto.RegisterReq request = DeviceFixture.INIT.toRegisterReq();
+            DeviceTokenDto.RegisterRes expectedResponse = new DeviceTokenDto.RegisterRes(2L, "originToken");
+            given(userAccountUseCase.registerDeviceToken(1L, request)).willReturn(expectedResponse);
 
             // when
             ResultActions result = mockMvc.perform(put("/v2/users/me/devices")

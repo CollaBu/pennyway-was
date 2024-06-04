@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import kr.co.pennyway.domain.common.converter.ProfileVisibilityConverter;
 import kr.co.pennyway.domain.common.converter.RoleConverter;
 import kr.co.pennyway.domain.common.model.DateAuditable;
-import kr.co.pennyway.domain.domains.device.domain.Device;
+import kr.co.pennyway.domain.domains.device.domain.DeviceToken;
 import kr.co.pennyway.domain.domains.user.type.ProfileVisibility;
 import kr.co.pennyway.domain.domains.user.type.Role;
 import lombok.AccessLevel;
@@ -53,7 +53,7 @@ public class User extends DateAuditable {
     private LocalDateTime deletedAt;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    private List<Device> devices = new ArrayList<>();
+    private List<DeviceToken> deviceTokens = new ArrayList<>();
 
     @Builder
     private User(String username, String name, String password, LocalDateTime passwordUpdatedAt, String profileImageUrl, String phone, Role role, ProfileVisibility profileVisibility, NotifySetting notifySetting, Boolean locked, LocalDateTime deletedAt) {

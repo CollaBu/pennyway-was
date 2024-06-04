@@ -11,7 +11,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotBlank;
-import kr.co.pennyway.api.apis.users.dto.DeviceDto;
+import kr.co.pennyway.api.apis.users.dto.DeviceTokenDto;
 import kr.co.pennyway.api.apis.users.dto.UserProfileDto;
 import kr.co.pennyway.api.apis.users.dto.UserProfileUpdateDto;
 import kr.co.pennyway.api.common.security.authentication.SecurityUserDetails;
@@ -29,7 +29,7 @@ public interface UserAccountApi {
             @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", examples = {
                     @ExampleObject(name = "디바이스 등록 성공", value = """
                             {
-                                "device": {
+                                "deviceToken": {
                                     "id": 1,
                                     "token": "newToken"
                                 }
@@ -45,7 +45,7 @@ public interface UserAccountApi {
                             """)
             }))
     })
-    ResponseEntity<?> putDevice(@RequestBody @Validated DeviceDto.RegisterReq request, @AuthenticationPrincipal SecurityUserDetails user);
+    ResponseEntity<?> putDevice(@RequestBody @Validated DeviceTokenDto.RegisterReq request, @AuthenticationPrincipal SecurityUserDetails user);
 
     @Operation(summary = "디바이스 토큰 제거", description = "사용자의 디바이스 정보와 토큰을 제거합니다.")
     @Parameter(name = "token", description = "삭제할 디바이스 토큰", required = true, in = ParameterIn.QUERY)

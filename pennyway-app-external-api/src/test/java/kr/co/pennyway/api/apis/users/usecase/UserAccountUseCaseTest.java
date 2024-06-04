@@ -1,7 +1,7 @@
 package kr.co.pennyway.api.apis.users.usecase;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import kr.co.pennyway.api.apis.users.dto.DeviceDto;
+import kr.co.pennyway.api.apis.users.dto.DeviceTokenDto;
 import kr.co.pennyway.api.apis.users.helper.PasswordEncoderHelper;
 import kr.co.pennyway.api.apis.users.service.UserDeleteService;
 import kr.co.pennyway.api.apis.users.service.UserProfileUpdateService;
@@ -9,10 +9,10 @@ import kr.co.pennyway.api.config.ExternalApiDBTestConfig;
 import kr.co.pennyway.api.config.fixture.DeviceFixture;
 import kr.co.pennyway.api.config.fixture.UserFixture;
 import kr.co.pennyway.domain.config.JpaConfig;
-import kr.co.pennyway.domain.domains.device.domain.Device;
-import kr.co.pennyway.domain.domains.device.exception.DeviceErrorCode;
-import kr.co.pennyway.domain.domains.device.exception.DeviceErrorException;
-import kr.co.pennyway.domain.domains.device.service.DeviceService;
+import kr.co.pennyway.domain.domains.device.domain.DeviceToken;
+import kr.co.pennyway.domain.domains.device.exception.DeviceTokenErrorCode;
+import kr.co.pennyway.domain.domains.device.exception.DeviceTokenErrorException;
+import kr.co.pennyway.domain.domains.device.service.DeviceTokenService;
 import kr.co.pennyway.domain.domains.oauth.domain.Oauth;
 import kr.co.pennyway.domain.domains.oauth.service.OauthService;
 import kr.co.pennyway.domain.domains.oauth.type.Provider;
@@ -44,7 +44,7 @@ import static org.springframework.test.util.AssertionErrors.*;
 @DataJpaTest(properties = "spring.jpa.hibernate.ddl-auto=create")
 @ContextConfiguration(classes = {
         JpaConfig.class, UserAccountUseCase.class, UserProfileUpdateService.class, UserDeleteService.class,
-        UserService.class, DeviceService.class, OauthService.class})
+        UserService.class, DeviceTokenService.class, OauthService.class})
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @TestClassOrder(ClassOrderer.OrderAnnotation.class)
 class UserAccountUseCaseTest extends ExternalApiDBTestConfig {
@@ -52,7 +52,7 @@ class UserAccountUseCaseTest extends ExternalApiDBTestConfig {
     private UserService userService;
 
     @Autowired
-    private DeviceService deviceService;
+    private DeviceTokenService deviceTokenService;
 
     @Autowired
     private OauthService oauthService;
@@ -69,7 +69,7 @@ class UserAccountUseCaseTest extends ExternalApiDBTestConfig {
     @Order(1)
     @Nested
     @DisplayName("[1] 디바이스 등록 테스트")
-    class DeviceRegisterTest {
+    class DeviceTokenRegisterTest {
         private User requestUser;
 
         @BeforeEach
@@ -83,13 +83,13 @@ class UserAccountUseCaseTest extends ExternalApiDBTestConfig {
         @DisplayName("[1] originToken과 newToken이 같은 경우, 신규 디바이스를 등록한다.")
         void registerNewDevice() {
             // given
-            DeviceDto.RegisterReq request = DeviceFixture.INIT.toRegisterReq();
+            DeviceTokenDto.RegisterReq request = DeviceFixture.INIT.toRegisterReq();
 
             // when
-            DeviceDto.RegisterRes response = userAccountUseCase.registerDevice(requestUser.getId(), request);
+            DeviceTokenDto.RegisterRes response = userAccountUseCase.registerDeviceToken(requestUser.getId(), request);
 
             // then
-            deviceService.readDeviceByUserIdAndToken(requestUser.getId(), request.token()).ifPresentOrElse(
+            deviceTokenService.readDeviceByUserIdAndToken(requestUser.getId(), request.token()).ifPresentOrElse(
                     device -> {
                         assertEquals("요청한 디바이스 토큰과 동일해야 한다.", response.token(), device.getToken());
                         assertEquals("디바이스 ID가 일치해야 한다.", response.id(), device.getId());
@@ -105,18 +105,18 @@ class UserAccountUseCaseTest extends ExternalApiDBTestConfig {
         @DisplayName("[2] 신규 저장 요청에서 originToken에 대한 디바이스가 이미 존재하는 경우, 기존 디바이스 정보를 반환한다.")
         void registerNewDeviceWhenDeviceIsAlreadyExists() {
             // given
-            Device originDevice = DeviceFixture.INIT.toDevice(requestUser);
-            deviceService.createDevice(originDevice);
-            DeviceDto.RegisterReq request = DeviceFixture.INIT.toRegisterReq();
+            DeviceToken originDeviceToken = DeviceFixture.INIT.toDevice(requestUser);
+            deviceTokenService.createDevice(originDeviceToken);
+            DeviceTokenDto.RegisterReq request = DeviceFixture.INIT.toRegisterReq();
 
             // when
-            DeviceDto.RegisterRes response = userAccountUseCase.registerDevice(requestUser.getId(), request);
+            DeviceTokenDto.RegisterRes response = userAccountUseCase.registerDeviceToken(requestUser.getId(), request);
 
             // then
-            deviceService.readDeviceByUserIdAndToken(requestUser.getId(), request.token()).ifPresentOrElse(
+            deviceTokenService.readDeviceByUserIdAndToken(requestUser.getId(), request.token()).ifPresentOrElse(
                     device -> {
                         assertEquals("요청한 디바이스 토큰과 동일해야 한다.", response.token(), device.getToken());
-                        assertEquals("디바이스 ID가 일치해야 한다.", originDevice.getId(), device.getId());
+                        assertEquals("디바이스 ID가 일치해야 한다.", originDeviceToken.getId(), device.getId());
                         assertTrue("디바이스가 사용자 ID와 연결되어 있어야 한다.", device.getUser().getId().equals(requestUser.getId()));
                         assertTrue("디바이스가 활성화 상태여야 한다.", device.getActivated());
                         System.out.println("device = " + device);
@@ -130,16 +130,16 @@ class UserAccountUseCaseTest extends ExternalApiDBTestConfig {
         @DisplayName("[3] token 갱신 요청에서 originToken과 일치하는 활성화 디바이스 토큰이 존재한다면, newToken으로 디바이스 토큰을 갱신한다.")
         void updateActivateDeviceToken() {
             // given
-            Device originDevice = DeviceFixture.INIT.toDevice(requestUser);
-            deviceService.createDevice(originDevice);
+            DeviceToken originDeviceToken = DeviceFixture.INIT.toDevice(requestUser);
+            deviceTokenService.createDevice(originDeviceToken);
 
-            DeviceDto.RegisterReq request = DeviceFixture.CHANGED_TOKEN.toRegisterReq();
+            DeviceTokenDto.RegisterReq request = DeviceFixture.CHANGED_TOKEN.toRegisterReq();
 
             // when
-            DeviceDto.RegisterRes response = userAccountUseCase.registerDevice(requestUser.getId(), request);
+            DeviceTokenDto.RegisterRes response = userAccountUseCase.registerDeviceToken(requestUser.getId(), request);
 
             // then
-            deviceService.readDeviceByUserIdAndToken(requestUser.getId(), request.token()).ifPresentOrElse(
+            deviceTokenService.readDeviceByUserIdAndToken(requestUser.getId(), request.token()).ifPresentOrElse(
                     device -> {
                         assertEquals("요청한 디바이스 토큰과 동일해야 한다.", response.token(), device.getToken());
                         assertEquals("디바이스 ID가 일치해야 한다.", response.id(), device.getId());
@@ -156,13 +156,13 @@ class UserAccountUseCaseTest extends ExternalApiDBTestConfig {
         @DisplayName("[4] 사용자가 수정 요청을 보냈을 때, originToken과 일치하는 활성화 토큰 정보가 없을 경우 newToken을 새로 등록한다.")
         void 토큰_수정_요청에서_기존_토큰이_없으면_새로운_토큰_등록() {
             // given
-            DeviceDto.RegisterReq request = DeviceFixture.CHANGED_TOKEN.toRegisterReq();
+            DeviceTokenDto.RegisterReq request = DeviceFixture.CHANGED_TOKEN.toRegisterReq();
 
             // when
-            DeviceDto.RegisterRes response = userAccountUseCase.registerDevice(requestUser.getId(), request);
+            DeviceTokenDto.RegisterRes response = userAccountUseCase.registerDeviceToken(requestUser.getId(), request);
 
             // then
-            deviceService.readDeviceByUserIdAndToken(requestUser.getId(), request.token()).ifPresentOrElse(
+            deviceTokenService.readDeviceByUserIdAndToken(requestUser.getId(), request.token()).ifPresentOrElse(
                     device -> {
                         assertEquals("요청한 디바이스 토큰과 동일해야 한다.", response.token(), device.getToken());
                         assertEquals("디바이스 ID가 일치해야 한다.", response.id(), device.getId());
@@ -178,7 +178,7 @@ class UserAccountUseCaseTest extends ExternalApiDBTestConfig {
     @Order(2)
     @Nested
     @DisplayName("[2] 디바이스 삭제 테스트")
-    class DeviceUnregisterTest {
+    class DeviceTokenUnregisterTest {
         private User requestUser;
 
         @BeforeEach
@@ -192,14 +192,14 @@ class UserAccountUseCaseTest extends ExternalApiDBTestConfig {
         @DisplayName("사용자 ID와 origin token에 매칭되는 활성 디바이스가 존재하는 경우 디바이스를 삭제한다.")
         void unregisterDevice() {
             // given
-            Device device = DeviceFixture.INIT.toDevice(requestUser);
-            deviceService.createDevice(device);
+            DeviceToken deviceToken = DeviceFixture.INIT.toDevice(requestUser);
+            deviceTokenService.createDevice(deviceToken);
 
             // when
-            userAccountUseCase.unregisterDevice(requestUser.getId(), device.getToken());
+            userAccountUseCase.unregisterDeviceToken(requestUser.getId(), deviceToken.getToken());
 
             // then
-            Optional<Device> deletedDevice = deviceService.readDeviceByUserIdAndToken(requestUser.getId(), device.getToken());
+            Optional<DeviceToken> deletedDevice = deviceTokenService.readDeviceByUserIdAndToken(requestUser.getId(), deviceToken.getToken());
             assertNull("디바이스가 삭제되어 있어야 한다.", deletedDevice.orElse(null));
         }
 
@@ -208,12 +208,12 @@ class UserAccountUseCaseTest extends ExternalApiDBTestConfig {
         @DisplayName("사용자 ID와 token에 매칭되는 디바이스가 존재하지 않는 경우 NOT_FOUND_DEVICE 에러를 반환한다.")
         void unregisterDeviceWhenDeviceIsNotExists() {
             // given
-            Device device = DeviceFixture.INIT.toDevice(requestUser);
-            deviceService.createDevice(device);
+            DeviceToken deviceToken = DeviceFixture.INIT.toDevice(requestUser);
+            deviceTokenService.createDevice(deviceToken);
 
             // when - then
-            DeviceErrorException ex = assertThrows(DeviceErrorException.class, () -> userAccountUseCase.unregisterDevice(requestUser.getId(), "notExistsToken"));
-            assertEquals("디바이스 토큰이 존재하지 않으면 Not Found를 반환한다.", DeviceErrorCode.NOT_FOUND_DEVICE, ex.getBaseErrorCode());
+            DeviceTokenErrorException ex = assertThrows(DeviceTokenErrorException.class, () -> userAccountUseCase.unregisterDeviceToken(requestUser.getId(), "notExistsToken"));
+            assertEquals("디바이스 토큰이 존재하지 않으면 Not Found를 반환한다.", DeviceTokenErrorCode.NOT_FOUND_DEVICE, ex.getBaseErrorCode());
         }
     }
 
@@ -445,13 +445,13 @@ class UserAccountUseCaseTest extends ExternalApiDBTestConfig {
             User user = UserFixture.GENERAL_USER.toUser();
             userService.createUser(user);
 
-            Device device = DeviceFixture.INIT.toDevice(user);
-            deviceService.createDevice(device);
+            DeviceToken deviceToken = DeviceFixture.INIT.toDevice(user);
+            deviceTokenService.createDevice(deviceToken);
 
             // when - then
             assertDoesNotThrow(() -> userAccountUseCase.deleteAccount(user.getId()));
             assertTrue("사용자가 삭제되어 있어야 한다.", userService.readUser(user.getId()).isEmpty());
-            assertTrue("디바이스가 삭제되어 있어야 한다.", deviceService.readDeviceByUserIdAndToken(user.getId(), device.getToken()).isEmpty());
+            assertTrue("디바이스가 삭제되어 있어야 한다.", deviceTokenService.readDeviceByUserIdAndToken(user.getId(), deviceToken.getToken()).isEmpty());
         }
 
         private Oauth createOauth(Provider provider, String providerId, User user) {
