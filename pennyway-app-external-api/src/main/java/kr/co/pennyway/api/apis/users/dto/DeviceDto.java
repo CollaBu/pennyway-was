@@ -8,23 +8,12 @@ import kr.co.pennyway.domain.domains.user.domain.User;
 public class DeviceDto {
     @Schema(title = "디바이스 등록 요청")
     public record RegisterReq(
-            @Schema(description = "기존 디바이스 토큰", requiredMode = Schema.RequiredMode.REQUIRED)
-            @NotBlank(message = "originToken은 필수입니다.")
-            String originToken,
-            @Schema(description = "새로운 디바이스 토큰", requiredMode = Schema.RequiredMode.REQUIRED)
-            @NotBlank(message = "newToken은 필수입니다.")
-            String newToken
+            @Schema(description = "디바이스 FCM 토큰", requiredMode = Schema.RequiredMode.REQUIRED)
+            @NotBlank(message = "token은 필수입니다.")
+            String token
     ) {
-        /**
-         * oldToken과 newToken이 같은 경우, 신규 등록 요청으로 판단
-         */
-        @Schema(hidden = true)
-        public boolean isInitRequest() {
-            return originToken.equals(newToken);
-        }
-
         public Device toEntity(User user) {
-            return Device.of(newToken, user);
+            return Device.of(token, user);
         }
     }
 
