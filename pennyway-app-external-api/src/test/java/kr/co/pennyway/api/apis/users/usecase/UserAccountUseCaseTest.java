@@ -154,7 +154,30 @@ class UserAccountUseCaseTest extends ExternalApiDBTestConfig {
 
         @Test
         @Transactional
-        @DisplayName("[4] 토큰 수정 요청에서 oldToken에 대한 디바이스가 존재하지 않는 경우, NOT_FOUND 에러를 반환한다.")
+        @DisplayName("[4] 사용자가 수정 요청을 보냈을 때, originToken과 일치하는 활성화 토큰 정보가 없을 경우 newToken을 새로 등록한다.")
+        void 토큰_수정_요청에서_기존_토큰이_없으면_새로운_토큰_등록() {
+            // given
+            DeviceDto.RegisterReq request = DeviceFixture.CHANGED_TOKEN.toRegisterReq();
+
+            // when
+            DeviceDto.RegisterRes response = userAccountUseCase.registerDevice(requestUser.getId(), request);
+
+            // then
+            deviceService.readDeviceByUserIdAndToken(requestUser.getId(), request.newToken()).ifPresentOrElse(
+                    device -> {
+                        assertEquals("요청한 디바이스 토큰과 동일해야 한다.", response.token(), device.getToken());
+                        assertEquals("디바이스 ID가 일치해야 한다.", response.id(), device.getId());
+                        assertTrue("디바이스가 사용자 ID와 연결되어 있어야 한다.", device.getUser().getId().equals(requestUser.getId()));
+                        assertTrue("디바이스가 활성화 상태여야 한다.", device.getActivated());
+                        System.out.println("device = " + device);
+                    },
+                    () -> fail("신규 디바이스가 등록되어 있어야 한다.")
+            );
+        }
+
+        @Test
+        @Transactional
+        @DisplayName("[5] 토큰 수정 요청에서 oldToken에 대한 디바이스가 존재하지 않는 경우, NOT_FOUND 에러를 반환한다.")
         void registerNewDeviceWhenOldDeviceTokenIsNotExists() {
             // given
             DeviceDto.RegisterReq request = DeviceFixture.CHANGED_TOKEN.toRegisterReq();
