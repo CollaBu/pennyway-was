@@ -47,7 +47,11 @@ public class Device extends DateAuditable {
         this.activated = Boolean.FALSE;
     }
 
+    /**
+     * 디바이스 토큰을 갱신하고 활성화 상태로 변경한다.
+     */
     public void updateToken(String token) {
+        this.activated = Boolean.TRUE;
         this.token = token;
     }
 
