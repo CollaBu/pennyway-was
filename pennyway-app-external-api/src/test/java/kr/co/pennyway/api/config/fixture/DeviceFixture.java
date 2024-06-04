@@ -1,7 +1,7 @@
 package kr.co.pennyway.api.config.fixture;
 
-import kr.co.pennyway.api.apis.users.dto.DeviceDto;
-import kr.co.pennyway.domain.domains.device.domain.Device;
+import kr.co.pennyway.api.apis.users.dto.DeviceTokenDto;
+import kr.co.pennyway.domain.domains.device.domain.DeviceToken;
 import kr.co.pennyway.domain.domains.user.domain.User;
 
 public enum DeviceFixture {
@@ -14,11 +14,11 @@ public enum DeviceFixture {
         this.token = token;
     }
 
-    public Device toDevice(User user) {
-        return Device.of(token, user);
+    public DeviceToken toDevice(User user) {
+        return DeviceToken.of(token, user);
     }
 
-    public DeviceDto.RegisterReq toRegisterReq() {
-        return new DeviceDto.RegisterReq(token);
+    public DeviceTokenDto.RegisterReq toRegisterReq() {
+        return new DeviceTokenDto.RegisterReq(token);
     }
 }

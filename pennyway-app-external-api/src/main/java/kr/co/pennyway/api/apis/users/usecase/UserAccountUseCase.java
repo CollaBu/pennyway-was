@@ -1,6 +1,6 @@
 package kr.co.pennyway.api.apis.users.usecase;
 
-import kr.co.pennyway.api.apis.users.dto.DeviceDto;
+import kr.co.pennyway.api.apis.users.dto.DeviceTokenDto;
 import kr.co.pennyway.api.apis.users.dto.UserProfileDto;
 import kr.co.pennyway.api.apis.users.dto.UserProfileUpdateDto;
 import kr.co.pennyway.api.apis.users.helper.PasswordEncoderHelper;
@@ -8,10 +8,10 @@ import kr.co.pennyway.api.apis.users.mapper.UserProfileMapper;
 import kr.co.pennyway.api.apis.users.service.UserDeleteService;
 import kr.co.pennyway.api.apis.users.service.UserProfileUpdateService;
 import kr.co.pennyway.common.annotation.UseCase;
-import kr.co.pennyway.domain.domains.device.domain.Device;
-import kr.co.pennyway.domain.domains.device.exception.DeviceErrorCode;
-import kr.co.pennyway.domain.domains.device.exception.DeviceErrorException;
-import kr.co.pennyway.domain.domains.device.service.DeviceService;
+import kr.co.pennyway.domain.domains.device.domain.DeviceToken;
+import kr.co.pennyway.domain.domains.device.exception.DeviceTokenErrorCode;
+import kr.co.pennyway.domain.domains.device.exception.DeviceTokenErrorException;
+import kr.co.pennyway.domain.domains.device.service.DeviceTokenService;
 import kr.co.pennyway.domain.domains.oauth.domain.Oauth;
 import kr.co.pennyway.domain.domains.oauth.service.OauthService;
 import kr.co.pennyway.domain.domains.user.domain.NotifySetting;
@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
 public class UserAccountUseCase {
     private final UserService userService;
     private final OauthService oauthService;
-    private final DeviceService deviceService;
+    private final DeviceTokenService deviceTokenService;
 
     private final UserProfileUpdateService userProfileUpdateService;
     private final UserDeleteService userDeleteService;
@@ -40,27 +40,27 @@ public class UserAccountUseCase {
     private final PasswordEncoderHelper passwordEncoderHelper;
 
     @Transactional
-    public DeviceDto.RegisterRes registerDevice(Long userId, DeviceDto.RegisterReq request) {
+    public DeviceTokenDto.RegisterRes registerDeviceToken(Long userId, DeviceTokenDto.RegisterReq request) {
         User user = readUserOrThrow(userId);
 
-        Device device = getOrCreateDevice(user, request);
+        DeviceToken deviceToken = getOrCreateDevice(user, request);
 
-        if (!device.isActivated()) {
-            throw new DeviceErrorException(DeviceErrorCode.NOT_ACTIVATED_DEVICE);
+        if (!deviceToken.isActivated()) {
+            throw new DeviceTokenErrorException(DeviceTokenErrorCode.NOT_ACTIVATED_DEVICE);
         }
 
-        return DeviceDto.RegisterRes.of(device.getId(), device.getToken());
+        return DeviceTokenDto.RegisterRes.of(deviceToken.getId(), deviceToken.getToken());
     }
 
     @Transactional
-    public void unregisterDevice(Long userId, String token) {
+    public void unregisterDeviceToken(Long userId, String token) {
         User user = readUserOrThrow(userId);
 
-        Device device = deviceService.readDeviceByUserIdAndToken(user.getId(), token).orElseThrow(
-                () -> new DeviceErrorException(DeviceErrorCode.NOT_FOUND_DEVICE)
+        DeviceToken deviceToken = deviceTokenService.readDeviceByUserIdAndToken(user.getId(), token).orElseThrow(
+                () -> new DeviceTokenErrorException(DeviceTokenErrorCode.NOT_FOUND_DEVICE)
         );
 
-        deviceService.deleteDevice(device);
+        deviceTokenService.deleteDevice(deviceToken);
     }
 
     @Transactional(readOnly = true)
@@ -128,9 +128,9 @@ public class UserAccountUseCase {
         userDeleteService.deleteUser(userId);
     }
 
-    private Device getOrCreateDevice(User user, DeviceDto.RegisterReq request) {
-        return deviceService.readDeviceByUserIdAndToken(user.getId(), request.token())
-                .orElseGet(() -> deviceService.createDevice(request.toEntity(user)));
+    private DeviceToken getOrCreateDevice(User user, DeviceTokenDto.RegisterReq request) {
+        return deviceTokenService.readDeviceByUserIdAndToken(user.getId(), request.token())
+                .orElseGet(() -> deviceTokenService.createDevice(request.toEntity(user)));
     }
 
     private User readUserOrThrow(Long userId) {

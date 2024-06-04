@@ -10,9 +10,9 @@ import org.hibernate.annotations.ColumnDefault;
 
 @Entity
 @Getter
-@Table(name = "device")
+@Table(name = "device_token")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Device extends DateAuditable {
+public class DeviceToken extends DateAuditable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -25,14 +25,14 @@ public class Device extends DateAuditable {
     @JoinColumn(name = "user_id")
     private User user;
 
-    private Device(String token, Boolean activated, User user) {
+    private DeviceToken(String token, Boolean activated, User user) {
         this.token = token;
         this.activated = activated;
         this.user = user;
     }
 
-    public static Device of(String token, User user) {
-        return new Device(token, Boolean.TRUE, user);
+    public static DeviceToken of(String token, User user) {
+        return new DeviceToken(token, Boolean.TRUE, user);
     }
 
     public Boolean isActivated() {
