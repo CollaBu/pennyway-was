@@ -47,7 +47,7 @@ public class UserAccountUseCase {
 
         Device device = deviceRegisterService.createOrUpdateDevice(user, request);
 
-        return DeviceDto.RegisterRes.of(device.getId(), request.newToken());
+        return DeviceDto.RegisterRes.of(device.getId(), device.getToken());
     }
 
     @Transactional
