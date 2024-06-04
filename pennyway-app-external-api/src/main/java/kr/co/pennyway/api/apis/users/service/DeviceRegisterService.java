@@ -27,9 +27,7 @@ public class DeviceRegisterService {
             return createDevice(user, request);
         }
 
-        Device originDevice = getDeviceOrThrow(device);
-
-        return updateDeviceToken(originDevice, request.newToken());
+        return device.isEmpty() ? createDevice(user, request) : updateDeviceToken(getDeviceOrThrow(device), request.newToken());
     }
 
     private Device createDevice(User user, DeviceDto.RegisterReq request) {
@@ -40,12 +38,14 @@ public class DeviceRegisterService {
     }
 
     /**
-     * 사용자 ID와 토큰으로 디바이스 정보를 조회한다.
+     * 사용자 ID와 토큰으로 활성화 디바이스 정보를 조회한다.
      *
      * @throws DeviceErrorException 사용자 id와 originToken과 매칭되는 디바이스 정보가 없는 경우
      */
     private Device getDeviceOrThrow(Optional<Device> device) {
-        return device.orElseThrow(() -> new DeviceErrorException(DeviceErrorCode.NOT_FOUND_DEVICE));
+        return device
+                .filter(Device::isActivated)
+                .orElseThrow(() -> new DeviceErrorException(DeviceErrorCode.NOT_FOUND_DEVICE));
     }
 
     /**
