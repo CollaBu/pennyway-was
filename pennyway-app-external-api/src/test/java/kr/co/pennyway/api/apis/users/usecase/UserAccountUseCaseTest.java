@@ -80,7 +80,7 @@ class UserAccountUseCaseTest extends ExternalApiDBTestConfig {
 
         @Test
         @Transactional
-        @DisplayName("[1] originToken과 newToken이 같은 경우, 신규 디바이스를 등록한다.")
+        @DisplayName("[1] token 등록 요청이 들어왔을 때, 새로운 디바이스 토큰을 등록한다.")
         void registerNewDevice() {
             // given
             DeviceTokenDto.RegisterReq request = DeviceTokenFixture.INIT.toRegisterReq();
@@ -102,7 +102,7 @@ class UserAccountUseCaseTest extends ExternalApiDBTestConfig {
 
         @Test
         @Transactional
-        @DisplayName("[2] 신규 저장 요청에서 originToken에 대한 디바이스가 이미 존재하는 경우, 기존 디바이스 정보를 반환한다.")
+        @DisplayName("[2] token에 대한 활성화 디바이스 토큰이 이미 존재하는 경우 기존 데이터를 반환한다.")
         void registerNewDeviceWhenDeviceIsAlreadyExists() {
             // given
             DeviceToken originDeviceToken = DeviceTokenFixture.INIT.toDevice(requestUser);
@@ -127,51 +127,17 @@ class UserAccountUseCaseTest extends ExternalApiDBTestConfig {
 
         @Test
         @Transactional
-        @DisplayName("[3] token 갱신 요청에서 originToken과 일치하는 활성화 디바이스 토큰이 존재한다면, newToken으로 디바이스 토큰을 갱신한다.")
-        void updateActivateDeviceToken() {
+        @DisplayName("[3] token 등록 요청이 들어왔을 때, 활성화되지 않은 디바이스 토큰이 존재하는 경우 NOT_ACTIVATED_DEVICE 에러를 반환한다.")
+        void registerNewDeviceWhenDeviceIsNotActivated() {
             // given
             DeviceToken originDeviceToken = DeviceTokenFixture.INIT.toDevice(requestUser);
+            originDeviceToken.deactivate();
             deviceTokenService.createDevice(originDeviceToken);
+            DeviceTokenDto.RegisterReq request = DeviceTokenFixture.INIT.toRegisterReq();
 
-            DeviceTokenDto.RegisterReq request = DeviceTokenFixture.CHANGED_TOKEN.toRegisterReq();
-
-            // when
-            DeviceTokenDto.RegisterRes response = userAccountUseCase.registerDeviceToken(requestUser.getId(), request);
-
-            // then
-            deviceTokenService.readDeviceByUserIdAndToken(requestUser.getId(), request.token()).ifPresentOrElse(
-                    device -> {
-                        assertEquals("요청한 디바이스 토큰과 동일해야 한다.", response.token(), device.getToken());
-                        assertEquals("디바이스 ID가 일치해야 한다.", response.id(), device.getId());
-                        assertTrue("디바이스가 사용자 ID와 연결되어 있어야 한다.", device.getUser().getId().equals(requestUser.getId()));
-                        assertTrue("디바이스가 활성화 상태여야 한다.", device.getActivated());
-                        System.out.println("device = " + device);
-                    },
-                    () -> fail("디바이스 토큰이 갱신되어 있어야 한다.")
-            );
-        }
-
-        @Test
-        @Transactional
-        @DisplayName("[4] 사용자가 수정 요청을 보냈을 때, originToken과 일치하는 활성화 토큰 정보가 없을 경우 newToken을 새로 등록한다.")
-        void 토큰_수정_요청에서_기존_토큰이_없으면_새로운_토큰_등록() {
-            // given
-            DeviceTokenDto.RegisterReq request = DeviceTokenFixture.CHANGED_TOKEN.toRegisterReq();
-
-            // when
-            DeviceTokenDto.RegisterRes response = userAccountUseCase.registerDeviceToken(requestUser.getId(), request);
-
-            // then
-            deviceTokenService.readDeviceByUserIdAndToken(requestUser.getId(), request.token()).ifPresentOrElse(
-                    device -> {
-                        assertEquals("요청한 디바이스 토큰과 동일해야 한다.", response.token(), device.getToken());
-                        assertEquals("디바이스 ID가 일치해야 한다.", response.id(), device.getId());
-                        assertTrue("디바이스가 사용자 ID와 연결되어 있어야 한다.", device.getUser().getId().equals(requestUser.getId()));
-                        assertTrue("디바이스가 활성화 상태여야 한다.", device.getActivated());
-                        System.out.println("device = " + device);
-                    },
-                    () -> fail("신규 디바이스가 등록되어 있어야 한다.")
-            );
+            // when - then
+            DeviceTokenErrorException ex = assertThrows(DeviceTokenErrorException.class, () -> userAccountUseCase.registerDeviceToken(requestUser.getId(), request));
+            assertEquals("활성화되지 않은 디바이스 토큰이 존재하는 경우 Not Activated Device를 반환한다.", DeviceTokenErrorCode.NOT_ACTIVATED_DEVICE, ex.getBaseErrorCode());
         }
     }
 
