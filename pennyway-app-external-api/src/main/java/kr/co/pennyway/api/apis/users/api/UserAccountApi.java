@@ -24,15 +24,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 @Tag(name = "사용자 계정 관리 API", description = "사용자 본인의 계정 관리를 위한 Usecase를 제공합니다.")
 public interface UserAccountApi {
-    @Operation(summary = "디바이스 등록", description = "사용자의 디바이스 정보를 등록(originToken == newToken)하거나 갱신(originToken != newToken)합니다.")
+    @Operation(summary = "디바이스 등록", description = "사용자의 디바이스 정보를 등록합니다.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", examples = {
-                    @ExampleObject(name = "디바이스 등록 성공", value = """
+            @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", schemaProperties = @SchemaProperty(name = "deviceToken", schema = @Schema(implementation = DeviceTokenDto.RegisterRes.class)))),
+            @ApiResponse(responseCode = "400", content = @Content(mediaType = "application/json", examples = {
+                    @ExampleObject(name = "잘못된 디바이스 토큰 저장 요청", description = "서버에 동일한 이름의 토큰이 사용자에게 등록되어 있고, 해당 토큰이 만료처리되어 있을 경우에 해당한다. (애초에 발생해선 안 되는 에러)", value = """
                             {
-                                "deviceToken": {
-                                    "id": 1,
-                                    "token": "newToken"
-                                }
+                                "code": "4005",
+                                "message": "활성화되지 않은 디바이스 토큰 정보입니다."
                             }
                             """)
             })),
