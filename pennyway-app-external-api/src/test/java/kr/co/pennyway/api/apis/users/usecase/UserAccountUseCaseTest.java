@@ -3,7 +3,6 @@ package kr.co.pennyway.api.apis.users.usecase;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import kr.co.pennyway.api.apis.users.dto.DeviceDto;
 import kr.co.pennyway.api.apis.users.helper.PasswordEncoderHelper;
-import kr.co.pennyway.api.apis.users.service.DeviceRegisterService;
 import kr.co.pennyway.api.apis.users.service.UserDeleteService;
 import kr.co.pennyway.api.apis.users.service.UserProfileUpdateService;
 import kr.co.pennyway.api.config.ExternalApiDBTestConfig;
@@ -44,7 +43,7 @@ import static org.springframework.test.util.AssertionErrors.*;
 @ExtendWith(MockitoExtension.class)
 @DataJpaTest(properties = "spring.jpa.hibernate.ddl-auto=create")
 @ContextConfiguration(classes = {
-        JpaConfig.class, UserAccountUseCase.class, DeviceRegisterService.class, UserProfileUpdateService.class, UserDeleteService.class,
+        JpaConfig.class, UserAccountUseCase.class, UserProfileUpdateService.class, UserDeleteService.class,
         UserService.class, DeviceService.class, OauthService.class})
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @TestClassOrder(ClassOrderer.OrderAnnotation.class)
@@ -90,7 +89,7 @@ class UserAccountUseCaseTest extends ExternalApiDBTestConfig {
             DeviceDto.RegisterRes response = userAccountUseCase.registerDevice(requestUser.getId(), request);
 
             // then
-            deviceService.readDeviceByUserIdAndToken(requestUser.getId(), request.newToken()).ifPresentOrElse(
+            deviceService.readDeviceByUserIdAndToken(requestUser.getId(), request.token()).ifPresentOrElse(
                     device -> {
                         assertEquals("요청한 디바이스 토큰과 동일해야 한다.", response.token(), device.getToken());
                         assertEquals("디바이스 ID가 일치해야 한다.", response.id(), device.getId());
@@ -114,7 +113,7 @@ class UserAccountUseCaseTest extends ExternalApiDBTestConfig {
             DeviceDto.RegisterRes response = userAccountUseCase.registerDevice(requestUser.getId(), request);
 
             // then
-            deviceService.readDeviceByUserIdAndToken(requestUser.getId(), request.newToken()).ifPresentOrElse(
+            deviceService.readDeviceByUserIdAndToken(requestUser.getId(), request.token()).ifPresentOrElse(
                     device -> {
                         assertEquals("요청한 디바이스 토큰과 동일해야 한다.", response.token(), device.getToken());
                         assertEquals("디바이스 ID가 일치해야 한다.", originDevice.getId(), device.getId());
@@ -140,7 +139,7 @@ class UserAccountUseCaseTest extends ExternalApiDBTestConfig {
             DeviceDto.RegisterRes response = userAccountUseCase.registerDevice(requestUser.getId(), request);
 
             // then
-            deviceService.readDeviceByUserIdAndToken(requestUser.getId(), request.newToken()).ifPresentOrElse(
+            deviceService.readDeviceByUserIdAndToken(requestUser.getId(), request.token()).ifPresentOrElse(
                     device -> {
                         assertEquals("요청한 디바이스 토큰과 동일해야 한다.", response.token(), device.getToken());
                         assertEquals("디바이스 ID가 일치해야 한다.", response.id(), device.getId());
@@ -163,7 +162,7 @@ class UserAccountUseCaseTest extends ExternalApiDBTestConfig {
             DeviceDto.RegisterRes response = userAccountUseCase.registerDevice(requestUser.getId(), request);
 
             // then
-            deviceService.readDeviceByUserIdAndToken(requestUser.getId(), request.newToken()).ifPresentOrElse(
+            deviceService.readDeviceByUserIdAndToken(requestUser.getId(), request.token()).ifPresentOrElse(
                     device -> {
                         assertEquals("요청한 디바이스 토큰과 동일해야 한다.", response.token(), device.getToken());
                         assertEquals("디바이스 ID가 일치해야 한다.", response.id(), device.getId());
