@@ -6,7 +6,7 @@ import kr.co.pennyway.api.apis.users.helper.PasswordEncoderHelper;
 import kr.co.pennyway.api.apis.users.service.UserDeleteService;
 import kr.co.pennyway.api.apis.users.service.UserProfileUpdateService;
 import kr.co.pennyway.api.config.ExternalApiDBTestConfig;
-import kr.co.pennyway.api.config.fixture.DeviceFixture;
+import kr.co.pennyway.api.config.fixture.DeviceTokenFixture;
 import kr.co.pennyway.api.config.fixture.UserFixture;
 import kr.co.pennyway.domain.config.JpaConfig;
 import kr.co.pennyway.domain.domains.device.domain.DeviceToken;
@@ -83,7 +83,7 @@ class UserAccountUseCaseTest extends ExternalApiDBTestConfig {
         @DisplayName("[1] originToken과 newToken이 같은 경우, 신규 디바이스를 등록한다.")
         void registerNewDevice() {
             // given
-            DeviceTokenDto.RegisterReq request = DeviceFixture.INIT.toRegisterReq();
+            DeviceTokenDto.RegisterReq request = DeviceTokenFixture.INIT.toRegisterReq();
 
             // when
             DeviceTokenDto.RegisterRes response = userAccountUseCase.registerDeviceToken(requestUser.getId(), request);
@@ -105,9 +105,9 @@ class UserAccountUseCaseTest extends ExternalApiDBTestConfig {
         @DisplayName("[2] 신규 저장 요청에서 originToken에 대한 디바이스가 이미 존재하는 경우, 기존 디바이스 정보를 반환한다.")
         void registerNewDeviceWhenDeviceIsAlreadyExists() {
             // given
-            DeviceToken originDeviceToken = DeviceFixture.INIT.toDevice(requestUser);
+            DeviceToken originDeviceToken = DeviceTokenFixture.INIT.toDevice(requestUser);
             deviceTokenService.createDevice(originDeviceToken);
-            DeviceTokenDto.RegisterReq request = DeviceFixture.INIT.toRegisterReq();
+            DeviceTokenDto.RegisterReq request = DeviceTokenFixture.INIT.toRegisterReq();
 
             // when
             DeviceTokenDto.RegisterRes response = userAccountUseCase.registerDeviceToken(requestUser.getId(), request);
@@ -130,10 +130,10 @@ class UserAccountUseCaseTest extends ExternalApiDBTestConfig {
         @DisplayName("[3] token 갱신 요청에서 originToken과 일치하는 활성화 디바이스 토큰이 존재한다면, newToken으로 디바이스 토큰을 갱신한다.")
         void updateActivateDeviceToken() {
             // given
-            DeviceToken originDeviceToken = DeviceFixture.INIT.toDevice(requestUser);
+            DeviceToken originDeviceToken = DeviceTokenFixture.INIT.toDevice(requestUser);
             deviceTokenService.createDevice(originDeviceToken);
 
-            DeviceTokenDto.RegisterReq request = DeviceFixture.CHANGED_TOKEN.toRegisterReq();
+            DeviceTokenDto.RegisterReq request = DeviceTokenFixture.CHANGED_TOKEN.toRegisterReq();
 
             // when
             DeviceTokenDto.RegisterRes response = userAccountUseCase.registerDeviceToken(requestUser.getId(), request);
@@ -156,7 +156,7 @@ class UserAccountUseCaseTest extends ExternalApiDBTestConfig {
         @DisplayName("[4] 사용자가 수정 요청을 보냈을 때, originToken과 일치하는 활성화 토큰 정보가 없을 경우 newToken을 새로 등록한다.")
         void 토큰_수정_요청에서_기존_토큰이_없으면_새로운_토큰_등록() {
             // given
-            DeviceTokenDto.RegisterReq request = DeviceFixture.CHANGED_TOKEN.toRegisterReq();
+            DeviceTokenDto.RegisterReq request = DeviceTokenFixture.CHANGED_TOKEN.toRegisterReq();
 
             // when
             DeviceTokenDto.RegisterRes response = userAccountUseCase.registerDeviceToken(requestUser.getId(), request);
@@ -192,7 +192,7 @@ class UserAccountUseCaseTest extends ExternalApiDBTestConfig {
         @DisplayName("사용자 ID와 origin token에 매칭되는 활성 디바이스가 존재하는 경우 디바이스를 삭제한다.")
         void unregisterDevice() {
             // given
-            DeviceToken deviceToken = DeviceFixture.INIT.toDevice(requestUser);
+            DeviceToken deviceToken = DeviceTokenFixture.INIT.toDevice(requestUser);
             deviceTokenService.createDevice(deviceToken);
 
             // when
@@ -208,7 +208,7 @@ class UserAccountUseCaseTest extends ExternalApiDBTestConfig {
         @DisplayName("사용자 ID와 token에 매칭되는 디바이스가 존재하지 않는 경우 NOT_FOUND_DEVICE 에러를 반환한다.")
         void unregisterDeviceWhenDeviceIsNotExists() {
             // given
-            DeviceToken deviceToken = DeviceFixture.INIT.toDevice(requestUser);
+            DeviceToken deviceToken = DeviceTokenFixture.INIT.toDevice(requestUser);
             deviceTokenService.createDevice(deviceToken);
 
             // when - then
@@ -445,7 +445,7 @@ class UserAccountUseCaseTest extends ExternalApiDBTestConfig {
             User user = UserFixture.GENERAL_USER.toUser();
             userService.createUser(user);
 
-            DeviceToken deviceToken = DeviceFixture.INIT.toDevice(user);
+            DeviceToken deviceToken = DeviceTokenFixture.INIT.toDevice(user);
             deviceTokenService.createDevice(deviceToken);
 
             // when - then

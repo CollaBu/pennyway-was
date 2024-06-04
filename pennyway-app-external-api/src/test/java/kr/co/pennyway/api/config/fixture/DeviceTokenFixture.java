@@ -4,13 +4,13 @@ import kr.co.pennyway.api.apis.users.dto.DeviceTokenDto;
 import kr.co.pennyway.domain.domains.device.domain.DeviceToken;
 import kr.co.pennyway.domain.domains.user.domain.User;
 
-public enum DeviceFixture {
+public enum DeviceTokenFixture {
     INIT("originToken"),
     CHANGED_TOKEN("newToken");
 
     private final String token;
 
-    DeviceFixture(String token) {
+    DeviceTokenFixture(String token) {
         this.token = token;
     }
 

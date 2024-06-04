@@ -5,7 +5,7 @@ import kr.co.pennyway.api.apis.users.dto.DeviceTokenDto;
 import kr.co.pennyway.api.apis.users.dto.UserProfileUpdateDto;
 import kr.co.pennyway.api.apis.users.usecase.UserAccountUseCase;
 import kr.co.pennyway.api.config.WebConfig;
-import kr.co.pennyway.api.config.fixture.DeviceFixture;
+import kr.co.pennyway.api.config.fixture.DeviceTokenFixture;
 import kr.co.pennyway.api.config.supporter.WithSecurityMockUser;
 import kr.co.pennyway.common.exception.StatusCode;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorCode;
@@ -66,7 +66,7 @@ public class UserAccountControllerUnitTest {
         @WithSecurityMockUser
         void putDevice() throws Exception {
             // given
-            DeviceTokenDto.RegisterReq request = DeviceFixture.INIT.toRegisterReq();
+            DeviceTokenDto.RegisterReq request = DeviceTokenFixture.INIT.toRegisterReq();
             DeviceTokenDto.RegisterRes expectedResponse = new DeviceTokenDto.RegisterRes(2L, "originToken");
             given(userAccountUseCase.registerDeviceToken(1L, request)).willReturn(expectedResponse);
 
