@@ -57,7 +57,7 @@ public class DeviceToken extends DateAuditable {
 
     @Override
     public String toString() {
-        return "Device{" +
+        return "DeviceToken {" +
                 "id=" + id +
                 ", token='" + token + '\'' +
                 ", activated=" + activated + '}';
