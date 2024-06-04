@@ -7,10 +7,12 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.SQLRestriction;
 
 @Entity
 @Getter
 @Table(name = "device")
+@SQLRestriction("activated IS true")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Device extends DateAuditable {
     @Id
