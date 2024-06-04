@@ -5,22 +5,20 @@ import kr.co.pennyway.domain.domains.device.domain.Device;
 import kr.co.pennyway.domain.domains.user.domain.User;
 
 public enum DeviceFixture {
-    INIT("originToken", "originToken"),
-    CHANGED_TOKEN("originToken", "newToken");
+    INIT("originToken"),
+    CHANGED_TOKEN("newToken");
 
-    private final String originToken;
-    private final String newToken;
+    private final String token;
 
-    DeviceFixture(String originToken, String newToken) {
-        this.originToken = originToken;
-        this.newToken = newToken;
+    DeviceFixture(String token) {
+        this.token = token;
     }
 
     public Device toDevice(User user) {
-        return Device.of(originToken, user);
+        return Device.of(token, user);
     }
 
     public DeviceDto.RegisterReq toRegisterReq() {
-        return new DeviceDto.RegisterReq(originToken, newToken);
+        return new DeviceDto.RegisterReq(token);
     }
 }
