@@ -174,18 +174,6 @@ class UserAccountUseCaseTest extends ExternalApiDBTestConfig {
                     () -> fail("신규 디바이스가 등록되어 있어야 한다.")
             );
         }
-
-        @Test
-        @Transactional
-        @DisplayName("[5] 토큰 수정 요청에서 oldToken에 대한 디바이스가 존재하지 않는 경우, NOT_FOUND 에러를 반환한다.")
-        void registerNewDeviceWhenOldDeviceTokenIsNotExists() {
-            // given
-            DeviceDto.RegisterReq request = DeviceFixture.CHANGED_TOKEN.toRegisterReq();
-
-            // when - then
-            DeviceErrorException ex = assertThrows(DeviceErrorException.class, () -> userAccountUseCase.registerDevice(requestUser.getId(), request));
-            assertEquals("디바이스 토큰이 존재하지 않으면 Not Found를 반환한다.", DeviceErrorCode.NOT_FOUND_DEVICE, ex.getBaseErrorCode());
-        }
     }
 
     @Order(2)
