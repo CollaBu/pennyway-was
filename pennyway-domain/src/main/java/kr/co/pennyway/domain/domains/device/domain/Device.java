@@ -12,7 +12,7 @@ import org.hibernate.annotations.SQLRestriction;
 @Entity
 @Getter
 @Table(name = "device")
-@SQLRestriction("activated IS true")
+@SQLRestriction("activated = true")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Device extends DateAuditable {
     @Id
