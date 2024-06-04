@@ -2,8 +2,6 @@ package kr.co.pennyway.api.apis.users.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
-import kr.co.pennyway.domain.domains.device.domain.Device;
-import kr.co.pennyway.domain.domains.user.domain.User;
 
 public class DeviceDto {
     @Schema(title = "디바이스 등록 요청")
@@ -13,13 +11,7 @@ public class DeviceDto {
             String originToken,
             @Schema(description = "새로운 디바이스 토큰", requiredMode = Schema.RequiredMode.REQUIRED)
             @NotBlank(message = "newToken은 필수입니다.")
-            String newToken,
-            @Schema(description = "디바이스 모델명", requiredMode = Schema.RequiredMode.REQUIRED)
-            @NotBlank(message = "model은 필수입니다.")
-            String model,
-            @Schema(description = "디바이스 OS", requiredMode = Schema.RequiredMode.REQUIRED)
-            @NotBlank(message = "os는 필수입니다.")
-            String os
+            String newToken
     ) {
         /**
          * oldToken과 newToken이 같은 경우, 신규 등록 요청으로 판단
@@ -27,10 +19,6 @@ public class DeviceDto {
         @Schema(hidden = true)
         public boolean isInitRequest() {
             return originToken.equals(newToken);
-        }
-
-        public Device toEntity(User user) {
-            return Device.of(newToken, model, os, user);
         }
     }
 
