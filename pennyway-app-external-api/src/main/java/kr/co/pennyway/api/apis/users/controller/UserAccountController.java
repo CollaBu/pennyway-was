@@ -27,7 +27,7 @@ public class UserAccountController implements UserAccountApi {
     @PutMapping("/devices")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> putDevice(@RequestBody @Validated DeviceTokenDto.RegisterReq request, @AuthenticationPrincipal SecurityUserDetails user) {
-        return ResponseEntity.ok(SuccessResponse.from("device", userAccountUseCase.registerDeviceToken(user.getUserId(), request)));
+        return ResponseEntity.ok(SuccessResponse.from("deviceToken", userAccountUseCase.registerDeviceToken(user.getUserId(), request)));
     }
 
     @Override
