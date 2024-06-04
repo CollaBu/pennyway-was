@@ -5,7 +5,6 @@ import kr.co.pennyway.api.apis.users.dto.UserProfileDto;
 import kr.co.pennyway.api.apis.users.dto.UserProfileUpdateDto;
 import kr.co.pennyway.api.apis.users.helper.PasswordEncoderHelper;
 import kr.co.pennyway.api.apis.users.mapper.UserProfileMapper;
-import kr.co.pennyway.api.apis.users.service.DeviceRegisterService;
 import kr.co.pennyway.api.apis.users.service.UserDeleteService;
 import kr.co.pennyway.api.apis.users.service.UserProfileUpdateService;
 import kr.co.pennyway.common.annotation.UseCase;
@@ -37,7 +36,6 @@ public class UserAccountUseCase {
 
     private final UserProfileUpdateService userProfileUpdateService;
     private final UserDeleteService userDeleteService;
-    private final DeviceRegisterService deviceRegisterService;
 
     private final PasswordEncoderHelper passwordEncoderHelper;
 
@@ -45,7 +43,8 @@ public class UserAccountUseCase {
     public DeviceDto.RegisterRes registerDevice(Long userId, DeviceDto.RegisterReq request) {
         User user = readUserOrThrow(userId);
 
-        Device device = deviceRegisterService.createOrUpdateDevice(user, request);
+        Device device = deviceService.readDeviceByUserIdAndToken(user.getId(), request.token())
+                .orElseGet(() -> deviceService.createDevice(request.toEntity(user)));
 
         return DeviceDto.RegisterRes.of(device.getId(), device.getToken());
     }
