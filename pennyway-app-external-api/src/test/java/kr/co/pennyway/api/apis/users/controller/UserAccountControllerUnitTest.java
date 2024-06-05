@@ -9,6 +9,8 @@ import kr.co.pennyway.api.config.supporter.WithSecurityMockUser;
 import kr.co.pennyway.common.exception.StatusCode;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorCode;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorException;
+import kr.co.pennyway.infra.common.exception.StorageErrorCode;
+import kr.co.pennyway.infra.common.exception.StorageException;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -365,7 +367,10 @@ public class UserAccountControllerUnitTest {
             String newPasswordWithOnlySpecialCharacterAndWhiteSpace = "!@#$%^&*() ";
             String newPasswordWithOnlySpecialCharacterAndEmoji = "!@#$%^&*()😊";
             String newPasswordWithOnlySpecialCharacterAndEmojiAndWhiteSpace = "!@#$%^&*() 😊";
-            List<String> newPasswords = List.of(newPasswordWithBlank, newPasswordWithUnderLength, newPasswordWithOverLength, newPasswordWithOnlyAlphabet, newPasswordWithOnlyNumber, newPasswordWithOnlySpecialCharacter, newPasswordWithOnlyUpperCase, newPasswordWithOnlyLowerCase, newPasswordWithOnlyEmoji, newPasswordWithOnlyWhiteSpace, newPasswordWithOnlySpecialCharacterAndWhiteSpace, newPasswordWithOnlySpecialCharacterAndEmoji, newPasswordWithOnlySpecialCharacterAndEmojiAndWhiteSpace);
+            List<String> newPasswords = List.of(newPasswordWithBlank, newPasswordWithUnderLength, newPasswordWithOverLength, newPasswordWithOnlyAlphabet,
+                    newPasswordWithOnlyNumber, newPasswordWithOnlySpecialCharacter, newPasswordWithOnlyUpperCase, newPasswordWithOnlyLowerCase,
+                    newPasswordWithOnlyEmoji, newPasswordWithOnlyWhiteSpace, newPasswordWithOnlySpecialCharacterAndWhiteSpace,
+                    newPasswordWithOnlySpecialCharacterAndEmoji, newPasswordWithOnlySpecialCharacterAndEmojiAndWhiteSpace);
 
             String expectedErrorCode = String.valueOf(StatusCode.UNPROCESSABLE_CONTENT.getCode() * 10 + REQUIRED_PARAMETERS_MISSING_IN_REQUEST_BODY.getCode());
 
@@ -504,6 +509,50 @@ public class UserAccountControllerUnitTest {
         private ResultActions performDeleteAccountRequest() throws Exception {
             return mockMvc.perform(delete("/v2/users/me")
                     .contentType("application/json"));
+        }
+    }
+
+    @Nested
+    @Order(7)
+    @DisplayName("[7] 사용자 프로필 이미지 등록 테스트")
+    class RegisterProfileImageTest {
+        @DisplayName("사용자 프로필 이미지 등록 요청 시, 존재하지 않는 이미지 경로인 경우 404 에러를 반환한다.")
+        @Test
+        @WithSecurityMockUser
+        void registerProfileImageNotFound() throws Exception {
+            // given
+            String profileImageUrl = "delete/profile/1/154aa3bd-da02-4311-a735-3bf7e4bb68d2_1717446100295.jpeg";
+            willThrow(new StorageException(StorageErrorCode.NOT_FOUND)).given(userAccountUseCase)
+                    .updateProfileImage(1L, new UserProfileUpdateDto.ProfileImageReq(profileImageUrl));
+
+            // when
+            ResultActions result = performRegisterProfileImageRequest(profileImageUrl);
+
+            // then
+            result.andExpect(status().isNotFound())
+                    .andDo(print());
+        }
+
+        @DisplayName("사용자 프로필 이미지 정상 요청 시, 200 코드를 반환한다.")
+        @Test
+        @WithSecurityMockUser
+        void registerProfileImageSuccess() throws Exception {
+            // given
+            String profileImageUrl = "delete/profile/1/154aa3bd-da02-4311-a735-3bf7e4bb68d2_1717446100295.jpeg";
+
+            // when
+            ResultActions result = performRegisterProfileImageRequest(profileImageUrl);
+
+            // then
+            result.andExpect(status().isOk())
+                    .andExpect(jsonPath("$.code").value("2000"))
+                    .andDo(print());
+        }
+
+        private ResultActions performRegisterProfileImageRequest(String profileImageUrl) throws Exception {
+            return mockMvc.perform(put("/v2/users/me/profile-image")
+                    .contentType("application/json")
+                    .content(objectMapper.writeValueAsString(new UserProfileUpdateDto.ProfileImageReq(profileImageUrl))));
         }
     }
 }
