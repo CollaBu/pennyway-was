@@ -33,7 +33,6 @@ public class TargetAmountCustomRepositoryImpl implements TargetAmountCustomRepos
                         .and(targetAmount.amount.gt(-1)))
                 .orderBy(targetAmount.createdAt.desc())
                 .fetchFirst();
-        log.info("최근 목표 금액 : {}", result);
 
         return Optional.ofNullable(result);
     }
