@@ -1,6 +1,8 @@
 package kr.co.pennyway.api.apis.users.service;
 
 import kr.co.pennyway.domain.domains.oauth.service.OauthService;
+import kr.co.pennyway.domain.domains.user.exception.UserErrorCode;
+import kr.co.pennyway.domain.domains.user.exception.UserErrorException;
 import kr.co.pennyway.domain.domains.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +24,11 @@ public class UserDeleteService {
     private final OauthService oauthService;
 
     @Transactional
-    public void deleteUser(Long userId) {
+    public void execute(Long userId) {
+        if (!userService.isExistUser(userId)) throw new UserErrorException(UserErrorCode.NOT_FOUND);
+
+        // TODO: [2024-05-03] 하나라도 채팅방의 방장으로 참여하는 경우 삭제 불가능 처리
+        
         oauthService.deleteOauthsByUserId(userId);
         userService.deleteUser(userId);
     }
