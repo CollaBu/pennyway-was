@@ -1,6 +1,7 @@
 package kr.co.pennyway.api.apis.ledger.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -86,6 +87,25 @@ public class TargetAmountDto {
                 return new TargetAmountInfo(-1L, -1, false);
             }
             return new TargetAmountInfo(targetAmount.getId(), targetAmount.getAmount(), targetAmount.isRead());
+        }
+    }
+
+    @Schema(title = "가장 최근에 입력한 목표 금액 정보")
+    public record RecentTargetAmountRes(
+            @Schema(description = "최근 목표 금액 존재 여부로써 데이터가 존재하지 않으면 false, 존재하면 true", example = "true", requiredMode = Schema.RequiredMode.REQUIRED)
+            boolean isPresent,
+            @Schema(description = "최근 목표 금액 정보. isPresent가 false인 경우 필드가 존재하지 않는다.", requiredMode = Schema.RequiredMode.REQUIRED)
+            @JsonInclude(JsonInclude.Include.NON_NULL)
+            Integer amount
+    ) {
+        public RecentTargetAmountRes {
+            if (!isPresent) {
+                amount = null;
+            }
+        }
+
+        public static RecentTargetAmountRes valueOf(Integer amount) {
+            return (amount.equals(-1)) ? new RecentTargetAmountRes(false, null) : new RecentTargetAmountRes(true, amount);
         }
     }
 }
