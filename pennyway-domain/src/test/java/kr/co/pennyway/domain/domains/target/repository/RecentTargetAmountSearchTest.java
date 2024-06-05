@@ -1,8 +1,8 @@
 package kr.co.pennyway.domain.domains.target.repository;
 
-import com.querydsl.jpa.impl.JPAQueryFactory;
 import kr.co.pennyway.domain.config.ContainerMySqlTestConfig;
 import kr.co.pennyway.domain.config.JpaConfig;
+import kr.co.pennyway.domain.config.TestJpaConfig;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
@@ -31,6 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @ContextConfiguration(classes = JpaConfig.class)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ActiveProfiles("test")
+@Import(TestJpaConfig.class)
 public class RecentTargetAmountSearchTest extends ContainerMySqlTestConfig {
     @Autowired
     private UserRepository userRepository;
@@ -38,9 +39,6 @@ public class RecentTargetAmountSearchTest extends ContainerMySqlTestConfig {
     private TargetAmountRepository targetAmountRepository;
     @Autowired
     private NamedParameterJdbcTemplate jdbcTemplate;
-
-    @MockBean
-    private JPAQueryFactory jpaQueryFactory;
 
     @Test
     @DisplayName("사용자의 가장 최근 목표 금액을 조회할 수 있다.")

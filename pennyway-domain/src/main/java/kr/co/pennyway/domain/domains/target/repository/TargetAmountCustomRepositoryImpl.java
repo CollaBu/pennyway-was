@@ -5,11 +5,13 @@ import kr.co.pennyway.domain.domains.target.domain.QTargetAmount;
 import kr.co.pennyway.domain.domains.target.domain.TargetAmount;
 import kr.co.pennyway.domain.domains.user.domain.QUser;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.Optional;
 
+@Slf4j
 @Repository
 @RequiredArgsConstructor
 public class TargetAmountCustomRepositoryImpl implements TargetAmountCustomRepository {
@@ -31,8 +33,9 @@ public class TargetAmountCustomRepositoryImpl implements TargetAmountCustomRepos
                         .and(targetAmount.amount.gt(-1)))
                 .orderBy(targetAmount.createdAt.desc())
                 .fetchFirst();
+        log.info("최근 목표 금액 : {}", result);
 
-        return Optional.of(result);
+        return Optional.ofNullable(result);
     }
 
     @Override
