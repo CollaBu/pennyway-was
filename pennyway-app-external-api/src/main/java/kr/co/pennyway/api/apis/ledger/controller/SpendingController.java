@@ -71,13 +71,13 @@ public class SpendingController implements SpendingApi {
     }
 
     /**
-     * categoryId가 -1이면 서비스에서 정의한 카테고리를 사용하므로 저장하려는 지출 내역의 icon은 OTHER가 될 수 없고, <br/>
-     * categoryId가 -1이 아니면 사용자가 정의한 카테고리를 사용하므로 저장하려는 지출 내역의 icon은 OTHER임을 확인한다.
+     * categoryId가 -1이면 서비스에서 정의한 카테고리를 사용하므로 저장하려는 지출 내역의 icon은 CUSTOM이나 OTHER이 될 수 없고, <br/>
+     * categoryId가 -1이 아니면 사용자가 정의한 카테고리를 사용하므로 저장하려는 지출 내역의 icon은 CUSTOM임을 확인한다.
      *
      * @param categoryId : 사용자가 정의한 카테고리 ID
      * @param icon       : 지출 내역으로 저장하려는 카테고리의 아이콘
      */
     private boolean isValidCategoryIdAndIcon(Long categoryId, SpendingCategory icon) {
-        return (categoryId.equals(-1L) && !icon.equals(SpendingCategory.CUSTOM) || categoryId > 0 && icon.equals(SpendingCategory.CUSTOM));
+        return (categoryId.equals(-1L) && (!icon.equals(SpendingCategory.CUSTOM) || !icon.equals(SpendingCategory.OTHER))) || (categoryId > 0 && icon.equals(SpendingCategory.CUSTOM));
     }
 }
