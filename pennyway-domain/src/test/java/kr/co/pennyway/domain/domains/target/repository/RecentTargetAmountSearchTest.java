@@ -33,10 +33,25 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @ActiveProfiles("test")
 @Import(TestJpaConfig.class)
 public class RecentTargetAmountSearchTest extends ContainerMySqlTestConfig {
+    private final Collection<MockTargetAmount> mockTargetAmounts = List.of(
+            MockTargetAmount.of(10000, true, LocalDateTime.of(2021, 1, 1, 0, 0, 0), LocalDateTime.of(2021, 1, 1, 0, 0, 0)),
+            MockTargetAmount.of(-1, false, LocalDateTime.of(2022, 3, 1, 0, 0, 0), LocalDateTime.of(2022, 3, 1, 0, 0, 0)),
+            MockTargetAmount.of(20000, true, LocalDateTime.of(2022, 5, 1, 0, 0, 0), LocalDateTime.of(2022, 5, 1, 0, 0, 0)),
+            MockTargetAmount.of(30000, true, LocalDateTime.of(2023, 7, 1, 0, 0, 0), LocalDateTime.of(2023, 7, 1, 0, 0, 0)),
+            MockTargetAmount.of(-1, false, LocalDateTime.of(2024, 1, 1, 0, 0, 0), LocalDateTime.of(2024, 1, 1, 0, 0, 0)),
+            MockTargetAmount.of(-1, true, LocalDateTime.of(2024, 2, 1, 0, 0, 0), LocalDateTime.of(2024, 2, 1, 0, 0, 0))
+    );
+    private final Collection<MockTargetAmount> mockTargetAmountsMinus = List.of(
+            MockTargetAmount.of(-1, true, LocalDateTime.of(2022, 3, 1, 0, 0, 0), LocalDateTime.of(2022, 3, 1, 0, 0, 0)),
+            MockTargetAmount.of(-1, false, LocalDateTime.of(2024, 1, 1, 0, 0, 0), LocalDateTime.of(2024, 1, 1, 0, 0, 0)),
+            MockTargetAmount.of(-1, false, LocalDateTime.of(2024, 1, 1, 0, 0, 0), LocalDateTime.of(2024, 1, 1, 0, 0, 0)),
+            MockTargetAmount.of(-1, true, LocalDateTime.of(2024, 1, 1, 0, 0, 0), LocalDateTime.of(2024, 1, 1, 0, 0, 0))
+    );
     @Autowired
     private UserRepository userRepository;
     @Autowired
     private TargetAmountRepository targetAmountRepository;
+    ;
     @Autowired
     private NamedParameterJdbcTemplate jdbcTemplate;
 
@@ -46,7 +61,7 @@ public class RecentTargetAmountSearchTest extends ContainerMySqlTestConfig {
     public void 가장_최근_사용자_목표_금액_조회() {
         // given
         User user = userRepository.save(User.builder().username("jayang").name("Yang").phone("010-0000-0000").build());
-        bulkInsertTargetAmount(user);
+        bulkInsertTargetAmount(user, mockTargetAmounts);
 
         // when - then
         targetAmountRepository.findRecentOneByUserId(user.getId())
@@ -56,9 +71,23 @@ public class RecentTargetAmountSearchTest extends ContainerMySqlTestConfig {
                 );
     }
 
-    private void bulkInsertTargetAmount(User user) {
-        Collection<MockTargetAmount> targetAmounts = getMockTargetAmounts();
+    @Test
+    @DisplayName("사용자의 가장 최근 목표 금액이 존재하지 않으면 Optional.empty()를 반환한다.")
+    @Transactional
+    public void 가장_최근_사용자_목표_금액_미존재() {
+        // given
+        User user = userRepository.save(User.builder().username("jayang").name("Yang").phone("010-0000-0000").build());
+        bulkInsertTargetAmount(user, mockTargetAmountsMinus);
 
+        // when - then
+        targetAmountRepository.findRecentOneByUserId(user.getId())
+                .ifPresentOrElse(
+                        targetAmount -> Assertions.fail("최근 목표 금액이 존재합니다."),
+                        () -> log.info("최근 목표 금액이 존재하지 않습니다.")
+                );
+    }
+
+    private void bulkInsertTargetAmount(User user, Collection<MockTargetAmount> targetAmounts) {
         String sql = String.format("""
                 INSERT INTO `%s` (amount, is_read, user_id, created_at, updated_at)
                 VALUES (:amount, true, :userId, :createdAt, :updatedAt)
@@ -71,17 +100,6 @@ public class RecentTargetAmountSearchTest extends ContainerMySqlTestConfig {
                         .addValue("updatedAt", mockTargetAmount.updatedAt))
                 .toArray(SqlParameterSource[]::new);
         jdbcTemplate.batchUpdate(sql, params);
-    }
-
-    private Collection<MockTargetAmount> getMockTargetAmounts() {
-        return List.of(
-                MockTargetAmount.of(10000, true, LocalDateTime.of(2021, 1, 1, 0, 0, 0), LocalDateTime.of(2021, 1, 1, 0, 0, 0)),
-                MockTargetAmount.of(-1, false, LocalDateTime.of(2022, 3, 1, 0, 0, 0), LocalDateTime.of(2022, 3, 1, 0, 0, 0)),
-                MockTargetAmount.of(20000, true, LocalDateTime.of(2022, 5, 1, 0, 0, 0), LocalDateTime.of(2022, 5, 1, 0, 0, 0)),
-                MockTargetAmount.of(30000, true, LocalDateTime.of(2023, 7, 1, 0, 0, 0), LocalDateTime.of(2023, 7, 1, 0, 0, 0)),
-                MockTargetAmount.of(-1, false, LocalDateTime.of(2024, 1, 1, 0, 0, 0), LocalDateTime.of(2024, 1, 1, 0, 0, 0)),
-                MockTargetAmount.of(-1, true, LocalDateTime.of(2024, 2, 1, 0, 0, 0), LocalDateTime.of(2024, 2, 1, 0, 0, 0))
-        );
     }
 
     private record MockTargetAmount(int amount, boolean isRead, LocalDateTime createdAt, LocalDateTime updatedAt) {
