@@ -74,8 +74,5 @@ public class UserProfileUpdateDto {
             @NotBlank(message = "프로필 이미지 URL을 입력해주세요")
             String profileImageUrl
     ) {
-        public static ProfileImageReq of(String profileImageUrl) {
-            return new ProfileImageReq(profileImageUrl);
-        }
     }
 }
