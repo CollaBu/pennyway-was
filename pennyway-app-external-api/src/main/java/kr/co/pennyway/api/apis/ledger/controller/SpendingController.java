@@ -21,6 +21,8 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RequestMapping("/v2/spendings")
 public class SpendingController implements SpendingApi {
+    private static final String SPENDING = "spending";
+
     private final SpendingUseCase spendingUseCase;
 
     @Override
@@ -31,21 +33,21 @@ public class SpendingController implements SpendingApi {
             throw new SpendingErrorException(SpendingErrorCode.INVALID_ICON_WITH_CATEGORY_ID);
         }
 
-        return ResponseEntity.ok(SuccessResponse.from("spending", spendingUseCase.createSpending(user.getUserId(), request)));
+        return ResponseEntity.ok(SuccessResponse.from(SPENDING, spendingUseCase.createSpending(user.getUserId(), request)));
     }
 
     @Override
     @GetMapping("")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> getSpendingListAtYearAndMonth(@RequestParam("year") int year, @RequestParam("month") int month, @AuthenticationPrincipal SecurityUserDetails user) {
-        return ResponseEntity.ok(SuccessResponse.from("spending", spendingUseCase.getSpendingsAtYearAndMonth(user.getUserId(), year, month)));
+        return ResponseEntity.ok(SuccessResponse.from(SPENDING, spendingUseCase.getSpendingsAtYearAndMonth(user.getUserId(), year, month)));
     }
 
     @Override
     @GetMapping("/{spendingId}")
     @PreAuthorize("isAuthenticated() and @spendingManager.hasPermission(#user.getUserId(), #spendingId)")
     public ResponseEntity<?> getSpendingDetail(@PathVariable Long spendingId, @AuthenticationPrincipal SecurityUserDetails user) {
-        return ResponseEntity.ok(SuccessResponse.from("spending", spendingUseCase.getSpedingDetail(spendingId)));
+        return ResponseEntity.ok(SuccessResponse.from(SPENDING, spendingUseCase.getSpedingDetail(spendingId)));
     }
 
     @Override
@@ -56,7 +58,7 @@ public class SpendingController implements SpendingApi {
             throw new SpendingErrorException(SpendingErrorCode.INVALID_ICON_WITH_CATEGORY_ID);
         }
 
-        return ResponseEntity.ok(SuccessResponse.from("spending", spendingUseCase.updateSpending(spendingId, request)));
+        return ResponseEntity.ok(SuccessResponse.from(SPENDING, spendingUseCase.updateSpending(spendingId, request)));
     }
 
     @Override
