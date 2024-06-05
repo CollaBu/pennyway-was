@@ -45,10 +45,10 @@ public class Spending extends DateAuditable {
 
     @Builder
     private Spending(Integer amount, SpendingCategory category, LocalDateTime spendAt, String accountName, String memo, User user, SpendingCustomCategory spendingCustomCategory) {
-        if (category.equals(SpendingCategory.CUSTOM) && spendingCustomCategory == null) {
-            throw new IllegalArgumentException("OTHER 아이콘의 경우 SpendingCustomCategory는 null일 수 없습니다.");
-        } else if (!category.equals(SpendingCategory.CUSTOM) && spendingCustomCategory != null) {
-            throw new IllegalArgumentException("OTHER 아이콘이 아닌 경우 SpendingCustomCategory는 null이어야 합니다.");
+        if (spendingCustomCategory == null && (category.equals(SpendingCategory.CUSTOM) || category.equals(SpendingCategory.OTHER))) {
+            throw new IllegalArgumentException("서비스 제공 아이콘을 등록할 때는 CUSTOM, OHTER 아이콘을 사용할 수 없습니다.");
+        } else if (spendingCustomCategory != null && !category.equals(SpendingCategory.CUSTOM)) {
+            throw new IllegalArgumentException("사용자 정의 아이콘을 등록할 때는 CUSTOM 아이콘이어야 합니다.");
         }
 
         this.amount = amount;
@@ -80,10 +80,10 @@ public class Spending extends DateAuditable {
     }
 
     public void updateSpendingCustomCategory(SpendingCustomCategory spendingCustomCategory) {
-        if (this.category.equals(SpendingCategory.CUSTOM) && spendingCustomCategory == null) {
-            throw new IllegalArgumentException("OTHER 아이콘의 경우 SpendingCustomCategory는 null일 수 없습니다.");
-        } else if (!this.category.equals(SpendingCategory.CUSTOM) && spendingCustomCategory != null) {
-            throw new IllegalArgumentException("OTHER 아이콘이 아닌 경우 SpendingCustomCategory는 null이어야 합니다.");
+        if (spendingCustomCategory == null && (category.equals(SpendingCategory.CUSTOM) || category.equals(SpendingCategory.OTHER))) {
+            throw new IllegalArgumentException("서비스 제공 아이콘을 등록할 때는 CUSTOM, OHTER 아이콘을 사용할 수 없습니다.");
+        } else if (spendingCustomCategory != null && !category.equals(SpendingCategory.CUSTOM)) {
+            throw new IllegalArgumentException("사용자 정의 아이콘을 등록할 때는 CUSTOM 아이콘이어야 합니다.");
         }
 
         this.spendingCustomCategory = spendingCustomCategory;
