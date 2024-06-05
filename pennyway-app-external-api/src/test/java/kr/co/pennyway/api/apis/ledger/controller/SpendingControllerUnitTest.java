@@ -77,7 +77,7 @@ public class SpendingControllerUnitTest {
         void whenCategoryIsNotDefined() throws Exception {
             // given
             Long categoryId = -1L;
-            SpendingCategory icon = SpendingCategory.OTHER;
+            SpendingCategory icon = SpendingCategory.CUSTOM;
             SpendingReq request = new SpendingReq(10000, categoryId, icon, LocalDate.now(), "소비처", "메모");
             given(spendingUseCase.createSpending(1L, request)).willReturn(SpendingSearchRes.Individual.builder().build());
 

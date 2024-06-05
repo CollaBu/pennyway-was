@@ -76,6 +76,6 @@ public class SpendingController implements SpendingApi {
      * @param icon       : 지출 내역으로 저장하려는 카테고리의 아이콘
      */
     private boolean isValidCategoryIdAndIcon(Long categoryId, SpendingCategory icon) {
-        return (categoryId.equals(-1L) && !icon.equals(SpendingCategory.OTHER) || categoryId > 0 && icon.equals(SpendingCategory.OTHER));
+        return (categoryId.equals(-1L) && !icon.equals(SpendingCategory.CUSTOM) || categoryId > 0 && icon.equals(SpendingCategory.CUSTOM));
     }
 }

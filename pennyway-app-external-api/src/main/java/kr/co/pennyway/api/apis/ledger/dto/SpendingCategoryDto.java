@@ -39,7 +39,7 @@ public class SpendingCategoryDto {
                 throw new IllegalArgumentException("isCustom과 id 정보가 일치하지 않습니다.");
             }
 
-            if (isCustom && icon.equals(SpendingCategory.OTHER)) {
+            if (isCustom && icon.equals(SpendingCategory.CUSTOM)) {
                 throw new IllegalArgumentException("사용자 정의 카테고리는 OTHER가 될 수 없습니다.");
             }
 

@@ -83,7 +83,7 @@ public class SpendingControllerIntegrationTest extends ExternalApiDBTestConfig {
             // given
             User user = userService.createUser(UserFixture.GENERAL_USER.toUser());
             SpendingCustomCategory category = spendingCustomCategoryService.createSpendingCustomCategory(SpendingCustomCategory.of("잉여비", SpendingCategory.LIVING, user));
-            SpendingReq request = new SpendingReq(10000, category.getId(), SpendingCategory.OTHER, LocalDate.now(), "소비처", "메모");
+            SpendingReq request = new SpendingReq(10000, category.getId(), SpendingCategory.CUSTOM, LocalDate.now(), "소비처", "메모");
 
             // when
             ResultActions result = performCreateSpendingSuccess(request, user);
@@ -103,7 +103,7 @@ public class SpendingControllerIntegrationTest extends ExternalApiDBTestConfig {
         void createSpendingWithInvalidCustomCategory() throws Exception {
             // given
             User user = userService.createUser(UserFixture.GENERAL_USER.toUser());
-            SpendingReq request = new SpendingReq(10000, 1000L, SpendingCategory.OTHER, LocalDate.now(), "소비처", "메모");
+            SpendingReq request = new SpendingReq(10000, 1000L, SpendingCategory.CUSTOM, LocalDate.now(), "소비처", "메모");
 
             // when
             ResultActions result = performCreateSpendingSuccess(request, user);

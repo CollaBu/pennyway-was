@@ -45,9 +45,9 @@ public class Spending extends DateAuditable {
 
     @Builder
     private Spending(Integer amount, SpendingCategory category, LocalDateTime spendAt, String accountName, String memo, User user, SpendingCustomCategory spendingCustomCategory) {
-        if (category.equals(SpendingCategory.OTHER) && spendingCustomCategory == null) {
+        if (category.equals(SpendingCategory.CUSTOM) && spendingCustomCategory == null) {
             throw new IllegalArgumentException("OTHER 아이콘의 경우 SpendingCustomCategory는 null일 수 없습니다.");
-        } else if (!category.equals(SpendingCategory.OTHER) && spendingCustomCategory != null) {
+        } else if (!category.equals(SpendingCategory.CUSTOM) && spendingCustomCategory != null) {
             throw new IllegalArgumentException("OTHER 아이콘이 아닌 경우 SpendingCustomCategory는 null이어야 합니다.");
         }
 
@@ -71,7 +71,7 @@ public class Spending extends DateAuditable {
      * @return {@link CategoryInfo}
      */
     public CategoryInfo getCategory() {
-        if (this.category.equals(SpendingCategory.OTHER)) {
+        if (this.category.equals(SpendingCategory.CUSTOM)) {
             SpendingCustomCategory category = getSpendingCustomCategory();
             return CategoryInfo.of(category.getId(), category.getName(), category.getIcon());
         }
@@ -80,9 +80,9 @@ public class Spending extends DateAuditable {
     }
 
     public void updateSpendingCustomCategory(SpendingCustomCategory spendingCustomCategory) {
-        if (this.category.equals(SpendingCategory.OTHER) && spendingCustomCategory == null) {
+        if (this.category.equals(SpendingCategory.CUSTOM) && spendingCustomCategory == null) {
             throw new IllegalArgumentException("OTHER 아이콘의 경우 SpendingCustomCategory는 null일 수 없습니다.");
-        } else if (!this.category.equals(SpendingCategory.OTHER) && spendingCustomCategory != null) {
+        } else if (!this.category.equals(SpendingCategory.CUSTOM) && spendingCustomCategory != null) {
             throw new IllegalArgumentException("OTHER 아이콘이 아닌 경우 SpendingCustomCategory는 null이어야 합니다.");
         }
 
