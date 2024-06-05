@@ -2,7 +2,7 @@ package kr.co.pennyway.api.apis.users.controller;
 
 import jakarta.validation.constraints.NotBlank;
 import kr.co.pennyway.api.apis.users.api.UserAccountApi;
-import kr.co.pennyway.api.apis.users.dto.DeviceDto;
+import kr.co.pennyway.api.apis.users.dto.DeviceTokenDto;
 import kr.co.pennyway.api.apis.users.dto.UserProfileUpdateDto;
 import kr.co.pennyway.api.apis.users.usecase.UserAccountUseCase;
 import kr.co.pennyway.api.common.response.SuccessResponse;
@@ -24,17 +24,17 @@ public class UserAccountController implements UserAccountApi {
     private final UserAccountUseCase userAccountUseCase;
 
     @Override
-    @PutMapping("/devices")
+    @PutMapping("/device-tokens")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> putDevice(@RequestBody @Validated DeviceDto.RegisterReq request, @AuthenticationPrincipal SecurityUserDetails user) {
-        return ResponseEntity.ok(SuccessResponse.from("device", userAccountUseCase.registerDevice(user.getUserId(), request)));
+    public ResponseEntity<?> putDevice(@RequestBody @Validated DeviceTokenDto.RegisterReq request, @AuthenticationPrincipal SecurityUserDetails user) {
+        return ResponseEntity.ok(SuccessResponse.from("deviceToken", userAccountUseCase.registerDeviceToken(user.getUserId(), request)));
     }
 
     @Override
-    @DeleteMapping("/devices")
+    @DeleteMapping("/device-tokens")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> deleteDevice(@RequestParam("token") @Validated @NotBlank String token, @AuthenticationPrincipal SecurityUserDetails user) {
-        userAccountUseCase.unregisterDevice(user.getUserId(), token);
+        userAccountUseCase.unregisterDeviceToken(user.getUserId(), token);
         return ResponseEntity.ok(SuccessResponse.noContent());
     }
 
