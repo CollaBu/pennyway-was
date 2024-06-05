@@ -51,7 +51,7 @@ public class RecentTargetAmountSearchTest extends ContainerMySqlTestConfig {
         bulkInsertTargetAmount(user);
 
         // when - then
-        targetAmountRepository.findTopByUser_IdOrderByCreatedAtDesc(user.getId())
+        targetAmountRepository.findRecentOneByUserId(user.getId())
                 .ifPresentOrElse(
                         targetAmount -> assertEquals(targetAmount.getAmount(), 30000),
                         () -> Assertions.fail("최근 목표 금액이 존재하지 않습니다.")
