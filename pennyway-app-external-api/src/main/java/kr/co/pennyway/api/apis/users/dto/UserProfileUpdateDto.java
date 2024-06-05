@@ -57,6 +57,7 @@ public class UserProfileUpdateDto {
             @JsonInclude(JsonInclude.Include.NON_NULL)
             Boolean chatNotify
     ) {
+<<<<<<< HEAD
     }
 
     @Schema(title = "프로필 이미지 등록 요청 DTO")
@@ -66,5 +67,7 @@ public class UserProfileUpdateDto {
             @NotBlank(message = "프로필 이미지 URL을 입력해주세요")
             String profileImageUrl
     ) {
+=======
+>>>>>>> origin/fix/PW-378-fcm-token
     }
 }
