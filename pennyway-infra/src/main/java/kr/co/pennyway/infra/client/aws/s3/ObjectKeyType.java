@@ -1,59 +1,67 @@
 package kr.co.pennyway.infra.client.aws.s3;
 
+import lombok.RequiredArgsConstructor;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import lombok.RequiredArgsConstructor;
-
 @RequiredArgsConstructor
 public enum ObjectKeyType {
-	PROFILE("1", "PROFILE", "delete/profile/{userId}/{uuid}_{timestamp}.{ext}", "profile/{userId}/origin/{uuid}_{timestamp}.{ext}"),
-	FEED("2", "FEED", "delete/feed/{feed_id}/{uuid}_{timestamp}.{ext}", "feed/{feed_id}/origin/{uuid}_{timestamp}.{ext}"),
-	CHATROOM_PROFILE("3", "CHATROOM_PROFILE", "delete/chatroom/{chatroom_id}/{uuid}_{timestamp}.{ext}",
-			"chatroom/{chatroom_id}/origin/{uuid}_{timestamp}.{ext}"),
-	CHAT("4", "CHAT", "delete/chatroom/{chatroom_id}/chat/{chat_id}/{uuid}_{timestamp}.{ext}",
-			"chatroom/{chatroom_id}/chat/{chat_id}/origin/{uuid}_{timestamp}.{ext}"),
-	CHAT_PROFILE("5", "CHAT_PROFILE", "delete/chatroom/{chatroom_id}/chat_profile/{userId}/{uuid}_{timestamp}.{ext}",
-			"chatroom/{chatroom_id}/chat_profile/{userId}/origin/{uuid}_{timestamp}.{ext}");
+    PROFILE("1", "PROFILE", "delete/profile/{userId}/{uuid}_{timestamp}.{ext}", "profile/{userId}/origin/{uuid}_{timestamp}.{ext}"),
+    FEED("2", "FEED", "delete/feed/{feed_id}/{uuid}_{timestamp}.{ext}", "feed/{feed_id}/origin/{uuid}_{timestamp}.{ext}"),
+    CHATROOM_PROFILE("3", "CHATROOM_PROFILE", "delete/chatroom/{chatroom_id}/{uuid}_{timestamp}.{ext}",
+            "chatroom/{chatroom_id}/origin/{uuid}_{timestamp}.{ext}"),
+    CHAT("4", "CHAT", "delete/chatroom/{chatroom_id}/chat/{chat_id}/{uuid}_{timestamp}.{ext}",
+            "chatroom/{chatroom_id}/chat/{chat_id}/origin/{uuid}_{timestamp}.{ext}"),
+    CHAT_PROFILE("5", "CHAT_PROFILE", "delete/chatroom/{chatroom_id}/chat_profile/{userId}/{uuid}_{timestamp}.{ext}",
+            "chatroom/{chatroom_id}/chat_profile/{userId}/origin/{uuid}_{timestamp}.{ext}");
 
-	private final String code;
-	private final String type;
-	private final String deleteTemplate;
-	private final String originTemplate;
+    private static final String userIdPattern = "([^/]+)";
+    private static final String uuidPattern = "([^_]+)";
+    private static final String timestampPattern = "([^\\.]+)";
+    private static final String extPattern = "([^/]+)";
+    private static final String feedIdPattern = "([^/]+)";
+    private static final String chatroomIdPattern = "([^/]+)";
+    private static final String chatIdPattern = "([^/]+)";
 
-	public String getCode() {
-		return code;
-	}
+    private final String code;
+    private final String type;
+    private final String deleteTemplate;
+    private final String originTemplate;
 
-	public String getType() {
-		return type;
-	}
+    public String getCode() {
+        return code;
+    }
 
-	public String getDeleteTemplate() {
-		return deleteTemplate;
-	}
+    public String getType() {
+        return type;
+    }
 
-	public String convertDeleteKeyToOriginKey(String deleteKey) {
-		String regex = deleteTemplate
-				.replace("{userId}", "([^/]+)")
-				.replace("{uuid}", "([^_]+)")
-				.replace("{timestamp}", "([^\\.]+)")
-				.replace("{ext}", "([^/]+)")
-				.replace("{feed_id}", "([^/]+)")
-				.replace("{chatroom_id}", "([^/]+)")
-				.replace("{chat_id}", "([^/]+)");
+    public String getDeleteTemplate() {
+        return deleteTemplate;
+    }
 
-		Pattern pattern = Pattern.compile(regex);
-		Matcher matcher = pattern.matcher(deleteKey);
+    public String convertDeleteKeyToOriginKey(String deleteKey) {
+        String regex = deleteTemplate
+                .replace("{userId}", userIdPattern)
+                .replace("{uuid}", uuidPattern)
+                .replace("{timestamp}", timestampPattern)
+                .replace("{ext}", extPattern)
+                .replace("{feed_id}", feedIdPattern)
+                .replace("{chatroom_id}", chatroomIdPattern)
+                .replace("{chat_id}", chatIdPattern);
 
-		if (matcher.matches()) {
-			String originKey = originTemplate;
-			for (int i = 1; i <= matcher.groupCount(); i++) {
-				originKey = originKey.replaceFirst("\\{[^}]+\\}", matcher.group(i));
-			}
-			return originKey;
-		}
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(deleteKey);
 
-		throw new IllegalArgumentException("No matching ObjectKeyType for deleteKey: " + deleteKey);
-	}
+        if (matcher.matches()) {
+            String originKey = originTemplate;
+            for (int i = 1; i <= matcher.groupCount(); i++) {
+                originKey = originKey.replaceFirst("\\{[^}]+\\}", matcher.group(i));
+            }
+            return originKey;
+        }
+
+        throw new IllegalArgumentException("No matching ObjectKeyType for deleteKey: " + deleteKey);
+    }
 }
