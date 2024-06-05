@@ -102,6 +102,13 @@ public class UserAccountUseCase {
     }
 
     @Transactional
+    public void updateProfileImage(Long userId, UserProfileUpdateDto.ProfileImageReq request) {
+        User user = readUserOrThrow(userId);
+
+        userProfileUpdateService.updateProfileImage(user, request.profileImageUrl());
+    }
+
+    @Transactional
     public UserProfileUpdateDto.NotifySettingUpdateReq activateNotification(Long userId, NotifySetting.NotifyType type) {
         User user = readUserOrThrow(userId);
 
@@ -119,7 +126,8 @@ public class UserAccountUseCase {
 
     @Transactional
     public void deleteAccount(Long userId) {
-        if (!userService.isExistUser(userId)) throw new UserErrorException(UserErrorCode.NOT_FOUND);
+        if (!userService.isExistUser(userId))
+            throw new UserErrorException(UserErrorCode.NOT_FOUND);
 
         // TODO: [2024-05-03] 하나라도 채팅방의 방장으로 참여하는 경우 삭제 불가능 처리
 

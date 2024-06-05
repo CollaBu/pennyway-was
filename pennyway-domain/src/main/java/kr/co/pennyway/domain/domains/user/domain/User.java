@@ -56,7 +56,8 @@ public class User extends DateAuditable {
     private List<Device> devices = new ArrayList<>();
 
     @Builder
-    private User(String username, String name, String password, LocalDateTime passwordUpdatedAt, String profileImageUrl, String phone, Role role, ProfileVisibility profileVisibility, NotifySetting notifySetting, Boolean locked, LocalDateTime deletedAt) {
+    private User(String username, String name, String password, LocalDateTime passwordUpdatedAt, String profileImageUrl, String phone, Role role,
+                 ProfileVisibility profileVisibility, NotifySetting notifySetting, Boolean locked, LocalDateTime deletedAt) {
         this.username = username;
         this.name = name;
         this.password = password;
@@ -81,6 +82,10 @@ public class User extends DateAuditable {
 
     public void updateUsername(String username) {
         this.username = username;
+    }
+
+    public void updateProfileImageUrl(String profileImageUrl) {
+        this.profileImageUrl = profileImageUrl;
     }
 
     public boolean isGeneralSignedUpUser() {
