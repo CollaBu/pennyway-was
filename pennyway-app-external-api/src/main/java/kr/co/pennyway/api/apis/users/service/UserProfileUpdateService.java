@@ -54,15 +54,11 @@ public class UserProfileUpdateService {
 
         // Profile Image URL 업데이트
         String originKey = ObjectKeyType.PROFILE.convertDeleteKeyToOriginKey(profileImageUrl);
-        user.updateProfileImageUrl(getObjectPrefix() + originKey);
+        user.updateProfileImageUrl(awsS3Provider.getObjectPrefix() + originKey);
     }
 
     @Transactional
     public void updateNotifySetting(User user, NotifySetting.NotifyType type, Boolean flag) {
         user.getNotifySetting().updateNotifySetting(type, flag);
-    }
-
-    private String getObjectPrefix() {
-        return "https://cdn.dev.pennyway.co.kr/";
     }
 }

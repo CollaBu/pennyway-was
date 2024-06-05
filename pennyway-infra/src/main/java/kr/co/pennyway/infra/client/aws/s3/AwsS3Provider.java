@@ -141,4 +141,8 @@ public class AwsS3Provider {
             throw new StorageException(StorageErrorCode.INVALID_FILE);
         }
     }
+
+    public String getObjectPrefix() {
+        return awsS3Config.getObjectPrefix();
+    }
 }
