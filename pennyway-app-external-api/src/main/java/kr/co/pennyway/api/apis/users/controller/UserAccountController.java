@@ -98,4 +98,12 @@ public class UserAccountController implements UserAccountApi {
         userAccountUseCase.deleteAccount(user.getUserId());
         return ResponseEntity.ok(SuccessResponse.noContent());
     }
+
+    @Override
+    @PutMapping("/profile-image")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> postProfileImage(@Validated UserProfileUpdateDto.ProfileImageReq request, SecurityUserDetails user) {
+        userAccountUseCase.updateProfileImage(user.getUserId(), request);
+        return ResponseEntity.ok(SuccessResponse.noContent());
+    }
 }

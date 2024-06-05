@@ -58,4 +58,13 @@ public class UserProfileUpdateDto {
             Boolean chatNotify
     ) {
     }
+
+    @Schema(title = "프로필 이미지 등록 요청 DTO")
+    public record ProfileImageReq(
+            @Schema(description = "프로필 이미지 URL", example = "delete/profile/1/154aa3bd-da02-4311-a735-3bf7e4bb68d2_1717446100295.jpeg")
+            @Pattern(regexp = "^delete/.*$", message = "URL은 'delete/'로 시작해야 합니다.")
+            @NotBlank(message = "프로필 이미지 URL을 입력해주세요")
+            String profileImageUrl
+    ) {
+    }
 }

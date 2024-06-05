@@ -87,7 +87,8 @@ public interface UserAccountApi {
                             """)
             }))
     })
-    ResponseEntity<?> postPasswordVerification(@RequestBody @Validated UserProfileUpdateDto.PasswordVerificationReq request, @AuthenticationPrincipal SecurityUserDetails user);
+    ResponseEntity<?> postPasswordVerification(@RequestBody @Validated UserProfileUpdateDto.PasswordVerificationReq request,
+                                               @AuthenticationPrincipal SecurityUserDetails user);
 
     @Operation(summary = "사용자 비밀번호 변경")
     @ApiResponses({
@@ -198,4 +199,25 @@ public interface UserAccountApi {
 
     @Operation(summary = "사용자 계정 삭제", description = "사용자 본인의 계정을 삭제합니다. 채팅방 방장이면 삭제가 안 되는 시나리오는 고려하지 않고 있습니다.")
     ResponseEntity<?> deleteAccount(@AuthenticationPrincipal SecurityUserDetails user);
+
+    @Operation(summary = "사용자 프로필 사진 등록", description = "사용자의 프로필 사진을 수정합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "400", content = @Content(mediaType = "application/json", examples = {
+                    @ExampleObject(name = "프로필 사진 URL이 유효하지 않은 경우", value = """
+                            {
+                                "code": "4000",
+                                "message": "프로필 이미지 URL이 유효하지 않습니다."
+                            }
+                            """)
+            })),
+            @ApiResponse(responseCode = "404", content = @Content(mediaType = "application/json", examples = {
+                    @ExampleObject(name = "프로필 사진 URL이 존재하지 않는 경우", value = """
+                            {
+                                "code": "4040",
+                                "message": "프로필 이미지 URL이 존재하지 않습니다."
+                            }
+                            """)
+            }))
+    })
+    ResponseEntity<?> postProfileImage(@RequestBody @Validated UserProfileUpdateDto.ProfileImageReq request, @AuthenticationPrincipal SecurityUserDetails user);
 }

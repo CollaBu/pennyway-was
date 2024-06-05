@@ -5,6 +5,10 @@ import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorCode;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorException;
 import kr.co.pennyway.domain.domains.user.service.UserService;
+import kr.co.pennyway.infra.client.aws.s3.AwsS3Provider;
+import kr.co.pennyway.infra.client.aws.s3.ObjectKeyType;
+import kr.co.pennyway.infra.common.exception.StorageErrorCode;
+import kr.co.pennyway.infra.common.exception.StorageException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -15,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class UserProfileUpdateService {
     private final UserService userService;
+    private final AwsS3Provider awsS3Provider;
 
     @Transactional
     public void updateName(Long userId, String newName) {
@@ -31,9 +36,27 @@ public class UserProfileUpdateService {
     }
 
     @Transactional
-    public void updateNotifySetting(Long userId, NotifySetting.NotifyType type, Boolean flag) {
+    public void updateProfileImage(Long userId, String profileImageUrl) {
         User user = readUserOrThrow(userId);
 
+        // Profile Image 존재 여부 확인
+        if (!awsS3Provider.isObjectExist(profileImageUrl)) {
+            log.info("프로필 이미지 URL이 유효하지 않습니다.");
+            throw new StorageException(StorageErrorCode.NOT_FOUND);
+        }
+
+        // Profile Image 원본 저장
+        awsS3Provider.copyObject(ObjectKeyType.PROFILE, profileImageUrl);
+
+        // Profile Image URL 업데이트
+        String originKey = ObjectKeyType.PROFILE.convertDeleteKeyToOriginKey(profileImageUrl);
+        user.updateProfileImageUrl(awsS3Provider.getObjectPrefix() + originKey);
+    }
+
+    @Transactional
+    public void updateNotifySetting(Long userId, NotifySetting.NotifyType type, Boolean flag) {
+        User user = readUserOrThrow(userId);
+        
         user.getNotifySetting().updateNotifySetting(type, flag);
     }
 

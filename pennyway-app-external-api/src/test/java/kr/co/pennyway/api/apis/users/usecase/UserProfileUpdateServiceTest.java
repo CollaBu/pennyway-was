@@ -9,6 +9,7 @@ import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorCode;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorException;
 import kr.co.pennyway.domain.domains.user.service.UserService;
+import kr.co.pennyway.infra.client.aws.s3.AwsS3Provider;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,6 +34,9 @@ public class UserProfileUpdateServiceTest extends ExternalApiDBTestConfig {
 
     @Autowired
     private UserProfileUpdateService userProfileUpdateService;
+
+    @MockBean
+    private AwsS3Provider awsS3Provider;
 
     @MockBean
     private JPAQueryFactory queryFactory;

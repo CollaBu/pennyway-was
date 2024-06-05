@@ -56,6 +56,10 @@ public class UserAccountUseCase {
         passwordUpdateService.execute(userId, oldPassword, newPassword);
     }
 
+    public void updateProfileImage(Long userId, UserProfileUpdateDto.ProfileImageReq request) {
+        userProfileUpdateService.updateProfileImage(userId, request.profileImageUrl());
+    }
+
     public UserProfileUpdateDto.NotifySettingUpdateRes activateNotification(Long userId, NotifySetting.NotifyType type) {
         userProfileUpdateService.updateNotifySetting(userId, type, Boolean.TRUE);
         return UserProfileMapper.toNotifySettingUpdateRes(type, Boolean.TRUE);

@@ -25,6 +25,8 @@ spring:
           static: ${AWS_S3_REGION:ap-northeast-2}
         bucket:
           name: ${AWS_S3_BUCKET_NAME:pennyway}
+      cloudfront:
+        domain: ${AWS_CLOUDFRONT_DOMAIN:https://cdn.cloudfront.net}
 
 app:
   question-address: ${ADMIN_ADDRESS:team.collabu@gmail.com}
