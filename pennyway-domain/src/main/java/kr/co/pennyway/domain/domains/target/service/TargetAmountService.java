@@ -23,6 +23,11 @@ public class TargetAmountService {
     }
 
     @Transactional(readOnly = true)
+    public Optional<TargetAmount> readTargetAmount(Long id) {
+        return targetAmountRepository.findById(id);
+    }
+
+    @Transactional(readOnly = true)
     public Optional<TargetAmount> readTargetAmountThatMonth(Long userId, LocalDate date) {
         return targetAmountRepository.findByUserIdThatMonth(userId, date);
     }
@@ -31,7 +36,18 @@ public class TargetAmountService {
     public List<TargetAmount> readTargetAmountsByUserId(Long userId) {
         return targetAmountRepository.findByUser_Id(userId);
     }
-  
+
+    @Transactional(readOnly = true)
+    public boolean isExistsTargetAmountThatMonth(Long userId, LocalDate date) {
+        return targetAmountRepository.existsByUserIdThatMonth(userId, date);
+    }
+
+    @Transactional(readOnly = true)
+    public boolean isExistsTargetAmountByIdAndUserId(Long id, Long userId) {
+        return targetAmountRepository.existsByIdAndUser_Id(id, userId);
+    }
+
+
     @Transactional
     public void deleteTargetAmount(TargetAmount targetAmount) {
         targetAmountRepository.delete(targetAmount);

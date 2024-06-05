@@ -1,6 +1,6 @@
 package kr.co.pennyway.domain.domains.coupon;
 
-import kr.co.pennyway.domain.common.aop.DistributedLock;
+import kr.co.pennyway.domain.common.redisson.DistributedLock;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.test.context.ActiveProfiles;

@@ -1,4 +1,4 @@
-package kr.co.pennyway.domain.common.aop;
+package kr.co.pennyway.domain.common.redisson;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

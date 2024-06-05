@@ -71,7 +71,7 @@ public class TargetAmountMapper {
         return TargetAmountDto.WithTotalSpendingRes.builder()
                 .year(date.getYear())
                 .month(date.getMonthValue())
-                .targetAmount(targetAmountInfo)
+                .targetAmountDetail(targetAmountInfo)
                 .totalSpending(totalSpending)
                 .diffAmount((targetAmountInfo.amount() == -1) ? 0 : totalSpending - targetAmountInfo.amount())
                 .build();
