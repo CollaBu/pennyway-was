@@ -25,13 +25,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 public interface SpendingApi {
     @Operation(summary = "지출 내역 추가", method = "POST", description = """
             사용자의 지출 내역을 추가하고 추가된 지출 내역을 반환합니다. <br/>
-            서비스에서 제공하는 지출 카테고리를 사용하는 경우 categoryId는 -1이어야 하며, icon은 OTHER가 될 수 없습니다. <br/>
-            사용자가 정의한 지출 카테고리를 사용하는 경우 categoryId는 -1이 아니어야 하며, icon은 OTHER여야 합니다.
+            서비스에서 제공하는 지출 카테고리를 사용하는 경우 categoryId는 -1이어야 하며, icon은 CUSTOM 혹은 OTHER이 될 수 없습니다. <br/>
+            사용자가 정의한 지출 카테고리를 사용하는 경우 categoryId는 -1이 아니어야 하며, icon은 CUSTOM이여야 합니다.
             """)
     @ApiResponses({
             @ApiResponse(responseCode = "200", content = @Content(schemaProperties = @SchemaProperty(name = "spending", schema = @Schema(implementation = SpendingSearchRes.Individual.class)))),
             @ApiResponse(responseCode = "400", description = "지출 카테고리 ID와 아이콘의 조합이 올바르지 않습니다.", content = @Content(examples = {
-                    @ExampleObject(name = "카테고리 id, 아이콘 조합 오류", description = "categoryId가 -1인데 icon이 OTHER이거나, categoryId가 -1이 아닌데 icon이 OTHER가 아닙니다.",
+                    @ExampleObject(name = "카테고리 id, 아이콘 조합 오류", description = "categoryId가 -1인데 icon이 CUSTOM/OTHER이거나, categoryId가 -1이 아닌데 icon이 CUSTOM이 아닙니다.",
                             value = """
                                     {
                                     "code": "4005",
@@ -85,7 +85,7 @@ public interface SpendingApi {
             """)
     @ApiResponse(responseCode = "200", content = @Content(schemaProperties = @SchemaProperty(name = "spending", schema = @Schema(implementation = SpendingSearchRes.Individual.class))))
     ResponseEntity<?> updateSpending(@PathVariable Long spendingId, @RequestBody @Validated SpendingReq request, @AuthenticationPrincipal SecurityUserDetails user);
-               
+
     @Operation(summary = "지출 내역 삭제", method = "DELETE", description = "지출 내역의 ID값으로 해당 지출 내역을 삭제 합니다.")
     @Parameter(name = "spendingId", description = "지출 내역 ID", example = "1", required = true, in = ParameterIn.PATH)
     @ApiResponse(responseCode = "403", description = "지출 카테고리에 대한 권한이 없습니다.", content = @Content(examples = {

@@ -42,7 +42,7 @@ public class SpendingUpdateServiceTest {
         spendingUpdateService = new SpendingUpdateService(spendingCustomCategoryService);
 
         request = new SpendingReq(10000, -1L, SpendingCategory.FOOD, LocalDate.now(), "소비처", "메모");
-        requestWithCustomCategory = new SpendingReq(10000, 1L, SpendingCategory.OTHER, LocalDate.now(), "소비처", "메모");
+        requestWithCustomCategory = new SpendingReq(10000, 1L, SpendingCategory.CUSTOM, LocalDate.now(), "소비처", "메모");
 
         user = UserFixture.GENERAL_USER.toUser();
 

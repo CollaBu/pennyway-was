@@ -30,7 +30,7 @@ public class SpendingCategoryController implements SpendingCategoryApi {
     @PostMapping("")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> postSpendingCategory(@Validated SpendingCategoryDto.CreateParamReq param, @AuthenticationPrincipal SecurityUserDetails user) {
-        if (param.icon().equals(SpendingCategory.OTHER)) {
+        if (param.icon().equals(SpendingCategory.CUSTOM)) {
             throw new SpendingErrorException(SpendingErrorCode.INVALID_ICON);
         }
 

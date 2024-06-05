@@ -72,9 +72,26 @@ public class SpendingControllerUnitTest {
         }
 
         @Test
-        @DisplayName("아이콘이 OTHER이면서 categoryId가 -1인 경우 400 Bad Request를 반환한다.")
+        @DisplayName("아이콘이 CUSTOM이면서 categoryId가 -1인 경우 400 Bad Request를 반환한다.")
         @WithSecurityMockUser
         void whenCategoryIsNotDefined() throws Exception {
+            // given
+            Long categoryId = -1L;
+            SpendingCategory icon = SpendingCategory.CUSTOM;
+            SpendingReq request = new SpendingReq(10000, categoryId, icon, LocalDate.now(), "소비처", "메모");
+            given(spendingUseCase.createSpending(1L, request)).willReturn(SpendingSearchRes.Individual.builder().build());
+
+            // when
+            ResultActions result = performPostSpending(request);
+
+            // then
+            result.andDo(print()).andExpect(status().isBadRequest());
+        }
+
+        @Test
+        @DisplayName("아이콘이 OTHER이면서 categoryId가 -1인 경우 400 Bad Request를 반환한다.")
+        @WithSecurityMockUser
+        void whenCategoryIsInvalidIcon() throws Exception {
             // given
             Long categoryId = -1L;
             SpendingCategory icon = SpendingCategory.OTHER;
@@ -87,6 +104,7 @@ public class SpendingControllerUnitTest {
             // then
             result.andDo(print()).andExpect(status().isBadRequest());
         }
+
 
         @Test
         @DisplayName("지출일이 현재보다 미래인 경우 422 Unprocessable Entity를 반환한다.")

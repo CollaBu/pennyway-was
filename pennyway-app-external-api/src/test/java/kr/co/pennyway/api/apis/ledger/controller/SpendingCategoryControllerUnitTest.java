@@ -87,12 +87,12 @@ public class SpendingCategoryControllerUnitTest {
     }
 
     @Test
-    @DisplayName("OTHER 아이콘을 입력하면 400 BAD_REQUEST 에러 응답을 반환한다.")
+    @DisplayName("CUSTOM 아이콘을 입력하면 400 BAD_REQUEST 에러 응답을 반환한다.")
     @WithSecurityMockUser
     void postSpendingCategoryWithOtherIcon() throws Exception {
         // given
         String name = "식비";
-        String icon = "OTHER";
+        String icon = SpendingCategory.CUSTOM.name();
 
         // when
         ResultActions result = performPostSpendingCategory(name, icon);
