@@ -40,7 +40,11 @@ public class SpendingCategoryDto {
             }
 
             if (isCustom && icon.equals(SpendingCategory.CUSTOM)) {
-                throw new IllegalArgumentException("사용자 정의 카테고리는 OTHER가 될 수 없습니다.");
+                throw new IllegalArgumentException("사용자 정의 카테고리는 CUSTOM이 될 수 없습니다.");
+            }
+
+            if (!isCustom && icon.equals(SpendingCategory.OTHER)) {
+                throw new IllegalArgumentException("서비스에서 제공하는 카테고리는 OTHER이 될 수 없습니다.");
             }
 
             if (!StringUtils.hasText(name)) {
