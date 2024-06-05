@@ -13,13 +13,8 @@ import lombok.Builder;
 import java.time.LocalDate;
 
 public class TargetAmountDto {
-    @Schema(title = "목표 금액 등록/수정 요청 파라미터")
-    public record UpdateParamReq(
-            @Schema(description = "등록하려는 목표 금액 날짜 (당일)", example = "2024-05-08", requiredMode = Schema.RequiredMode.REQUIRED)
-            @NotNull(message = "date 값은 필수입니다.")
-            @JsonSerialize(using = LocalDateSerializer.class)
-            @JsonFormat(pattern = "yyyy-MM-dd")
-            LocalDate date,
+    @Schema(title = "목표 금액의 amount 유효성 검사를 위한 요청 파라미터", hidden = true)
+    public record AmountParam(
             @Schema(description = "등록하려는 목표 금액 (0이상의 정수)", example = "100000", requiredMode = Schema.RequiredMode.REQUIRED)
             @NotNull(message = "amount 값은 필수입니다.")
             @Min(value = 0, message = "amount 값은 0 이상이어야 합니다.")
@@ -28,8 +23,8 @@ public class TargetAmountDto {
 
     }
 
-    @Schema(title = "목표 금액 조회 요청 파라미터", hidden = true)
-    public record GetParamReq(
+    @Schema(title = "목표 금액의 date 유효성 검사를 위한 요청 파라미터", hidden = true)
+    public record DateParam(
             @Schema(description = "조회하려는 목표 금액 날짜 (당일)", example = "2024-05-08", requiredMode = Schema.RequiredMode.REQUIRED)
             @NotNull(message = "date 값은 필수입니다.")
             @JsonSerialize(using = LocalDateSerializer.class)
@@ -50,8 +45,8 @@ public class TargetAmountDto {
             @NotNull(message = "month 값은 필수입니다.")
             Integer month,
             @Schema(description = "목표 금액", requiredMode = Schema.RequiredMode.REQUIRED)
-            @NotNull(message = "targetAmount 값은 필수입니다.")
-            TargetAmountInfo targetAmount,
+            @NotNull(message = "targetAmountDetail 값은 필수입니다.")
+            TargetAmountInfo targetAmountDetail,
             @Schema(description = "총 지출 금액", example = "100000", requiredMode = Schema.RequiredMode.REQUIRED)
             @NotNull(message = "totalSpending 값은 필수입니다.")
             Integer totalSpending,
@@ -68,7 +63,9 @@ public class TargetAmountDto {
             Long id,
             @Schema(description = "목표 금액. -1이면 설정한 목표 금액이 존재하지 않음을 의미한다.", example = "50000", requiredMode = Schema.RequiredMode.REQUIRED)
             @NotNull(message = "amount 값은 필수입니다.")
-            Integer amount
+            Integer amount,
+            @Schema(description = "사용자 확인 여부", example = "true", requiredMode = Schema.RequiredMode.REQUIRED)
+            boolean isRead
     ) {
         public TargetAmountInfo {
             if (id == null) {
@@ -86,9 +83,9 @@ public class TargetAmountDto {
          */
         public static TargetAmountInfo from(TargetAmount targetAmount) {
             if (targetAmount == null) {
-                return new TargetAmountInfo(-1L, -1);
+                return new TargetAmountInfo(-1L, -1, false);
             }
-            return new TargetAmountInfo(targetAmount.getId(), targetAmount.getAmount());
+            return new TargetAmountInfo(targetAmount.getId(), targetAmount.getAmount(), targetAmount.isRead());
         }
     }
 }

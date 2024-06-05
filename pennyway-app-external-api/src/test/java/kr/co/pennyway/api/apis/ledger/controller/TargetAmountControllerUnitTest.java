@@ -1,9 +1,11 @@
 package kr.co.pennyway.api.apis.ledger.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import kr.co.pennyway.api.apis.ledger.dto.TargetAmountDto;
 import kr.co.pennyway.api.apis.ledger.usecase.TargetAmountUseCase;
 import kr.co.pennyway.api.config.WebConfig;
+import kr.co.pennyway.api.config.fixture.UserFixture;
 import kr.co.pennyway.api.config.supporter.WithSecurityMockUser;
+import kr.co.pennyway.domain.domains.target.domain.TargetAmount;
 import kr.co.pennyway.domain.domains.target.exception.TargetAmountErrorCode;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,9 +20,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-
+import static org.mockito.BDDMockito.given;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -35,9 +35,6 @@ public class TargetAmountControllerUnitTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @Autowired
-    private ObjectMapper objectMapper;
-
     @MockBean
     private TargetAmountUseCase targetAmountUseCase;
 
@@ -51,53 +48,19 @@ public class TargetAmountControllerUnitTest {
                 .build();
     }
 
-    @Order(1)
     @Nested
-    @DisplayName("당월 목표 금액 등록/수정")
-    class PutTargetAmount {
+    @DisplayName("당월 목표 금액 등록")
+    class PostTargetAmount {
         @Test
-        @DisplayName("date가 'yyyy-MM-dd' 형식이 아닐 경우 422 Unprocessable Entity 에러 응답을 반환한다.")
+        @DisplayName("오늘 날짜에 대한 요청이 아니면 400 Bad Request 에러 응답을 반환한다.")
         @WithMockUser
-        void putTargetAmountWithInvalidDateFormat() throws Exception {
+        void postTargetAmountNotThatMonth() throws Exception {
             // given
-            String date = "2024/05/08";
-            Integer amount = 100000;
+            int year = 2024;
+            int month = 5;
 
             // when
-            ResultActions result = performPutTargetAmount(date, amount);
-
-            // then
-            result
-                    .andDo(print())
-                    .andExpect(status().isUnprocessableEntity());
-        }
-
-        @Test
-        @DisplayName("date가 null인 경우 422 Unprocessable Entity 에러 응답을 반환한다.")
-        @WithMockUser
-        void putTargetAmountWithNullDate() throws Exception {
-            // given
-            Integer amount = 100000;
-
-            // when
-            ResultActions result = performPutTargetAmount(null, amount);
-
-            // then
-            result
-                    .andDo(print())
-                    .andExpect(status().isUnprocessableEntity());
-        }
-
-        @Test
-        @DisplayName("date가 당월 날짜가 아닌 경우 400 Bad Request 에러 응답을 반환한다.")
-        @WithMockUser
-        void putTargetAmountWithInvalidDate() throws Exception {
-            // given
-            String date = "1999-05-19";
-            Integer amount = 100000;
-
-            // when
-            ResultActions result = performPutTargetAmount(date, amount);
+            ResultActions result = performPostTargetAmount(year, month);
 
             // then
             result
@@ -107,37 +70,40 @@ public class TargetAmountControllerUnitTest {
                     .andExpect(jsonPath("$.message").value(TargetAmountErrorCode.INVALID_TARGET_AMOUNT_DATE.getExplainError()));
         }
 
+        private ResultActions performPostTargetAmount(int year, int month) throws Exception {
+            return mockMvc.perform(post("/v2/target-amounts")
+                    .param("year", String.valueOf(year))
+                    .param("month", String.valueOf(month))
+            );
+        }
+    }
+
+    @Nested
+    @DisplayName("당월 목표 금액 수정")
+    class PutTargetAmount {
         @Test
         @DisplayName("amount가 null인 경우 422 Unprocessable Entity 에러 응답을 반환한다.")
         @WithMockUser
         void putTargetAmountWithInvalidAmountFormat() throws Exception {
-            // given
-            String date = "2024-05-08";
-
             // when
-            ResultActions result1 = performPutTargetAmount(date, null);
+            ResultActions result1 = performPutTargetAmount(1L, null);
 
             // then
-            result1
-                    .andDo(print())
-                    .andExpect(status().isUnprocessableEntity());
+            result1.andDo(print()).andExpect(status().isUnprocessableEntity());
         }
 
         @Test
         @DisplayName("amount가 0보다 작은 경우 422 Unprocessable Entity 에러 응답을 반환한다.")
-        @WithMockUser
+        @WithSecurityMockUser
         void putTargetAmountWithNegativeAmount() throws Exception {
             // given
-            String date = "2024-05-08";
             Integer negativeAmount = -100000;
 
             // when
-            ResultActions result = performPutTargetAmount(date, negativeAmount);
+            ResultActions result = performPutTargetAmount(1L, negativeAmount);
 
             // then
-            result
-                    .andDo(print())
-                    .andExpect(status().isUnprocessableEntity());
+            result.andDo(print()).andExpect(status().isUnprocessableEntity());
         }
 
         @Test
@@ -145,22 +111,19 @@ public class TargetAmountControllerUnitTest {
         @WithSecurityMockUser
         void putTargetAmountWithValidRequest() throws Exception {
             // given
-            String date = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
             Integer amount = 100000;
+            given(targetAmountUseCase.updateTargetAmount(1L, amount)).willReturn(TargetAmountDto.TargetAmountInfo.from(TargetAmount.of(amount, UserFixture.GENERAL_USER.toUser())));
 
             // when
-            ResultActions result = performPutTargetAmount(date, amount);
+            ResultActions result = performPutTargetAmount(1L, amount);
 
             // then
-            result
-                    .andDo(print())
-                    .andExpect(status().isOk());
+            result.andDo(print()).andExpect(status().isOk());
         }
 
 
-        private ResultActions performPutTargetAmount(String date, Integer amount) throws Exception {
-            return mockMvc.perform(put("/v2/targets")
-                    .param("date", date)
+        private ResultActions performPutTargetAmount(Long targetAmountId, Integer amount) throws Exception {
+            return mockMvc.perform(patch("/v2/target-amounts/{target_amount_id}", targetAmountId)
                     .param("amount", String.valueOf(amount))
             );
         }

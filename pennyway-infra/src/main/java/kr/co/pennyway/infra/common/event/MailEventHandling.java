@@ -4,6 +4,7 @@ import kr.co.pennyway.infra.client.google.mail.GoogleMailSender;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionalEventListener;
 
@@ -21,8 +22,9 @@ public class MailEventHandling {
      * @param event {@link MailEvent}
      */
     @TransactionalEventListener
+    @Async
     public void handleMailEvent(MailEvent event) {
-        log.info("handleMailEvent: {}", event);
+        log.info("문의 메일 전송 이벤트 발생: {}", event);
         googleMailSender.sendMail(event.email(), event.content(), event.category());
     }
 }
