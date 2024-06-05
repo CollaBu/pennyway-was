@@ -16,18 +16,24 @@ public enum ObjectKeyType {
     CHAT_PROFILE("5", "CHAT_PROFILE", "delete/chatroom/{chatroom_id}/chat_profile/{userId}/{uuid}_{timestamp}.{ext}",
             "chatroom/{chatroom_id}/chat_profile/{userId}/origin/{uuid}_{timestamp}.{ext}");
 
-    private static final String userIdPattern = "([^/]+)";
-    private static final String uuidPattern = "([^_]+)";
-    private static final String timestampPattern = "([^\\.]+)";
-    private static final String extPattern = "([^/]+)";
-    private static final String feedIdPattern = "([^/]+)";
-    private static final String chatroomIdPattern = "([^/]+)";
-    private static final String chatIdPattern = "([^/]+)";
-
     private final String code;
     private final String type;
     private final String deleteTemplate;
     private final String originTemplate;
+
+    public static String convertDeleteKeyToOriginKey(String deleteKey, Pattern pattern, String originTemplate) {
+        Matcher matcher = pattern.matcher(deleteKey);
+
+        if (matcher.matches()) {
+            String originKey = originTemplate;
+            for (int i = 1; i <= matcher.groupCount(); i++) {
+                originKey = originKey.replaceFirst("\\{[^}]+\\}", matcher.group(i));
+            }
+            return originKey;
+        }
+
+        throw new IllegalArgumentException("No matching ObjectKeyType for deleteKey: " + deleteKey);
+    }
 
     public String getCode() {
         return code;
@@ -41,27 +47,19 @@ public enum ObjectKeyType {
         return deleteTemplate;
     }
 
+    public String getOriginTemplate() {
+        return originTemplate;
+    }
+
     public String convertDeleteKeyToOriginKey(String deleteKey) {
-        String regex = deleteTemplate
-                .replace("{userId}", userIdPattern)
-                .replace("{uuid}", uuidPattern)
-                .replace("{timestamp}", timestampPattern)
-                .replace("{ext}", extPattern)
-                .replace("{feed_id}", feedIdPattern)
-                .replace("{chatroom_id}", chatroomIdPattern)
-                .replace("{chat_id}", chatIdPattern);
-
-        Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(deleteKey);
-
-        if (matcher.matches()) {
-            String originKey = originTemplate;
-            for (int i = 1; i <= matcher.groupCount(); i++) {
-                originKey = originKey.replaceFirst("\\{[^}]+\\}", matcher.group(i));
-            }
-            return originKey;
-        }
-
-        throw new IllegalArgumentException("No matching ObjectKeyType for deleteKey: " + deleteKey);
+        Pattern pattern = switch (this) {
+            case PROFILE -> ObjectKeyPattern.PROFILE_PATTERN;
+            case FEED -> ObjectKeyPattern.FEED_PATTERN;
+            case CHATROOM_PROFILE -> ObjectKeyPattern.CHATROOM_PROFILE_PATTERN;
+            case CHAT -> ObjectKeyPattern.CHAT_PATTERN;
+            case CHAT_PROFILE -> ObjectKeyPattern.CHAT_PROFILE_PATTERN;
+            default -> throw new IllegalArgumentException("Unknown ObjectKeyType: " + this);
+        };
+        return convertDeleteKeyToOriginKey(deleteKey, pattern, this.originTemplate);
     }
 }
