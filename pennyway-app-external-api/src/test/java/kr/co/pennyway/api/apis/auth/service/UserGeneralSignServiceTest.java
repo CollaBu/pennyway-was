@@ -1,6 +1,7 @@
 package kr.co.pennyway.api.apis.auth.service;
 
 import kr.co.pennyway.api.apis.auth.dto.UserSyncDto;
+import kr.co.pennyway.api.config.fixture.UserFixture;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorCode;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorException;
@@ -51,7 +52,7 @@ public class UserGeneralSignServiceTest {
     @Test
     void isSignedUserWhenGeneralReturnTrue() {
         // given
-        given(userService.readUserByPhone(phone)).willReturn(Optional.of(User.builder().username("pennyway").password(null).build()));
+        given(userService.readUserByPhone(phone)).willReturn(Optional.of(UserFixture.OAUTH_USER.toUser()));
 
         // when
         UserSyncDto userSync = userGeneralSignService.isSignUpAllowed(phone);
@@ -59,15 +60,14 @@ public class UserGeneralSignServiceTest {
         // then
         assertTrue(userSync.isSignUpAllowed());
         assertTrue(userSync.isExistAccount());
-        assertEquals("pennyway", userSync.username());
+        assertEquals(UserFixture.OAUTH_USER.getUsername(), userSync.username());
     }
 
     @DisplayName("일반 회원가입 시, 이미 일반회원 가입된 회원인 경우 계정 생성 불가 응답을 반환한다.")
     @Test
     void isSignedUserWhenGeneralThrowUserErrorException() {
         // given
-        given(userService.readUserByPhone(phone)).willReturn(
-                Optional.of(User.builder().username("pennyway").password("password").build()));
+        given(userService.readUserByPhone(phone)).willReturn(Optional.of(UserFixture.GENERAL_USER.toUser()));
 
         // when
         UserSyncDto userSync = userGeneralSignService.isSignUpAllowed(phone);
@@ -75,19 +75,19 @@ public class UserGeneralSignServiceTest {
         // then
         assertFalse(userSync.isSignUpAllowed());
         assertTrue(userSync.isExistAccount());
-        assertEquals("pennyway", userSync.username());
+        assertEquals(UserFixture.GENERAL_USER.getUsername(), userSync.username());
     }
 
     @DisplayName("로그인 시, 유저가 존재하고 비밀번호가 일치하면 User를 반환한다.")
     @Test
     void readUserIfValidReturnUser() {
         // given
-        User user = User.builder().username("pennyway").password("password").build();
-        given(userService.readUserByUsername("pennyway")).willReturn(Optional.of(user));
-        given(passwordEncoder.matches("password", user.getPassword())).willReturn(true);
+        User user = UserFixture.GENERAL_USER.toUser();
+        given(userService.readUserByUsername(user.getUsername())).willReturn(Optional.of(user));
+        given(passwordEncoder.matches(user.getPassword(), user.getPassword())).willReturn(true);
 
         // when
-        User result = userGeneralSignService.readUserIfValid("pennyway", "password");
+        User result = userGeneralSignService.readUserIfValid(user.getUsername(), user.getPassword());
 
         // then
         assertEquals(result, user);
@@ -97,8 +97,7 @@ public class UserGeneralSignServiceTest {
     @Test
     void readUserIfNotFound() {
         // given
-        given(userService.readUserByUsername("pennyway")).willThrow(
-                new UserErrorException(UserErrorCode.NOT_FOUND));
+        given(userService.readUserByUsername("pennyway")).willThrow(new UserErrorException(UserErrorCode.NOT_FOUND));
 
         // when - then
         UserErrorException exception = assertThrows(UserErrorException.class, () -> userGeneralSignService.readUserIfValid("pennyway", "password"));
@@ -109,8 +108,8 @@ public class UserGeneralSignServiceTest {
     @Test
     void readUserIfNotMatchedPassword() {
         // given
-        User user = User.builder().username("pennyway").password("password").build();
-        given(userService.readUserByUsername("pennyway")).willReturn(Optional.of(user));
+        User user = UserFixture.GENERAL_USER.toUser();
+        given(userService.readUserByUsername(user.getUsername())).willReturn(Optional.of(user));
         given(passwordEncoder.matches("password", user.getPassword())).willReturn(false);
 
         // when - then
