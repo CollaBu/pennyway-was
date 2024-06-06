@@ -99,6 +99,10 @@ public class User extends DateAuditable {
         return password != null;
     }
 
+    public boolean isLocked() {
+        return locked;
+    }
+
     @Override
     public String toString() {
         return "User{" +
