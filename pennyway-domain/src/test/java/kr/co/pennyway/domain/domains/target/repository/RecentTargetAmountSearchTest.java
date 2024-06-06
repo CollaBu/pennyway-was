@@ -3,8 +3,11 @@ package kr.co.pennyway.domain.domains.target.repository;
 import kr.co.pennyway.domain.config.ContainerMySqlTestConfig;
 import kr.co.pennyway.domain.config.JpaConfig;
 import kr.co.pennyway.domain.config.TestJpaConfig;
+import kr.co.pennyway.domain.domains.user.domain.NotifySetting;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.repository.UserRepository;
+import kr.co.pennyway.domain.domains.user.type.ProfileVisibility;
+import kr.co.pennyway.domain.domains.user.type.Role;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -51,7 +54,6 @@ public class RecentTargetAmountSearchTest extends ContainerMySqlTestConfig {
     private UserRepository userRepository;
     @Autowired
     private TargetAmountRepository targetAmountRepository;
-    ;
     @Autowired
     private NamedParameterJdbcTemplate jdbcTemplate;
 
@@ -60,7 +62,7 @@ public class RecentTargetAmountSearchTest extends ContainerMySqlTestConfig {
     @Transactional
     public void 가장_최근_사용자_목표_금액_조회() {
         // given
-        User user = userRepository.save(User.builder().username("jayang").name("Yang").phone("010-0000-0000").build());
+        User user = userRepository.save(createUser());
         bulkInsertTargetAmount(user, mockTargetAmounts);
 
         // when - then
@@ -76,7 +78,7 @@ public class RecentTargetAmountSearchTest extends ContainerMySqlTestConfig {
     @Transactional
     public void 가장_최근_사용자_목표_금액_미존재() {
         // given
-        User user = userRepository.save(User.builder().username("jayang").name("Yang").phone("010-0000-0000").build());
+        User user = userRepository.save(createUser());
         bulkInsertTargetAmount(user, mockTargetAmountsMinus);
 
         // when - then
@@ -100,6 +102,18 @@ public class RecentTargetAmountSearchTest extends ContainerMySqlTestConfig {
                         .addValue("updatedAt", mockTargetAmount.updatedAt))
                 .toArray(SqlParameterSource[]::new);
         jdbcTemplate.batchUpdate(sql, params);
+    }
+
+    private User createUser() {
+        return User.builder()
+                .username("test")
+                .name("pannyway")
+                .password("test")
+                .phone("010-1234-5678")
+                .role(Role.USER)
+                .profileVisibility(ProfileVisibility.PUBLIC)
+                .notifySetting(NotifySetting.of(true, true, true))
+                .build();
     }
 
     private record MockTargetAmount(int amount, boolean isRead, LocalDateTime createdAt, LocalDateTime updatedAt) {
