@@ -68,6 +68,11 @@ public interface TargetAmountApi {
             schemaProperties = @SchemaProperty(name = "targetAmounts", array = @ArraySchema(schema = @Schema(implementation = TargetAmountDto.WithTotalSpendingRes.class)))))
     ResponseEntity<?> getTargetAmountsAndTotalSpendings(@Validated TargetAmountDto.DateParam param, @AuthenticationPrincipal SecurityUserDetails user);
 
+    @Operation(summary = "당월 이전 사용자가 입력한 목표 금액 중 최신 데이터 단일 조회", method = "GET",
+            description = "당월에 목표 금액이 존재한다면 당월 목표 금액이 반환되겠지만, 일반적으로 해당 API는 당월 목표 금액 조회 시 isRead가 false인 경우이므로 amount도 -1이라는 전제를 두어 별도의 예외처리를 수행하지는 않는다. isPresent 필드를 통해 데이터 존재 여부를 확인할 수 있다.")
+    @ApiResponse(responseCode = "200", description = "목표 금액 조회 성공", content = @Content(schemaProperties = @SchemaProperty(name = "targetAmount", schema = @Schema(implementation = TargetAmountDto.RecentTargetAmountRes.class))))
+    ResponseEntity<?> getRecentTargetAmount(@AuthenticationPrincipal SecurityUserDetails user);
+
     @Operation(summary = "당월 목표 금액 수정", method = "PATCH")
     @Parameters({
             @Parameter(name = "targetAmountId", description = "수정하려는 목표 금액 ID", required = true, example = "1", in = ParameterIn.PATH),

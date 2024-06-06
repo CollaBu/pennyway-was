@@ -49,6 +49,15 @@ public class TargetAmountMapper {
                 .toList();
     }
 
+    /**
+     * 최근 목표 금액을 응답 형태로 변환한다.
+     *
+     * @return TargetAmountDto.RecentTargetAmountRes
+     */
+    public static TargetAmountDto.RecentTargetAmountRes toRecentTargetAmountResponse(Integer amount) {
+        return TargetAmountDto.RecentTargetAmountRes.valueOf(amount);
+    }
+
     private static List<TargetAmountDto.WithTotalSpendingRes> createWithTotalSpendingResponses(Map<YearMonth, TargetAmount> targetAmounts, Map<YearMonth, Integer> totalSpendings, LocalDate startAt, int monthLength) {
         List<TargetAmountDto.WithTotalSpendingRes> withTotalSpendingResponses = new ArrayList<>(monthLength + 1);
 
