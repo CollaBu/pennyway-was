@@ -14,6 +14,7 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Entity
 @Getter
@@ -51,12 +52,12 @@ public class Spending extends DateAuditable {
             throw new IllegalArgumentException("사용자 정의 아이콘을 등록할 때는 CUSTOM 아이콘이어야 합니다.");
         }
 
-        this.amount = amount;
-        this.category = category;
-        this.spendAt = spendAt;
+        this.amount = Objects.requireNonNull(amount, "amount는 null이 될 수 없습니다.");
+        this.category = Objects.requireNonNull(category, "category는 null이 될 수 없습니다.");
+        this.spendAt = Objects.requireNonNull(spendAt, "spendAt는 null이 될 수 없습니다.");
         this.accountName = accountName;
         this.memo = memo;
-        this.user = user;
+        this.user = Objects.requireNonNull(user, "user는 null이 될 수 없습니다.");
         this.spendingCustomCategory = spendingCustomCategory;
     }
 
