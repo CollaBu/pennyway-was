@@ -17,6 +17,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
@@ -109,7 +110,7 @@ public class UserGeneralSignServiceTest {
     void readUserIfNotMatchedPassword() {
         // given
         User user = UserFixture.GENERAL_USER.toUser();
-        given(userService.readUserByUsername(user.getUsername())).willReturn(Optional.of(user));
+        given(userService.readUserByUsername(any())).willReturn(Optional.of(user));
         given(passwordEncoder.matches("password", user.getPassword())).willReturn(false);
 
         // when - then
