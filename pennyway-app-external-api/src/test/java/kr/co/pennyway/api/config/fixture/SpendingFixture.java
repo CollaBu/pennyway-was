@@ -18,7 +18,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public enum SpendingFixture {
     GENERAL_SPENDING(10000, SpendingCategory.FOOD, LocalDateTime.now(), "카페인 수혈", "아메리카노 1잔"),
-    CUSTOM_CATEGORY_SPENDING(10000, SpendingCategory.OTHER, LocalDateTime.now(), "커스텀 카페인 수혈", "아메리카노 1잔");
+    CUSTOM_CATEGORY_SPENDING(10000, SpendingCategory.CUSTOM, LocalDateTime.now(), "커스텀 카페인 수혈", "아메리카노 1잔");
 
     private final int amount;
     private final SpendingCategory category;
@@ -39,13 +39,22 @@ public enum SpendingFixture {
         return new SpendingReq(10000, -1L, SpendingCategory.FOOD, LocalDate.now(), "카페인 수혈", "아메리카노 1잔");
     }
 
-    public static void bulkInsertSpending(User user, int capacity, NamedParameterJdbcTemplate jdbcTemplate) {
+    public static void bulkInsertSpending(User user, int capacity, boolean isCustom, NamedParameterJdbcTemplate jdbcTemplate) {
         Collection<Spending> spendings = getRandomSpendings(user, capacity);
+        String sql;
+        if (isCustom) {
+            SpendingCustomCategoryFixture.bulkInsertCustomCategory(user, capacity, jdbcTemplate);
+            sql = String.format("""
+                    INSERT INTO `%s` (amount, category, spend_at, account_name, memo, user_id, spending_custom_category_id, created_at, updated_at, deleted_at)
+                    VALUES (:amount, 1+FLOOR(RAND()*11), :spendAt, :accountName, :memo, :user.id, 1 + FLOOR(RAND() * %d), NOW(), NOW(), null)
+                    """, "spending", capacity);
+        } else {
+            sql = String.format("""
+                    INSERT INTO `%s` (amount, category, spend_at, account_name, memo, user_id, spending_custom_category_id, created_at, updated_at, deleted_at)
+                    VALUES (:amount, 1+FLOOR(RAND()*11), :spendAt, :accountName, :memo, :user.id, null, NOW(), NOW(), null)
+                    """, "spending");
+        }
 
-        String sql = String.format("""
-                INSERT INTO `%s` (amount, category, spend_at, account_name, memo, user_id, spending_custom_category_id, created_at, updated_at, deleted_at)
-                VALUES (:amount, 1+FLOOR(RAND()*11), :spendAt, :accountName, :memo, :user.id, null, NOW(), NOW(), null)
-                """, "spending");
         SqlParameterSource[] params = spendings.stream()
                 .map(BeanPropertySqlParameterSource::new)
                 .toArray(SqlParameterSource[]::new);
@@ -53,27 +62,6 @@ public enum SpendingFixture {
     }
 
     private static List<Spending> getRandomSpendings(User user, int capacity) {
-        List<Spending> spending = new ArrayList<>(capacity);
-
-        for (int i = 0; i < 100; i++) {
-            spending.add(Spending.builder()
-                    .amount(ThreadLocalRandom.current().nextInt(100, 10000001))
-                    .category(SpendingCategory.FOOD)
-                    .spendAt(getRandomSpendAt(user))
-                    .accountName(getRandomAccountName())
-                    .memo((i % 5 == 0) ? "메모" : null)
-                    .user(user)
-                    .spendingCustomCategory(null)
-                    .build()
-            );
-        }
-
-        return spending;
-    }
-
-
-    // 커스텀 카테고리를 가지는 지출 내역 생성
-    private static List<Spending> getRandomCustomCategorySpendings(User user, int capacity) {
         List<Spending> spending = new ArrayList<>(capacity);
 
         for (int i = 0; i < 100; i++) {
