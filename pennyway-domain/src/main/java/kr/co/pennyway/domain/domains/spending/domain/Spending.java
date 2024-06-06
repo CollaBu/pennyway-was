@@ -80,16 +80,6 @@ public class Spending extends DateAuditable {
         return CategoryInfo.of(-1L, this.category.getType(), this.category);
     }
 
-    public void updateSpendingCustomCategory(SpendingCustomCategory spendingCustomCategory) {
-        if (spendingCustomCategory == null && (category.equals(SpendingCategory.CUSTOM) || category.equals(SpendingCategory.OTHER))) {
-            throw new IllegalArgumentException("서비스 제공 아이콘을 등록할 때는 CUSTOM, OHTER 아이콘을 사용할 수 없습니다.");
-        } else if (spendingCustomCategory != null && !category.equals(SpendingCategory.CUSTOM)) {
-            throw new IllegalArgumentException("사용자 정의 아이콘을 등록할 때는 CUSTOM 아이콘이어야 합니다.");
-        }
-
-        this.spendingCustomCategory = spendingCustomCategory;
-    }
-
     public void update(Spending spending) {
         this.amount = spending.amount;
         this.category = spending.category;
