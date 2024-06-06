@@ -53,8 +53,7 @@ public class PasswordUpdateServiceTest extends ExternalApiDBTestConfig {
 
         @BeforeEach
         void setUp() {
-            originUser = UserFixture.GENERAL_USER.toUser();
-            userService.createUser(originUser);
+            originUser = userService.createUser(UserFixture.GENERAL_USER.toUser());
         }
 
         @Test
