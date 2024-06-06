@@ -95,7 +95,7 @@ public class UserExtendedRepositoryTest extends ContainerMySqlTestConfig {
 
             assertTrue("id는 내림차순 정렬되어야 한다.", user.getId() <= maxValue);
             assertTrue("일반 회원가입 이력이 존재해야 한다.", user.isGeneralSignedUpUser());
-            assertFalse("lock이 걸려있지 않아야 한다.", user.getLocked());
+            assertFalse("lock이 걸려있지 않아야 한다.", user.isLocked());
 
             maxValue = user.getId();
         }
@@ -213,7 +213,6 @@ public class UserExtendedRepositoryTest extends ContainerMySqlTestConfig {
                     .role(Role.USER)
                     .locked((i % 10 == 0))
                     .notifySetting(NotifySetting.of(true, true, true))
-                    .deletedAt(null)
                     .build();
 
             users.add(user);

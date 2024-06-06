@@ -68,7 +68,7 @@ public record UserProfileDto(
                 .profileImageUrl(Objects.toString(user.getProfileImageUrl(), ""))
                 .phone(user.getPhone())
                 .profileVisibility(user.getProfileVisibility())
-                .locked(user.getLocked())
+                .locked(user.isLocked())
                 .notifySetting(user.getNotifySetting())
                 .isGeneralSignUp(user.isGeneralSignedUpUser())
                 .createdAt(user.getCreatedAt())
