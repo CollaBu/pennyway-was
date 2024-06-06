@@ -251,7 +251,7 @@ public class AuthControllerIntegrationTest extends ExternalApiDBTestConfig {
             String invalidCode = "111111";
 
             // when
-            ResultActions resultActions = performSyncWithOauthSignUpRequest(invalidCode);
+            ResultActions resultActions = performSyncWithOauthSignUpRequest(expectedPhone, invalidCode);
 
             // then
             resultActions
@@ -267,12 +267,12 @@ public class AuthControllerIntegrationTest extends ExternalApiDBTestConfig {
         @DisplayName("인증번호가 일치하는 경우 200 OK를 반환하고, 기존의 소셜 계정과 연동된 회원가입이 완료된다.")
         void syncWithOauthSignUpSuccess() throws Exception {
             // given
-            phoneCodeService.create(expectedPhone, expectedCode, PhoneCodeKeyType.SIGN_UP);
             User user = userService.createUser(UserFixture.OAUTH_USER.toUser());
             oauthService.createOauth(Oauth.of(Provider.KAKAO, "oauthId", user));
+            phoneCodeService.create(user.getPhone(), expectedCode, PhoneCodeKeyType.SIGN_UP);
 
             // when
-            ResultActions resultActions = performSyncWithOauthSignUpRequest(expectedCode);
+            ResultActions resultActions = performSyncWithOauthSignUpRequest(user.getPhone(), expectedCode);
 
             // then
             resultActions
@@ -285,7 +285,7 @@ public class AuthControllerIntegrationTest extends ExternalApiDBTestConfig {
             assertNotNull(user.getPassword());
         }
 
-        private ResultActions performSyncWithOauthSignUpRequest(String code) throws Exception {
+        private ResultActions performSyncWithOauthSignUpRequest(String expectedPhone, String code) throws Exception {
             SignUpReq.SyncWithOauth request = new SignUpReq.SyncWithOauth("dkssudgktpdy1", expectedPhone, code);
             return mockMvc.perform(
                     post("/v1/auth/link-oauth")
