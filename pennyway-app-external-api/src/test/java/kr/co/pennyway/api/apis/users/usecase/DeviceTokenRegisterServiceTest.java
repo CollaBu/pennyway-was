@@ -5,6 +5,7 @@ import kr.co.pennyway.api.apis.users.dto.DeviceTokenDto;
 import kr.co.pennyway.api.apis.users.service.DeviceTokenRegisterService;
 import kr.co.pennyway.api.config.ExternalApiDBTestConfig;
 import kr.co.pennyway.api.config.fixture.DeviceTokenFixture;
+import kr.co.pennyway.api.config.fixture.UserFixture;
 import kr.co.pennyway.domain.config.JpaConfig;
 import kr.co.pennyway.domain.domains.device.domain.DeviceToken;
 import kr.co.pennyway.domain.domains.device.exception.DeviceTokenErrorCode;
@@ -12,8 +13,6 @@ import kr.co.pennyway.domain.domains.device.exception.DeviceTokenErrorException;
 import kr.co.pennyway.domain.domains.device.service.DeviceTokenService;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.service.UserService;
-import kr.co.pennyway.domain.domains.user.type.ProfileVisibility;
-import kr.co.pennyway.domain.domains.user.type.Role;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -50,8 +49,7 @@ public class DeviceTokenRegisterServiceTest extends ExternalApiDBTestConfig {
 
     @BeforeEach
     void setUp() {
-        User user = User.builder().role(Role.USER).profileVisibility(ProfileVisibility.PUBLIC).build();
-        requestUser = userService.createUser(user);
+        requestUser = userService.createUser(UserFixture.GENERAL_USER.toUser());
     }
 
     @Test
