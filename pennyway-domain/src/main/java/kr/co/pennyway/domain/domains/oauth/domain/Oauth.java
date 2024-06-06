@@ -46,14 +46,13 @@ public class Oauth {
     private User user;
 
     @Builder(access = AccessLevel.PRIVATE)
-    private Oauth(Provider provider, String oauthId, LocalDateTime deletedAt, User user) {
+    private Oauth(Provider provider, String oauthId, User user) {
         if (!StringUtils.hasText(oauthId)) {
             throw new IllegalArgumentException("oauthId는 null이거나 빈 문자열이 될 수 없습니다.");
         }
 
         this.provider = Objects.requireNonNull(provider, "provider는 null이 될 수 없습니다.");
         this.oauthId = oauthId;
-        this.deletedAt = deletedAt;
         this.user = Objects.requireNonNull(user, "user는 null이 될 수 없습니다.");
     }
 
