@@ -19,13 +19,11 @@ public class SpendingUpdateService {
 
     @Transactional
     public Spending updateSpending(Spending spending, SpendingReq request) {
-        if (!request.isCustomCategory()) {
-            spending.update(request.toEntity());
-        } else {
-            SpendingCustomCategory customCategory = spendingCustomCategoryService.readSpendingCustomCategory(request.categoryId())
-                    .orElseThrow(() -> new SpendingErrorException(SpendingErrorCode.NOT_FOUND_CUSTOM_CATEGORY));
-            spending.update(request.toEntity(customCategory));
-        }
+        SpendingCustomCategory customCategory = (request.isCustomCategory())
+                ? spendingCustomCategoryService.readSpendingCustomCategory(request.categoryId()).orElseThrow(() -> new SpendingErrorException(SpendingErrorCode.NOT_FOUND_CUSTOM_CATEGORY))
+                : null;
+
+        spending.update(request.amount(), request.icon(), request.spendAt().atStartOfDay(), request.accountName(), request.memo(), customCategory);
 
         return spending;
     }
