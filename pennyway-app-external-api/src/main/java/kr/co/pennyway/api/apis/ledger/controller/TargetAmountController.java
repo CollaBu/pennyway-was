@@ -53,6 +53,13 @@ public class TargetAmountController implements TargetAmountApi {
     }
 
     @Override
+    @GetMapping("/recent")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> getRecentTargetAmount(@AuthenticationPrincipal SecurityUserDetails user) {
+        return ResponseEntity.ok(SuccessResponse.from(TARGET_AMOUNT, targetAmountUseCase.getRecentTargetAmount(user.getUserId())));
+    }
+
+    @Override
     @PatchMapping("/{target_amount_id}")
     @PreAuthorize("isAuthenticated() and @targetAmountManager.hasPermission(principal.userId, #targetAmountId)")
     public ResponseEntity<?> patchTargetAmount(@Validated TargetAmountDto.AmountParam param, @PathVariable("target_amount_id") Long targetAmountId) {

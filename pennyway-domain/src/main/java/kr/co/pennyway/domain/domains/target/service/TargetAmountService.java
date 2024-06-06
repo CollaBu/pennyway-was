@@ -38,6 +38,11 @@ public class TargetAmountService {
     }
 
     @Transactional(readOnly = true)
+    public Optional<TargetAmount> readRecentTargetAmount(Long userId) {
+        return targetAmountRepository.findRecentOneByUserId(userId);
+    }
+
+    @Transactional(readOnly = true)
     public boolean isExistsTargetAmountThatMonth(Long userId, LocalDate date) {
         return targetAmountRepository.existsByUserIdThatMonth(userId, date);
     }
