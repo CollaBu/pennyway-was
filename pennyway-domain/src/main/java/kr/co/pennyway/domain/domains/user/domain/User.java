@@ -15,10 +15,12 @@ import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Getter
@@ -46,7 +48,7 @@ public class User extends DateAuditable {
     @Convert(converter = ProfileVisibilityConverter.class)
     private ProfileVisibility profileVisibility;
     @ColumnDefault("false")
-    private Boolean locked;
+    private boolean locked;
     @Embedded
     private NotifySetting notifySetting;
     @ColumnDefault("NULL")
@@ -57,18 +59,23 @@ public class User extends DateAuditable {
 
     @Builder
     private User(String username, String name, String password, LocalDateTime passwordUpdatedAt, String profileImageUrl, String phone, Role role,
-                 ProfileVisibility profileVisibility, NotifySetting notifySetting, Boolean locked, LocalDateTime deletedAt) {
+                 ProfileVisibility profileVisibility, NotifySetting notifySetting, boolean locked) {
+        if (!StringUtils.hasText(username)) {
+            throw new IllegalArgumentException("username은 null이거나 빈 문자열이 될 수 없습니다.");
+        } else if (!StringUtils.hasText(name)) {
+            throw new IllegalArgumentException("name은 null이거나 빈 문자열이 될 수 없습니다.");
+        }
+
         this.username = username;
         this.name = name;
         this.password = password;
         this.passwordUpdatedAt = passwordUpdatedAt;
         this.profileImageUrl = profileImageUrl;
-        this.phone = phone;
-        this.role = role;
-        this.profileVisibility = profileVisibility;
-        this.notifySetting = notifySetting;
+        this.phone = Objects.requireNonNull(phone, "phone은 null이 될 수 없습니다.");
+        this.role = Objects.requireNonNull(role, "role은 null이 될 수 없습니다.");
+        this.profileVisibility = Objects.requireNonNull(profileVisibility, "profileVisibility는 null이 될 수 없습니다.");
+        this.notifySetting = Objects.requireNonNull(notifySetting, "notifySetting은 null이 될 수 없습니다.");
         this.locked = locked;
-        this.deletedAt = deletedAt;
     }
 
     public void updatePassword(String password) {
