@@ -13,8 +13,10 @@ import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.SQLDelete;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Entity
 @Getter
@@ -44,12 +46,15 @@ public class Oauth {
     private User user;
 
     @Builder(access = AccessLevel.PRIVATE)
-    private Oauth(Provider provider, String oauthId, LocalDateTime createdAt, LocalDateTime deletedAt, User user) {
-        this.provider = provider;
+    private Oauth(Provider provider, String oauthId, LocalDateTime deletedAt, User user) {
+        if (!StringUtils.hasText(oauthId)) {
+            throw new IllegalArgumentException("oauthId는 null이거나 빈 문자열이 될 수 없습니다.");
+        }
+
+        this.provider = Objects.requireNonNull(provider, "provider는 null이 될 수 없습니다.");
         this.oauthId = oauthId;
-        this.createdAt = createdAt;
         this.deletedAt = deletedAt;
-        this.user = user;
+        this.user = Objects.requireNonNull(user, "user는 null이 될 수 없습니다.");
     }
 
     public static Oauth of(Provider provider, String oauthId, User user) {
@@ -68,6 +73,10 @@ public class Oauth {
         if (deletedAt == null) {
             throw new IllegalStateException("삭제되지 않은 oauth 정보 갱신 요청입니다. oauthId: " + oauthId);
         }
+        if (!StringUtils.hasText(oauthId)) {
+            throw new IllegalArgumentException("oauthId는 null이거나 빈 문자열이 될 수 없습니다.");
+        }
+
         this.oauthId = oauthId;
         this.deletedAt = null;
     }
