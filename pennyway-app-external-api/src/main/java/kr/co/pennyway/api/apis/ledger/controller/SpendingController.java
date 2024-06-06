@@ -21,6 +21,8 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RequestMapping("/v2/spendings")
 public class SpendingController implements SpendingApi {
+    private static final String SPENDING = "spending";
+
     private final SpendingUseCase spendingUseCase;
 
     @Override
@@ -31,21 +33,21 @@ public class SpendingController implements SpendingApi {
             throw new SpendingErrorException(SpendingErrorCode.INVALID_ICON_WITH_CATEGORY_ID);
         }
 
-        return ResponseEntity.ok(SuccessResponse.from("spending", spendingUseCase.createSpending(user.getUserId(), request)));
+        return ResponseEntity.ok(SuccessResponse.from(SPENDING, spendingUseCase.createSpending(user.getUserId(), request)));
     }
 
     @Override
     @GetMapping("")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> getSpendingListAtYearAndMonth(@RequestParam("year") int year, @RequestParam("month") int month, @AuthenticationPrincipal SecurityUserDetails user) {
-        return ResponseEntity.ok(SuccessResponse.from("spending", spendingUseCase.getSpendingsAtYearAndMonth(user.getUserId(), year, month)));
+        return ResponseEntity.ok(SuccessResponse.from(SPENDING, spendingUseCase.getSpendingsAtYearAndMonth(user.getUserId(), year, month)));
     }
 
     @Override
     @GetMapping("/{spendingId}")
     @PreAuthorize("isAuthenticated() and @spendingManager.hasPermission(#user.getUserId(), #spendingId)")
     public ResponseEntity<?> getSpendingDetail(@PathVariable Long spendingId, @AuthenticationPrincipal SecurityUserDetails user) {
-        return ResponseEntity.ok(SuccessResponse.from("spending", spendingUseCase.getSpedingDetail(spendingId)));
+        return ResponseEntity.ok(SuccessResponse.from(SPENDING, spendingUseCase.getSpedingDetail(spendingId)));
     }
 
     @Override
@@ -56,7 +58,7 @@ public class SpendingController implements SpendingApi {
             throw new SpendingErrorException(SpendingErrorCode.INVALID_ICON_WITH_CATEGORY_ID);
         }
 
-        return ResponseEntity.ok(SuccessResponse.from("spending", spendingUseCase.updateSpending(spendingId, request)));
+        return ResponseEntity.ok(SuccessResponse.from(SPENDING, spendingUseCase.updateSpending(spendingId, request)));
     }
 
     @Override
@@ -69,13 +71,13 @@ public class SpendingController implements SpendingApi {
     }
 
     /**
-     * categoryId가 -1이면 서비스에서 정의한 카테고리를 사용하므로 저장하려는 지출 내역의 icon은 OTHER가 될 수 없고, <br/>
-     * categoryId가 -1이 아니면 사용자가 정의한 카테고리를 사용하므로 저장하려는 지출 내역의 icon은 OTHER임을 확인한다.
+     * categoryId가 -1이면 서비스에서 정의한 카테고리를 사용하므로 저장하려는 지출 내역의 icon은 CUSTOM이나 OTHER이 될 수 없고, <br/>
+     * categoryId가 -1이 아니면 사용자가 정의한 카테고리를 사용하므로 저장하려는 지출 내역의 icon은 CUSTOM임을 확인한다.
      *
      * @param categoryId : 사용자가 정의한 카테고리 ID
      * @param icon       : 지출 내역으로 저장하려는 카테고리의 아이콘
      */
     private boolean isValidCategoryIdAndIcon(Long categoryId, SpendingCategory icon) {
-        return (categoryId.equals(-1L) && !icon.equals(SpendingCategory.OTHER) || categoryId > 0 && icon.equals(SpendingCategory.OTHER));
+        return (categoryId.equals(-1L) && (!icon.equals(SpendingCategory.CUSTOM) && !icon.equals(SpendingCategory.OTHER))) || (categoryId > 0 && icon.equals(SpendingCategory.CUSTOM));
     }
 }

@@ -10,16 +10,14 @@ import org.hibernate.annotations.ColumnDefault;
 
 @Entity
 @Getter
-@Table(name = "device")
+@Table(name = "device_token")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Device extends DateAuditable {
+public class DeviceToken extends DateAuditable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String token;
-    private String model;
-    private String os;
     @ColumnDefault("true")
     private Boolean activated;
 
@@ -27,16 +25,14 @@ public class Device extends DateAuditable {
     @JoinColumn(name = "user_id")
     private User user;
 
-    private Device(String token, String model, String os, Boolean activated, User user) {
+    private DeviceToken(String token, Boolean activated, User user) {
         this.token = token;
-        this.model = model;
-        this.os = os;
         this.activated = activated;
         this.user = user;
     }
 
-    public static Device of(String token, String model, String os, User user) {
-        return new Device(token, model, os, Boolean.TRUE, user);
+    public static DeviceToken of(String token, User user) {
+        return new DeviceToken(token, Boolean.TRUE, user);
     }
 
     public Boolean isActivated() {
@@ -51,22 +47,19 @@ public class Device extends DateAuditable {
         this.activated = Boolean.FALSE;
     }
 
+    /**
+     * 디바이스 토큰을 갱신하고 활성화 상태로 변경한다.
+     */
     public void updateToken(String token) {
+        this.activated = Boolean.TRUE;
         this.token = token;
-    }
-
-    public void updateDeviceInfo(String model, String os) {
-        this.model = model;
-        this.os = os;
     }
 
     @Override
     public String toString() {
-        return "Device{" +
+        return "DeviceToken {" +
                 "id=" + id +
                 ", token='" + token + '\'' +
-                ", model='" + model + '\'' +
-                ", os='" + os + '\'' +
                 ", activated=" + activated + '}';
     }
 }
