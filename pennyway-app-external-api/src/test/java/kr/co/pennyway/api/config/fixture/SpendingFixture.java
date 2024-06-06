@@ -71,6 +71,27 @@ public enum SpendingFixture {
         return spending;
     }
 
+
+    // 커스텀 카테고리를 가지는 지출 내역 생성
+    private static List<Spending> getRandomCustomCategorySpendings(User user, int capacity) {
+        List<Spending> spending = new ArrayList<>(capacity);
+
+        for (int i = 0; i < 100; i++) {
+            spending.add(Spending.builder()
+                    .amount(ThreadLocalRandom.current().nextInt(100, 10000001))
+                    .category(SpendingCategory.FOOD)
+                    .spendAt(getRandomSpendAt(user))
+                    .accountName(getRandomAccountName())
+                    .memo((i % 5 == 0) ? "메모" : null)
+                    .user(user)
+                    .spendingCustomCategory(null)
+                    .build()
+            );
+        }
+
+        return spending;
+    }
+
     private static LocalDateTime getRandomSpendAt(User user) {
         LocalDate startAt = user.getCreatedAt().toLocalDate();
         LocalDate endAt = LocalDate.now();
