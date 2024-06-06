@@ -79,15 +79,27 @@ public class User extends DateAuditable {
     }
 
     public void updatePassword(String password) {
+        if (!StringUtils.hasText(password)) {
+            throw new IllegalArgumentException("password는 null이거나 빈 문자열이 될 수 없습니다.");
+        }
+
         this.password = password;
         this.passwordUpdatedAt = LocalDateTime.now();
     }
 
     public void updateName(String name) {
+        if (!StringUtils.hasText(name)) {
+            throw new IllegalArgumentException("name은 null이거나 빈 문자열이 될 수 없습니다.");
+        }
+
         this.name = name;
     }
 
     public void updateUsername(String username) {
+        if (!StringUtils.hasText(username)) {
+            throw new IllegalArgumentException("username은 null이거나 빈 문자열이 될 수 없습니다.");
+        }
+
         this.username = username;
     }
 
