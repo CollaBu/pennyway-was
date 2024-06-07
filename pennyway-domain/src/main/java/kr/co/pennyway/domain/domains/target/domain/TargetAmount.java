@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLDelete;
 
 import java.time.YearMonth;
+import java.util.Objects;
 
 @Entity
 @Getter
@@ -29,15 +30,23 @@ public class TargetAmount extends DateAuditable {
 
     private TargetAmount(int amount, User user) {
         this.amount = amount;
-        this.user = user;
+        this.user = Objects.requireNonNull(user, "user는 null이 될 수 없습니다.");
         this.isRead = false;
     }
 
+    /**
+     * @param amount 목표 금액은 null을 허용하지 않는다.
+     * @param user   사용자는 null을 허용하지 않는다.
+     * @throws NullPointerException amount가 null이거나 user가 null일 때
+     */
     public static TargetAmount of(int amount, User user) {
         return new TargetAmount(amount, user);
     }
 
-    public void updateAmount(Integer amount) {
+    /**
+     * @param amount 변경할 목표 금액은 null을 허용하지 않는다.
+     */
+    public void updateAmount(int amount) {
         this.amount = amount;
         this.isRead = true;
     }

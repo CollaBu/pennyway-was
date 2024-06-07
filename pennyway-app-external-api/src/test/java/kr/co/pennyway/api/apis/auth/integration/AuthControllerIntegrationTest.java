@@ -6,6 +6,7 @@ import kr.co.pennyway.api.apis.auth.dto.SignUpReq;
 import kr.co.pennyway.api.common.exception.PhoneVerificationErrorCode;
 import kr.co.pennyway.api.config.ExternalApiDBTestConfig;
 import kr.co.pennyway.api.config.ExternalApiIntegrationTest;
+import kr.co.pennyway.api.config.fixture.UserFixture;
 import kr.co.pennyway.domain.common.redis.phone.PhoneCodeKeyType;
 import kr.co.pennyway.domain.common.redis.phone.PhoneCodeService;
 import kr.co.pennyway.domain.domains.oauth.domain.Oauth;
@@ -14,8 +15,6 @@ import kr.co.pennyway.domain.domains.oauth.type.Provider;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorCode;
 import kr.co.pennyway.domain.domains.user.service.UserService;
-import kr.co.pennyway.domain.domains.user.type.ProfileVisibility;
-import kr.co.pennyway.domain.domains.user.type.Role;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -42,10 +41,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @TestClassOrder(ClassOrderer.OrderAnnotation.class)
 public class AuthControllerIntegrationTest extends ExternalApiDBTestConfig {
-    private final String expectedUsername = "jayang";
     private final String expectedPhone = "010-1234-5678";
     private final String expectedCode = "123456";
-    private final String expectedOauthId = "oauthId";
 
     @Autowired
     private MockMvc mockMvc;
@@ -66,40 +63,6 @@ public class AuthControllerIntegrationTest extends ExternalApiDBTestConfig {
                 .build();
     }
 
-    /**
-     * 일반 회원가입 유저 생성
-     */
-    private User createGeneralSignedUser() {
-        return User.builder()
-                .name("페니웨이")
-                .username(expectedUsername)
-                .password("dkssudgktpdy1")
-                .phone("010-1234-5678")
-                .role(Role.USER)
-                .profileVisibility(ProfileVisibility.PUBLIC)
-                .build();
-    }
-
-    /**
-     * OAuth로 가입한 유저 생성 (password가 NULL)
-     */
-    private User createOauthSignedUser() {
-        return User.builder()
-                .name("페니웨이")
-                .username(expectedUsername)
-                .phone("010-1234-5678")
-                .role(Role.USER)
-                .profileVisibility(ProfileVisibility.PUBLIC)
-                .build();
-    }
-
-    /**
-     * User에 연결된 Oauth 생성
-     */
-    private Oauth createOauthAccount(User user) {
-        return Oauth.of(Provider.KAKAO, expectedOauthId, user);
-    }
-
     @Nested
     @Order(1)
     @DisplayName("[2] 전화번호 검증 테스트")
@@ -110,7 +73,7 @@ public class AuthControllerIntegrationTest extends ExternalApiDBTestConfig {
         void generalSignUpFailBecauseAlreadyGeneralSignUp() throws Exception {
             // given
             phoneCodeService.create(expectedPhone, expectedCode, PhoneCodeKeyType.SIGN_UP);
-            given(userService.readUserByPhone(expectedPhone)).willReturn(Optional.of(createGeneralSignedUser()));
+            given(userService.readUserByPhone(expectedPhone)).willReturn(Optional.of(UserFixture.GENERAL_USER.toUser()));
 
             // when
             ResultActions resultActions = performPhoneVerificationRequest(expectedCode);
@@ -187,7 +150,7 @@ public class AuthControllerIntegrationTest extends ExternalApiDBTestConfig {
         void generalSignUpSuccessWithOauth() throws Exception {
             // given
             phoneCodeService.create(expectedPhone, expectedCode, PhoneCodeKeyType.SIGN_UP);
-            given(userService.readUserByPhone(expectedPhone)).willReturn(Optional.of(createOauthSignedUser()));
+            given(userService.readUserByPhone(expectedPhone)).willReturn(Optional.of(UserFixture.OAUTH_USER.toUser()));
 
             // when
             ResultActions resultActions = performPhoneVerificationRequest(expectedCode);
@@ -197,7 +160,7 @@ public class AuthControllerIntegrationTest extends ExternalApiDBTestConfig {
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.data.sms.code").value(true))
                     .andExpect(jsonPath("$.data.sms.oauth").value(true))
-                    .andExpect(jsonPath("$.data.sms.username").value(expectedUsername))
+                    .andExpect(jsonPath("$.data.sms.username").value(UserFixture.OAUTH_USER.getUsername()))
                     .andDo(print());
         }
 
@@ -261,7 +224,7 @@ public class AuthControllerIntegrationTest extends ExternalApiDBTestConfig {
         }
 
         private ResultActions performGeneralSignUpRequest(String code) throws Exception {
-            SignUpReq.General request = new SignUpReq.General(expectedUsername, "pennyway", "dkssudgktpdy1", expectedPhone, code);
+            SignUpReq.General request = new SignUpReq.General(UserFixture.GENERAL_USER.getUsername(), "pennyway", "dkssudgktpdy1", expectedPhone, code);
             return mockMvc.perform(
                     post("/v1/auth/sign-up")
                             .contentType(MediaType.APPLICATION_JSON)
@@ -288,7 +251,7 @@ public class AuthControllerIntegrationTest extends ExternalApiDBTestConfig {
             String invalidCode = "111111";
 
             // when
-            ResultActions resultActions = performSyncWithOauthSignUpRequest(invalidCode);
+            ResultActions resultActions = performSyncWithOauthSignUpRequest(expectedPhone, invalidCode);
 
             // then
             resultActions
@@ -304,13 +267,12 @@ public class AuthControllerIntegrationTest extends ExternalApiDBTestConfig {
         @DisplayName("인증번호가 일치하는 경우 200 OK를 반환하고, 기존의 소셜 계정과 연동된 회원가입이 완료된다.")
         void syncWithOauthSignUpSuccess() throws Exception {
             // given
-            phoneCodeService.create(expectedPhone, expectedCode, PhoneCodeKeyType.SIGN_UP);
-            User user = createOauthSignedUser();
-            userService.createUser(user);
-            oauthService.createOauth(createOauthAccount(user));
+            User user = userService.createUser(UserFixture.OAUTH_USER.toUser());
+            oauthService.createOauth(Oauth.of(Provider.KAKAO, "oauthId", user));
+            phoneCodeService.create(user.getPhone(), expectedCode, PhoneCodeKeyType.SIGN_UP);
 
             // when
-            ResultActions resultActions = performSyncWithOauthSignUpRequest(expectedCode);
+            ResultActions resultActions = performSyncWithOauthSignUpRequest(user.getPhone(), expectedCode);
 
             // then
             resultActions
@@ -323,7 +285,7 @@ public class AuthControllerIntegrationTest extends ExternalApiDBTestConfig {
             assertNotNull(user.getPassword());
         }
 
-        private ResultActions performSyncWithOauthSignUpRequest(String code) throws Exception {
+        private ResultActions performSyncWithOauthSignUpRequest(String expectedPhone, String code) throws Exception {
             SignUpReq.SyncWithOauth request = new SignUpReq.SyncWithOauth("dkssudgktpdy1", expectedPhone, code);
             return mockMvc.perform(
                     post("/v1/auth/link-oauth")

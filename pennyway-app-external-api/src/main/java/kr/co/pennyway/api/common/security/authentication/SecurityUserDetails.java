@@ -46,7 +46,7 @@ public final class SecurityUserDetails implements UserDetails {
                 .userId(user.getId())
                 .username(user.getUsername())
                 .authorities(List.of(new CustomGrantedAuthority(user.getRole().getType())))
-                .accountNonLocked(user.getLocked())
+                .accountNonLocked(user.isLocked())
                 .build();
     }
 
