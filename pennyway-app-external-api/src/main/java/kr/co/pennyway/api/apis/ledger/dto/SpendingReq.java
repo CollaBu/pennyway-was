@@ -69,33 +69,6 @@ public record SpendingReq(
                 .build();
     }
 
-    /**
-     * 지출 내역 수정시 사용되는 user필드가 null인 지출 내역으로 변환
-     */
-    public Spending toEntity() {
-        return Spending.builder()
-                .amount(amount)
-                .category(icon)
-                .spendAt(spendAt.atStartOfDay())
-                .accountName(accountName)
-                .memo(memo)
-                .build();
-    }
-
-    /**
-     * 지출 내역 수정시 사용되는 user필드가 null이며, 사용자 정의 지출 카테고리를 사용하는 지출 내역으로 변환
-     */
-    public Spending toEntity(SpendingCustomCategory spendingCustomCategory) {
-        return Spending.builder()
-                .amount(amount)
-                .category(icon)
-                .spendAt(spendAt.atStartOfDay())
-                .accountName(accountName)
-                .memo(memo)
-                .spendingCustomCategory(spendingCustomCategory)
-                .build();
-    }
-
     @Schema(hidden = true)
     public boolean isCustomCategory() {
         return !categoryId.equals(-1L);

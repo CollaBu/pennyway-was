@@ -21,7 +21,6 @@ import kr.co.pennyway.domain.domains.oauth.service.OauthService;
 import kr.co.pennyway.domain.domains.oauth.type.Provider;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.service.UserService;
-import kr.co.pennyway.domain.domains.user.type.ProfileVisibility;
 import kr.co.pennyway.domain.domains.user.type.Role;
 import kr.co.pennyway.infra.common.exception.JwtErrorCode;
 import kr.co.pennyway.infra.common.oidc.OidcDecodePayload;
@@ -88,13 +87,7 @@ public class UserAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
 
         @BeforeEach
         void setUp() {
-            User user = User.builder()
-                    .username("pennyway")
-                    .password("password")
-                    .profileVisibility(ProfileVisibility.PUBLIC)
-                    .role(Role.USER)
-                    .locked(Boolean.FALSE)
-                    .build();
+            User user = UserFixture.GENERAL_USER.toUser();
             userService.createUser(user);
             userId = user.getId();
             expectedAccessToken = accessTokenProvider.generateToken(AccessTokenClaim.of(user.getId(), Role.USER.getType()));

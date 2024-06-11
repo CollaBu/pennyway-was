@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import kr.co.pennyway.api.common.validator.Password;
+import kr.co.pennyway.domain.domains.user.domain.NotifySetting;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.type.ProfileVisibility;
 import kr.co.pennyway.domain.domains.user.type.Role;
@@ -31,6 +32,7 @@ public class SignUpReq {
                     .phone(phone)
                     .role(Role.USER)
                     .profileVisibility(ProfileVisibility.PUBLIC)
+                    .notifySetting(NotifySetting.of(true, true, true))
                     .build();
         }
 
@@ -49,6 +51,7 @@ public class SignUpReq {
                     .phone(phone)
                     .role(Role.USER)
                     .profileVisibility(ProfileVisibility.PUBLIC)
+                    .notifySetting(NotifySetting.of(true, true, true))
                     .build();
         }
     }

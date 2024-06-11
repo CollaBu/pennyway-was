@@ -6,14 +6,18 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Entity
 @Getter
-@Table(name = "Question")
+@Table(name = "question")
+@SQLDelete(sql = "UPDATE question SET deleted_at = NOW() WHERE id = ?")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
 public class Question {
@@ -32,10 +36,15 @@ public class Question {
     private LocalDateTime deletedAt;
 
     @Builder
-    private Question(String email, QuestionCategory category, String content, LocalDateTime createdAt, LocalDateTime deletedAt) {
+    private Question(String email, QuestionCategory category, String content) {
+        if (!StringUtils.hasText(email)) {
+            throw new IllegalArgumentException("email은 null이거나 빈 문자열이 될 수 없습니다.");
+        } else if (!StringUtils.hasText(content)) {
+            throw new IllegalArgumentException("content는 null이거나 빈 문자열이 될 수 없습니다.");
+        }
+
         this.email = email;
-        this.category = category;
+        this.category = Objects.requireNonNull(category, "category는 null이 될 수 없습니다.");
         this.content = content;
-        this.createdAt = createdAt;
     }
 }
