@@ -54,15 +54,8 @@ public class TargetAmountUseCase {
 
     @Transactional
     public TargetAmountDto.TargetAmountInfo updateTargetAmount(Long targetAmountId, Integer amount) {
-        TargetAmount targetAmount = targetAmountService.readTargetAmount(targetAmountId)
-                .orElseThrow(() -> new TargetAmountErrorException(TargetAmountErrorCode.NOT_FOUND_TARGET_AMOUNT));
-
-        if (!targetAmount.isThatMonth()) {
-            throw new TargetAmountErrorException(TargetAmountErrorCode.INVALID_TARGET_AMOUNT_DATE);
-        }
-
-        targetAmount.updateAmount(amount);
-
+        TargetAmount targetAmount = targetAmountSaveService.updateTargetAmount(targetAmountId, amount);
+        
         return TargetAmountDto.TargetAmountInfo.from(targetAmount);
     }
 

@@ -12,6 +12,7 @@ import kr.co.pennyway.domain.domains.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 
@@ -32,5 +33,19 @@ public class TargetAmountSaveService {
         }
 
         return targetAmountService.createTargetAmount(TargetAmount.of(-1, user));
+    }
+
+    @Transactional
+    public TargetAmount updateTargetAmount(Long targetAmountId, Integer amount) {
+        TargetAmount targetAmount = targetAmountService.readTargetAmount(targetAmountId)
+                .orElseThrow(() -> new TargetAmountErrorException(TargetAmountErrorCode.NOT_FOUND_TARGET_AMOUNT));
+
+        if (!targetAmount.isThatMonth()) {
+            throw new TargetAmountErrorException(TargetAmountErrorCode.INVALID_TARGET_AMOUNT_DATE);
+        }
+
+        targetAmount.updateAmount(amount);
+
+        return targetAmount;
     }
 }
