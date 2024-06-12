@@ -2,8 +2,8 @@ package kr.co.pennyway.api.apis.ledger.usecase;
 
 import kr.co.pennyway.api.apis.ledger.dto.TargetAmountDto;
 import kr.co.pennyway.api.apis.ledger.mapper.TargetAmountMapper;
-import kr.co.pennyway.api.apis.ledger.service.RecentTargetAmountSearchService;
 import kr.co.pennyway.api.apis.ledger.service.TargetAmountSaveService;
+import kr.co.pennyway.api.apis.ledger.service.TargetAmountSearchService;
 import kr.co.pennyway.common.annotation.UseCase;
 import kr.co.pennyway.domain.common.redisson.DistributedLockPrefix;
 import kr.co.pennyway.domain.domains.spending.dto.TotalSpendingAmount;
@@ -33,7 +33,7 @@ public class TargetAmountUseCase {
     private final SpendingService spendingService;
 
     private final TargetAmountSaveService targetAmountSaveService;
-    private final RecentTargetAmountSearchService recentTargetAmountSearchService;
+    private final TargetAmountSearchService targetAmountSearchService;
 
     @Transactional
     public TargetAmountDto.TargetAmountInfo createTargetAmount(Long userId, int year, int month) {
@@ -62,7 +62,7 @@ public class TargetAmountUseCase {
 
     @Transactional(readOnly = true)
     public TargetAmountDto.RecentTargetAmountRes getRecentTargetAmount(Long userId) {
-        return TargetAmountMapper.toRecentTargetAmountResponse(recentTargetAmountSearchService.readRecentTargetAmount(userId));
+        return TargetAmountMapper.toRecentTargetAmountResponse(targetAmountSearchService.readRecentTargetAmount(userId));
     }
 
     @Transactional

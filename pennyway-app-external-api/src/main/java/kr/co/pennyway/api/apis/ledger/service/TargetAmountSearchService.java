@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class RecentTargetAmountSearchService {
+public class TargetAmountSearchService {
     private final TargetAmountService targetAmountService;
 
     @Transactional(readOnly = true)
