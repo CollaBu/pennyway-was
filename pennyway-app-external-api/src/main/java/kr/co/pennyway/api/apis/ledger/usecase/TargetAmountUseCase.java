@@ -37,9 +37,7 @@ public class TargetAmountUseCase {
 
     @Transactional
     public TargetAmountDto.TargetAmountInfo createTargetAmount(Long userId, int year, int month) {
-        User user = userService.readUser(userId).orElseThrow(() -> new UserErrorException(UserErrorCode.NOT_FOUND));
-
-        TargetAmount targetAmount = targetAmountSaveService.createTargetAmount(DistributedLockPrefix.TARGET_AMOUNT_USER, user, LocalDate.of(year, month, 1));
+        TargetAmount targetAmount = targetAmountSaveService.createTargetAmount(DistributedLockPrefix.TARGET_AMOUNT_USER, userId, LocalDate.of(year, month, 1));
 
         return TargetAmountDto.TargetAmountInfo.from(targetAmount);
     }
