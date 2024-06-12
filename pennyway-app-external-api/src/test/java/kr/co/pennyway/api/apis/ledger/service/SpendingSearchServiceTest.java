@@ -7,6 +7,7 @@ import kr.co.pennyway.api.config.ExternalApiIntegrationTest;
 import kr.co.pennyway.api.config.fixture.SpendingFixture;
 import kr.co.pennyway.api.config.fixture.UserFixture;
 import kr.co.pennyway.domain.domains.spending.domain.Spending;
+import kr.co.pennyway.domain.domains.spending.service.SpendingService;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.service.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -28,9 +29,9 @@ import java.util.List;
 @ExternalApiIntegrationTest
 class SpendingSearchServiceTest extends ExternalApiDBTestConfig {
     @Autowired
-    private SpendingSearchService spendingSearchService;
-    @Autowired
     private UserService userService;
+    @Autowired
+    private SpendingService spendingService;
     @Autowired
     private NamedParameterJdbcTemplate jdbcTemplate;
 
@@ -60,7 +61,8 @@ class SpendingSearchServiceTest extends ExternalApiDBTestConfig {
         SpendingFixture.bulkInsertSpending(user, 100, true, jdbcTemplate);
 
         // when
-        List<Spending> spendings = spendingSearchService.readSpendings(user.getId(), LocalDate.now().getYear(), LocalDate.now().getMonthValue());
+        List<Spending> spendings = spendingService.readSpendings(user.getId(), LocalDate.now().getYear(), LocalDate.now().getMonthValue()).orElseThrow();
+
         int size = spendings.size();
         for (Spending spending : spendings) {
             log.info("지출내역 id : {} 커스텀 카테고리 id : {} 커스텀 카테고리 name : {}",
