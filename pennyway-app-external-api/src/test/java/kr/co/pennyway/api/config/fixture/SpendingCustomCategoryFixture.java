@@ -10,7 +10,6 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 
 public enum SpendingCustomCategoryFixture {
     GENERAL_SPENDING_CUSTOM_CATEGORY("커스텀 지출 내역 카테고리", SpendingCategory.FOOD);
@@ -24,7 +23,7 @@ public enum SpendingCustomCategoryFixture {
     }
 
     public static void bulkInsertCustomCategory(User user, int capacity, NamedParameterJdbcTemplate jdbcTemplate) {
-        Collection<SpendingCustomCategory> customCategories = getRandomCustomCategories(user, capacity);
+        Collection<SpendingCustomCategory> customCategories = getCustomCategories(user, capacity);
 
         String sql = String.format("""
                 INSERT INTO `%s` (name, icon, user_id, created_at, updated_at, deleted_at)
@@ -36,22 +35,13 @@ public enum SpendingCustomCategoryFixture {
         jdbcTemplate.batchUpdate(sql, params);
     }
 
-    private static List<SpendingCustomCategory> getRandomCustomCategories(User user, int capacity) {
+    private static List<SpendingCustomCategory> getCustomCategories(User user, int capacity) {
         List<SpendingCustomCategory> customCategories = new ArrayList<>(capacity);
 
         for (int i = 0; i < capacity; i++) {
-            customCategories.add(SpendingCustomCategory.of(
-                    getRandomCustomCategoryName(),
-                    SpendingCategory.OTHER,
-                    user
-            ));
+            customCategories.add(SpendingCustomCategoryFixture.GENERAL_SPENDING_CUSTOM_CATEGORY.toCustomSpendingCategory(user));
         }
         return customCategories;
-    }
-
-    private static String getRandomCustomCategoryName() {
-        List<String> customCategoryNames = List.of("은밀한 취미", "특이한 취미", "은밀한 지출", "특이한 지출", "은밀한 비용");
-        return customCategoryNames.get(ThreadLocalRandom.current().nextInt(0, customCategoryNames.size()));
     }
 
     public SpendingCustomCategory toCustomSpendingCategory(User user) {
