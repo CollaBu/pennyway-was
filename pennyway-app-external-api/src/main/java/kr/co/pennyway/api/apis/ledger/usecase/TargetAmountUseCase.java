@@ -2,16 +2,12 @@ package kr.co.pennyway.api.apis.ledger.usecase;
 
 import kr.co.pennyway.api.apis.ledger.dto.TargetAmountDto;
 import kr.co.pennyway.api.apis.ledger.mapper.TargetAmountMapper;
+import kr.co.pennyway.api.apis.ledger.service.TargetAmountDeleteService;
 import kr.co.pennyway.api.apis.ledger.service.TargetAmountSaveService;
 import kr.co.pennyway.api.apis.ledger.service.TargetAmountSearchService;
 import kr.co.pennyway.common.annotation.UseCase;
 import kr.co.pennyway.domain.common.redisson.DistributedLockPrefix;
-import kr.co.pennyway.domain.domains.spending.service.SpendingService;
 import kr.co.pennyway.domain.domains.target.domain.TargetAmount;
-import kr.co.pennyway.domain.domains.target.exception.TargetAmountErrorCode;
-import kr.co.pennyway.domain.domains.target.exception.TargetAmountErrorException;
-import kr.co.pennyway.domain.domains.target.service.TargetAmountService;
-import kr.co.pennyway.domain.domains.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,12 +19,9 @@ import java.util.List;
 @UseCase
 @RequiredArgsConstructor
 public class TargetAmountUseCase {
-    private final UserService userService;
-    private final TargetAmountService targetAmountService;
-    private final SpendingService spendingService;
-
     private final TargetAmountSaveService targetAmountSaveService;
     private final TargetAmountSearchService targetAmountSearchService;
+    private final TargetAmountDeleteService targetAmountDeleteService;
 
     @Transactional
     public TargetAmountDto.TargetAmountInfo createTargetAmount(Long userId, int year, int month) {
@@ -55,20 +48,12 @@ public class TargetAmountUseCase {
     @Transactional
     public TargetAmountDto.TargetAmountInfo updateTargetAmount(Long targetAmountId, Integer amount) {
         TargetAmount targetAmount = targetAmountSaveService.updateTargetAmount(targetAmountId, amount);
-        
+
         return TargetAmountDto.TargetAmountInfo.from(targetAmount);
     }
 
     @Transactional
     public void deleteTargetAmount(Long targetAmountId) {
-        TargetAmount targetAmount = targetAmountService.readTargetAmount(targetAmountId)
-                .filter(TargetAmount::isAllocatedAmount)
-                .orElseThrow(() -> new TargetAmountErrorException(TargetAmountErrorCode.NOT_FOUND_TARGET_AMOUNT));
-
-        if (!targetAmount.isThatMonth()) {
-            throw new TargetAmountErrorException(TargetAmountErrorCode.INVALID_TARGET_AMOUNT_DATE);
-        }
-
-        targetAmountService.deleteTargetAmount(targetAmount);
+        targetAmountDeleteService.execute(targetAmountId);
     }
 }
