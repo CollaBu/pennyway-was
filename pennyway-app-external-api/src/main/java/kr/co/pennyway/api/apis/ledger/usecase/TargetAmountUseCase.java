@@ -6,15 +6,11 @@ import kr.co.pennyway.api.apis.ledger.service.TargetAmountSaveService;
 import kr.co.pennyway.api.apis.ledger.service.TargetAmountSearchService;
 import kr.co.pennyway.common.annotation.UseCase;
 import kr.co.pennyway.domain.common.redisson.DistributedLockPrefix;
-import kr.co.pennyway.domain.domains.spending.dto.TotalSpendingAmount;
 import kr.co.pennyway.domain.domains.spending.service.SpendingService;
 import kr.co.pennyway.domain.domains.target.domain.TargetAmount;
 import kr.co.pennyway.domain.domains.target.exception.TargetAmountErrorCode;
 import kr.co.pennyway.domain.domains.target.exception.TargetAmountErrorException;
 import kr.co.pennyway.domain.domains.target.service.TargetAmountService;
-import kr.co.pennyway.domain.domains.user.domain.User;
-import kr.co.pennyway.domain.domains.user.exception.UserErrorCode;
-import kr.co.pennyway.domain.domains.user.exception.UserErrorException;
 import kr.co.pennyway.domain.domains.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -48,12 +44,7 @@ public class TargetAmountUseCase {
 
     @Transactional(readOnly = true)
     public List<TargetAmountDto.WithTotalSpendingRes> getTargetAmountsAndTotalSpendings(Long userId, LocalDate date) {
-        User user = userService.readUser(userId).orElseThrow(() -> new UserErrorException(UserErrorCode.NOT_FOUND));
-
-        List<TargetAmount> targetAmounts = targetAmountService.readTargetAmountsByUserId(userId);
-        List<TotalSpendingAmount> totalSpendings = spendingService.readTotalSpendingsAmountByUserId(userId);
-
-        return TargetAmountMapper.toWithTotalSpendingResponses(targetAmounts, totalSpendings, user.getCreatedAt().toLocalDate(), date);
+        return targetAmountSearchService.readTargetAmountsAndTotalSpendings(userId, date);
     }
 
     @Transactional(readOnly = true)
