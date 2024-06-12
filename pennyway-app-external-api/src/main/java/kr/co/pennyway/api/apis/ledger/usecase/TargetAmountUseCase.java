@@ -30,17 +30,14 @@ public class TargetAmountUseCase {
         return TargetAmountDto.TargetAmountInfo.from(targetAmount);
     }
 
-    @Transactional(readOnly = true)
     public TargetAmountDto.WithTotalSpendingRes getTargetAmountAndTotalSpending(Long userId, LocalDate date) {
         return targetAmountSearchService.readTargetAmountAndTotalSpending(userId, date);
     }
 
-    @Transactional(readOnly = true)
     public List<TargetAmountDto.WithTotalSpendingRes> getTargetAmountsAndTotalSpendings(Long userId, LocalDate date) {
         return targetAmountSearchService.readTargetAmountsAndTotalSpendings(userId, date);
     }
 
-    @Transactional(readOnly = true)
     public TargetAmountDto.RecentTargetAmountRes getRecentTargetAmount(Long userId) {
         return TargetAmountMapper.toRecentTargetAmountResponse(targetAmountSearchService.readRecentTargetAmount(userId));
     }
@@ -52,7 +49,6 @@ public class TargetAmountUseCase {
         return TargetAmountDto.TargetAmountInfo.from(targetAmount);
     }
 
-    @Transactional
     public void deleteTargetAmount(Long targetAmountId) {
         targetAmountDeleteService.execute(targetAmountId);
     }
