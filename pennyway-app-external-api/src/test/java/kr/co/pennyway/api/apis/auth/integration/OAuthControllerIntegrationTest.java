@@ -14,6 +14,7 @@ import kr.co.pennyway.domain.domains.oauth.domain.Oauth;
 import kr.co.pennyway.domain.domains.oauth.exception.OauthErrorCode;
 import kr.co.pennyway.domain.domains.oauth.service.OauthService;
 import kr.co.pennyway.domain.domains.oauth.type.Provider;
+import kr.co.pennyway.domain.domains.user.domain.NotifySetting;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.service.UserService;
 import kr.co.pennyway.domain.domains.user.type.ProfileVisibility;
@@ -87,6 +88,7 @@ public class OAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
                 .phone("010-1234-5678")
                 .role(Role.USER)
                 .profileVisibility(ProfileVisibility.PUBLIC)
+                .notifySetting(NotifySetting.of(true, true, true))
                 .build();
     }
 
@@ -100,6 +102,7 @@ public class OAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
                 .phone("010-1234-5678")
                 .role(Role.USER)
                 .profileVisibility(ProfileVisibility.PUBLIC)
+                .notifySetting(NotifySetting.of(true, true, true))
                 .build();
     }
 

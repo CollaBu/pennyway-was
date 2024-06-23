@@ -8,6 +8,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 
+import java.util.Objects;
+
 @Entity
 @Getter
 @Table(name = "device_token")
@@ -26,9 +28,9 @@ public class DeviceToken extends DateAuditable {
     private User user;
 
     private DeviceToken(String token, Boolean activated, User user) {
-        this.token = token;
-        this.activated = activated;
-        this.user = user;
+        this.token = Objects.requireNonNull(token, "token은 null이 될 수 없습니다.");
+        this.activated = Objects.requireNonNull(activated, "activated는 null이 될 수 없습니다.");
+        this.user = Objects.requireNonNull(user, "user는 null이 될 수 없습니다.");
     }
 
     public static DeviceToken of(String token, User user) {

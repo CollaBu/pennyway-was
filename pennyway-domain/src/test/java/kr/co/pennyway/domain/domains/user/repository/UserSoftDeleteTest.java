@@ -4,6 +4,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import kr.co.pennyway.domain.config.ContainerMySqlTestConfig;
 import kr.co.pennyway.domain.config.JpaConfig;
+import kr.co.pennyway.domain.domains.user.domain.NotifySetting;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.service.UserService;
 import kr.co.pennyway.domain.domains.user.type.ProfileVisibility;
@@ -46,6 +47,7 @@ public class UserSoftDeleteTest extends ContainerMySqlTestConfig {
                 .phone("01012345678")
                 .role(Role.USER)
                 .profileVisibility(ProfileVisibility.PUBLIC)
+                .notifySetting(NotifySetting.of(true, true, true))
                 .build();
     }
 

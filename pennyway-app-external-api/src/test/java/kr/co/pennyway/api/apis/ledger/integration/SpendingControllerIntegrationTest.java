@@ -219,18 +219,15 @@ public class SpendingControllerIntegrationTest extends ExternalApiDBTestConfig {
         void updateSpendingSuccess() throws Exception {
             // given
             User user = userService.createUser(UserFixture.GENERAL_USER.toUser());
-            Spending spending = SpendingFixture.GENERAL_SPENDING.toSpending(user);
+            Spending spending = spendingService.createSpending(SpendingFixture.GENERAL_SPENDING.toSpending(user));
 
             SpendingReq request = new SpendingReq(20000, -1L, SpendingCategory.LIVING, LocalDate.now(), "수정된 소비처", "수정된 메모");
-            spendingService.createSpending(spending);
 
             // when
             ResultActions resultActions = performUpdateSpending(request, user, spending.getId());
 
             // then
-            resultActions
-                    .andDo(print())
-                    .andExpect(status().isOk());
+            resultActions.andDo(print()).andExpect(status().isOk());
 
             Spending updatedSpending = spendingService.readSpending(spending.getId()).get();
             Assertions.assertEquals(request.memo(), updatedSpending.getMemo());
