@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.IntStream;
 
 @Slf4j
 @ExtendWith(MockitoExtension.class)
@@ -77,5 +78,9 @@ class SpendingSearchServiceTest extends ExternalApiDBTestConfig {
         log.info("readSpendings로 조회해온 지출 내역 개수: {}", size);
 
         Assertions.assertEquals(2, statistics.getPrepareStatementCount());
+
+        boolean isSortedDescending = IntStream.range(0, spendings.size() - 1)
+                .allMatch(i -> !spendings.get(i).getSpendAt().isBefore(spendings.get(i + 1).getSpendAt()));
+        Assertions.assertTrue(isSortedDescending);
     }
 }
