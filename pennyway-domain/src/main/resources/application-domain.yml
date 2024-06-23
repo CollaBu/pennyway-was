@@ -26,7 +26,7 @@ spring:
     open-in-view: false
     generate-ddl: false
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
     show-sql: true
     properties:
       hibernate:
@@ -57,7 +57,7 @@ spring:
     generate-ddl: false
     hibernate:
       ddl-auto: none
-    show-sql: false
+    show-sql: true
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
