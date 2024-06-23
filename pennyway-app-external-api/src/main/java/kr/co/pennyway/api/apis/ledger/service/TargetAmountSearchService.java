@@ -18,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -28,14 +27,6 @@ public class TargetAmountSearchService {
     private final TargetAmountService targetAmountService;
 
     @Transactional(readOnly = true)
-    public TargetAmountDto.WithTotalSpendingRes readTargetAmountAndTotalSpending(Long userId, LocalDate date) {
-        TargetAmount targetAmount = targetAmountService.readTargetAmountThatMonth(userId, date).orElseThrow(() -> new TargetAmountErrorException(TargetAmountErrorCode.NOT_FOUND_TARGET_AMOUNT));
-        Optional<TotalSpendingAmount> totalSpending = spendingService.readTotalSpendingAmountByUserId(userId, date);
-
-        return TargetAmountMapper.toWithTotalSpendingResponse(targetAmount, totalSpending.orElse(null), date);
-    }
-
-    @Transactional(readOnly = true)
     public List<TargetAmountDto.WithTotalSpendingRes> readTargetAmountsAndTotalSpendings(Long userId, LocalDate date) {
         User user = userService.readUser(userId).orElseThrow(() -> new UserErrorException(UserErrorCode.NOT_FOUND));
 
@@ -43,6 +34,11 @@ public class TargetAmountSearchService {
         List<TotalSpendingAmount> totalSpendings = spendingService.readTotalSpendingsAmountByUserId(userId);
 
         return TargetAmountMapper.toWithTotalSpendingResponses(targetAmounts, totalSpendings, user.getCreatedAt().toLocalDate(), date);
+    }
+
+    @Transactional(readOnly = true)
+    public TargetAmount readTargetAmountThatMonth(Long userId, LocalDate date) {
+        return targetAmountService.readTargetAmountThatMonth(userId, date).orElseThrow(() -> new TargetAmountErrorException(TargetAmountErrorCode.NOT_FOUND_TARGET_AMOUNT));
     }
 
     @Transactional(readOnly = true)
