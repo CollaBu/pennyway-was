@@ -32,12 +32,13 @@ public class TargetAmountMapper {
 
     /**
      * TargetAmount와 TotalSpendingAmount를 이용하여 WithTotalSpendingRes 리스트를 생성한다. <br/>
-     * startAt부터 endAt까지의 날짜에 대한 WithTotalSpendingRes를 생성하며, 임의의 날짜에 대한 정보가 없을 경우 더미 데이터를 생성한다.
+     * startAt부터 endAt까지의 날짜에 대한 WithTotalSpendingRes를 생성하며, 임의의 날짜에 대한 정보가 없을 경우 더미 데이터를 생성한다. <br/>
+     * startAt은 목표 금액 데이터 중 가장 오래된 날짜를 기준으로 잡는다.
      *
-     * @param startAt : 조회 시작 날짜. 이유가 없다면 사용자 생성 날짜를 사용한다.
-     * @param endAt   : 조회 종료 날짜. 이유가 없다면 현재 날짜이며, 클라이언트로 부터 받은 날짜를 사용한다.
+     * @param endAt : 조회 종료 날짜. 이유가 없다면 현재 날짜이며, 클라이언트로 부터 받은 날짜를 사용한다.
      */
-    public static List<TargetAmountDto.WithTotalSpendingRes> toWithTotalSpendingResponses(List<TargetAmount> targetAmounts, List<TotalSpendingAmount> totalSpendings, LocalDate startAt, LocalDate endAt) {
+    public static List<TargetAmountDto.WithTotalSpendingRes> toWithTotalSpendingResponses(List<TargetAmount> targetAmounts, List<TotalSpendingAmount> totalSpendings, LocalDate endAt) {
+        LocalDate startAt = getOldestDate(targetAmounts);
         int monthLength = (endAt.getYear() - startAt.getYear()) * 12 + (endAt.getMonthValue() - startAt.getMonthValue());
 
         Map<YearMonth, TargetAmount> targetAmountsByDates = toYearMonthMap(targetAmounts, targetAmount -> YearMonth.of(targetAmount.getCreatedAt().getYear(), targetAmount.getCreatedAt().getMonthValue()), Function.identity());
@@ -84,6 +85,19 @@ public class TargetAmountMapper {
                 .totalSpending(totalSpending)
                 .diffAmount((targetAmountInfo.amount() == -1) ? 0 : totalSpending - targetAmountInfo.amount())
                 .build();
+    }
+
+    private static LocalDate getOldestDate(List<TargetAmount> targetAmounts) {
+        LocalDate minDate = LocalDate.now();
+
+        for (TargetAmount targetAmount : targetAmounts) {
+            LocalDate date = targetAmount.getCreatedAt().toLocalDate();
+            if (date.isBefore(minDate)) {
+                minDate = date;
+            }
+        }
+
+        return minDate;
     }
 
     /**
