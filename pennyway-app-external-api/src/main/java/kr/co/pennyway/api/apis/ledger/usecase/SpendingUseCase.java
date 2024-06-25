@@ -4,7 +4,6 @@ import kr.co.pennyway.api.apis.ledger.dto.SpendingReq;
 import kr.co.pennyway.api.apis.ledger.dto.SpendingSearchRes;
 import kr.co.pennyway.api.apis.ledger.mapper.SpendingMapper;
 import kr.co.pennyway.api.apis.ledger.service.SpendingSaveService;
-import kr.co.pennyway.api.apis.ledger.service.SpendingSearchService;
 import kr.co.pennyway.api.apis.ledger.service.SpendingUpdateService;
 import kr.co.pennyway.common.annotation.UseCase;
 import kr.co.pennyway.domain.domains.spending.domain.Spending;
@@ -26,7 +25,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SpendingUseCase {
     private final SpendingSaveService spendingSaveService;
-    private final SpendingSearchService spendingSearchService;
     private final SpendingUpdateService spendingUpdateService;
     private final SpendingService spendingService;
 
@@ -45,7 +43,9 @@ public class SpendingUseCase {
 
     @Transactional(readOnly = true)
     public SpendingSearchRes.Month getSpendingsAtYearAndMonth(Long userId, int year, int month) {
-        List<Spending> spendings = spendingSearchService.readSpendings(userId, year, month);
+        List<Spending> spendings = spendingService.readSpendings(userId, year, month).orElseThrow(
+                () -> new SpendingErrorException(SpendingErrorCode.NOT_FOUND_SPENDING)
+        );
 
         return SpendingMapper.toSpendingSearchResMonth(spendings, year, month);
     }

@@ -47,9 +47,6 @@ public class TargetAmountUseCase {
         List<TargetAmount> targetAmounts = targetAmountSearchService.readTargetAmountsByUserId(userId);
         List<TotalSpendingAmount> totalSpendings = spendingSearchService.readTotalSpendingsAmountByUserId(userId);
 
-        // 목표 금액 중 가장 오래된 날짜를 기준으로 잡는다. (마지막 원소)
-        LocalDate startAt = targetAmounts.get(targetAmounts.size() - 1).getCreatedAt().toLocalDate();
-
         return TargetAmountMapper.toWithTotalSpendingResponses(targetAmounts, totalSpendings, date);
     }
 
