@@ -47,13 +47,10 @@ public class TargetAmountUseCase {
         List<TargetAmount> targetAmounts = targetAmountSearchService.readTargetAmountsByUserId(userId);
         List<TotalSpendingAmount> totalSpendings = spendingSearchService.readTotalSpendingsAmountByUserId(userId);
 
-        // 소비 내역 중 가장 오래된 날짜를 기준으로 잡는다.
-        LocalDate startAt = totalSpendings.stream()
-                .map(totalSpendingAmount -> LocalDate.of(totalSpendingAmount.year(), totalSpendingAmount.month(), 1))
-                .min(LocalDate::compareTo)
-                .orElse(LocalDate.now());
+        // 목표 금액 중 가장 오래된 날짜를 기준으로 잡는다. (마지막 원소)
+        LocalDate startAt = targetAmounts.get(targetAmounts.size() - 1).getCreatedAt().toLocalDate();
 
-        return TargetAmountMapper.toWithTotalSpendingResponses(targetAmounts, totalSpendings, startAt, date);
+        return TargetAmountMapper.toWithTotalSpendingResponses(targetAmounts, totalSpendings, date);
     }
 
     public TargetAmountDto.RecentTargetAmountRes getRecentTargetAmount(Long userId) {
