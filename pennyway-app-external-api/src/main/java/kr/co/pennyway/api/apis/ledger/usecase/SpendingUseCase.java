@@ -28,15 +28,11 @@ public class SpendingUseCase {
     private final SpendingUpdateService spendingUpdateService;
     private final SpendingService spendingService;
 
-
     private final UserService userService;
-
 
     @Transactional
     public SpendingSearchRes.Individual createSpending(Long userId, SpendingReq request) {
-        User user = readUserOrThrow(userId);
-
-        Spending spending = spendingSaveService.createSpending(user, request);
+        Spending spending = spendingSaveService.createSpending(userId, request);
 
         return SpendingMapper.toSpendingSearchResIndividual(spending);
     }
