@@ -2,6 +2,7 @@ package kr.co.pennyway.api.config.fixture;
 
 import kr.co.pennyway.api.apis.ledger.dto.SpendingReq;
 import kr.co.pennyway.domain.domains.spending.domain.Spending;
+import kr.co.pennyway.domain.domains.spending.domain.SpendingCustomCategory;
 import kr.co.pennyway.domain.domains.spending.type.SpendingCategory;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
@@ -16,35 +17,44 @@ import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 public enum SpendingFixture {
-    GENERAL_SPENDING(10000, SpendingCategory.FOOD, LocalDateTime.now(), "카페인 수혈", "아메리카노 1잔", UserFixture.GENERAL_USER.toUser());
+    GENERAL_SPENDING(10000, SpendingCategory.FOOD, LocalDateTime.now(), "카페인 수혈", "아메리카노 1잔"),
+    CUSTOM_CATEGORY_SPENDING(10000, SpendingCategory.CUSTOM, LocalDateTime.now(), "커스텀 카페인 수혈", "아메리카노 1잔");
 
     private final int amount;
     private final SpendingCategory category;
     private final LocalDateTime spendAt;
     private final String accountName;
     private final String memo;
-    private final User user;
 
-    SpendingFixture(int amount, SpendingCategory category, LocalDateTime spendAt, String accountName, String memo, User user) {
+
+    SpendingFixture(int amount, SpendingCategory category, LocalDateTime spendAt, String accountName, String memo) {
         this.amount = amount;
         this.category = category;
         this.spendAt = spendAt;
         this.accountName = accountName;
         this.memo = memo;
-        this.user = user;
     }
 
     public static SpendingReq toSpendingReq(User user) {
         return new SpendingReq(10000, -1L, SpendingCategory.FOOD, LocalDate.now(), "카페인 수혈", "아메리카노 1잔");
     }
 
-    public static void bulkInsertSpending(User user, int capacity, NamedParameterJdbcTemplate jdbcTemplate) {
+    public static void bulkInsertSpending(User user, int capacity, boolean isCustom, NamedParameterJdbcTemplate jdbcTemplate) {
         Collection<Spending> spendings = getRandomSpendings(user, capacity);
+        String sql;
+        if (isCustom) {
+            SpendingCustomCategoryFixture.bulkInsertCustomCategory(user, capacity, jdbcTemplate);
+            sql = String.format("""
+                    INSERT INTO `%s` (amount, category, spend_at, account_name, memo, user_id, spending_custom_category_id, created_at, updated_at, deleted_at)
+                    VALUES (:amount, 1+FLOOR(RAND()*11), :spendAt, :accountName, :memo, :user.id, 1 + FLOOR(RAND() * %d), NOW(), NOW(), null)
+                    """, "spending", capacity);
+        } else {
+            sql = String.format("""
+                    INSERT INTO `%s` (amount, category, spend_at, account_name, memo, user_id, spending_custom_category_id, created_at, updated_at, deleted_at)
+                    VALUES (:amount, 1+FLOOR(RAND()*11), :spendAt, :accountName, :memo, :user.id, null, NOW(), NOW(), null)
+                    """, "spending");
+        }
 
-        String sql = String.format("""
-                INSERT INTO `%s` (amount, category, spend_at, account_name, memo, user_id, spending_custom_category_id, created_at, updated_at, deleted_at)
-                VALUES (:amount, 1+FLOOR(RAND()*11), :spendAt, :accountName, :memo, :user.id, null, NOW(), NOW(), null)
-                """, "spending");
         SqlParameterSource[] params = spendings.stream()
                 .map(BeanPropertySqlParameterSource::new)
                 .toArray(SqlParameterSource[]::new);
@@ -94,6 +104,18 @@ public enum SpendingFixture {
                 .accountName(accountName)
                 .memo(memo)
                 .user(user)
+                .build();
+    }
+
+    public Spending toCustomCategorySpending(User user, SpendingCustomCategory customCategory) {
+        return Spending.builder()
+                .amount(amount)
+                .category(category)
+                .spendAt(spendAt)
+                .accountName(accountName)
+                .memo(memo)
+                .user(user)
+                .spendingCustomCategory(customCategory)
                 .build();
     }
 }
