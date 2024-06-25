@@ -6,6 +6,7 @@ import kr.co.pennyway.domain.domains.spending.domain.Spending;
 import kr.co.pennyway.domain.domains.spending.domain.SpendingCustomCategory;
 import kr.co.pennyway.domain.domains.spending.exception.SpendingErrorException;
 import kr.co.pennyway.domain.domains.spending.service.SpendingCustomCategoryService;
+import kr.co.pennyway.domain.domains.spending.service.SpendingService;
 import kr.co.pennyway.domain.domains.spending.type.SpendingCategory;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +29,8 @@ public class SpendingUpdateServiceTest {
     private SpendingUpdateService spendingUpdateService;
     @Mock
     private SpendingCustomCategoryService spendingCustomCategoryService;
+    @Mock
+    private SpendingService spendingService;
 
     private Spending spending;
     private Spending spendingWithCustomCategory;
@@ -39,7 +42,7 @@ public class SpendingUpdateServiceTest {
 
     @BeforeEach
     void setUp() {
-        spendingUpdateService = new SpendingUpdateService(spendingCustomCategoryService);
+        spendingUpdateService = new SpendingUpdateService(spendingService, spendingCustomCategoryService);
 
         request = new SpendingReq(10000, -1L, SpendingCategory.FOOD, LocalDate.now(), "소비처", "메모");
         requestWithCustomCategory = new SpendingReq(10000, 1L, SpendingCategory.CUSTOM, LocalDate.now(), "소비처", "메모");
@@ -56,11 +59,13 @@ public class SpendingUpdateServiceTest {
     @Test
     void testUpdateSpendingWithCustomCategoryNotFound() {
         // given
+        Long spendingId = 1L;
+        given(spendingService.readSpending(spendingId)).willReturn(Optional.of(spending));
         given(spendingCustomCategoryService.readSpendingCustomCategory(1L)).willReturn(Optional.empty());
 
         // when - then
         SpendingErrorException exception = assertThrows(SpendingErrorException.class, () -> {
-            spendingUpdateService.updateSpending(spending, requestWithCustomCategory);
+            spendingUpdateService.updateSpending(spendingId, requestWithCustomCategory);
         });
         log.debug(exception.getExplainError());
     }
@@ -69,18 +74,24 @@ public class SpendingUpdateServiceTest {
     @Test
     void testUpdateSpendingWithCustomCategory() {
         // given
+        Long spendingId = 1L;
+        given(spendingService.readSpending(spendingId)).willReturn(Optional.of(spending));
         given(spendingCustomCategoryService.readSpendingCustomCategory(1L)).willReturn(Optional.of(customCategory));
 
         // when - then
-        assertDoesNotThrow(() -> spendingUpdateService.updateSpending(spending, requestWithCustomCategory));
+        assertDoesNotThrow(() -> spendingUpdateService.updateSpending(spendingId, requestWithCustomCategory));
         assertNotNull(spending.getSpendingCustomCategory());
     }
 
     @DisplayName("시스템 카테고리를 사용한 지출내역으로 수정할 시, Spending 객체가 수정된다.")
     @Test
     void testUpdateSpendingWithNonCustomCategory() {
+        // given
+        Long spendingId = 1L;
+        given(spendingService.readSpending(spendingId)).willReturn(Optional.of(spending));
+
         // when - then
-        assertDoesNotThrow(() -> spendingUpdateService.updateSpending(spending, request));
+        assertDoesNotThrow(() -> spendingUpdateService.updateSpending(spendingId, request));
         assertNull(spending.getSpendingCustomCategory());
     }
 }

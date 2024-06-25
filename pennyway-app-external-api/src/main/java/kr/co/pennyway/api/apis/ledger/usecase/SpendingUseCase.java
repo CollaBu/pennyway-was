@@ -3,17 +3,12 @@ package kr.co.pennyway.api.apis.ledger.usecase;
 import kr.co.pennyway.api.apis.ledger.dto.SpendingReq;
 import kr.co.pennyway.api.apis.ledger.dto.SpendingSearchRes;
 import kr.co.pennyway.api.apis.ledger.mapper.SpendingMapper;
+import kr.co.pennyway.api.apis.ledger.service.SpendingDeleteService;
 import kr.co.pennyway.api.apis.ledger.service.SpendingSaveService;
+import kr.co.pennyway.api.apis.ledger.service.SpendingSearchService;
 import kr.co.pennyway.api.apis.ledger.service.SpendingUpdateService;
 import kr.co.pennyway.common.annotation.UseCase;
 import kr.co.pennyway.domain.domains.spending.domain.Spending;
-import kr.co.pennyway.domain.domains.spending.exception.SpendingErrorCode;
-import kr.co.pennyway.domain.domains.spending.exception.SpendingErrorException;
-import kr.co.pennyway.domain.domains.spending.service.SpendingService;
-import kr.co.pennyway.domain.domains.user.domain.User;
-import kr.co.pennyway.domain.domains.user.exception.UserErrorCode;
-import kr.co.pennyway.domain.domains.user.exception.UserErrorException;
-import kr.co.pennyway.domain.domains.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,68 +20,39 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SpendingUseCase {
     private final SpendingSaveService spendingSaveService;
+    private final SpendingSearchService spendingSearchService;
     private final SpendingUpdateService spendingUpdateService;
-    private final SpendingService spendingService;
-
-
-    private final UserService userService;
-
+    private final SpendingDeleteService spendingDeleteService;
 
     @Transactional
     public SpendingSearchRes.Individual createSpending(Long userId, SpendingReq request) {
-        User user = readUserOrThrow(userId);
-
-        Spending spending = spendingSaveService.createSpending(user, request);
+        Spending spending = spendingSaveService.createSpending(userId, request);
 
         return SpendingMapper.toSpendingSearchResIndividual(spending);
     }
 
     @Transactional(readOnly = true)
     public SpendingSearchRes.Month getSpendingsAtYearAndMonth(Long userId, int year, int month) {
-        List<Spending> spendings = spendingService.readSpendings(userId, year, month).orElseThrow(
-                () -> new SpendingErrorException(SpendingErrorCode.NOT_FOUND_SPENDING)
-        );
+        List<Spending> spendings = spendingSearchService.readSpendingsAtYearAndMonth(userId, year, month);
 
         return SpendingMapper.toSpendingSearchResMonth(spendings, year, month);
     }
 
     @Transactional(readOnly = true)
     public SpendingSearchRes.Individual getSpedingDetail(Long spendingId) {
-        Spending spending = readSpendingOrThrow(spendingId);
+        Spending spending = spendingSearchService.readSpending(spendingId);
 
         return SpendingMapper.toSpendingSearchResIndividual(spending);
     }
 
     @Transactional
     public SpendingSearchRes.Individual updateSpending(Long spendingId, SpendingReq request) {
-        Spending spending = readSpendingOrThrow(spendingId);
-
-        Spending updatedSpending = spendingUpdateService.updateSpending(spending, request);
+        Spending updatedSpending = spendingUpdateService.updateSpending(spendingId, request);
 
         return SpendingMapper.toSpendingSearchResIndividual(updatedSpending);
     }
 
-    @Transactional
     public void deleteSpending(Long spendingId) {
-        Spending spending = spendingService.readSpending(spendingId)
-                .orElseThrow(() -> new SpendingErrorException(SpendingErrorCode.NOT_FOUND_SPENDING));
-
-        spendingService.deleteSpending(spending);
-    }
-
-    private User readUserOrThrow(Long userId) {
-        return userService.readUser(userId).orElseThrow(
-                () -> {
-                    throw new UserErrorException(UserErrorCode.NOT_FOUND);
-                }
-        );
-    }
-
-    private Spending readSpendingOrThrow(Long spendingId) {
-        return spendingService.readSpending(spendingId).orElseThrow(
-                () -> {
-                    throw new SpendingErrorException(SpendingErrorCode.NOT_FOUND_SPENDING);
-                }
-        );
+        spendingDeleteService.deleteSpending(spendingId);
     }
 }
