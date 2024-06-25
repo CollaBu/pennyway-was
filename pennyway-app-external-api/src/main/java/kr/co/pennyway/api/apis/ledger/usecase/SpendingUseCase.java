@@ -3,13 +3,12 @@ package kr.co.pennyway.api.apis.ledger.usecase;
 import kr.co.pennyway.api.apis.ledger.dto.SpendingReq;
 import kr.co.pennyway.api.apis.ledger.dto.SpendingSearchRes;
 import kr.co.pennyway.api.apis.ledger.mapper.SpendingMapper;
+import kr.co.pennyway.api.apis.ledger.service.SpendingDeleteService;
 import kr.co.pennyway.api.apis.ledger.service.SpendingSaveService;
 import kr.co.pennyway.api.apis.ledger.service.SpendingSearchService;
 import kr.co.pennyway.api.apis.ledger.service.SpendingUpdateService;
 import kr.co.pennyway.common.annotation.UseCase;
 import kr.co.pennyway.domain.domains.spending.domain.Spending;
-import kr.co.pennyway.domain.domains.spending.exception.SpendingErrorCode;
-import kr.co.pennyway.domain.domains.spending.exception.SpendingErrorException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +22,7 @@ public class SpendingUseCase {
     private final SpendingSaveService spendingSaveService;
     private final SpendingSearchService spendingSearchService;
     private final SpendingUpdateService spendingUpdateService;
+    private final SpendingDeleteService spendingDeleteService;
 
     @Transactional
     public SpendingSearchRes.Individual createSpending(Long userId, SpendingReq request) {
@@ -52,11 +52,7 @@ public class SpendingUseCase {
         return SpendingMapper.toSpendingSearchResIndividual(updatedSpending);
     }
 
-    @Transactional
     public void deleteSpending(Long spendingId) {
-        Spending spending = spendingService.readSpending(spendingId)
-                .orElseThrow(() -> new SpendingErrorException(SpendingErrorCode.NOT_FOUND_SPENDING));
-
-        spendingService.deleteSpending(spending);
+        spendingDeleteService.deleteSpending(spendingId);
     }
 }
