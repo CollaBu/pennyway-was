@@ -62,7 +62,7 @@ class SpendingSearchServiceTest extends ExternalApiDBTestConfig {
         SpendingFixture.bulkInsertSpending(user, 100, true, jdbcTemplate);
 
         // when
-        List<Spending> spendings = spendingService.readSpendings(user.getId(), LocalDate.now().getYear(), LocalDate.now().getMonthValue()).orElseThrow();
+        List<Spending> spendings = spendingService.readSpendings(user.getId(), LocalDate.now().getYear(), LocalDate.now().getMonthValue());
 
         int size = spendings.size();
         for (Spending spending : spendings) {
