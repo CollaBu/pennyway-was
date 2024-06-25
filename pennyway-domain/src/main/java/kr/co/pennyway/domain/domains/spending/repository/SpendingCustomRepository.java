@@ -9,5 +9,5 @@ import java.util.Optional;
 public interface SpendingCustomRepository {
     Optional<TotalSpendingAmount> findTotalSpendingAmountByUserId(Long userId, int year, int month);
 
-    Optional<List<Spending>> findByYearAndMonth(Long userId, int year, int month);
+    List<Spending> findByYearAndMonth(Long userId, int year, int month);
 }

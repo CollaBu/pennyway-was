@@ -59,7 +59,7 @@ public interface TargetAmountApi {
     })
     ResponseEntity<?> getTargetAmountAndTotalSpending(@PathVariable LocalDate date, @AuthenticationPrincipal SecurityUserDetails user);
 
-    @Operation(summary = "사용자 가입 이후 현재까지의 목표 금액 및 총 사용 금액 리스트 조회", method = "GET", description = "일수는 무시하고 년/월 정보만 사용한다. 데이터가 존재하지 않을 때 더미 값을 사용하며, 최신 데이터 순으로 정렬된 응답을 반환한다.")
+    @Operation(summary = "가장 오래된 목표 금액 이후부터 현재까지의 목표 금액 및 총 사용 금액 리스트 조회", method = "GET", description = "일수는 무시하고 년/월 정보만 사용한다. 데이터가 존재하지 않을 때 더미 값을 사용하며, 최신 데이터 순으로 정렬된 응답을 반환한다.")
     @Parameters({
             @Parameter(name = "date", description = "현재 날짜(yyyy-MM-dd)", required = true, in = ParameterIn.QUERY),
             @Parameter(name = "param", hidden = true)

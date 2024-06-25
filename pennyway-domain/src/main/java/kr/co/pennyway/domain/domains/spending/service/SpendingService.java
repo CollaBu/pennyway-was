@@ -45,7 +45,7 @@ public class SpendingService {
     }
 
     @Transactional(readOnly = true)
-    public Optional<List<Spending>> readSpendings(Long userId, int year, int month) {
+    public List<Spending> readSpendings(Long userId, int year, int month) {
         return spendingRepository.findByYearAndMonth(userId, year, month);
     }
 
