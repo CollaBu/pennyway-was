@@ -112,6 +112,10 @@ public class TargetAmountDto {
             }
         }
 
+        public static RecentTargetAmountRes notPresent() {
+            return new RecentTargetAmountRes(false, null, null, null);
+        }
+
         public static RecentTargetAmountRes of(Integer year, Integer month, Integer amount) {
             return (amount.equals(-1)) ? new RecentTargetAmountRes(false, null, null, null) : new RecentTargetAmountRes(true, year, month, amount);
         }
