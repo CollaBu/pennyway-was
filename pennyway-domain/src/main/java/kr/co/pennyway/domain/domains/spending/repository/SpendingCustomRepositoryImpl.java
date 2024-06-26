@@ -51,10 +51,11 @@ public class SpendingCustomRepositoryImpl implements SpendingCustomRepository {
         List<OrderSpecifier<?>> orderSpecifiers = QueryDslUtil.getOrderSpecifier(sort);
 
         return queryFactory.selectFrom(spending)
-                .leftJoin(spending.user, user)
                 .leftJoin(spending.spendingCustomCategory, spendingCustomCategory).fetchJoin()
                 .where(spending.spendAt.year().eq(year)
-                        .and(spending.spendAt.month().eq(month)))
+                        .and(spending.spendAt.month().eq(month))
+                        .and(spending.user.id.eq(userId))
+                )
                 .orderBy(orderSpecifiers.toArray(new OrderSpecifier[0]))
                 .fetch();
     }
