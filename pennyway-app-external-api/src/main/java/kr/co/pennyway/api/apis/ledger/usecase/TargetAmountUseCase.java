@@ -50,6 +50,7 @@ public class TargetAmountUseCase {
         return TargetAmountMapper.toWithTotalSpendingResponses(targetAmounts, totalSpendings, date);
     }
 
+    @Transactional(readOnly = true)
     public TargetAmountDto.RecentTargetAmountRes getRecentTargetAmount(Long userId) {
         return TargetAmountMapper.toRecentTargetAmountResponse(targetAmountSearchService.readRecentTargetAmount(userId));
     }

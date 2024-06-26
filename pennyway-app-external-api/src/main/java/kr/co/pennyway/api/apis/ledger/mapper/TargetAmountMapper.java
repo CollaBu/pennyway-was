@@ -8,10 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDate;
 import java.time.YearMonth;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -53,10 +50,18 @@ public class TargetAmountMapper {
     /**
      * 최근 목표 금액을 응답 형태로 변환한다.
      *
-     * @return TargetAmountDto.RecentTargetAmountRes
+     * @return {@link TargetAmountDto.RecentTargetAmountRes}
      */
-    public static TargetAmountDto.RecentTargetAmountRes toRecentTargetAmountResponse(Integer amount) {
-        return TargetAmountDto.RecentTargetAmountRes.valueOf(amount);
+    public static TargetAmountDto.RecentTargetAmountRes toRecentTargetAmountResponse(Optional<TargetAmount> targetAmount) {
+        if (targetAmount.isEmpty()) {
+            return TargetAmountDto.RecentTargetAmountRes.notPresent();
+        }
+
+        Integer year = targetAmount.get().getCreatedAt().getYear();
+        Integer month = targetAmount.get().getCreatedAt().getMonthValue();
+        Integer amount = targetAmount.get().getAmount();
+
+        return TargetAmountDto.RecentTargetAmountRes.of(year, month, amount);
     }
 
     private static List<TargetAmountDto.WithTotalSpendingRes> createWithTotalSpendingResponses(Map<YearMonth, TargetAmount> targetAmounts, Map<YearMonth, Integer> totalSpendings, LocalDate startAt, int monthLength) {
