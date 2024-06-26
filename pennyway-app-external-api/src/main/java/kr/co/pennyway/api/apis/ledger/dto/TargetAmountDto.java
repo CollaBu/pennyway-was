@@ -94,18 +94,30 @@ public class TargetAmountDto {
     public record RecentTargetAmountRes(
             @Schema(description = "최근 목표 금액 존재 여부로써 데이터가 존재하지 않으면 false, 존재하면 true", example = "true", requiredMode = Schema.RequiredMode.REQUIRED)
             boolean isPresent,
+            @Schema(description = "최근 목표 금액 년도 정보. isPresent가 false인 경우 필드가 존재하지 않는다.", example = "2024", requiredMode = Schema.RequiredMode.REQUIRED)
+            @JsonInclude(JsonInclude.Include.NON_NULL)
+            Integer year,
+            @Schema(description = "최근 목표 금액 월 정보. isPresent가 false인 경우 필드가 존재하지 않는다.", example = "6", requiredMode = Schema.RequiredMode.REQUIRED)
+            @JsonInclude(JsonInclude.Include.NON_NULL)
+            Integer month,
             @Schema(description = "최근 목표 금액 정보. isPresent가 false인 경우 필드가 존재하지 않는다.", requiredMode = Schema.RequiredMode.REQUIRED)
             @JsonInclude(JsonInclude.Include.NON_NULL)
             Integer amount
     ) {
         public RecentTargetAmountRes {
             if (!isPresent) {
-                amount = null;
+                assert year == null;
+                assert month == null;
+                assert amount == null;
             }
         }
 
-        public static RecentTargetAmountRes valueOf(Integer amount) {
-            return (amount.equals(-1)) ? new RecentTargetAmountRes(false, null) : new RecentTargetAmountRes(true, amount);
+        public static RecentTargetAmountRes notPresent() {
+            return new RecentTargetAmountRes(false, null, null, null);
+        }
+
+        public static RecentTargetAmountRes of(Integer year, Integer month, Integer amount) {
+            return (amount.equals(-1)) ? new RecentTargetAmountRes(false, null, null, null) : new RecentTargetAmountRes(true, year, month, amount);
         }
     }
 }

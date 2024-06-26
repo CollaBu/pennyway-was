@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -27,9 +28,7 @@ public class TargetAmountSearchService {
     }
 
     @Transactional(readOnly = true)
-    public Integer readRecentTargetAmount(Long userId) {
-        return targetAmountService.readRecentTargetAmount(userId)
-                .map(TargetAmount::getAmount)
-                .orElse(-1);
+    public Optional<TargetAmount> readRecentTargetAmount(Long userId) {
+        return targetAmountService.readRecentTargetAmount(userId);
     }
 }
