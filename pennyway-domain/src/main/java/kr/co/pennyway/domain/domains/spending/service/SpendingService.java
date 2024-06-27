@@ -75,4 +75,9 @@ public class SpendingService {
     public void deleteSpending(Spending spending) {
         spendingRepository.delete(spending);
     }
+
+    @Transactional
+    public void deleteSpendings(List<Long> spendingIds) {
+        spendingRepository.deleteByIds(spendingIds);
+    }
 }

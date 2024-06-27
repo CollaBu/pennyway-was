@@ -9,6 +9,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -21,5 +23,10 @@ public class SpendingDeleteService {
                 .orElseThrow(() -> new SpendingErrorException(SpendingErrorCode.NOT_FOUND_SPENDING));
 
         spendingService.deleteSpending(spending);
+    }
+
+    @Transactional
+    public void deleteSpendings(List<Long> spendingIds) {
+        spendingService.deleteSpendings(spendingIds);
     }
 }
