@@ -81,7 +81,7 @@ public class UserAccountController implements UserAccountApi {
     @PatchMapping("/profile")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> patchProfile(@RequestBody @Validated UserProfileUpdateDto.UsernameAndPhoneReq request, @AuthenticationPrincipal SecurityUserDetails user) {
-        userAccountUseCase.updateProfile(user.getUserId(), request);
+        userAccountUseCase.updateUsernameAndPhone(user.getUserId(), request);
         return ResponseEntity.ok(SuccessResponse.noContent());
     }
 
