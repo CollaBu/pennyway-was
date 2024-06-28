@@ -78,7 +78,7 @@ public class UserProfileUpdateDto {
             @NotBlank(message = "전화번호는 필수입니다.")
             @Pattern(regexp = "^01[01]-\\d{4}-\\d{4}$", message = "전화번호 형식이 올바르지 않습니다.")
             String phone,
-            @Schema(description = "6자리 정수 인증번호", example = "123456")
+            @Schema(description = "6자리 정수 인증번호. 만약 전화번호가 변경되지 않는다면, 6자리 정수 더미값 삽입", example = "123456")
             @NotBlank(message = "인증번호는 필수입니다.")
             @Pattern(regexp = "^[0-9]{6}$", message = "인증 코드는 6자리 숫자여야 합니다.")
             String code
