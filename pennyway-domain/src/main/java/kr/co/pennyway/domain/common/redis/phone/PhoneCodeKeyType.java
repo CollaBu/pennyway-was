@@ -12,7 +12,8 @@ public enum PhoneCodeKeyType {
     OAUTH_SIGN_UP_GOOGLE("oauthSignUp:google"),
     OAUTH_SIGN_UP_APPLE("oauthSignUp:apple"),
     FIND_USERNAME("username"),
-    FIND_PASSWORD("password");
+    FIND_PASSWORD("password"),
+    PHONE("phone");
 
     private final String prefix;
 
