@@ -61,7 +61,7 @@ public class UserAccountUseCase {
     }
 
     public void updateUsernameAndPhone(Long userId, UserProfileUpdateDto.UsernameAndPhoneReq request) {
-        userProfileUpdateService.updateUsernameAndPhone(userId, request.username(), request.phone());
+        userProfileUpdateService.updateUsernameAndPhone(userId, request.username(), request.phone(), request.code());
     }
 
     public UserProfileUpdateDto.NotifySettingUpdateRes activateNotification(Long userId, NotifySetting.NotifyType type) {
