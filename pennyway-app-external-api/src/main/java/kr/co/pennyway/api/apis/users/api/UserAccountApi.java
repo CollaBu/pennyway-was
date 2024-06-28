@@ -118,6 +118,24 @@ public interface UserAccountApi {
     ResponseEntity<?> patchPassword(@RequestBody @Validated UserProfileUpdateDto.PasswordReq request, @AuthenticationPrincipal SecurityUserDetails user);
 
     @Operation(summary = "사용자 프로필 수정")
+    @ApiResponses({
+            @ApiResponse(responseCode = "401", content = @Content(mediaType = "application/json", examples = {
+                    @ExampleObject(name = "검증 실패", value = """
+                            {
+                                "code": "4010",
+                                "message": "인증번호가 일치하지 않습니다."
+                            }
+                            """)
+            })),
+            @ApiResponse(responseCode = "404", content = @Content(mediaType = "application/json", examples = {
+                    @ExampleObject(name = "검증 실패 - 인증번호 만료", value = """
+                            {
+                                "code": "4042",
+                                "message": "만료되었거나 등록되지 않은 휴대폰 정보입니다."
+                            }
+                            """)
+            }))
+    })
     ResponseEntity<?> patchProfile(@RequestBody @Validated UserProfileUpdateDto.UsernameAndPhoneReq request, @AuthenticationPrincipal SecurityUserDetails user);
 
     @Operation(summary = "사용자 알림 활성화")
