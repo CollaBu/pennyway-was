@@ -67,4 +67,26 @@ public class UserProfileUpdateDto {
             String profileImageUrl
     ) {
     }
+
+    @Schema(title = "휴대폰 번호 인증 코드 DTO")
+    public record PhoneVerificationReq(
+            @Schema(description = "전화번호", example = "010-2629-4624")
+            @NotBlank(message = "전화번호는 필수입니다.")
+            @Pattern(regexp = "^01[01]-\\d{4}-\\d{4}$", message = "전화번호 형식이 올바르지 않습니다.")
+            String phone,
+            @Schema(description = "6자리 정수 인증번호", example = "123456")
+            @NotBlank(message = "인증번호는 필수입니다.")
+            @Pattern(regexp = "^[0-9]{6}$", message = "인증 코드는 6자리 숫자여야 합니다.")
+            String code
+    ) {
+    }
+
+    @Schema(title = "휴대폰 번호 변경 요청 DTO")
+    public record UpdatePhoneReq(
+            @Schema(description = "전화번호", example = "010-2629-4624")
+            @NotBlank(message = "전화번호는 필수입니다.")
+            @Pattern(regexp = "^01[01]-\\d{4}-\\d{4}$", message = "전화번호 형식이 올바르지 않습니다.")
+            String phone
+    ) {
+    }
 }
