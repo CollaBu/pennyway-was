@@ -1,9 +1,11 @@
 package kr.co.pennyway.api.apis.users.usecase;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import kr.co.pennyway.api.apis.auth.service.PhoneVerificationService;
 import kr.co.pennyway.api.apis.users.service.UserProfileUpdateService;
 import kr.co.pennyway.api.config.ExternalApiDBTestConfig;
 import kr.co.pennyway.api.config.fixture.UserFixture;
+import kr.co.pennyway.domain.common.redis.phone.PhoneCodeService;
 import kr.co.pennyway.domain.config.JpaConfig;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorCode;
@@ -37,6 +39,12 @@ public class UserProfileUpdateServiceTest extends ExternalApiDBTestConfig {
 
     @MockBean
     private AwsS3Provider awsS3Provider;
+
+    @MockBean
+    private PhoneVerificationService phoneVerificationService;
+
+    @MockBean
+    private PhoneCodeService phoneCodeService;
 
     @MockBean
     private JPAQueryFactory queryFactory;
