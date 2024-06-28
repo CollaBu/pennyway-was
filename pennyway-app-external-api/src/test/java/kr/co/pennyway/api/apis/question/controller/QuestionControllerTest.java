@@ -65,7 +65,7 @@ public class QuestionControllerTest {
         resultActions
                 .andExpect(status().isUnprocessableEntity())
                 .andExpect(jsonPath("$.fieldErrors.email").value("이메일을 입력해주세요"))
-                .andExpect(jsonPath("$.fieldErrors.content").value("문의 내용을 입력해주세요"))
+                .andExpect(jsonPath("$.fieldErrors.content").value("문의 내용은 1자 이상 5000자 이하로 입력해주세요"))
                 .andDo(print());
     }
 
@@ -125,6 +125,28 @@ public class QuestionControllerTest {
         // then
         resultActions
                 .andExpect(status().isOk())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("[5] 이메일, 내용을 필수로 입력해야 합니다.")
+    void sendLargeQuestion() throws Exception {
+
+        // given
+        String content = "a".repeat(5001);
+        QuestionReq request = new QuestionReq("team.collabu@gmail.com", content, QuestionCategory.ETC);
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                post("/v1/questions")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request))
+        );
+
+        // then
+        resultActions
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(jsonPath("$.fieldErrors.content").value("문의 내용은 1자 이상 5000자 이하로 입력해주세요"))
                 .andDo(print());
     }
 }

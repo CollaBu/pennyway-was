@@ -101,11 +101,11 @@ public class AuthControllerValidationTest {
                 .andDo(print());
     }
 
-    @DisplayName("[3] 이름은 2~8자의 한글, 영문 소문자만 사용 가능합니다.")
+    @DisplayName("[3] 2~8자의 한글, 영문 소문자, 숫자만 사용 가능합니다.")
     @Test
     void nameValidError() throws Exception {
         // given
-        SignUpReq.General request = new SignUpReq.General("pennyway", "페니웨이1", "pennyway1234",
+        SignUpReq.General request = new SignUpReq.General("pennyway", "페니웨이12345", "pennyway1234",
                 "010-1234-5678", "123456");
 
         // when
@@ -118,7 +118,7 @@ public class AuthControllerValidationTest {
         // then
         resultActions
                 .andExpect(status().isUnprocessableEntity())
-                .andExpect(jsonPath("$.fieldErrors.name").value("2~8자의 한글, 영문 소문자만 사용 가능합니다."))
+                .andExpect(jsonPath("$.fieldErrors.name").value("2~8자의 한글, 영문 소문자, 숫자만 사용 가능합니다."))
                 .andDo(print());
     }
 
@@ -213,7 +213,7 @@ public class AuthControllerValidationTest {
     @Test
     void signUp() throws Exception {
         // given
-        SignUpReq.General request = new SignUpReq.General("pennyway", "페니웨이", "pennyway1234",
+        SignUpReq.General request = new SignUpReq.General("pennyway", "페니웨이123", "pennyway1234",
                 "010-1234-5678", "123456");
         ResponseCookie expectedCookie = ResponseCookie.from("refreshToken", "refreshToken")
                 .maxAge(Duration.ofDays(7).toSeconds()).httpOnly(true).path("/").build();
