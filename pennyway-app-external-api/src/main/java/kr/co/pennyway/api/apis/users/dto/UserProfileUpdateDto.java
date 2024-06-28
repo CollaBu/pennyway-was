@@ -69,7 +69,7 @@ public class UserProfileUpdateDto {
     }
 
     @Schema(title = "사용자 아이디, 전화번호 변경 DTO")
-    public record ProfileUpdateReq(
+    public record UsernameAndPhoneReq(
             @Schema(description = "변경할 아이디", example = "pennyway")
             @NotBlank(message = "아이디를 입력해주세요")
             @Pattern(regexp = "^[a-z-_.]{5,20}$", message = "5~20자의 영문 소문자, -, _, . 만 사용 가능합니다.")
