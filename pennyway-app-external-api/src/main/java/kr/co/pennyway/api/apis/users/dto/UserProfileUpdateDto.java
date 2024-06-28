@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
-import kr.co.pennyway.api.apis.auth.dto.PhoneVerificationDto;
 import kr.co.pennyway.api.common.validator.Password;
 
 public class UserProfileUpdateDto {
@@ -84,8 +83,5 @@ public class UserProfileUpdateDto {
             @Pattern(regexp = "^[0-9]{6}$", message = "인증 코드는 6자리 숫자여야 합니다.")
             String code
     ) {
-        public static PhoneVerificationDto.VerifyCodeReq toVerifyCodeReq(String phone, String code) {
-            return new PhoneVerificationDto.VerifyCodeReq(phone, code);
-        }
     }
 }
