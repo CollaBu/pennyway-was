@@ -7,7 +7,8 @@ public enum VerificationType {
     GENERAL("general"),
     OAUTH("oauth"),
     USERNAME("username"),
-    PASSWORD("password");
+    PASSWORD("password"),
+    PHONE("phone");
 
     private final String type;
 
