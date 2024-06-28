@@ -117,6 +117,9 @@ public interface UserAccountApi {
     })
     ResponseEntity<?> patchPassword(@RequestBody @Validated UserProfileUpdateDto.PasswordReq request, @AuthenticationPrincipal SecurityUserDetails user);
 
+    @Operation(summary = "사용자 프로필 수정")
+    ResponseEntity<?> patchProfile(@RequestBody @Validated UserProfileUpdateDto.UsernameAndPhoneReq request, @AuthenticationPrincipal SecurityUserDetails user);
+
     @Operation(summary = "사용자 알림 활성화")
     @Parameter(name = "type", description = "알림 타입", examples = {
             @ExampleObject(name = "가계부", value = "account_book"), @ExampleObject(name = "피드", value = "feed"), @ExampleObject(name = "채팅", value = "chat")
