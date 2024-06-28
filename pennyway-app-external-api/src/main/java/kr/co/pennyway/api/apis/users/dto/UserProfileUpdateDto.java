@@ -68,8 +68,12 @@ public class UserProfileUpdateDto {
     ) {
     }
 
-    @Schema(title = "휴대폰 번호 인증 코드 DTO")
-    public record PhoneVerificationReq(
+    @Schema(title = "사용자 아이디, 전화번호 변경 DTO")
+    public record UsernameAndPhoneUpdateReq(
+            @Schema(description = "변경할 아이디", example = "pennyway")
+            @NotBlank(message = "아이디를 입력해주세요")
+            @Pattern(regexp = "^[a-z-_.]{5,20}$", message = "5~20자의 영문 소문자, -, _, . 만 사용 가능합니다.")
+            String username,
             @Schema(description = "전화번호", example = "010-2629-4624")
             @NotBlank(message = "전화번호는 필수입니다.")
             @Pattern(regexp = "^01[01]-\\d{4}-\\d{4}$", message = "전화번호 형식이 올바르지 않습니다.")
@@ -78,15 +82,6 @@ public class UserProfileUpdateDto {
             @NotBlank(message = "인증번호는 필수입니다.")
             @Pattern(regexp = "^[0-9]{6}$", message = "인증 코드는 6자리 숫자여야 합니다.")
             String code
-    ) {
-    }
-
-    @Schema(title = "휴대폰 번호 변경 요청 DTO")
-    public record UpdatePhoneReq(
-            @Schema(description = "전화번호", example = "010-2629-4624")
-            @NotBlank(message = "전화번호는 필수입니다.")
-            @Pattern(regexp = "^01[01]-\\d{4}-\\d{4}$", message = "전화번호 형식이 올바르지 않습니다.")
-            String phone
     ) {
     }
 }
