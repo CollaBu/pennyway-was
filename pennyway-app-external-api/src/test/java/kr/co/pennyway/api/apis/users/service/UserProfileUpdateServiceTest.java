@@ -108,6 +108,9 @@ public class UserProfileUpdateServiceTest {
         verifyNoInteractions(awsS3Provider, phoneVerificationService, phoneCodeService);
     }
 
+    /**
+     * 트랜잭션이 활성화되지 않아서, username 변경이 되지 않음을 확인할 수는 없다.
+     */
     @Test
     @DisplayName("수정 요청한 전화번호가 이미 존재하면, ALREADY_EXIST_PHONE 에러를 반환한다.")
     void updateAlreadyExistPhone() {
