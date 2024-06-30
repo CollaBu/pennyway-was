@@ -107,6 +107,10 @@ public class User extends DateAuditable {
         this.profileImageUrl = profileImageUrl;
     }
 
+    public void updatePhone(String phone) {
+        this.phone = phone;
+    }
+
     public boolean isGeneralSignedUpUser() {
         return password != null;
     }

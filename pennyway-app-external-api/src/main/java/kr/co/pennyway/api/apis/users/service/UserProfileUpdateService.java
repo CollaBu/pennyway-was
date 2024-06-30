@@ -1,5 +1,9 @@
 package kr.co.pennyway.api.apis.users.service;
 
+import kr.co.pennyway.api.apis.auth.dto.PhoneVerificationDto;
+import kr.co.pennyway.api.apis.auth.service.PhoneVerificationService;
+import kr.co.pennyway.domain.common.redis.phone.PhoneCodeKeyType;
+import kr.co.pennyway.domain.common.redis.phone.PhoneCodeService;
 import kr.co.pennyway.domain.domains.user.domain.NotifySetting;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorCode;
@@ -20,6 +24,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserProfileUpdateService {
     private final UserService userService;
     private final AwsS3Provider awsS3Provider;
+
+    private final PhoneVerificationService phoneVerificationService;
+    private final PhoneCodeService phoneCodeService;
 
     @Transactional
     public void updateName(Long userId, String newName) {
@@ -54,9 +61,33 @@ public class UserProfileUpdateService {
     }
 
     @Transactional
+    public void updateUsernameAndPhone(Long userId, String username, String phone, String code) {
+        User user = readUserOrThrow(userId);
+
+        if (!user.getUsername().equals(username)) {
+            if (userService.isExistUsername(username)) {
+                throw new UserErrorException(UserErrorCode.ALREADY_EXIST_USERNAME);
+            }
+
+            user.updateUsername(username);
+        }
+
+        if (!user.getPhone().equals(phone)) {
+            phoneVerificationService.isValidCode(PhoneVerificationDto.VerifyCodeReq.of(phone, code), PhoneCodeKeyType.PHONE);
+            phoneCodeService.delete(phone, PhoneCodeKeyType.PHONE);
+
+            if (userService.isExistPhone(phone)) {
+                throw new UserErrorException(UserErrorCode.ALREADY_EXIST_PHONE);
+            }
+
+            user.updatePhone(phone);
+        }
+    }
+
+    @Transactional
     public void updateNotifySetting(Long userId, NotifySetting.NotifyType type, Boolean flag) {
         User user = readUserOrThrow(userId);
-        
+
         user.getNotifySetting().updateNotifySetting(type, flag);
     }
 

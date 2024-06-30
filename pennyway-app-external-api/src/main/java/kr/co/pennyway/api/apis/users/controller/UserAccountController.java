@@ -78,6 +78,14 @@ public class UserAccountController implements UserAccountApi {
     }
 
     @Override
+    @PatchMapping("/profile")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> patchProfile(@RequestBody @Validated UserProfileUpdateDto.UsernameAndPhoneReq request, @AuthenticationPrincipal SecurityUserDetails user) {
+        userAccountUseCase.updateUsernameAndPhone(user.getUserId(), request);
+        return ResponseEntity.ok(SuccessResponse.noContent());
+    }
+
+    @Override
     @PatchMapping("/notifications")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> patchNotifySetting(@RequestParam NotifySetting.NotifyType type, @AuthenticationPrincipal SecurityUserDetails user) {
