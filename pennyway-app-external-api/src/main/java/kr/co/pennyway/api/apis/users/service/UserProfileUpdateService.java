@@ -64,11 +64,21 @@ public class UserProfileUpdateService {
     public void updateUsernameAndPhone(Long userId, String username, String phone, String code) {
         User user = readUserOrThrow(userId);
 
-        user.updateUsername(username);
+        if (!user.getUsername().equals(username)) {
+            if (userService.isExistUsernameExceptForMe(username, userId)) {
+                throw new UserErrorException(UserErrorCode.ALREADY_EXIST_USERNAME);
+            }
+
+            user.updateUsername(username);
+        }
 
         if (!user.getPhone().equals(phone)) {
             phoneVerificationService.isValidCode(PhoneVerificationDto.VerifyCodeReq.of(phone, code), PhoneCodeKeyType.PHONE);
             phoneCodeService.delete(phone, PhoneCodeKeyType.PHONE);
+
+            if (userService.isExistPhoneExceptForMe(phone, userId)) {
+                throw new UserErrorException(UserErrorCode.ALREADY_EXIST_PHONE);
+            }
 
             user.updatePhone(phone);
         }
