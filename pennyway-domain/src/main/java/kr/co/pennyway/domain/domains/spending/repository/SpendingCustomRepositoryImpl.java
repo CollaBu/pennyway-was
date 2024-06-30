@@ -59,11 +59,4 @@ public class SpendingCustomRepositoryImpl implements SpendingCustomRepository {
                 .orderBy(orderSpecifiers.toArray(new OrderSpecifier[0]))
                 .fetch();
     }
-
-    @Override
-    public void deleteByIds(List<Long> spendingIds) {
-        queryFactory.delete(spending)
-                .where(spending.id.in(spendingIds))
-                .execute();
-    }
 }

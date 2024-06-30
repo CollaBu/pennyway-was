@@ -78,6 +78,6 @@ public class SpendingService {
 
     @Transactional
     public void deleteSpendings(List<Long> spendingIds) {
-        spendingRepository.deleteByIds(spendingIds);
+        spendingRepository.deleteAllById(spendingIds);
     }
 }
