@@ -17,6 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verifyNoInteractions;
 
@@ -24,7 +25,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 @ExtendWith(MockitoExtension.class)
 public class UserProfileUpdateServiceTest {
     private final Long userId = 1L;
-    private final User user = UserFixture.GENERAL_USER.toUser();
+    private User user = UserFixture.GENERAL_USER.toUser();
     @InjectMocks
     private UserProfileUpdateService userProfileUpdateService;
     @Mock
@@ -42,12 +43,28 @@ public class UserProfileUpdateServiceTest {
     }
 
     @Test
-    @DisplayName("수정 요청한 이름과 전화번호가 기존 정보와 일치할 경우, 변경이 발생하지 않는다.")
+    @DisplayName("수정 요청한 아이디와 전화번호가 기존 정보와 일치할 경우, 변경이 발생하지 않는다.")
     void updateSameUsermameAndPhone() {
         // when
         userProfileUpdateService.updateUsernameAndPhone(userId, user.getUsername(), user.getPhone(), "000000");
 
         // then
+        verifyNoInteractions(awsS3Provider, phoneVerificationService, phoneCodeService);
+    }
+
+    @Test
+    @DisplayName("수정 요청한 아이디만 기존 정보와 다를 경우, 아이디만 변경이 발생한다.")
+    void updateDifferentUsername() {
+        // given
+        String newUsername = "newUsername";
+        String expectedPhone = user.getPhone();
+
+        // when
+        userProfileUpdateService.updateUsernameAndPhone(userId, newUsername, user.getPhone(), "000000");
+
+        // then
+        assertEquals(newUsername, user.getUsername());
+        assertEquals(expectedPhone, user.getPhone());
         verifyNoInteractions(awsS3Provider, phoneVerificationService, phoneCodeService);
     }
 }
