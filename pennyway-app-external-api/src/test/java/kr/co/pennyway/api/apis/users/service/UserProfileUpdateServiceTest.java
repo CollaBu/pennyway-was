@@ -2,6 +2,7 @@ package kr.co.pennyway.api.apis.users.service;
 
 import kr.co.pennyway.api.apis.auth.service.PhoneVerificationService;
 import kr.co.pennyway.api.config.fixture.UserFixture;
+import kr.co.pennyway.domain.common.redis.phone.PhoneCodeKeyType;
 import kr.co.pennyway.domain.common.redis.phone.PhoneCodeService;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.service.UserService;
@@ -18,7 +19,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.Mockito.verifyNoInteractions;
 
 @Slf4j
@@ -66,5 +70,23 @@ public class UserProfileUpdateServiceTest {
         assertEquals(newUsername, user.getUsername());
         assertEquals(expectedPhone, user.getPhone());
         verifyNoInteractions(awsS3Provider, phoneVerificationService, phoneCodeService);
+    }
+
+    @Test
+    @DisplayName("수정 요청한 전화번호만 기존 정보와 다를 경우, 전화번호만 변경이 발생한다.")
+    void updateDifferentPhone() {
+        // given
+        String expectedUsername = user.getUsername();
+        String newPhone = "010-0000-0000";
+        given(phoneVerificationService.isValidCode(any(), eq(PhoneCodeKeyType.PHONE))).willReturn(true);
+        willDoNothing().given(phoneCodeService).delete(newPhone, PhoneCodeKeyType.PHONE);
+
+        // when
+        userProfileUpdateService.updateUsernameAndPhone(userId, user.getUsername(), newPhone, "000000");
+
+        // then
+        assertEquals(expectedUsername, user.getUsername());
+        assertEquals(newPhone, user.getPhone());
+        verifyNoInteractions(awsS3Provider);
     }
 }
