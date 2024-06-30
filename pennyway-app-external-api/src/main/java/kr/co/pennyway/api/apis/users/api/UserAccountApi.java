@@ -134,6 +134,20 @@ public interface UserAccountApi {
                                 "message": "만료되었거나 등록되지 않은 휴대폰 정보입니다."
                             }
                             """)
+            })),
+            @ApiResponse(responseCode = "409", content = @Content(mediaType = "application/json", examples = {
+                    @ExampleObject(name = "검증 실패 - 이미 존재하는 아이디", value = """
+                            {
+                                "code": "4091",
+                                "message": "이미 존재하는 아이디입니다."
+                            }
+                            """),
+                    @ExampleObject(name = "검증 실패 - 이미 존재하는 휴대폰 번호", value = """
+                            {
+                                "code": "4091",
+                                "message": "이미 존재하는 휴대폰 번호입니다."
+                            }
+                            """)
             }))
     })
     ResponseEntity<?> patchProfile(@RequestBody @Validated UserProfileUpdateDto.UsernameAndPhoneReq request, @AuthenticationPrincipal SecurityUserDetails user);
