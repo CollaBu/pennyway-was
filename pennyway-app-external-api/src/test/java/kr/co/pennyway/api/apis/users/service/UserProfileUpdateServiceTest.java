@@ -5,6 +5,8 @@ import kr.co.pennyway.api.config.fixture.UserFixture;
 import kr.co.pennyway.domain.common.redis.phone.PhoneCodeKeyType;
 import kr.co.pennyway.domain.common.redis.phone.PhoneCodeService;
 import kr.co.pennyway.domain.domains.user.domain.User;
+import kr.co.pennyway.domain.domains.user.exception.UserErrorCode;
+import kr.co.pennyway.domain.domains.user.exception.UserErrorException;
 import kr.co.pennyway.domain.domains.user.service.UserService;
 import kr.co.pennyway.infra.client.aws.s3.AwsS3Provider;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +21,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
@@ -87,6 +90,38 @@ public class UserProfileUpdateServiceTest {
         // then
         assertEquals(expectedUsername, user.getUsername());
         assertEquals(newPhone, user.getPhone());
+        verifyNoInteractions(awsS3Provider);
+    }
+
+    @Test
+    @DisplayName("수정 요청한 아이디가 이미 존재하면, ALREADY_EXIST_USERNAME 에러를 반환한다.")
+    void updateAlreadyExistUsername() {
+        // given
+        String newUsername = "newUsername";
+        given(userService.isExistUsername(newUsername)).willReturn(true);
+
+        // when
+        UserErrorException exception = assertThrows(UserErrorException.class, () -> userProfileUpdateService.updateUsernameAndPhone(userId, newUsername, user.getPhone(), "000000"));
+
+        // then
+        assertEquals(UserErrorCode.ALREADY_EXIST_USERNAME, exception.getBaseErrorCode());
+        verifyNoInteractions(awsS3Provider, phoneVerificationService, phoneCodeService);
+    }
+
+    @Test
+    @DisplayName("수정 요청한 전화번호가 이미 존재하면, ALREADY_EXIST_PHONE 에러를 반환한다.")
+    void updateAlreadyExistPhone() {
+        // given
+        String newPhone = "010-0000-0000";
+        given(userService.isExistPhone(newPhone)).willReturn(true);
+        given(phoneVerificationService.isValidCode(any(), eq(PhoneCodeKeyType.PHONE))).willReturn(true);
+        willDoNothing().given(phoneCodeService).delete(newPhone, PhoneCodeKeyType.PHONE);
+
+        // when
+        UserErrorException exception = assertThrows(UserErrorException.class, () -> userProfileUpdateService.updateUsernameAndPhone(userId, user.getUsername(), newPhone, "000000"));
+
+        // then
+        assertEquals(UserErrorCode.ALREADY_EXIST_PHONE, exception.getBaseErrorCode());
         verifyNoInteractions(awsS3Provider);
     }
 }
