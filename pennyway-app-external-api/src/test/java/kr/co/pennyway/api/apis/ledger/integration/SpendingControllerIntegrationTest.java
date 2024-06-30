@@ -1,6 +1,7 @@
 package kr.co.pennyway.api.apis.ledger.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import kr.co.pennyway.api.apis.ledger.dto.SpendingIdsDto;
 import kr.co.pennyway.api.apis.ledger.dto.SpendingReq;
 import kr.co.pennyway.api.common.security.authentication.SecurityUserDetails;
 import kr.co.pennyway.api.config.ExternalApiDBTestConfig;
@@ -26,6 +27,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -313,6 +316,74 @@ public class SpendingControllerIntegrationTest extends ExternalApiDBTestConfig {
 
             return mockMvc.perform(MockMvcRequestBuilders.delete("/v2/spendings/{spendingId}", spendingId)
                     .with(user(userDetails)));
+        }
+    }
+
+    @Order(6)
+    @Nested
+    @DisplayName("지출 내역 복수 삭제")
+    class DeleteSpendings {
+
+        @Test
+        @DisplayName("지출 내역 복수 삭제 성공")
+        @Transactional
+        void deleteSpendingsSuccess() throws Exception {
+            // given
+            User user = userService.createUser(UserFixture.GENERAL_USER.toUser());
+            List<Long> spendingIds = new ArrayList<>();
+
+            for (int i = 0; i < 5; i++) {
+                Spending spending = SpendingFixture.GENERAL_SPENDING.toSpending(user);
+                spendingService.createSpending(spending);
+                spendingIds.add(spending.getId());
+            }
+            SpendingIdsDto spendingIdsDto = new SpendingIdsDto(spendingIds);
+
+            // when
+            ResultActions resultActions = performDeleteSpendings(user, spendingIdsDto);
+
+            // then
+            resultActions
+                    .andDo(print())
+                    .andExpect(status().isOk());
+
+            for (Long id : spendingIds) {
+                Assertions.assertTrue(spendingService.readSpending(id).isEmpty());
+            }
+        }
+
+        @Test
+        @DisplayName("spendingIds에 하나라도 소유하지 않은 지출 내역이 포함되어 있을 경우, 403 Forbidden을 반환한다.")
+        @Transactional
+        void deleteSpendingsForbidden() throws Exception {
+            // given
+            User user = userService.createUser(UserFixture.GENERAL_USER.toUser());
+            User user2 = userService.createUser(UserFixture.GENERAL_USER.toUser());
+            List<Long> spendingIds = new ArrayList<>();
+
+            for (int i = 0; i < 5; i++) {
+                Spending spending = SpendingFixture.GENERAL_SPENDING.toSpending(user);
+                spendingService.createSpending(spending);
+                spendingIds.add(spending.getId());
+            }
+            SpendingIdsDto spendingIdsDto = new SpendingIdsDto(spendingIds);
+
+            // when
+            ResultActions resultActions = performDeleteSpendings(user2, spendingIdsDto);
+
+            // then
+            resultActions
+                    .andDo(print())
+                    .andExpect(status().isForbidden());
+        }
+
+        private ResultActions performDeleteSpendings(User requestUser, SpendingIdsDto req) throws Exception {
+            UserDetails userDetails = SecurityUserDetails.from(requestUser);
+
+            return mockMvc.perform(MockMvcRequestBuilders.delete("/v2/spendings", req)
+                    .contentType("application/json")
+                    .with(user(userDetails))
+                    .content(objectMapper.writeValueAsString(req)));
         }
     }
 }
