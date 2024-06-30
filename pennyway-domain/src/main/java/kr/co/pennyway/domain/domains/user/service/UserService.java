@@ -43,6 +43,16 @@ public class UserService {
         return userRepository.existsByUsername(username);
     }
 
+    @Transactional(readOnly = true)
+    public boolean isExistPhoneExceptForMe(String phone, Long userId) {
+        return userRepository.existsByPhoneAndIdNot(phone, userId);
+    }
+
+    @Transactional(readOnly = true)
+    public boolean isExistUsernameExceptForMe(String username, Long userId) {
+        return userRepository.existsByUsernameAndIdNot(username, userId);
+    }
+
     @Transactional
     public void deleteUser(User user) {
         userRepository.delete(user);
