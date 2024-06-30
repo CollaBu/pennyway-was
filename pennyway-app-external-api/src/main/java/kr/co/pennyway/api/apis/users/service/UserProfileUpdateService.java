@@ -65,7 +65,7 @@ public class UserProfileUpdateService {
         User user = readUserOrThrow(userId);
 
         if (!user.getUsername().equals(username)) {
-            if (userService.isExistUsernameExceptForMe(username, userId)) {
+            if (userService.isExistUsername(username)) {
                 throw new UserErrorException(UserErrorCode.ALREADY_EXIST_USERNAME);
             }
 
@@ -76,7 +76,7 @@ public class UserProfileUpdateService {
             phoneVerificationService.isValidCode(PhoneVerificationDto.VerifyCodeReq.of(phone, code), PhoneCodeKeyType.PHONE);
             phoneCodeService.delete(phone, PhoneCodeKeyType.PHONE);
 
-            if (userService.isExistPhoneExceptForMe(phone, userId)) {
+            if (userService.isExistPhone(phone)) {
                 throw new UserErrorException(UserErrorCode.ALREADY_EXIST_PHONE);
             }
 
