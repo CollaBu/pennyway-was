@@ -48,13 +48,17 @@ public class SpendingCategoryController implements SpendingCategoryApi {
     }
 
     @GetMapping("/{categoryId}/spendings")
-    @PreAuthorize("isAuthenticated() and @spendingCateogryManager.hasPermission(#user.getUserId(), #categoryId, #type)")
+    @PreAuthorize("isAuthenticated() and @spendingCategoryManager.hasPermission(#user.getUserId(), #categoryId, #type)")
     public ResponseEntity<?> getSpendingsByCategory(
             @PathVariable(value = "categoryId") Long categoryId,
             @RequestParam(value = "type") SpendingCategoryType type,
             @PageableDefault(size = 30, page = 0) @SortDefault(sort = "spending.createdAt", direction = Sort.Direction.DESC) Pageable pageable,
             @AuthenticationPrincipal SecurityUserDetails user
     ) {
+        if (type.equals(SpendingCategoryType.DEFAULT) && (categoryId.equals(0L) || categoryId.equals(12L))) {
+            throw new SpendingErrorException(SpendingErrorCode.INVALID_TYPE_WITH_CATEGORY_ID);
+        }
+
         return ResponseEntity.ok(SuccessResponse.from("spendings", spendingCategoryUseCase.getSpendingsByCategory(user.getUserId(), categoryId, pageable, type)));
     }
 }
