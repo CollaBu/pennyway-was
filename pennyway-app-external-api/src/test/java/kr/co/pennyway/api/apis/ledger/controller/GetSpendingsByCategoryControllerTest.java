@@ -2,6 +2,7 @@ package kr.co.pennyway.api.apis.ledger.controller;
 
 import kr.co.pennyway.api.apis.ledger.usecase.SpendingCategoryUseCase;
 import kr.co.pennyway.api.common.query.SpendingCategoryType;
+import kr.co.pennyway.api.config.supporter.WithSecurityMockUser;
 import kr.co.pennyway.domain.common.redis.sign.SignEventLogService;
 import kr.co.pennyway.infra.common.jwt.JwtProvider;
 import org.junit.jupiter.api.BeforeEach;
@@ -44,6 +45,7 @@ public class GetSpendingsByCategoryControllerTest {
 
     @Test
     @DisplayName("default, custom 타입은 올바르게 조회된다.")
+    @WithSecurityMockUser
     void getSpendingsByCategory() throws Exception {
         performGetSpendingsByCategory(1L, SpendingCategoryType.DEFAULT.name())
                 .andExpect(status().isOk());
@@ -57,6 +59,17 @@ public class GetSpendingsByCategoryControllerTest {
         performGetSpendingsByCategory(1L, "invalid")
                 .andDo(print())
                 .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    @DisplayName("카테고리 타입이 default이면서 categoryId가 0이거나 12이면 400 에러가 발생한다.")
+    void getSpendingsByCategory_InvalidCategoryId() throws Exception {
+        performGetSpendingsByCategory(0L, SpendingCategoryType.DEFAULT.name())
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+        performGetSpendingsByCategory(12L, SpendingCategoryType.DEFAULT.name())
+                .andDo(print())
+                .andExpect(status().isBadRequest());
     }
 
     private ResultActions performGetSpendingsByCategory(Long categoryId, String type) throws Exception {
