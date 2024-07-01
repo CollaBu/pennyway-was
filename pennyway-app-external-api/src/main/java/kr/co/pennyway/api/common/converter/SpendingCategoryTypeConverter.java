@@ -11,7 +11,7 @@ public class SpendingCategoryTypeConverter implements Converter<String, Spending
         try {
             return SpendingCategoryType.valueOf(type.toUpperCase());
         } catch (IllegalArgumentException e) {
-            throw new SpendingErrorException(SpendingErrorCode.INVALIE_CATEGORY_TYPE);
+            throw new SpendingErrorException(SpendingErrorCode.INVALID_CATEGORY_TYPE);
         }
     }
 }
