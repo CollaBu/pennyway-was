@@ -71,6 +71,7 @@ public class SpendingController implements SpendingApi {
         return ResponseEntity.ok(SuccessResponse.noContent());
     }
 
+    @Override
     @DeleteMapping("")
     @PreAuthorize("isAuthenticated() and @spendingManager.hasPermissions(#user.getUserId(), #spendingIds.spendingIds())")
     public ResponseEntity<?> deleteSpendings(@RequestBody SpendingIdsDto spendingIds, @AuthenticationPrincipal SecurityUserDetails user) {
