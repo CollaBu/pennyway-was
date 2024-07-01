@@ -26,11 +26,10 @@ public class SpendingManager {
 
     @Transactional(readOnly = true)
     public boolean hasPermissions(Long userId, List<Long> spendingIds) {
-        for (Long spendingId : spendingIds) {
-            if (!spendingService.isExistsSpending(userId, spendingId)) {
-                return false;
-            }
+        if (spendingService.countByUserIdAndIdIn(userId, spendingIds) != spendingIds.size()) {
+            return false;
         }
+
         return true;
     }
 }

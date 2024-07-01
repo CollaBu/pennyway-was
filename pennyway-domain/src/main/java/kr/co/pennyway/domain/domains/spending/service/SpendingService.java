@@ -80,4 +80,9 @@ public class SpendingService {
     public void deleteSpendings(List<Long> spendingIds) {
         spendingRepository.deleteAllById(spendingIds);
     }
+
+    @Transactional(readOnly = true)
+    public long countByUserIdAndIdIn(Long userId, List<Long> spendingIds) {
+        return spendingRepository.countByUserIdAndIdIn(userId, spendingIds);
+    }
 }
