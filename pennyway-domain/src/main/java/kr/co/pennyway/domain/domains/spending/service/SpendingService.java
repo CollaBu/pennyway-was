@@ -11,6 +11,7 @@ import kr.co.pennyway.domain.domains.spending.repository.SpendingRepository;
 import kr.co.pennyway.domain.domains.user.domain.QUser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -47,6 +48,26 @@ public class SpendingService {
     @Transactional(readOnly = true)
     public List<Spending> readSpendings(Long userId, int year, int month) {
         return spendingRepository.findByYearAndMonth(userId, year, month);
+    }
+
+    /**
+     * 사용자 정의 카테고리 ID로 지출 내역 리스트를 조회한다.
+     *
+     * @return 지출 내역 리스트를 {@link Slice}에 담아서 반환한다.
+     */
+    @Transactional(readOnly = true)
+    public Slice<Spending> readSpendingsSliceByCategoryId(Long userId, Long categoryId, org.springframework.data.domain.Pageable pageable) {
+        return spendingRepository.findAllByCustomCategoryId(userId, categoryId, pageable);
+    }
+
+    /**
+     * 시스템 제공 카테고리 code로 지출 내역 리스트를 조회한다.
+     *
+     * @return 지출 내역 리스트를 {@link Slice}에 담아서 반환한다.
+     */
+    @Transactional(readOnly = true)
+    public Slice<Spending> readSpendingsSliceByCategory(Long userId, Long code, org.springframework.data.domain.Pageable pageable) {
+        return spendingRepository.findAllByCategoryId(userId, code, pageable);
     }
 
     @Transactional(readOnly = true)

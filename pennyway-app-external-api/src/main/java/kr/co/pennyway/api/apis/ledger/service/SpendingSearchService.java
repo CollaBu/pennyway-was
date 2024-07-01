@@ -43,10 +43,10 @@ public class SpendingSearchService {
     @Transactional(readOnly = true)
     public Slice<Spending> readSpendingsByCategoryId(Long userId, Long categoryId, Pageable pageable, SpendingCategoryType type) {
         if (type.equals(SpendingCategoryType.CUSTOM)) {
-            return spendingService.readSpendingsByCustomCategoryId(userId, categoryId, pageable);
+            return spendingService.readSpendingsSliceByCategoryId(userId, categoryId, pageable);
         }
 
-        return spendingService.readSpendingsByCategory(userId, categoryId, pageable);
+        return spendingService.readSpendingsSliceByCategory(userId, categoryId, pageable);
     }
 
     @Transactional(readOnly = true)
