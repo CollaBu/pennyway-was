@@ -1,6 +1,7 @@
 package kr.co.pennyway.api.apis.ledger.controller;
 
 import kr.co.pennyway.api.apis.ledger.usecase.SpendingCategoryUseCase;
+import kr.co.pennyway.api.common.query.SpendingCategoryType;
 import kr.co.pennyway.api.config.WebConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +36,8 @@ public class GetSpendingsByCategoryControllerTest {
                 .build();
     }
 
-    private ResultActions performGetSpendingsByCategory(Long categoryId) throws Exception {
-        return mockMvc.perform(MockMvcRequestBuilders.get("/api/v2/spending-categories/{categoryId}/spendings", categoryId));
+    private ResultActions performGetSpendingsByCategory(Long categoryId, SpendingCategoryType type) throws Exception {
+        return mockMvc.perform(MockMvcRequestBuilders.get("/v2/spending-categories/{categoryId}/spendings", categoryId)
+                .param("type", type.name()));
     }
 }
