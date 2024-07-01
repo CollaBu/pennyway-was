@@ -15,6 +15,8 @@ public interface UserRepository extends ExtendedRepository<User, Long> {
 
     boolean existsByUsername(String username);
 
+    boolean existsByPhone(String phone);
+
     @Transactional
     @Modifying(clearAutomatically = true)
     @Query("UPDATE User u SET u.deletedAt = NOW() WHERE u.id = :userId")
