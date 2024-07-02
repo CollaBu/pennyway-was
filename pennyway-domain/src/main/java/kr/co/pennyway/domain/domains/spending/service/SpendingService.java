@@ -55,6 +55,16 @@ public class SpendingService {
         return spendingRepository.findByYearAndMonth(userId, year, month);
     }
 
+    @Transactional(readOnly = true)
+    public int readSpendingTotalCountByCategoryId(Long userId, Long categoryId) {
+        return spendingRepository.countByUser_IdAndSpendingCustomCategory_Id(userId, categoryId);
+    }
+
+    @Transactional(readOnly = true)
+    public int readSpendingTotalCountByCategory(Long userId, SpendingCategory spendingCategory) {
+        return spendingRepository.countByUser_IdAndCategory(userId, spendingCategory);
+    }
+
     /**
      * 사용자 정의 카테고리 ID로 지출 내역 리스트를 조회한다.
      *
