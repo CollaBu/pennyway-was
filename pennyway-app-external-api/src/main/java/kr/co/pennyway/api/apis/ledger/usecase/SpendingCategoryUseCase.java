@@ -6,6 +6,7 @@ import kr.co.pennyway.api.apis.ledger.mapper.SpendingCategoryMapper;
 import kr.co.pennyway.api.apis.ledger.mapper.SpendingMapper;
 import kr.co.pennyway.api.apis.ledger.service.SpendingCategorySaveService;
 import kr.co.pennyway.api.apis.ledger.service.SpendingCategorySearchService;
+import kr.co.pennyway.api.apis.ledger.service.SpendingSearchService;
 import kr.co.pennyway.api.common.query.SpendingCategoryType;
 import kr.co.pennyway.common.annotation.UseCase;
 import kr.co.pennyway.domain.domains.spending.domain.Spending;
@@ -26,6 +27,8 @@ public class SpendingCategoryUseCase {
     private final SpendingCategorySaveService spendingCategorySaveService;
     private final SpendingCategorySearchService spendingCategorySearchService;
 
+    private final SpendingSearchService spendingSearchService;
+
     @Transactional
     public SpendingCategoryDto.Res createSpendingCategory(Long userId, String categoryName, SpendingCategory icon) {
         SpendingCustomCategory category = spendingCategorySaveService.execute(userId, categoryName, icon);
@@ -42,8 +45,9 @@ public class SpendingCategoryUseCase {
 
     @Transactional(readOnly = true)
     public List<SpendingSearchRes.Month> getSpendingsByCategory(Long userId, Long categoryId, Pageable pageable, SpendingCategoryType type) {
-        Slice<Spending> spendings = spendingCategorySearchService.readSpendingsByCategoryId(userId, categoryId, pageable, type);
+        Slice<Spending> spendings = spendingSearchService.readSpendingsByCategoryId(userId, categoryId, pageable, type);
 
-        return SpendingMapper.toSpendingsByCategory(spendings);
+//        return SpendingMapper.toSpendingsByCategory(spendings);
+        return SpendingMapper.toSpendingByCategory(spendings);
     }
 }
