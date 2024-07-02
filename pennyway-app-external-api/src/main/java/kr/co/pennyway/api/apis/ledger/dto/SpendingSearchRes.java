@@ -17,8 +17,8 @@ public class SpendingSearchRes {
     @Builder
     @Schema(title = "월별 지출 내역 조회 슬라이스 응답")
     public record MonthSlice(
-            @Schema(description = "월별 지출 내역")
-            List<Month> months,
+            @Schema(description = "년/월별 지출 내역")
+            List<Month> content,
             @Schema(description = "현재 페이지 번호")
             int currentPageNumber,
             @Schema(description = "페이지 크기")
