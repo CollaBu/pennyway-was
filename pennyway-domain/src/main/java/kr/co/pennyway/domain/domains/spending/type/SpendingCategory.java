@@ -4,6 +4,8 @@ import kr.co.pennyway.domain.common.converter.LegacyCommonType;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.util.stream.Stream;
+
 @Getter
 @RequiredArgsConstructor
 public enum SpendingCategory implements LegacyCommonType {
@@ -23,4 +25,11 @@ public enum SpendingCategory implements LegacyCommonType {
 
     private final String code;
     private final String type;
+
+    public static SpendingCategory fromCode(String code) {
+        return Stream.of(values())
+                .filter(v -> v.getCode().equals(code))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 카테고리 코드입니다."));
+    }
 }
