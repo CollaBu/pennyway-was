@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 
 @Mapper
 public class SpendingMapper {
-    public static List<SpendingSearchRes.Month> toSpendingByCategory(Slice<Spending> spendings) {
+    public static SpendingSearchRes.MonthSlice toSpendingByCategory(Slice<Spending> spendings) {
         List<Spending> spendingList = spendings.getContent();
 
         ConcurrentMap<Integer, List<Spending>> groupSpendingsByYearAndMonth = spendingList.stream()
@@ -19,7 +19,7 @@ public class SpendingMapper {
                         spending -> spending.getSpendAt().getYear() * 100 + spending.getSpendAt().getMonthValue()
                 ));
 
-        return groupSpendingsByYearAndMonth.entrySet().stream()
+        List<SpendingSearchRes.Month> months = groupSpendingsByYearAndMonth.entrySet().stream()
                 .map(entry -> {
                     int year = entry.getKey() / 100;
                     int month = entry.getKey() % 100;
@@ -32,6 +32,8 @@ public class SpendingMapper {
                     return b.year() - a.year();
                 })
                 .toList();
+
+        return SpendingSearchRes.MonthSlice.from(months, spendings.getPageable(), spendings.getNumberOfElements(), spendings.hasNext());
     }
 
     public static SpendingSearchRes.Month toSpendingSearchResMonth(List<Spending> spendings, int year, int month) {
