@@ -49,6 +49,7 @@ public class SpendingCategoryController implements SpendingCategoryApi {
 
     @Override
     @GetMapping("/{categoryId}/spendings/count")
+    @PreAuthorize("isAuthenticated() and @spendingCategoryManager.hasPermission(#user.getUserId(), #categoryId, #type)")
     public ResponseEntity<?> getSpendingTotalCountByCategory(
             @PathVariable(value = "categoryId") Long categoryId,
             @RequestParam(value = "type") SpendingCategoryType type,
