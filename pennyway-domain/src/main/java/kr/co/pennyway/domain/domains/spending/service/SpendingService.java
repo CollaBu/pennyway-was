@@ -4,7 +4,9 @@ import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Predicate;
 import kr.co.pennyway.common.annotation.DomainService;
 import kr.co.pennyway.domain.common.repository.QueryHandler;
+import kr.co.pennyway.domain.common.util.SliceUtil;
 import kr.co.pennyway.domain.domains.spending.domain.QSpending;
+import kr.co.pennyway.domain.domains.spending.domain.QSpendingCustomCategory;
 import kr.co.pennyway.domain.domains.spending.domain.Spending;
 import kr.co.pennyway.domain.domains.spending.dto.TotalSpendingAmount;
 import kr.co.pennyway.domain.domains.spending.repository.SpendingRepository;
@@ -12,6 +14,7 @@ import kr.co.pennyway.domain.domains.spending.type.SpendingCategory;
 import kr.co.pennyway.domain.domains.user.domain.QUser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +33,7 @@ public class SpendingService {
 
     private final QUser user = QUser.user;
     private final QSpending spending = QSpending.spending;
+    private final QSpendingCustomCategory spendingCustomCategory = QSpendingCustomCategory.spendingCustomCategory;
 
     @Transactional
     public Spending createSpending(Spending spending) {
@@ -57,8 +61,17 @@ public class SpendingService {
      * @return 지출 내역 리스트를 {@link Slice}에 담아서 반환한다.
      */
     @Transactional(readOnly = true)
-    public Slice<Spending> readSpendingsSliceByCategoryId(Long userId, Long categoryId, org.springframework.data.domain.Pageable pageable) {
-        return spendingRepository.findAllByCustomCategoryId(userId, categoryId, pageable);
+    public Slice<Spending> readSpendingsSliceByCategoryId(Long userId, Long categoryId, Pageable pageable) {
+        Predicate predicate = spending.user.id.eq(userId).and(spendingCustomCategory.id.eq(categoryId));
+
+        QueryHandler queryHandler = query -> query
+                .leftJoin(spending.spendingCustomCategory, spendingCustomCategory).fetchJoin()
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize() + 1);
+
+        Sort sort = pageable.getSort();
+
+        return SliceUtil.toSlice(spendingRepository.findList(predicate, queryHandler, sort), pageable);
     }
 
     /**
@@ -67,12 +80,20 @@ public class SpendingService {
      * @return 지출 내역 리스트를 {@link Slice}에 담아서 반환한다.
      */
     @Transactional(readOnly = true)
-    public Slice<Spending> readSpendingsSliceByCategory(Long userId, SpendingCategory spendingCategory, org.springframework.data.domain.Pageable pageable) {
+    public Slice<Spending> readSpendingsSliceByCategory(Long userId, SpendingCategory spendingCategory, Pageable pageable) {
         if (spendingCategory.equals(SpendingCategory.CUSTOM) || spendingCategory.equals(SpendingCategory.OTHER)) {
             throw new IllegalArgumentException("지출 카테고리가 시스템 제공 카테고리가 아닙니다.");
         }
 
-        return spendingRepository.findAllByCategory(userId, spendingCategory, pageable);
+        Predicate predicate = spending.user.id.eq(userId).and(spending.category.eq(spendingCategory));
+
+        QueryHandler queryHandler = query -> query
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize() + 1);
+
+        Sort sort = pageable.getSort();
+
+        return SliceUtil.toSlice(spendingRepository.findList(predicate, queryHandler, sort), pageable);
     }
 
     @Transactional(readOnly = true)
