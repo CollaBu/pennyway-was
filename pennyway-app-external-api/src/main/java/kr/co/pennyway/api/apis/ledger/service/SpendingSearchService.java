@@ -35,6 +35,19 @@ public class SpendingSearchService {
     }
 
     /**
+     * 카테고리에 등록된 지출 내역 개수를 조회한다.
+     */
+    @Transactional(readOnly = true)
+    public int readSpendingTotalCountByCategoryId(Long userId, Long categoryId, SpendingCategoryType type) {
+        if (type.equals(SpendingCategoryType.CUSTOM)) {
+            return spendingService.readSpendingTotalCountByCategoryId(userId, categoryId);
+        }
+
+        SpendingCategory spendingCategory = SpendingCategory.fromCode(categoryId.toString());
+        return spendingService.readSpendingTotalCountByCategory(userId, spendingCategory);
+    }
+
+    /**
      * 카테고리에 등록된 지출 내역 리스트를 조회한다.
      *
      * @param categoryId type이 {@link SpendingCategoryType#CUSTOM}이면 커스텀 카테고리 아이디, {@link SpendingCategoryType#DEFAULT}이면 시스템 제공 카테고리 코드로 사용한다.
