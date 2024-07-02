@@ -42,6 +42,34 @@ public interface SpendingCategoryApi {
     @ApiResponse(responseCode = "200", description = "지출 카테고리 조회 성공", content = @Content(mediaType = "application/json", schemaProperties = @SchemaProperty(name = "spendingCategories", array = @ArraySchema(schema = @Schema(implementation = SpendingCategoryDto.Res.class)))))
     ResponseEntity<?> getSpendingCategories(@AuthenticationPrincipal SecurityUserDetails user);
 
+    @Operation(summary = "지출 카테고리에 등록된 지출 내역 총 개수 조회", method = "GET")
+    @Parameters({
+            @Parameter(name = "categoryId", description = "type이 default면 아이콘 코드(1~11), custom이면 카테고리 pk", required = true, in = ParameterIn.PATH),
+            @Parameter(name = "type", description = "지출 카테고리 타입", required = true, in = ParameterIn.QUERY, examples = {
+                    @ExampleObject(name = "기본", value = "default"), @ExampleObject(name = "사용자 정의", value = "custom")
+            })
+    })
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "지출 내역 총 개수 조회 성공", content = @Content(mediaType = "application/json", examples = @ExampleObject(name = "지출 내역 총 개수 조회 성공", value = """
+                        {
+                            "totalCount": 10
+                        }
+                    """))),
+            @ApiResponse(responseCode = "400", description = "type과 categoryId 미스 매치", content = @Content(examples =
+            @ExampleObject(name = "type과 categoryId가 유효하지 않은 조합", description = "type이 default면서, categoryId가 CUSTOM(0) 혹은 OTHER(12)일 수는 없다.", value = """
+                        {
+                            "code": "4005",
+                            "message": "type의 정보와 categoryId의 정보가 존재할 수 없는 조합입니다."
+                        }
+                    """
+            )))
+    })
+    ResponseEntity<?> getSpendingTotalCountByCategory(
+            @PathVariable(value = "categoryId") Long categoryId,
+            @RequestParam(value = "type") SpendingCategoryType type,
+            @AuthenticationPrincipal SecurityUserDetails user
+    );
+
     @Operation(summary = "지출 카테고리에 등록된 지출 내역 조회", method = "GET", description = "지출 카테고리별 지출 내역을 조회하며, 무한 스크롤 응답이 반환됩니다.")
     @Parameters({
             @Parameter(name = "categoryId", description = "type이 default면 아이콘 코드(1~11), custom이면 카테고리 pk", required = true, in = ParameterIn.PATH),
