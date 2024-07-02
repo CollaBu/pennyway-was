@@ -44,6 +44,11 @@ public class SpendingCategoryUseCase {
     }
 
     @Transactional(readOnly = true)
+    public int getSpendingTotalCountByCategory(Long userId, Long categoryId, SpendingCategoryType type) {
+        return spendingSearchService.readSpendingTotalCountByCategoryId(userId, categoryId, type);
+    }
+
+    @Transactional(readOnly = true)
     public SpendingSearchRes.MonthSlice getSpendingsByCategory(Long userId, Long categoryId, Pageable pageable, SpendingCategoryType type) {
         Slice<Spending> spendings = spendingSearchService.readSpendingsByCategoryId(userId, categoryId, pageable, type);
 

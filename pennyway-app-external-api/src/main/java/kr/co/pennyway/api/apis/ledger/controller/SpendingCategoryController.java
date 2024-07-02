@@ -58,7 +58,7 @@ public class SpendingCategoryController implements SpendingCategoryApi {
             throw new SpendingErrorException(SpendingErrorCode.INVALID_TYPE_WITH_CATEGORY_ID);
         }
 
-        return ResponseEntity.ok(SuccessResponse.from("totalCount", spendingCategoryUseCase.getSpendingCountByCategory(user.getUserId(), categoryId, type)));
+        return ResponseEntity.ok(SuccessResponse.from("totalCount", spendingCategoryUseCase.getSpendingTotalCountByCategory(user.getUserId(), categoryId, type)));
     }
 
     @Override
