@@ -47,7 +47,6 @@ public class SpendingCategoryUseCase {
     public List<SpendingSearchRes.Month> getSpendingsByCategory(Long userId, Long categoryId, Pageable pageable, SpendingCategoryType type) {
         Slice<Spending> spendings = spendingSearchService.readSpendingsByCategoryId(userId, categoryId, pageable, type);
 
-//        return SpendingMapper.toSpendingsByCategory(spendings);
         return SpendingMapper.toSpendingByCategory(spendings);
     }
 }
