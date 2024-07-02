@@ -48,6 +48,20 @@ public class SpendingCategoryController implements SpendingCategoryApi {
     }
 
     @Override
+    @GetMapping("/{categoryId}/spendings/count")
+    public ResponseEntity<?> getSpendingTotalCountByCategory(
+            @PathVariable(value = "categoryId") Long categoryId,
+            @RequestParam(value = "type") SpendingCategoryType type,
+            @AuthenticationPrincipal SecurityUserDetails user
+    ) {
+        if (type.equals(SpendingCategoryType.DEFAULT) && (categoryId.equals(0L) || categoryId.equals(12L))) {
+            throw new SpendingErrorException(SpendingErrorCode.INVALID_TYPE_WITH_CATEGORY_ID);
+        }
+
+        return ResponseEntity.ok(SuccessResponse.from("totalCount", spendingCategoryUseCase.getSpendingCountByCategory(user.getUserId(), categoryId, type)));
+    }
+
+    @Override
     @GetMapping("/{categoryId}/spendings")
     @PreAuthorize("isAuthenticated() and @spendingCategoryManager.hasPermission(#user.getUserId(), #categoryId, #type)")
     public ResponseEntity<?> getSpendingsByCategory(
