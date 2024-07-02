@@ -1,5 +1,6 @@
 package kr.co.pennyway.api.apis.ledger.controller;
 
+import kr.co.pennyway.api.apis.ledger.dto.SpendingSearchRes;
 import kr.co.pennyway.api.apis.ledger.usecase.SpendingCategoryUseCase;
 import kr.co.pennyway.api.common.query.SpendingCategoryType;
 import kr.co.pennyway.api.config.supporter.WithSecurityMockUser;
@@ -18,6 +19,10 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.util.ArrayList;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -47,7 +52,10 @@ public class GetSpendingsByCategoryControllerTest {
     @DisplayName("default, custom 타입은 올바르게 조회된다.")
     @WithSecurityMockUser
     void getSpendingsByCategory() throws Exception {
+        given(spendingCategoryUseCase.getSpendingsByCategory(any(), any(), any(), any())).willReturn(new SpendingSearchRes.MonthSlice(new ArrayList<>(), 0, 0, 0, false));
+
         performGetSpendingsByCategory(1L, SpendingCategoryType.DEFAULT.name())
+                .andDo(print())
                 .andExpect(status().isOk());
         performGetSpendingsByCategory(1L, SpendingCategoryType.CUSTOM.name().toLowerCase())
                 .andExpect(status().isOk());
