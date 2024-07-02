@@ -8,6 +8,7 @@ import kr.co.pennyway.domain.domains.spending.domain.QSpending;
 import kr.co.pennyway.domain.domains.spending.domain.Spending;
 import kr.co.pennyway.domain.domains.spending.dto.TotalSpendingAmount;
 import kr.co.pennyway.domain.domains.spending.repository.SpendingRepository;
+import kr.co.pennyway.domain.domains.spending.type.SpendingCategory;
 import kr.co.pennyway.domain.domains.user.domain.QUser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -66,8 +67,12 @@ public class SpendingService {
      * @return 지출 내역 리스트를 {@link Slice}에 담아서 반환한다.
      */
     @Transactional(readOnly = true)
-    public Slice<Spending> readSpendingsSliceByCategory(Long userId, Long code, org.springframework.data.domain.Pageable pageable) {
-        return spendingRepository.findAllByCategoryId(userId, code, pageable);
+    public Slice<Spending> readSpendingsSliceByCategory(Long userId, SpendingCategory spendingCategory, org.springframework.data.domain.Pageable pageable) {
+        if (spendingCategory.equals(SpendingCategory.CUSTOM) || spendingCategory.equals(SpendingCategory.OTHER)) {
+            throw new IllegalArgumentException("지출 카테고리가 시스템 제공 카테고리가 아닙니다.");
+        }
+
+        return spendingRepository.findAllByCategory(userId, spendingCategory, pageable);
     }
 
     @Transactional(readOnly = true)
