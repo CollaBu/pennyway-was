@@ -4,12 +4,16 @@ import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import kr.co.pennyway.domain.common.util.QueryDslUtil;
+import kr.co.pennyway.domain.common.util.SliceUtil;
 import kr.co.pennyway.domain.domains.spending.domain.QSpending;
 import kr.co.pennyway.domain.domains.spending.domain.QSpendingCustomCategory;
 import kr.co.pennyway.domain.domains.spending.domain.Spending;
 import kr.co.pennyway.domain.domains.spending.dto.TotalSpendingAmount;
+import kr.co.pennyway.domain.domains.spending.type.SpendingCategory;
 import kr.co.pennyway.domain.domains.user.domain.QUser;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 
@@ -60,4 +64,32 @@ public class SpendingCustomRepositoryImpl implements SpendingCustomRepository {
                 .fetch();
     }
 
+    @Override
+    public Slice<Spending> findAllByCustomCategoryId(Long userId, Long categoryId, Pageable pageable) {
+        List<Spending> result = queryFactory.selectFrom(spending)
+                .leftJoin(spending.spendingCustomCategory, spendingCustomCategory).fetchJoin()
+                .where(spending.user.id.eq(userId)
+                        .and(spendingCustomCategory.id.eq(categoryId))
+                )
+                .orderBy(QueryDslUtil.getOrderSpecifier(pageable.getSort()).toArray(OrderSpecifier[]::new))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize() + 1)
+                .fetch();
+
+        return SliceUtil.toSlice(result, pageable);
+    }
+
+    @Override
+    public Slice<Spending> findAllByCategory(Long userId, SpendingCategory spendingCategory, Pageable pageable) {
+        List<Spending> result = queryFactory.selectFrom(spending)
+                .where(spending.user.id.eq(userId)
+                        .and(spending.category.eq(spendingCategory))
+                )
+                .orderBy(QueryDslUtil.getOrderSpecifier(pageable.getSort()).toArray(OrderSpecifier[]::new))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize() + 1)
+                .fetch();
+
+        return SliceUtil.toSlice(result, pageable);
+    }
 }
