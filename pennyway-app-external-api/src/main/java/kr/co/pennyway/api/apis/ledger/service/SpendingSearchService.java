@@ -6,6 +6,7 @@ import kr.co.pennyway.domain.domains.spending.dto.TotalSpendingAmount;
 import kr.co.pennyway.domain.domains.spending.exception.SpendingErrorCode;
 import kr.co.pennyway.domain.domains.spending.exception.SpendingErrorException;
 import kr.co.pennyway.domain.domains.spending.service.SpendingService;
+import kr.co.pennyway.domain.domains.spending.type.SpendingCategory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -46,7 +47,8 @@ public class SpendingSearchService {
             return spendingService.readSpendingsSliceByCategoryId(userId, categoryId, pageable);
         }
 
-        return spendingService.readSpendingsSliceByCategory(userId, categoryId, pageable);
+        SpendingCategory spendingCategory = SpendingCategory.fromCode(categoryId.toString());
+        return spendingService.readSpendingsSliceByCategory(userId, spendingCategory, pageable);
     }
 
     @Transactional(readOnly = true)
