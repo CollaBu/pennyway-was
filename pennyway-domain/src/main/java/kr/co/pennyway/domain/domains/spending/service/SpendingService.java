@@ -77,7 +77,7 @@ public class SpendingService {
     }
 
     @Transactional
-    public void deleteSpendings(List<Long> spendingIds) {
+    public void deleteSpendingsInQuery(List<Long> spendingIds) {
         spendingRepository.deleteAllByIdAndDeletedAtNullInQuery(spendingIds);
     }
 
