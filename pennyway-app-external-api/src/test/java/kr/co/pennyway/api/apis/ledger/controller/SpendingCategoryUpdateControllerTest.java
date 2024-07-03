@@ -2,7 +2,6 @@ package kr.co.pennyway.api.apis.ledger.controller;
 
 import kr.co.pennyway.api.apis.ledger.dto.SpendingCategoryDto;
 import kr.co.pennyway.api.apis.ledger.usecase.SpendingCategoryUseCase;
-import kr.co.pennyway.api.common.query.SpendingCategoryType;
 import kr.co.pennyway.api.config.supporter.WithSecurityMockUser;
 import kr.co.pennyway.domain.common.redis.sign.SignEventLogService;
 import kr.co.pennyway.domain.domains.spending.type.SpendingCategory;
@@ -45,54 +44,70 @@ public class SpendingCategoryUpdateControllerTest {
     }
 
     @Test
-    @DisplayName("type 쿼리 파라미터가 default, custom이면 요청에 성공한다. (대/소문자 모두 허용)")
+    @DisplayName("icon이 8자 이하의 공백이 아닌 문자열이고, icon이 SpendingCategory에 있는 값이면 200 OK 응답을 반환한다.")
     @WithSecurityMockUser
-    void patchSpendingCategoryWithValidType() throws Exception {
+    void patchSpendingCategorySuccess() throws Exception {
         // given
         Long spendingCategoryId = 1L;
-        given(spendingCategoryUseCase.updateSpendingCategory(1L, spendingCategoryId, SpendingCategoryType.DEFAULT)).willReturn(new SpendingCategoryDto.Res(false, -1L, "name", SpendingCategory.FOOD));
-        given(spendingCategoryUseCase.updateSpendingCategory(1L, spendingCategoryId, SpendingCategoryType.CUSTOM)).willReturn(new SpendingCategoryDto.Res(true, 1L, "name", SpendingCategory.FOOD));
+        String expectedName = "name";
+        SpendingCategory icon = SpendingCategory.FOOD;
+        given(spendingCategoryUseCase.updateSpendingCategory(1L, spendingCategoryId, expectedName, icon)).willReturn(new SpendingCategoryDto.Res(false, -1L, "name", icon));
 
         // when
-        ResultActions resultDefault = performPatchSpendingCategory(spendingCategoryId, "DEFAULT");
-        ResultActions resultCustom = performPatchSpendingCategory(spendingCategoryId, "custom");
+        ResultActions resultDefault = performPatchSpendingCategory(spendingCategoryId, expectedName, icon.name());
 
         // then
         resultDefault.andExpect(status().isOk());
-        resultCustom.andExpect(status().isOk());
     }
 
     @Test
-    @DisplayName("type이 default면서, categoryId가 0(CUSTOM) 혹은 12(OTHER)이면 400 Bad Request 에러 응답을 반환한다.")
+    @DisplayName("name이 공백 문자거나, 8자 이상인 경우 422 Unprocessable Entity 에러 응답을 반환한다.")
     void patchSpendingCategoryWithInvalidDefaultAndCategoryId() throws Exception {
         // given
-        Long categoryId1 = 0L, categoryId2 = 12L;
-        SpendingCategoryType type = SpendingCategoryType.DEFAULT;
+        Long spendingCategoryId = 1L;
+        String whitespaceName = "  ", longName = "123456789";
+        SpendingCategory icon = SpendingCategory.FOOD;
 
         // when
-        ResultActions result1 = performPatchSpendingCategory(categoryId1, type.name());
-        ResultActions result2 = performPatchSpendingCategory(categoryId2, type.name());
+        ResultActions result1 = performPatchSpendingCategory(spendingCategoryId, whitespaceName, icon);
+        ResultActions result2 = performPatchSpendingCategory(spendingCategoryId, longName, icon);
 
         // then
-        result1.andExpect(status().isBadRequest());
-        result2.andExpect(status().isBadRequest());
+        result1.andExpect(status().isUnprocessableEntity());
+        result2.andExpect(status().isUnprocessableEntity());
     }
 
     @Test
-    @DisplayName("type이 default 혹은 custom이 아닌 경우 422 Unprocessable Entity 에러 응답을 반환한다.")
-    void patchSpendingCategoryWithInvalidType() throws Exception {
+    @DisplayName("icon이 SpendingCategory에 없는 값이면 422 Unprocessable Entity 에러 응답을 반환한다.")
+    void patchSpendingCategoryWithInvalidIcon() throws Exception {
         // given
         Long spendingCategoryId = 1L;
+        String name = "name", invalidIcon = "INVALID";
 
         // when
-        ResultActions result = performPatchSpendingCategory(spendingCategoryId, "invalid");
+        ResultActions result = performPatchSpendingCategory(spendingCategoryId, name, invalidIcon);
 
         // then
         result.andExpect(status().isUnprocessableEntity());
     }
 
-    private ResultActions performPatchSpendingCategory(Long spendingCategoryId, String type) throws Exception {
+    @Test
+    @DisplayName("icon이 CUSTOM이면 400 Bad Request 에러 응답을 반환한다.")
+    void patchSpendingCategoryWithCustomIcon() throws Exception {
+        // given
+        Long spendingCategoryId = 1L;
+        String name = "name", customIcon = SpendingCategory.CUSTOM.name();
+
+        // when
+        ResultActions result = performPatchSpendingCategory(spendingCategoryId, name, customIcon);
+
+        // then
+        result.andExpect(status().isBadRequest());
+    }
+
+    private ResultActions performPatchSpendingCategory(Long spendingCategoryId, String name, String icon) throws Exception {
         return mockMvc.perform(patch("/v2/spending-categories/{categoryId}", spendingCategoryId)
-                .param("type", type));
+                .param("name", name)
+                .param("icon", icon));
     }
 }
