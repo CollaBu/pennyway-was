@@ -46,4 +46,13 @@ public class SpendingCustomCategory extends DateAuditable {
     public static SpendingCustomCategory of(String name, SpendingCategory icon, User user) {
         return new SpendingCustomCategory(name, icon, user);
     }
+
+    @Override
+    public String toString() {
+        return "SpendingCustomCategory{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", icon=" + icon +
+                ", deletedAt=" + deletedAt + '}';
+    }
 }
