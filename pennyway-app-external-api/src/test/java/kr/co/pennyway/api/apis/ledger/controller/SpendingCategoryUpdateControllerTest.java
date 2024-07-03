@@ -3,6 +3,7 @@ package kr.co.pennyway.api.apis.ledger.controller;
 import kr.co.pennyway.api.apis.ledger.dto.SpendingCategoryDto;
 import kr.co.pennyway.api.apis.ledger.usecase.SpendingCategoryUseCase;
 import kr.co.pennyway.api.common.query.SpendingCategoryType;
+import kr.co.pennyway.api.config.supporter.WithSecurityMockUser;
 import kr.co.pennyway.domain.common.redis.sign.SignEventLogService;
 import kr.co.pennyway.domain.domains.spending.type.SpendingCategory;
 import kr.co.pennyway.infra.common.jwt.JwtProvider;
@@ -18,8 +19,6 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -47,10 +46,12 @@ public class SpendingCategoryUpdateControllerTest {
 
     @Test
     @DisplayName("type 쿼리 파라미터가 default, custom이면 요청에 성공한다. (대/소문자 모두 허용)")
+    @WithSecurityMockUser
     void patchSpendingCategoryWithValidType() throws Exception {
         // given
         Long spendingCategoryId = 1L;
-        given(spendingCategoryUseCase.updateSpendingCategory(anyLong(), spendingCategoryId, any())).willReturn(new SpendingCategoryDto.Res(false, 1L, "name", SpendingCategory.FOOD));
+        given(spendingCategoryUseCase.updateSpendingCategory(1L, spendingCategoryId, SpendingCategoryType.DEFAULT)).willReturn(new SpendingCategoryDto.Res(false, -1L, "name", SpendingCategory.FOOD));
+        given(spendingCategoryUseCase.updateSpendingCategory(1L, spendingCategoryId, SpendingCategoryType.CUSTOM)).willReturn(new SpendingCategoryDto.Res(true, 1L, "name", SpendingCategory.FOOD));
 
         // when
         ResultActions resultDefault = performPatchSpendingCategory(spendingCategoryId, "DEFAULT");
