@@ -1,5 +1,6 @@
 package kr.co.pennyway.api.apis.ledger.service;
 
+import kr.co.pennyway.api.common.query.SpendingCategoryType;
 import kr.co.pennyway.domain.domains.spending.domain.SpendingCustomCategory;
 import kr.co.pennyway.domain.domains.spending.service.SpendingCustomCategoryService;
 import kr.co.pennyway.domain.domains.spending.type.SpendingCategory;
@@ -24,5 +25,10 @@ public class SpendingCategorySaveService {
         User user = userService.readUser(userId).orElseThrow(() -> new UserErrorException(UserErrorCode.NOT_FOUND));
 
         return spendingCustomCategoryService.createSpendingCustomCategory(SpendingCustomCategory.of(categoryName, icon, user));
+    }
+
+    @Transactional
+    public SpendingCustomCategory update(Long userId, Long categoryId, SpendingCategoryType type) {
+        return null;
     }
 }
