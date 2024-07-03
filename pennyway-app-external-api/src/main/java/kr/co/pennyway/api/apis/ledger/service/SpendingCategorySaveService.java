@@ -20,7 +20,7 @@ public class SpendingCategorySaveService {
     private final SpendingCustomCategoryService spendingCustomCategoryService;
 
     @Transactional
-    public SpendingCustomCategory execute(Long userId, String categoryName, SpendingCategory icon) {
+    public SpendingCustomCategory create(Long userId, String categoryName, SpendingCategory icon) {
         User user = userService.readUser(userId).orElseThrow(() -> new UserErrorException(UserErrorCode.NOT_FOUND));
 
         return spendingCustomCategoryService.createSpendingCustomCategory(SpendingCustomCategory.of(categoryName, icon, user));

@@ -23,7 +23,7 @@ public class SpendingCategoryUseCase {
 
     @Transactional
     public SpendingCategoryDto.Res createSpendingCategory(Long userId, String categoryName, SpendingCategory icon) {
-        SpendingCustomCategory category = spendingCategorySaveService.execute(userId, categoryName, icon);
+        SpendingCustomCategory category = spendingCategorySaveService.create(userId, categoryName, icon);
 
         return SpendingCategoryMapper.toResponse(category);
     }
