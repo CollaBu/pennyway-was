@@ -13,7 +13,7 @@ public interface SpendingRepository extends ExtendedRepository<Spending, Long>, 
     boolean existsByIdAndUser_Id(Long id, Long userId);
 
     @Transactional(readOnly = true)
-    Integer countByUserIdAndIdIn(Long userId, List<Long> spendingIds);
+    long countByUserIdAndIdIn(Long userId, List<Long> spendingIds);
 
     @Modifying(clearAutomatically = true)
     @Transactional

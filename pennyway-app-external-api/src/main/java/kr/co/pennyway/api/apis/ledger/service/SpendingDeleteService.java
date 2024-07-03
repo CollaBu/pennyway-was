@@ -27,6 +27,6 @@ public class SpendingDeleteService {
 
     @Transactional
     public void deleteSpendings(List<Long> spendingIds) {
-        spendingService.deleteSpendings(spendingIds);
+        spendingService.deleteSpendingsInQuery(spendingIds);
     }
 }
