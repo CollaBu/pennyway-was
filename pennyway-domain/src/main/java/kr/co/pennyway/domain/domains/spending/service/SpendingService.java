@@ -78,7 +78,7 @@ public class SpendingService {
 
     @Transactional
     public void deleteSpendings(List<Long> spendingIds) {
-        spendingRepository.deleteAllById(spendingIds);
+        spendingRepository.deleteAllByIdAndDeletedAtNullInQuery(spendingIds);
     }
 
     @Transactional(readOnly = true)

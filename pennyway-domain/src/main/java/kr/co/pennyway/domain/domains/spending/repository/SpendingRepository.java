@@ -17,6 +17,6 @@ public interface SpendingRepository extends ExtendedRepository<Spending, Long>, 
 
     @Modifying(clearAutomatically = true)
     @Transactional
-    @Query("UPDATE Spending s SET s.deletedAt = NOW() where s.id IN :spendingIds")
-    void deleteAllById(List<Long> spendingIds);
+    @Query("UPDATE Spending s SET s.deletedAt = NOW() where s.id IN :spendingIds AND s.deletedAt IS NULL")
+    void deleteAllByIdAndDeletedAtNullInQuery(List<Long> spendingIds);
 }
