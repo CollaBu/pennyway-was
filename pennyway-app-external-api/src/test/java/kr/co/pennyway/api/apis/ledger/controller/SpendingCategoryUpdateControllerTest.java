@@ -1,7 +1,10 @@
 package kr.co.pennyway.api.apis.ledger.controller;
 
+import kr.co.pennyway.api.apis.ledger.dto.SpendingCategoryDto;
+import kr.co.pennyway.api.apis.ledger.usecase.SpendingCategoryUseCase;
 import kr.co.pennyway.api.common.query.SpendingCategoryType;
 import kr.co.pennyway.domain.common.redis.sign.SignEventLogService;
+import kr.co.pennyway.domain.domains.spending.type.SpendingCategory;
 import kr.co.pennyway.infra.common.jwt.JwtProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -15,6 +18,9 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.BDDMockito.given;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -26,6 +32,8 @@ public class SpendingCategoryUpdateControllerTest {
     private SignEventLogService signEventLogService;
     @MockBean
     private JwtProvider accessTokenProvider;
+    @MockBean
+    private SpendingCategoryUseCase spendingCategoryUseCase;
     @Autowired
     private MockMvc mockMvc;
 
@@ -42,6 +50,7 @@ public class SpendingCategoryUpdateControllerTest {
     void patchSpendingCategoryWithValidType() throws Exception {
         // given
         Long spendingCategoryId = 1L;
+        given(spendingCategoryUseCase.updateSpendingCategory(anyLong(), spendingCategoryId, any())).willReturn(new SpendingCategoryDto.Res(false, 1L, "name", SpendingCategory.FOOD));
 
         // when
         ResultActions resultDefault = performPatchSpendingCategory(spendingCategoryId, "DEFAULT");
