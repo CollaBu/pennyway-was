@@ -35,8 +35,8 @@ public class SpendingCategoryUseCase {
     }
 
     @Transactional
-    public SpendingCategoryDto.Res updateSpendingCategory(Long userId, Long categoryId, String name, SpendingCategory icon) {
-        SpendingCustomCategory category = spendingCategorySaveService.update(userId, categoryId, name, icon);
+    public SpendingCategoryDto.Res updateSpendingCategory(Long categoryId, String name, SpendingCategory icon) {
+        SpendingCustomCategory category = spendingCategorySaveService.update(categoryId, name, icon);
 
         return SpendingCategoryMapper.toResponse(category);
     }

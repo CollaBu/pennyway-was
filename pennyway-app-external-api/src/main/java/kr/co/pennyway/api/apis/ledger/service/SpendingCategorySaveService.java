@@ -29,7 +29,7 @@ public class SpendingCategorySaveService {
     }
 
     @Transactional
-    public SpendingCustomCategory update(Long userId, Long categoryId, String name, SpendingCategory icon) {
+    public SpendingCustomCategory update(Long categoryId, String name, SpendingCategory icon) {
         SpendingCustomCategory category = spendingCustomCategoryService.readSpendingCustomCategory(categoryId)
                 .orElseThrow(() -> new SpendingErrorException(SpendingErrorCode.NOT_FOUND_CUSTOM_CATEGORY));
 
