@@ -1,5 +1,6 @@
 package kr.co.pennyway.api.common.security.authorization;
 
+import kr.co.pennyway.api.common.query.SpendingCategoryType;
 import kr.co.pennyway.domain.domains.spending.service.SpendingCustomCategoryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,5 +26,19 @@ public class SpendingCategoryManager {
         }
 
         return spendingCustomCategoryService.isExistsSpendingCustomCategory(userId, categoryId);
+    }
+
+    /**
+     * 사용자가 지출 카테고리에 대한 권한이 있는지 확인한다.
+     * {@link SpendingCategoryType#CUSTOM}이면 {@link #hasPermission(Long, Long)}를 호출한다.
+     * {@link SpendingCategoryType#DEFAULT}면, 시스템 제공 카테고리이므로 권한 검사를 수행하지 않는다.
+     */
+    @Transactional(readOnly = true)
+    public boolean hasPermission(Long userId, Long categoryId, SpendingCategoryType type) {
+        if (type.equals(SpendingCategoryType.CUSTOM)) {
+            return hasPermission(userId, categoryId);
+        }
+
+        return true;
     }
 }
