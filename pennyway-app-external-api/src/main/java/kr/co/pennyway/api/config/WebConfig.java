@@ -2,6 +2,7 @@ package kr.co.pennyway.api.config;
 
 import kr.co.pennyway.api.common.converter.NotifyTypeConverter;
 import kr.co.pennyway.api.common.converter.ProviderConverter;
+import kr.co.pennyway.api.common.converter.SpendingCategoryTypeConverter;
 import kr.co.pennyway.api.common.converter.VerificationTypeConverter;
 import kr.co.pennyway.api.common.interceptor.SignEventLogInterceptor;
 import kr.co.pennyway.domain.common.redis.sign.SignEventLogService;
@@ -20,10 +21,10 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addFormatters(FormatterRegistry registrar) {
-
         registrar.addConverter(new ProviderConverter());
         registrar.addConverter(new VerificationTypeConverter());
         registrar.addConverter(new NotifyTypeConverter());
+        registrar.addConverter(new SpendingCategoryTypeConverter());
     }
 
     @Override

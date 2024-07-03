@@ -94,4 +94,15 @@ public class Spending extends DateAuditable {
         this.memo = memo;
         this.spendingCustomCategory = spendingCustomCategory;
     }
+
+    @Override
+    public String toString() {
+        return "Spending{" +
+                "id=" + id +
+                ", amount=" + amount +
+                ", category=" + category +
+                ", spendAt=" + spendAt +
+                ", accountName='" + accountName + '\'' +
+                ", memo='" + memo + "'}";
+    }
 }
