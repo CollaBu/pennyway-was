@@ -69,8 +69,8 @@ public class SpendingCategoryUpdateControllerTest {
         SpendingCategory icon = SpendingCategory.FOOD;
 
         // when
-        ResultActions result1 = performPatchSpendingCategory(spendingCategoryId, whitespaceName, icon);
-        ResultActions result2 = performPatchSpendingCategory(spendingCategoryId, longName, icon);
+        ResultActions result1 = performPatchSpendingCategory(spendingCategoryId, whitespaceName, icon.name());
+        ResultActions result2 = performPatchSpendingCategory(spendingCategoryId, longName, icon.name());
 
         // then
         result1.andExpect(status().isUnprocessableEntity());
