@@ -24,6 +24,8 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.util.Map;
+
 import static org.springframework.test.util.AssertionErrors.assertEquals;
 
 @Slf4j
@@ -66,20 +68,21 @@ public class SpendingCategoryUpdateIntegrationTest extends ExternalApiDBTestConf
         String expectedName = "뉴 카테고리";
 
         // when
-        ResponseEntity<SuccessResponse<SpendingCategoryDto.Res>> response = successRequest(user, category.getId(), expectedName, SpendingCategory.HEALTH.name());
+        ResponseEntity<SuccessResponse<Map<String, SpendingCategoryDto.Res>>> response = successRequest(user, category.getId(), expectedName, SpendingCategory.HEALTH.name());
+        SpendingCategoryDto.Res data = response.getBody().getData().get("spendingCategory");
 
         // then
         assertEquals("200 OK 응답을 받아야 합니다.", response.getStatusCode(), HttpStatus.OK);
-        assertEquals("수정된 지출 카테고리 이름이 일치해야 합니다.", expectedName, response.getBody().getData().name());
-        assertEquals("수정된 지출 카테고리 아이콘이 일치해야 합니다.", SpendingCategory.HEALTH.name(), response.getBody().getData().icon());
+        assertEquals("수정된 지출 카테고리 이름이 일치해야 합니다.", expectedName, data.name());
+        assertEquals("수정된 지출 카테고리 아이콘이 일치해야 합니다.", SpendingCategory.HEALTH.name(), data.icon().name());
     }
 
-    private ResponseEntity<SuccessResponse<SpendingCategoryDto.Res>> successRequest(User user, Long spendingCategoryId, String name, String icon) {
+    private ResponseEntity<SuccessResponse<Map<String, SpendingCategoryDto.Res>>> successRequest(User user, Long spendingCategoryId, String name, String icon) {
         return restTemplate.exchange(
                 createUriComponentsBuilder(spendingCategoryId, name, icon),
                 HttpMethod.PATCH,
                 createHttpEntity(user),
-                new ParameterizedTypeReference<SuccessResponse<SpendingCategoryDto.Res>>() {
+                new ParameterizedTypeReference<SuccessResponse<Map<String, SpendingCategoryDto.Res>>>() {
                 }
         );
     }
