@@ -78,6 +78,7 @@ public class SpendingCategoryController implements SpendingCategoryApi {
         return ResponseEntity.ok(SuccessResponse.from("spendings", spendingCategoryUseCase.getSpendingsByCategory(user.getUserId(), categoryId, pageable, type)));
     }
 
+    @Override
     @PatchMapping("/{categoryId}")
     @PreAuthorize("isAuthenticated() and @spendingCategoryManager.hasPermission(principal.userId, #categoryId)")
     public ResponseEntity<?> patchSpendingCategory(@PathVariable Long categoryId, @Validated SpendingCategoryDto.CreateParamReq param) {
