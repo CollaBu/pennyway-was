@@ -3,7 +3,6 @@ package kr.co.pennyway.api.apis.ledger.controller;
 import kr.co.pennyway.api.apis.ledger.api.SpendingCategoryApi;
 import kr.co.pennyway.api.apis.ledger.dto.SpendingCategoryDto;
 import kr.co.pennyway.api.apis.ledger.usecase.SpendingCategoryUseCase;
-import kr.co.pennyway.api.common.query.SpendingCategoryType;
 import kr.co.pennyway.api.common.response.SuccessResponse;
 import kr.co.pennyway.api.common.security.authentication.SecurityUserDetails;
 import kr.co.pennyway.domain.domains.spending.exception.SpendingErrorCode;
@@ -44,16 +43,16 @@ public class SpendingCategoryController implements SpendingCategoryApi {
     }
 
     @PatchMapping("/{categoryId}")
-    @PreAuthorize("isAuthenticated() and @spendingCategoryManager.hasPermission(#user.getUserId(), #categoryId, #type)")
+    @PreAuthorize("isAuthenticated() and @spendingCategoryManager.hasPermission(#user.getUserId(), #categoryId)")
     public ResponseEntity<?> patchSpendingCategory(
             @PathVariable Long categoryId,
-            @RequestParam("type") SpendingCategoryType type,
+            @Validated SpendingCategoryDto.CreateParamReq param,
             @AuthenticationPrincipal SecurityUserDetails user
     ) {
-        if (type.equals(SpendingCategoryType.DEFAULT) && (categoryId.equals(0L) || categoryId.equals(12L))) {
-            throw new SpendingErrorException(SpendingErrorCode.INVALID_TYPE_WITH_CATEGORY_ID);
+        if (SpendingCategory.CUSTOM.equals(param.icon())) {
+            throw new SpendingErrorException(SpendingErrorCode.INVALID_ICON);
         }
 
-        return ResponseEntity.ok(SuccessResponse.from("spendingCategory", spendingCategoryUseCase.updateSpendingCategory(user.getUserId(), categoryId, type)));
+        return ResponseEntity.ok(SuccessResponse.from("spendingCategory", spendingCategoryUseCase.updateSpendingCategory(user.getUserId(), categoryId, param.name(), param.icon())));
     }
 }
