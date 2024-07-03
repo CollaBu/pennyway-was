@@ -51,7 +51,7 @@ public class SpendingCategoryUpdateControllerTest {
         Long spendingCategoryId = 1L;
         String expectedName = "name";
         SpendingCategory icon = SpendingCategory.FOOD;
-        given(spendingCategoryUseCase.updateSpendingCategory(1L, spendingCategoryId, expectedName, icon)).willReturn(new SpendingCategoryDto.Res(false, -1L, "name", icon));
+        given(spendingCategoryUseCase.updateSpendingCategory(spendingCategoryId, expectedName, icon)).willReturn(new SpendingCategoryDto.Res(false, -1L, "name", icon));
 
         // when
         ResultActions resultDefault = performPatchSpendingCategory(spendingCategoryId, expectedName, icon.name());
