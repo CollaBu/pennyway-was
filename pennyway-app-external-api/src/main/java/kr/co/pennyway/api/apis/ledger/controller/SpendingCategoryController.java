@@ -43,7 +43,7 @@ public class SpendingCategoryController implements SpendingCategoryApi {
     }
 
     @PatchMapping("/{categoryId}")
-    @PreAuthorize("isAuthenticated() and @spendingCategoryManager.hasPermission(#principal.getUserId(), #categoryId)")
+    @PreAuthorize("isAuthenticated() and @spendingCategoryManager.hasPermission(principal.userId, #categoryId)")
     public ResponseEntity<?> patchSpendingCategory(@PathVariable Long categoryId, @Validated SpendingCategoryDto.CreateParamReq param) {
         if (SpendingCategory.CUSTOM.equals(param.icon())) {
             throw new SpendingErrorException(SpendingErrorCode.INVALID_ICON);
