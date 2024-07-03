@@ -13,7 +13,7 @@ import java.util.Objects;
 public class SpendingCategoryDto {
     public record CreateParamReq(
             @NotBlank(message = "카테고리 이름은 필수입니다.")
-            @Size(max = 15, message = "카테고리 이름은 15자 이하로 입력해주세요.")
+            @Size(max = 8, message = "카테고리 이름은 8자 이하로 입력해주세요.")
             String name,
             @NotNull(message = "카테고리 아이콘은 필수입니다.")
             SpendingCategory icon
