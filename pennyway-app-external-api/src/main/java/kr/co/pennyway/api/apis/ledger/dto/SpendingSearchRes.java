@@ -7,12 +7,32 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import kr.co.pennyway.domain.domains.spending.dto.CategoryInfo;
 import lombok.Builder;
+import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
 public class SpendingSearchRes {
+    @Builder
+    @Schema(title = "월별 지출 내역 조회 슬라이스 응답")
+    public record MonthSlice(
+            @Schema(description = "년/월별 지출 내역")
+            List<Month> content,
+            @Schema(description = "현재 페이지 번호")
+            int currentPageNumber,
+            @Schema(description = "페이지 크기")
+            int pageSize,
+            @Schema(description = "전체 요소 개수")
+            int numberOfElements,
+            @Schema(description = "다음 페이지 존재 여부")
+            boolean hasNext
+    ) {
+        public static MonthSlice from(List<Month> months, Pageable pageable, int numberOfElements, boolean hasNext) {
+            return new MonthSlice(months, pageable.getPageNumber(), pageable.getPageSize(), numberOfElements, hasNext);
+        }
+    }
+
     @Builder
     @Schema(title = "월별 지출 내역 조회 응답")
     public record Month(

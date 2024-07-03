@@ -39,7 +39,7 @@ public class SpendingCategoryManager {
      * {@link SpendingCategoryType#DEFAULT}면, 시스템 제공 카테고리이므로 권한 검사를 수행하지 않는다.
      */
     @Transactional(readOnly = true)
-    public boolean hasPermissionExceptMinus(Long userId, Long categoryId, SpendingCategoryType type) {
+    public boolean hasPermission(Long userId, Long categoryId, SpendingCategoryType type) {
         if (type.equals(SpendingCategoryType.CUSTOM)) {
             return hasPermission(userId, categoryId);
         }
