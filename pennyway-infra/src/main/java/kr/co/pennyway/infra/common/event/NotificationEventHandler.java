@@ -10,7 +10,7 @@ import org.springframework.transaction.event.TransactionalEventListener;
 import java.util.concurrent.Executors;
 
 /**
- * FCM 푸시 알림{을 처리하는 핸들러
+ * FCM 푸시 알림을 처리하는 핸들러
  */
 @Slf4j
 @Component
