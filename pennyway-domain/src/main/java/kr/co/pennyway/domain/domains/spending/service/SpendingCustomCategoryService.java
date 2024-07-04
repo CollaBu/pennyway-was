@@ -35,4 +35,9 @@ public class SpendingCustomCategoryService {
     public boolean isExistsSpendingCustomCategory(Long userId, Long categoryId) {
         return spendingCustomCategoryRepository.existsByIdAndUser_Id(categoryId, userId);
     }
+
+    @Transactional
+    public void deleteSpendingCustomCategory(Long categoryId) {
+        spendingCustomCategoryRepository.deleteById(categoryId);
+    }
 }

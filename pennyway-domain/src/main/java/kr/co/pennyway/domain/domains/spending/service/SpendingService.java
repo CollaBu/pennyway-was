@@ -66,6 +66,11 @@ public class SpendingService {
         return spendingRepository.selectList(predicate, TotalSpendingAmount.class, bindings, queryHandler, sort);
     }
 
+    @Transactional
+    public void deleteSpendingsByCategoryIdInQuery(Long categoryId) {
+        spendingRepository.deleteAllByCategoryIdAndDeletedAtNullInQuery(categoryId);
+    }
+
     @Transactional(readOnly = true)
     public boolean isExistsSpending(Long userId, Long spendingId) {
         return spendingRepository.existsByIdAndUser_Id(spendingId, userId);

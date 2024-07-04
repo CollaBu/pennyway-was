@@ -14,10 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
@@ -43,5 +40,13 @@ public class SpendingCategoryController implements SpendingCategoryApi {
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> getSpendingCategories(@AuthenticationPrincipal SecurityUserDetails user) {
         return ResponseEntity.ok(SuccessResponse.from("spendingCategories", spendingCategoryUseCase.getSpendingCategories(user.getUserId())));
+    }
+
+    @DeleteMapping("/{categoryId}")
+    @PreAuthorize("isAuthenticated() and @spendingCategoryManager.hasPermission(#user.getUserId(), #categoryId)")
+    public ResponseEntity<?> deleteSpendingCategory(@PathVariable Long categoryId, @AuthenticationPrincipal SecurityUserDetails user) {
+        spendingCategoryUseCase.deleteSpendingCategory(categoryId);
+
+        return ResponseEntity.ok(SuccessResponse.noContent());
     }
 }
