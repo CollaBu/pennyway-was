@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.media.SchemaProperty;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import kr.co.pennyway.api.apis.ledger.dto.SpendingIdsDto;
 import kr.co.pennyway.api.apis.ledger.dto.SpendingReq;
 import kr.co.pennyway.api.apis.ledger.dto.SpendingSearchRes;
 import kr.co.pennyway.api.common.security.authentication.SecurityUserDetails;
@@ -88,8 +89,8 @@ public interface SpendingApi {
 
     @Operation(summary = "지출 내역 삭제", method = "DELETE", description = "지출 내역의 ID값으로 해당 지출 내역을 삭제 합니다.")
     @Parameter(name = "spendingId", description = "지출 내역 ID", example = "1", required = true, in = ParameterIn.PATH)
-    @ApiResponse(responseCode = "403", description = "지출 카테고리에 대한 권한이 없습니다.", content = @Content(examples = {
-            @ExampleObject(name = "지출 카테고리 권한 오류", description = "지출 카테고리에 대한 권한이 없습니다.",
+    @ApiResponse(responseCode = "403", description = "지출 내역에 대한 권한이 없습니다.", content = @Content(examples = {
+            @ExampleObject(name = "지출 내역 권한 오류", description = "지출 내역에 대한 권한이 없습니다.",
                     value = """
                             {
                             "code": "4030",
@@ -99,4 +100,18 @@ public interface SpendingApi {
             )
     }))
     ResponseEntity<?> deleteSpending(@PathVariable Long spendingId, @AuthenticationPrincipal SecurityUserDetails user);
+
+
+    @Operation(summary = "지출 내역 복수 삭제", method = "DELETE", description = "사용자의 지출 내역의 ID목록으로 해당 지출 내역들을 삭제 합니다.")
+    @ApiResponse(responseCode = "403", description = "지출 내역에 대한 권한이 없습니다.", content = @Content(examples = {
+            @ExampleObject(name = "지출 내역 권한 오류", description = "지출 내역에 대한 권한이 없습니다.",
+                    value = """
+                            {
+                            "code": "4030",
+                            "message": "ACCESS_TO_THE_REQUESTED_RESOURCE_IS_FORBIDDEN"
+                            }
+                            """
+            )
+    }))
+    ResponseEntity<?> deleteSpendings(@RequestBody SpendingIdsDto spendingIds, @AuthenticationPrincipal SecurityUserDetails user);
 }

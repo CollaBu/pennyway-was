@@ -6,6 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Slf4j
 @Component("spendingManager")
 @RequiredArgsConstructor
@@ -20,6 +22,15 @@ public class SpendingManager {
     @Transactional(readOnly = true)
     public boolean hasPermission(Long userId, Long spendingId) {
         return spendingService.isExistsSpending(userId, spendingId);
+    }
+
+    @Transactional(readOnly = true)
+    public boolean hasPermissions(Long userId, List<Long> spendingIds) {
+        if (spendingService.countByUserIdAndIdIn(userId, spendingIds) != (long) spendingIds.size()) {
+            return false;
+        }
+
+        return true;
     }
 }
 

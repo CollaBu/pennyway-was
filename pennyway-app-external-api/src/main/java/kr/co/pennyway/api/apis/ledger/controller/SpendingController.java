@@ -1,6 +1,7 @@
 package kr.co.pennyway.api.apis.ledger.controller;
 
 import kr.co.pennyway.api.apis.ledger.api.SpendingApi;
+import kr.co.pennyway.api.apis.ledger.dto.SpendingIdsDto;
 import kr.co.pennyway.api.apis.ledger.dto.SpendingReq;
 import kr.co.pennyway.api.apis.ledger.usecase.SpendingUseCase;
 import kr.co.pennyway.api.common.response.SuccessResponse;
@@ -67,6 +68,14 @@ public class SpendingController implements SpendingApi {
     public ResponseEntity<?> deleteSpending(@PathVariable Long spendingId, @AuthenticationPrincipal SecurityUserDetails user) {
         spendingUseCase.deleteSpending(spendingId);
 
+        return ResponseEntity.ok(SuccessResponse.noContent());
+    }
+
+    @Override
+    @DeleteMapping("")
+    @PreAuthorize("isAuthenticated() and @spendingManager.hasPermissions(#user.getUserId(), #spendingIds.spendingIds())")
+    public ResponseEntity<?> deleteSpendings(@RequestBody SpendingIdsDto spendingIds, @AuthenticationPrincipal SecurityUserDetails user) {
+        spendingUseCase.deleteSpendings(spendingIds.spendingIds());
         return ResponseEntity.ok(SuccessResponse.noContent());
     }
 

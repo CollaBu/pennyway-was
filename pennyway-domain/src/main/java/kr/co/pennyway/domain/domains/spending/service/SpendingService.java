@@ -132,4 +132,14 @@ public class SpendingService {
     public void deleteSpending(Spending spending) {
         spendingRepository.delete(spending);
     }
+
+    @Transactional
+    public void deleteSpendingsInQuery(List<Long> spendingIds) {
+        spendingRepository.deleteAllByIdAndDeletedAtNullInQuery(spendingIds);
+    }
+
+    @Transactional(readOnly = true)
+    public long countByUserIdAndIdIn(Long userId, List<Long> spendingIds) {
+        return spendingRepository.countByUserIdAndIdIn(userId, spendingIds);
+    }
 }
