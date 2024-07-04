@@ -39,15 +39,22 @@ public enum SpendingFixture {
         return new SpendingReq(10000, -1L, SpendingCategory.FOOD, LocalDate.now(), "카페인 수혈", "아메리카노 1잔");
     }
 
-    public static void bulkInsertSpending(User user, int capacity, boolean isCustom, NamedParameterJdbcTemplate jdbcTemplate) {
+    /**
+     * Spending 객체들을 벌크연산으로 삽입한다.
+     *
+     * @param user             {@link User} Spending 객체의 사용자
+     * @param capacity         {@link Integer} 생성할 Spending 객체의 개수
+     * @param customCategoryId {@link Long} Spending 객체의 customCategoryId. 기본 카테고리를 가질시 0이 된다.
+     * @param jdbcTemplate     {@link NamedParameterJdbcTemplate} Spending 객체를 생성할 때 사용할 jdbcTemplate
+     */
+    public static void bulkInsertSpending(User user, int capacity, Long customCategoryId, NamedParameterJdbcTemplate jdbcTemplate) {
         Collection<Spending> spendings = getRandomSpendings(user, capacity);
         String sql;
-        if (isCustom) {
-            SpendingCustomCategoryFixture.bulkInsertCustomCategory(user, capacity, jdbcTemplate);
+        if (!customCategoryId.equals(0L)) {
             sql = String.format("""
                     INSERT INTO `%s` (amount, category, spend_at, account_name, memo, user_id, spending_custom_category_id, created_at, updated_at, deleted_at)
-                    VALUES (:amount, 1+FLOOR(RAND()*11), :spendAt, :accountName, :memo, :user.id, 1 + FLOOR(RAND() * %d), NOW(), NOW(), null)
-                    """, "spending", capacity);
+                    VALUES (:amount, 1+FLOOR(RAND()*11), :spendAt, :accountName, :memo, :user.id, %d, NOW(), NOW(), null)
+                    """, "spending", customCategoryId);
         } else {
             sql = String.format("""
                     INSERT INTO `%s` (amount, category, spend_at, account_name, memo, user_id, spending_custom_category_id, created_at, updated_at, deleted_at)

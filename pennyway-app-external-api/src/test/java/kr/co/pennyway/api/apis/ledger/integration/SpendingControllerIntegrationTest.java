@@ -133,7 +133,7 @@ public class SpendingControllerIntegrationTest extends ExternalApiDBTestConfig {
         void getSpendingListAtYearAndMonthSuccess() throws Exception {
             // given
             User user = userService.createUser(UserFixture.GENERAL_USER.toUser());
-            SpendingFixture.bulkInsertSpending(user, 150, false, jdbcTemplate);
+            SpendingFixture.bulkInsertSpending(user, 150, 0L, jdbcTemplate);
 
             // when
             long before = System.currentTimeMillis();
