@@ -20,31 +20,29 @@ public class FcmManager {
      * 만약 디바이스 토큰이 존재하지 않는 경우에는 메시지 전송을 하지 않는다.
      * </p>
      */
-    public void sendMessage(NotificationEvent event) {
+    public ApiFuture<?> sendMessage(NotificationEvent event) {
         if (event.deviceTokensSize() == 0) {
             log.info("메시지 전송을 위한 디바이스 토큰이 존재하지 않습니다.");
-            return;
+            return null;
         }
 
         if (event.deviceTokensSize() == 1) {
-            sendSingleMessage(event);
+            return sendSingleMessage(event);
         } else {
-            sendMulticastMessage(event);
+            return sendMulticastMessage(event);
         }
     }
 
-    private void sendSingleMessage(NotificationEvent event) {
+    private ApiFuture<String> sendSingleMessage(NotificationEvent event) {
         Message message = event.buildSingleMessage().setApnsConfig(getApnsConfig(event)).build();
 
-        ApiFuture<String> syncRes = firebaseMessaging.sendAsync(message);
-        log.info("Successfully sync sent message: " + syncRes);
+        return firebaseMessaging.sendAsync(message);
     }
 
-    private void sendMulticastMessage(NotificationEvent event) {
+    private ApiFuture<BatchResponse> sendMulticastMessage(NotificationEvent event) {
         MulticastMessage messages = event.buildMulticastMessage().setApnsConfig(getApnsConfig(event)).build();
 
-        ApiFuture<BatchResponse> response = firebaseMessaging.sendEachForMulticastAsync(messages);
-        log.info("Successfully sent message: " + response);
+        return firebaseMessaging.sendEachForMulticastAsync(messages);
     }
 
     private ApnsConfig getApnsConfig(NotificationEvent event) {
