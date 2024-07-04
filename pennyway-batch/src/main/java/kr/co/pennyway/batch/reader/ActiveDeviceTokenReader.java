@@ -23,7 +23,7 @@ public class ActiveDeviceTokenReader {
                 .repository(deviceTokenRepository)
                 .methodName("findByActivatedIsTrue")
                 .pageSize(100)
-                .sorts(new HashMap<String, Sort.Direction>() {{
+                .sorts(new HashMap<>() {{
                     put("id", Sort.Direction.ASC);
                 }})
                 .build();
