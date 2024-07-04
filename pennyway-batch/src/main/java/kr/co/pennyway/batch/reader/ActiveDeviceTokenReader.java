@@ -21,7 +21,7 @@ public class ActiveDeviceTokenReader {
         return new RepositoryItemReaderBuilder<DeviceToken>()
                 .name("activeDeviceTokenReader")
                 .repository(deviceTokenRepository)
-                .methodName("findAll")
+                .methodName("findByActivatedIsTrue")
                 .pageSize(100)
                 .sorts(new HashMap<String, Sort.Direction>() {{
                     put("id", Sort.Direction.ASC);
