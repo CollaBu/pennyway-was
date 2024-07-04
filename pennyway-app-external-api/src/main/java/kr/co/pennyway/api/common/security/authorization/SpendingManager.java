@@ -26,7 +26,7 @@ public class SpendingManager {
 
     @Transactional(readOnly = true)
     public boolean hasPermissions(Long userId, List<Long> spendingIds) {
-        if (spendingService.countByUserIdAndIdIn(userId, spendingIds) != spendingIds.size()) {
+        if (spendingService.countByUserIdAndIdIn(userId, spendingIds) != (long) spendingIds.size()) {
             return false;
         }
 
