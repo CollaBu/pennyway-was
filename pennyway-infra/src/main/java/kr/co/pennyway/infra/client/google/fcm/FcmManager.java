@@ -47,9 +47,9 @@ public class FcmManager {
 
     private ApnsConfig getApnsConfig(NotificationEvent event) {
         ApsAlert alert = ApsAlert.builder()
-                .setTitle(event.getTitle())
-                .setBody(event.getContent())
-                .setLaunchImage("")
+                .setTitle(event.title())
+                .setBody(event.content())
+                .setLaunchImage(event.imageUrl())
                 .build();
 
         Aps aps = Aps.builder()
