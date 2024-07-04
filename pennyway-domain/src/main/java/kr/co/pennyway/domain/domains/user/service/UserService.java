@@ -43,6 +43,11 @@ public class UserService {
         return userRepository.existsByUsername(username);
     }
 
+    @Transactional(readOnly = true)
+    public boolean isExistPhone(String phone) {
+        return userRepository.existsByPhone(phone);
+    }
+
     @Transactional
     public void deleteUser(User user) {
         userRepository.delete(user);

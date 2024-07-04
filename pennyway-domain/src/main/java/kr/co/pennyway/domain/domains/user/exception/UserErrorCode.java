@@ -21,6 +21,8 @@ public enum UserErrorCode implements BaseErrorCode {
 
     /* 409 Conflict */
     ALREADY_SIGNUP(StatusCode.CONFLICT, ReasonCode.RESOURCE_ALREADY_EXISTS, "이미 회원가입한 유저입니다."),
+    ALREADY_EXIST_USERNAME(StatusCode.CONFLICT, ReasonCode.RESOURCE_ALREADY_EXISTS, "이미 존재하는 아이디입니다."),
+    ALREADY_EXIST_PHONE(StatusCode.CONFLICT, ReasonCode.RESOURCE_ALREADY_EXISTS, "이미 존재하는 휴대폰 번호입니다."),
 
     /* 404 NOT_FOUND */
     NOT_FOUND(StatusCode.NOT_FOUND, ReasonCode.REQUESTED_RESOURCE_NOT_FOUND, "유저를 찾을 수 없습니다."),

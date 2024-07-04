@@ -28,7 +28,7 @@ public class SpendingController implements SpendingApi {
 
     @Override
     @PostMapping("")
-    @PreAuthorize("isAuthenticated() and @spendingCategoryManager.hasPermission(#user.getUserId(), #request.categoryId())")
+    @PreAuthorize("isAuthenticated() and @spendingCategoryManager.hasPermissionExceptMinus(#user.getUserId(), #request.categoryId())")
     public ResponseEntity<?> postSpending(@RequestBody @Validated SpendingReq request, @AuthenticationPrincipal SecurityUserDetails user) {
         if (!isValidCategoryIdAndIcon(request.categoryId(), request.icon())) {
             throw new SpendingErrorException(SpendingErrorCode.INVALID_ICON_WITH_CATEGORY_ID);
