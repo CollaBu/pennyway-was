@@ -3,7 +3,6 @@ package kr.co.pennyway.infra.common.event;
 import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.MulticastMessage;
 import com.google.firebase.messaging.Notification;
-import lombok.Getter;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
@@ -13,7 +12,6 @@ import java.util.List;
  * <p>
  * 제목, 내용, 디바이스 토큰 리스트, 푸시 알림 이미지를 필드로 갖는다.
  */
-@Getter
 public record NotificationEvent(
         String title,
         String content,
