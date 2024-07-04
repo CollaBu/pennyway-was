@@ -12,7 +12,7 @@ import java.util.Collection;
 import java.util.List;
 
 public enum SpendingCustomCategoryFixture {
-    GENERAL_SPENDING_CUSTOM_CATEGORY("커스텀 지출 내역 카테고리", SpendingCategory.FOOD);
+    GENERAL_SPENDING_CUSTOM_CATEGORY("일반카테고리", SpendingCategory.FOOD);
 
     private final String name;
     private final SpendingCategory icon;

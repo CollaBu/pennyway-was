@@ -31,7 +31,7 @@ public class SpendingCategoryUseCase {
 
     @Transactional
     public SpendingCategoryDto.Res createSpendingCategory(Long userId, String categoryName, SpendingCategory icon) {
-        SpendingCustomCategory category = spendingCategorySaveService.execute(userId, categoryName, icon);
+        SpendingCustomCategory category = spendingCategorySaveService.create(userId, categoryName, icon);
 
         return SpendingCategoryMapper.toResponse(category);
     }
@@ -42,7 +42,7 @@ public class SpendingCategoryUseCase {
 
         return SpendingCategoryMapper.toResponses(categories);
     }
-
+    
     @Transactional(readOnly = true)
     public int getSpendingTotalCountByCategory(Long userId, Long categoryId, SpendingCategoryType type) {
         return spendingSearchService.readSpendingTotalCountByCategoryId(userId, categoryId, type);
@@ -53,5 +53,12 @@ public class SpendingCategoryUseCase {
         Slice<Spending> spendings = spendingSearchService.readSpendingsByCategoryId(userId, categoryId, pageable, type);
 
         return SpendingMapper.toMonthSlice(spendings);
+    }
+
+    @Transactional
+    public SpendingCategoryDto.Res updateSpendingCategory(Long categoryId, String name, SpendingCategory icon) {
+        SpendingCustomCategory category = spendingCategorySaveService.update(categoryId, name, icon);
+
+        return SpendingCategoryMapper.toResponse(category);
     }
 }
