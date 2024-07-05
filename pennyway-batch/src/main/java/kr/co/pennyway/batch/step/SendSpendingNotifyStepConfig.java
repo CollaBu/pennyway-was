@@ -21,7 +21,7 @@ public class SendSpendingNotifyStepConfig {
     private final NotificationWriter writer;
 
     @Bean
-    public Step execute(PlatformTransactionManager transactionManager) {
+    public Step sendSpendingNotifyStep(PlatformTransactionManager transactionManager) {
         return new StepBuilder("sendSpendingNotifyStep", jobRepository)
                 .<DeviceTokenOwner, DeviceTokenOwner>chunk(100, transactionManager)
                 .reader(reader.activeDeviceTokenReader())
