@@ -5,6 +5,7 @@ import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import kr.co.pennyway.domain.domains.device.domain.QDeviceToken;
 import kr.co.pennyway.domain.domains.device.dto.DeviceTokenOwner;
+import kr.co.pennyway.domain.domains.user.domain.QUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,6 +18,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DeviceTokenCustomRepositoryImpl implements DeviceTokenCustomRepository {
     private final JPAQueryFactory queryFactory;
+
+    private final QUser user = QUser.user;
     private final QDeviceToken deviceToken = QDeviceToken.deviceToken;
 
     @Override
@@ -26,14 +29,16 @@ public class DeviceTokenCustomRepositoryImpl implements DeviceTokenCustomReposit
                         Projections.constructor(
                                 DeviceTokenOwner.class,
                                 deviceToken.token,
-                                deviceToken.user.id
+                                user.id,
+                                user.name
                         )
                 )
+                .leftJoin(user).on(deviceToken.user.id.eq(user.id))
                 .from(deviceToken)
-                .where(deviceToken.activated.isTrue())
+                .where(deviceToken.activated.isTrue().and(user.notifySetting.accountBookNotify.isTrue()))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
-                .orderBy(deviceToken.id.asc()) // TODO: id 정렬이 의미가 없을 수 있음. 확인 필요.
+                .orderBy(user.id.asc())
                 .fetch();
 
         JPAQuery<Long> count = queryFactory
