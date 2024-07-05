@@ -5,6 +5,7 @@ package kr.co.pennyway.domain.domains.device.dto;
  */
 public record DeviceTokenOwner(
         String deviceToken,
-        Long userId
+        Long userId,
+        String name
 ) {
 }
