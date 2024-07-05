@@ -4,7 +4,7 @@ import kr.co.pennyway.domain.common.converter.LegacyCommonType;
 import lombok.Getter;
 
 @Getter
-public enum Announce implements LegacyCommonType {
+public enum Announcement implements LegacyCommonType {
     NOT_ANNOUNCE("0", "", ""),
 
     // 정기 지출 알림
@@ -15,7 +15,7 @@ public enum Announce implements LegacyCommonType {
     private final String title;
     private final String content;
 
-    Announce(String code, String title, String content) {
+    Announcement(String code, String title, String content) {
         this.code = code;
         this.title = title;
         this.content = content;
