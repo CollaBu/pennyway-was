@@ -1,5 +1,6 @@
 package kr.co.pennyway.domain.domains.notification.type;
 
+import kr.co.pennyway.domain.common.converter.LegacyCommonType;
 import lombok.Getter;
 
 /**
@@ -14,7 +15,7 @@ import lombok.Getter;
  * @since 2024-07-04
  */
 @Getter
-public enum NoticeType {
+public enum NoticeType implements LegacyCommonType {
     ANNOUNCEMENT("0", "%s", "%s"); // 공지 사항은 별도 제목을 설정하여 사용한다.
 
     private final String code;
