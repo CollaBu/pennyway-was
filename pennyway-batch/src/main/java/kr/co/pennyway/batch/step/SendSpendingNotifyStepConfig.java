@@ -3,7 +3,7 @@ package kr.co.pennyway.batch.step;
 import kr.co.pennyway.batch.processor.NotificationProcessor;
 import kr.co.pennyway.batch.reader.ActiveDeviceTokenReader;
 import kr.co.pennyway.batch.writer.NotificationWriter;
-import kr.co.pennyway.domain.domains.device.domain.DeviceToken;
+import kr.co.pennyway.domain.domains.device.dto.DeviceTokenOwner;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.repository.JobRepository;
@@ -23,7 +23,7 @@ public class SendSpendingNotifyStepConfig {
     @Bean
     public Step execute(PlatformTransactionManager transactionManager) {
         return new StepBuilder("sendSpendingNotifyStep", jobRepository)
-                .<DeviceToken, DeviceToken>chunk(100, transactionManager)
+                .<DeviceTokenOwner, DeviceTokenOwner>chunk(100, transactionManager)
                 .reader(reader.activeDeviceTokenReader())
                 .processor(processor)
                 .writer(writer)

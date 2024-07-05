@@ -1,6 +1,6 @@
 package kr.co.pennyway.batch.reader;
 
-import kr.co.pennyway.domain.domains.device.domain.DeviceToken;
+import kr.co.pennyway.domain.domains.device.dto.DeviceTokenOwner;
 import kr.co.pennyway.domain.domains.device.repository.DeviceTokenRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.item.data.RepositoryItemReader;
@@ -17,11 +17,11 @@ public class ActiveDeviceTokenReader {
     private final DeviceTokenRepository deviceTokenRepository;
 
     @Bean
-    public RepositoryItemReader<DeviceToken> activeDeviceTokenReader() {
-        return new RepositoryItemReaderBuilder<DeviceToken>()
+    public RepositoryItemReader<DeviceTokenOwner> activeDeviceTokenReader() {
+        return new RepositoryItemReaderBuilder<DeviceTokenOwner>()
                 .name("activeDeviceTokenReader")
                 .repository(deviceTokenRepository)
-                .methodName("findByActivatedIsTrue")
+                .methodName("findActiveDeviceTokenOwners")
                 .pageSize(100)
                 .sorts(new HashMap<>() {{
                     put("id", Sort.Direction.ASC);
