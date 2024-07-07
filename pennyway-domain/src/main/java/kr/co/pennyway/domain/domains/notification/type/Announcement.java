@@ -2,6 +2,7 @@ package kr.co.pennyway.domain.domains.notification.type;
 
 import kr.co.pennyway.domain.common.converter.LegacyCommonType;
 import lombok.Getter;
+import org.springframework.util.StringUtils;
 
 @Getter
 public enum Announcement implements LegacyCommonType {
@@ -19,5 +20,21 @@ public enum Announcement implements LegacyCommonType {
         this.code = code;
         this.title = title;
         this.content = content;
+    }
+
+    public String createFormattedTitle(String name) {
+        validateName(name);
+        return String.format(title, name);
+    }
+
+    public String createFormattedContent(String name) {
+        validateName(name);
+        return String.format(content, name);
+    }
+
+    private void validateName(String name) {
+        if (!StringUtils.hasText(name)) {
+            throw new IllegalArgumentException("name must not be empty");
+        }
     }
 }
