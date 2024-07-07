@@ -28,23 +28,14 @@ public class NotificationWriter implements ItemWriter<DeviceTokenOwner> {
         LocalDateTime publishedAt = LocalDateTime.now();
 
         List<Long> userIds = new ArrayList<>();
-        List<String> deviceTokens = new ArrayList<>();
-
         for (DeviceTokenOwner deviceTokenOwner : deviceTokenOwners) {
             userIds.add(deviceTokenOwner.userId());
-            deviceTokens.addAll(deviceTokenOwner.deviceTokens());
         }
 
         notificationRepository.saveDailySpendingAnnounceInBulk(userIds, publishedAt, announcement);
 
-        // 3. 이벤트 리스너 호출
-        publisher.publishEvent(
-                new NotificationEvent(
-                        Announcement.DAILY_SPENDING.getTitle(),
-                        Announcement.DAILY_SPENDING.getContent(),
-                        deviceTokens,
-                        ""
-                )
-        );
+        for (DeviceTokenOwner owner : deviceTokenOwners) {
+            publisher.publishEvent(NotificationEvent.of(announcement.createFormattedTitle(owner.name()), announcement.getTitle(), owner.deviceTokens(), ""));
+        }
     }
 }
