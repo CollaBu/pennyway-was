@@ -1,7 +1,8 @@
 package kr.co.pennyway.batch.writer;
 
-import kr.co.pennyway.domain.domains.device.domain.DeviceToken;
 import kr.co.pennyway.domain.domains.device.dto.DeviceTokenOwner;
+import kr.co.pennyway.domain.domains.notification.repository.NotificationRepository;
+import kr.co.pennyway.domain.domains.notification.type.Announcement;
 import kr.co.pennyway.infra.common.event.NotificationEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.item.Chunk;
@@ -10,7 +11,9 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Set;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -21,17 +24,27 @@ public class NotificationWriter implements ItemWriter<DeviceTokenOwner> {
     @Override
     @Transactional
     public void write(Chunk<? extends DeviceTokenOwner> deviceTokenOwners) throws Exception {
-        // 1. 토큰 주인 userId 리스트 중복 없이 추출
-        Set<Long> userIds = deviceTokenOwners.getItems().stream()
-                .map(DeviceTokenOwner::userId)
-                .collect(Collectors.toSet());
+        Announcement announcement = Announcement.DAILY_SPENDING;
+        LocalDateTime publishedAt = LocalDateTime.now();
 
+        List<Long> userIds = new ArrayList<>();
+        List<String> deviceTokens = new ArrayList<>();
 
-        // 2. 전송 알림 DB 쓰기
-        notificationRepository.saveAll(notifications);
+        for (DeviceTokenOwner deviceTokenOwner : deviceTokenOwners) {
+            userIds.add(deviceTokenOwner.userId());
+            deviceTokens.addAll(deviceTokenOwner.deviceTokens());
+        }
+
+        notificationRepository.saveDailySpendingAnnounceInBulk(userIds, publishedAt, announcement);
 
         // 3. 이벤트 리스너 호출
-        String title = "", content = "", imageUrl = "";
-        publisher.publishEvent(NotificationEvent.of(title, content, , imageUrl));
+        publisher.publishEvent(
+                new NotificationEvent(
+                        Announcement.DAILY_SPENDING.getTitle(),
+                        Announcement.DAILY_SPENDING.getContent(),
+                        deviceTokens,
+                        ""
+                )
+        );
     }
 }
