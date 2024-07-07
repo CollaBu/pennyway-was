@@ -56,7 +56,6 @@ public class Notification extends DateAuditable {
     }
 
     public static class Builder {
-        private Long id;
         private LocalDateTime readAt;
         private NoticeType type;
         private Announcement announcement;
@@ -64,8 +63,7 @@ public class Notification extends DateAuditable {
         private User receiver = null;
         private User sender = null;
 
-        public Builder(Long id, LocalDateTime readAt, NoticeType type, Announcement announcement) {
-            this.id = id;
+        public Builder(LocalDateTime readAt, NoticeType type, Announcement announcement) {
             this.readAt = readAt;
             this.type = type;
             this.announcement = announcement;
