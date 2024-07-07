@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 
-public interface NotificationRepository extends JpaRepository<Notification, Long> {
+public interface NotificationRepository extends JpaRepository<Notification, Long>, NotificationCustomRepository {
     @Transactional
     @Modifying(clearAutomatically = true)
     @Query(value = "INSERT INTO notification (readAt, type, announcement, receiver, sender) " +
