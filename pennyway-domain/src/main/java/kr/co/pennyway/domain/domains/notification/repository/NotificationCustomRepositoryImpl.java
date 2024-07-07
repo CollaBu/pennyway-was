@@ -38,10 +38,18 @@ public class NotificationCustomRepositoryImpl implements NotificationCustomRepos
                                 )
                                 .from(user)
                                 .where(user.id.in(userIds)
-                                        .and(notification.createdAt.dayOfYear().eq(publishedAt.getDayOfYear()))
-                                        .and(notification.createdAt.year().eq(publishedAt.getYear()))
-                                        .and(notification.type.eq(NoticeType.ANNOUNCEMENT))
-                                        .and(notification.announcement.ne(announcement)))
+                                        .and(
+                                                JPAExpressions.selectOne()
+                                                        .from(notification)
+                                                        .where(notification.receiver.id.eq(user.id)
+                                                                .and(notification.createdAt.dayOfYear().eq(publishedAt.getDayOfYear()))
+                                                                .and(notification.createdAt.year().eq(publishedAt.getYear()))
+                                                                .and(notification.type.eq(NoticeType.ANNOUNCEMENT))
+                                                                .and(notification.announcement.eq(announcement))
+                                                        )
+                                                        .notExists()
+                                        )
+                                )
                 )
                 .execute();
     }
