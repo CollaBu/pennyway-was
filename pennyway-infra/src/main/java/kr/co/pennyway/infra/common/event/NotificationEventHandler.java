@@ -4,6 +4,7 @@ import com.google.api.core.ApiFuture;
 import kr.co.pennyway.infra.client.google.fcm.FcmManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionalEventListener;
 
@@ -18,6 +19,7 @@ import java.util.concurrent.Executors;
 public class NotificationEventHandler {
     private final FcmManager fcmManager;
 
+    @Async
     @TransactionalEventListener
     public void handleEvent(NotificationEvent event) {
         log.debug("handleEvent: {}", event);
