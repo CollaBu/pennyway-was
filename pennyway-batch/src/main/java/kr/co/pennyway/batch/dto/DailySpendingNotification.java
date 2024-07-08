@@ -26,7 +26,7 @@ public record DailySpendingNotification(
         Objects.requireNonNull(deviceTokens, "deviceTokens must not be null");
     }
 
-    public static DailySpendingNotification from(DeviceTokenOwner owner, LocalDateTime publishedAt) {
+    public static DailySpendingNotification of(DeviceTokenOwner owner, LocalDateTime publishedAt) {
         Announcement announcement = Announcement.DAILY_SPENDING;
 
         return DailySpendingNotification.builder()
