@@ -6,15 +6,11 @@ import org.springframework.batch.item.ItemProcessor;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
-
 @Component
 public class NotificationProcessor implements ItemProcessor<DeviceTokenOwner, DailySpendingNotification> {
 
     @Override
     public DailySpendingNotification process(@NonNull DeviceTokenOwner deviceTokenOwner) throws Exception {
-        LocalDateTime publishedAt = LocalDateTime.now();
-
-        return DailySpendingNotification.of(deviceTokenOwner, publishedAt);
+        return DailySpendingNotification.from(deviceTokenOwner);
     }
 }
