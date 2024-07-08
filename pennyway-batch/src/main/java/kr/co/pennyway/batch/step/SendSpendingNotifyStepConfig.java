@@ -1,5 +1,6 @@
 package kr.co.pennyway.batch.step;
 
+import kr.co.pennyway.batch.dto.DailySpendingNotification;
 import kr.co.pennyway.batch.processor.NotificationProcessor;
 import kr.co.pennyway.batch.reader.ActiveDeviceTokenReader;
 import kr.co.pennyway.batch.writer.NotificationWriter;
@@ -23,7 +24,7 @@ public class SendSpendingNotifyStepConfig {
     @Bean
     public Step sendSpendingNotifyStep(PlatformTransactionManager transactionManager) {
         return new StepBuilder("sendSpendingNotifyStep", jobRepository)
-                .<DeviceTokenOwner, DeviceTokenOwner>chunk(100, transactionManager)
+                .<DeviceTokenOwner, DailySpendingNotification>chunk(100, transactionManager)
                 .reader(reader.activeDeviceTokenReader())
                 .processor(processor)
                 .writer(writer)
