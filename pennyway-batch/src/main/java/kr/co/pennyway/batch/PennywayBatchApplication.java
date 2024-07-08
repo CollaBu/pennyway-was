@@ -1,4 +1,4 @@
-package kr.co.pennyway;
+package kr.co.pennyway.batch;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
