@@ -12,6 +12,7 @@ import kr.co.pennyway.api.common.security.authentication.SecurityUserDetails;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.PathVariable;
 
 @Tag(name = "지출 카테고리 API")
 public interface SpendingCategoryApi {
@@ -32,4 +33,20 @@ public interface SpendingCategoryApi {
     @Operation(summary = "사용자 정의 지출 카테고리 조회", method = "GET", description = "사용자가 생성한 지출 카테고리 목록을 조회합니다.")
     @ApiResponse(responseCode = "200", description = "지출 카테고리 조회 성공", content = @Content(mediaType = "application/json", schemaProperties = @SchemaProperty(name = "spendingCategories", array = @ArraySchema(schema = @Schema(implementation = SpendingCategoryDto.Res.class)))))
     ResponseEntity<?> getSpendingCategories(@AuthenticationPrincipal SecurityUserDetails user);
+
+    @Operation(summary = "사용자 정의 카테고리 삭제", method = "DELETE", description = "사용자가 생성한 지출 카테고리를 삭제합니다.")
+    @Parameter(name = "categoryId", description = "카테고리 ID", example = "1", required = true, in = ParameterIn.PATH)
+    @ApiResponse(responseCode = "403", description = "지출 카테고리에 대한 권한이 없습니다.", content = @Content(examples = {
+            @ExampleObject(name = "지출 카테고리 권한 오류", description = "지출 카테고리에 대한 권한이 없습니다.",
+                    value = """ 
+                            {
+                            "code": "4030",
+                            "message": "ACCESS_TO_THE_REQUESTED_RESOURCE_IS_FORBIDDEN"
+                            }
+                            """
+            )
+    }))
+    ResponseEntity<?> deleteSpendingCategory(@PathVariable Long categoryId, @AuthenticationPrincipal SecurityUserDetails user);
 }
+
+
