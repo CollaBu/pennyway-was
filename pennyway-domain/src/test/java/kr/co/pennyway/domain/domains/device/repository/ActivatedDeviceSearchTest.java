@@ -120,9 +120,6 @@ public class ActivatedDeviceSearchTest extends ContainerMySqlTestConfig {
         }
 
         // then
-        log.info("owners: {}", owners.getContent());
-        log.info("deviceTokenMap: {}", deviceTokenMap);
-
         assertEquals("전체 결과 개수는 5개여야 합니다.", 5L, owners.getTotalElements());
         assertEquals("jayang의 디바이스 토큰 개수는 3개여야 합니다.", 3, deviceTokenMap.get("jayang").size());
         assertEquals("mock의 디바이스 토큰 개수는 2개여야 합니다.", 2, deviceTokenMap.get("mock").size());
