@@ -3,7 +3,9 @@ package kr.co.pennyway.domain.domains.notification.repository;
 import kr.co.pennyway.domain.config.ContainerMySqlTestConfig;
 import kr.co.pennyway.domain.config.JpaConfig;
 import kr.co.pennyway.domain.config.TestJpaConfig;
+import kr.co.pennyway.domain.domains.notification.domain.Notification;
 import kr.co.pennyway.domain.domains.notification.type.Announcement;
+import kr.co.pennyway.domain.domains.notification.type.NoticeType;
 import kr.co.pennyway.domain.domains.user.domain.NotifySetting;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.repository.UserRepository;
@@ -58,6 +60,31 @@ public class SaveDailySpendingAnnounceInBulkTest extends ContainerMySqlTestConfi
             log.info("notification: {}", notification);
             assertEquals("알림 타입이 일일 소비 알림이어야 한다.", Announcement.DAILY_SPENDING, notification.getAnnouncement());
         });
+    }
+
+    @Test
+    @Transactional
+    @DisplayName("이미 당일에 알림을 받은 사용자에게 데이터가 중복 저장되지 않아야 한다.")
+    public void notSaveDuplicateNotification() {
+        // given
+        User user1 = userRepository.save(createUser("jayang"));
+        User user2 = userRepository.save(createUser("mock"));
+
+        Notification notification = new Notification.Builder(NoticeType.ANNOUNCEMENT, Announcement.DAILY_SPENDING)
+                .receiver(user1)
+                .build();
+        notificationRepository.save(notification);
+
+        // when
+        notificationRepository.saveDailySpendingAnnounceInBulk(
+                List.of(user1.getId(), user2.getId()),
+                LocalDateTime.now(),
+                Announcement.DAILY_SPENDING
+        );
+
+        // then
+        List<Notification> notifications = notificationRepository.findAll();
+        assertEquals("알림이 중복 저장되지 않아야 한다.", 2, notifications.size());
     }
 
     private User createUser(String name) {
