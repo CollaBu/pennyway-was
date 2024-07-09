@@ -23,7 +23,10 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.springframework.test.util.AssertionErrors.assertEquals;
 import static org.springframework.test.util.AssertionErrors.assertNotEquals;
@@ -61,7 +64,7 @@ public class ActivatedDeviceSearchTest extends ContainerMySqlTestConfig {
         // then
         assertEquals("조회 결과 원소 개수는 2여야 합니다.", owners.getTotalElements(), 2L);
         for (DeviceTokenOwner owner : owners) {
-            assertNotEquals("deviceToken2는 비활성화 토큰입니다.", "deviceToken2", owner.deviceTokens());
+            assertNotEquals("deviceToken2는 비활성화 토큰입니다.", "deviceToken2", owner.deviceToken());
         }
     }
 
@@ -111,13 +114,18 @@ public class ActivatedDeviceSearchTest extends ContainerMySqlTestConfig {
 
         // when
         Page<DeviceTokenOwner> owners = deviceTokenRepository.findActivatedDeviceTokenOwners(pageable);
+        Map<String, List<String>> deviceTokenMap = new HashMap<>();
+        for (DeviceTokenOwner owner : owners) {
+            deviceTokenMap.computeIfAbsent(owner.name(), k -> new ArrayList<>()).add(owner.deviceToken());
+        }
 
         // then
         log.info("owners: {}", owners.getContent());
+        log.info("deviceTokenMap: {}", deviceTokenMap);
 
         assertEquals("전체 결과 개수는 5개여야 합니다.", 5L, owners.getTotalElements());
-        assertEquals("jayang의 디바이스 토큰 개수는 3개여야 합니다.", 3, owners.getContent().get(0).deviceTokens().size());
-        assertEquals("mock의 디바이스 토큰 개수는 2개여야 합니다.", 2, owners.getContent().get(1).deviceTokens().size());
+        assertEquals("jayang의 디바이스 토큰 개수는 3개여야 합니다.", 3, deviceTokenMap.get("jayang").size());
+        assertEquals("mock의 디바이스 토큰 개수는 2개여야 합니다.", 2, deviceTokenMap.get("mock").size());
     }
 
     private User createUser(String name) {
