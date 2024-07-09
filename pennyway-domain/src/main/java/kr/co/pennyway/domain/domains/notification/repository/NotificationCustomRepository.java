@@ -12,22 +12,18 @@ public interface NotificationCustomRepository {
      *
      * <pre>
      * {@code
-     * INSERT INTO notification (created_at, type, announcement, receiver)
-     * SELECT
-     *     'ANNOUNCEMENT' AS type,
-     *     :announcement AS announcement,
-     *     u.id AS receiver
+     * INSERT INTO notification(id, type, read_at, created_at, updated_at, receiver, announcement)
+     * SELECT NULL, '0', NOW(), NOW(), NOW(), u.id, '1'
      * FROM user u
-     * WHERE
-     *     u.id IN (:userIds)
+     * WHERE u.id IN (?)
      * AND NOT EXISTS (
-     *    SELECT 1
-     *    FROM notification n
-     *    WHERE n.receiver = u.id
-     *        AND DATE(n.created_at) = DATE(:publishedAt)
-     *        AND YEAR(n.created_at) = YEAR(:publishedAt)
-     *        AND n.type = 'ANNOUNCEMENT'
-     *        AND n.announcement = :announcement
+     * 	SELECT n.receiver
+     * 	FROM notification n
+     * 	WHERE n.receiver = u.id
+     *     AND n.created_at >= CURDATE()
+     *     AND n.created_at < CURDATE() + INTERVAL 1 DAY
+     * 	AND n.type = '0'
+     * 	AND n.announcement = 1
      * );
      * }
      * </pre>
