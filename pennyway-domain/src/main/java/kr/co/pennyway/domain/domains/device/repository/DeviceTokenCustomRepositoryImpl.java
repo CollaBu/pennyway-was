@@ -1,6 +1,5 @@
 package kr.co.pennyway.domain.domains.device.repository;
 
-import com.querydsl.core.group.GroupBy;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -22,7 +21,7 @@ public class DeviceTokenCustomRepositoryImpl implements DeviceTokenCustomReposit
 
     private final QUser user = QUser.user;
     private final QDeviceToken deviceToken = QDeviceToken.deviceToken;
-    
+
     @Override
     public Page<DeviceTokenOwner> findActivatedDeviceTokenOwners(Pageable pageable) {
         List<DeviceTokenOwner> content = queryFactory
@@ -31,13 +30,12 @@ public class DeviceTokenCustomRepositoryImpl implements DeviceTokenCustomReposit
                                 DeviceTokenOwner.class,
                                 user.id,
                                 user.name,
-                                GroupBy.list(deviceToken.token)
+                                deviceToken.token
                         )
                 )
-                .leftJoin(user).on(deviceToken.user.id.eq(user.id))
                 .from(deviceToken)
+                .leftJoin(user).on(deviceToken.user.id.eq(user.id))
                 .where(deviceToken.activated.isTrue().and(user.notifySetting.accountBookNotify.isTrue()))
-                .groupBy(user.id)
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .orderBy(user.id.asc())
