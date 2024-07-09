@@ -48,6 +48,14 @@ public class SpendingCategoryController implements SpendingCategoryApi {
     }
 
     @Override
+    @DeleteMapping("/{categoryId}")
+    @PreAuthorize("isAuthenticated() and @spendingCategoryManager.hasPermission(principal.userId, #categoryId)")
+    public ResponseEntity<?> deleteSpendingCategory(@PathVariable Long categoryId) {
+        spendingCategoryUseCase.deleteSpendingCategory(categoryId);
+
+        return ResponseEntity.ok(SuccessResponse.noContent());
+    }
+
     @GetMapping("/{categoryId}/spendings/count")
     @PreAuthorize("isAuthenticated() and @spendingCategoryManager.hasPermission(#user.getUserId(), #categoryId, #type)")
     public ResponseEntity<?> getSpendingTotalCountByCategory(

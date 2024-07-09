@@ -13,6 +13,11 @@ public interface SpendingRepository extends ExtendedRepository<Spending, Long>, 
     @Transactional(readOnly = true)
     boolean existsByIdAndUser_Id(Long id, Long userId);
 
+    @Transactional
+    @Modifying(clearAutomatically = true)
+    @Query("UPDATE Spending s SET s.deletedAt = NOW() WHERE s.spendingCustomCategory.id = :categoryId AND s.deletedAt IS NULL")
+    void deleteAllByCategoryIdAndDeletedAtNullInQuery(Long categoryId);
+
     @Transactional(readOnly = true)
     int countByUser_IdAndSpendingCustomCategory_Id(Long userId, Long categoryId);
 
