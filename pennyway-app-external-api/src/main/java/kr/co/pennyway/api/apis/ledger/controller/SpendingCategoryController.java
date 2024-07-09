@@ -44,8 +44,8 @@ public class SpendingCategoryController implements SpendingCategoryApi {
 
     @Override
     @DeleteMapping("/{categoryId}")
-    @PreAuthorize("isAuthenticated() and @spendingCategoryManager.hasPermission(#user.getUserId(), #categoryId)")
-    public ResponseEntity<?> deleteSpendingCategory(@PathVariable Long categoryId, @AuthenticationPrincipal SecurityUserDetails user) {
+    @PreAuthorize("isAuthenticated() and @spendingCategoryManager.hasPermission(principal.userId, #categoryId)")
+    public ResponseEntity<?> deleteSpendingCategory(@PathVariable Long categoryId) {
         spendingCategoryUseCase.deleteSpendingCategory(categoryId);
 
         return ResponseEntity.ok(SuccessResponse.noContent());

@@ -46,7 +46,7 @@ public interface SpendingCategoryApi {
                             """
             )
     }))
-    ResponseEntity<?> deleteSpendingCategory(@PathVariable Long categoryId, @AuthenticationPrincipal SecurityUserDetails user);
+    ResponseEntity<?> deleteSpendingCategory(@PathVariable Long categoryId);
 }
 
 
