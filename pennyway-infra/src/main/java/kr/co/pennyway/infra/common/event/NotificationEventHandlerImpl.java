@@ -5,7 +5,6 @@ import kr.co.pennyway.infra.client.google.fcm.FcmManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionalEventListener;
 
 import java.util.concurrent.Executors;
@@ -14,9 +13,8 @@ import java.util.concurrent.Executors;
  * FCM 푸시 알림을 처리하는 핸들러
  */
 @Slf4j
-@Component
 @RequiredArgsConstructor
-public class NotificationEventHandler {
+public class NotificationEventHandlerImpl implements NotificationEventHandler {
     private final FcmManager fcmManager;
 
     @Async
