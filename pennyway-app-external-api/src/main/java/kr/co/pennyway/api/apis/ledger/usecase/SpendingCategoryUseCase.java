@@ -3,8 +3,8 @@ package kr.co.pennyway.api.apis.ledger.usecase;
 import kr.co.pennyway.api.apis.ledger.dto.SpendingCategoryDto;
 import kr.co.pennyway.api.apis.ledger.dto.SpendingSearchRes;
 import kr.co.pennyway.api.apis.ledger.mapper.SpendingCategoryMapper;
-import kr.co.pennyway.api.apis.ledger.service.SpendingCategoryDeleteService;
 import kr.co.pennyway.api.apis.ledger.mapper.SpendingMapper;
+import kr.co.pennyway.api.apis.ledger.service.SpendingCategoryDeleteService;
 import kr.co.pennyway.api.apis.ledger.service.SpendingCategorySaveService;
 import kr.co.pennyway.api.apis.ledger.service.SpendingCategorySearchService;
 import kr.co.pennyway.api.apis.ledger.service.SpendingSearchService;
@@ -48,7 +48,8 @@ public class SpendingCategoryUseCase {
     @Transactional
     public void deleteSpendingCategory(Long categoryId) {
         spendingCategoryDeleteService.execute(categoryId);
-    
+    }
+
     @Transactional(readOnly = true)
     public int getSpendingTotalCountByCategory(Long userId, Long categoryId, SpendingCategoryType type) {
         return spendingSearchService.readSpendingTotalCountByCategoryId(userId, categoryId, type);
