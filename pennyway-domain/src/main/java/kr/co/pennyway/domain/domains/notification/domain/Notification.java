@@ -38,7 +38,7 @@ public class Notification extends DateAuditable {
     private User sender;
 
     private Notification(LocalDateTime readAt, NoticeType type, Announcement announcement, User receiver, User sender) {
-        this.readAt = Objects.requireNonNull(readAt);
+        this.readAt = readAt;
         this.type = Objects.requireNonNull(type);
         this.announcement = Objects.requireNonNull(announcement);
         this.receiver = receiver;
@@ -63,10 +63,14 @@ public class Notification extends DateAuditable {
         private User receiver = null;
         private User sender = null;
 
-        public Builder(LocalDateTime readAt, NoticeType type, Announcement announcement) {
-            this.readAt = readAt;
+        public Builder(NoticeType type, Announcement announcement) {
             this.type = type;
             this.announcement = announcement;
+        }
+
+        public Builder readAt(LocalDateTime readAt) {
+            this.readAt = readAt;
+            return this;
         }
 
         public Builder receiver(User receiver) {
