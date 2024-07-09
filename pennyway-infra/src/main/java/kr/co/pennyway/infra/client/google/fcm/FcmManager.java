@@ -5,10 +5,8 @@ import com.google.firebase.messaging.*;
 import kr.co.pennyway.infra.common.event.NotificationEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
 @Slf4j
-@Component
 @RequiredArgsConstructor
 public class FcmManager {
     private final FirebaseMessaging firebaseMessaging;
