@@ -18,6 +18,7 @@ public class NotificationEventHandlerImpl implements NotificationEventHandler {
     private final FcmManager fcmManager;
 
     @Async
+    @Override
     @TransactionalEventListener
     public void handleEvent(NotificationEvent event) {
         log.debug("handleEvent: {}", event);

@@ -9,4 +9,5 @@ package kr.co.pennyway.infra.common.event;
  * @since 2024-07-09
  */
 public interface NotificationEventHandler {
+    void handleEvent(NotificationEvent event);
 }
