@@ -31,4 +31,14 @@ public interface SpendingRepository extends ExtendedRepository<Spending, Long>, 
     @Transactional
     @Query("UPDATE Spending s SET s.deletedAt = NOW() where s.id IN :spendingIds AND s.deletedAt IS NULL")
     void deleteAllByIdAndDeletedAtNullInQuery(List<Long> spendingIds);
+
+    @Modifying(clearAutomatically = true)
+    @Transactional
+    @Query("UPDATE Spending s SET s.spendingCustomCategory.id = :toCategoryId WHERE s.spendingCustomCategory.id = :fromCategoryId AND s.deletedAt IS NULL")
+    void updateSpendingCustomCategoryInQuery(Long fromCategoryId, Long toCategoryId);
+
+    @Modifying(clearAutomatically = true)
+    @Transactional
+    @Query("UPDATE Spending s SET s.spendingCustomCategory = null, s.category = :toCategory WHERE s.spendingCustomCategory.id = :fromCategoryId AND s.deletedAt IS NULL")
+    void updateCategoryInQuery(Long fromCategoryId, SpendingCategory toCategory);
 }

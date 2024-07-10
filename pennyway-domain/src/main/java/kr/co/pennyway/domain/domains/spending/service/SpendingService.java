@@ -147,4 +147,14 @@ public class SpendingService {
     public long countByUserIdAndIdIn(Long userId, List<Long> spendingIds) {
         return spendingRepository.countByUserIdAndIdIn(userId, spendingIds);
     }
+
+    @Transactional
+    public void migrateSpendingsByCategoryId(Long fromCategoryId, Long toCategoryId) {
+        spendingRepository.updateSpendingCustomCategoryInQuery(fromCategoryId, toCategoryId);
+    }
+
+    @Transactional
+    public void migrateSpendingsByCategory(Long fromCategoryId, SpendingCategory toCategory) {
+        spendingRepository.updateCategoryInQuery(fromCategoryId, toCategory);
+    }
 }
