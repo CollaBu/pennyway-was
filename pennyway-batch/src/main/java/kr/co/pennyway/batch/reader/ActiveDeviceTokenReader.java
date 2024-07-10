@@ -20,8 +20,6 @@ public class ActiveDeviceTokenReader {
 
     @Bean
     public RepositoryItemReader<DeviceTokenOwner> execute() {
-        log.info("ActiveDeviceToken 읽기 실행");
-
         return new RepositoryItemReaderBuilder<DeviceTokenOwner>()
                 .name("execute")
                 .repository(deviceTokenRepository)
