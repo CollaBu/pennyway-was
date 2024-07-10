@@ -2,6 +2,7 @@ package kr.co.pennyway.api.apis.ledger.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.pennyway.api.apis.ledger.dto.SpendingIdsDto;
+import kr.co.pennyway.api.apis.ledger.dto.SpendingMigrateDto;
 import kr.co.pennyway.api.apis.ledger.dto.SpendingReq;
 import kr.co.pennyway.api.common.query.SpendingCategoryType;
 import kr.co.pennyway.api.common.security.authentication.SecurityUserDetails;
@@ -388,9 +389,10 @@ public class SpendingControllerIntegrationTest extends ExternalApiDBTestConfig {
         }
     }
 
+    /* TODO : lazyLoading proxy 예외 문제 해결한 테스트코드 작성하기 */
     @Test
-    @DisplayName("지출 내역 카테고리 이동")
-    void migrateCategory() throws Exception {
+    @DisplayName("지출 내역 카테고리 이동 (커스텀 카테고리)")
+    void migrateCategoryByCategoryId() throws Exception {
         // given
         User user = userService.createUser(UserFixture.GENERAL_USER.toUser());
         SpendingCustomCategory fromCategory = spendingCustomCategoryService.createSpendingCustomCategory(SpendingCustomCategory.of("잉여비", SpendingCategory.LIVING, user));
@@ -399,26 +401,70 @@ public class SpendingControllerIntegrationTest extends ExternalApiDBTestConfig {
         Spending spending = spendingService.createSpending(SpendingFixture.CUSTOM_CATEGORY_SPENDING.toCustomCategorySpending(user, fromCategory));
         Long id = spending.getId();
 
+        SpendingMigrateDto request = new SpendingMigrateDto(toCategory.getId(), SpendingCategoryType.CUSTOM);
+
         // when
-        ResultActions resultActions = performMigrateCategory(user, fromCategory.getId(), toCategory.getId(), SpendingCategoryType.CUSTOM);
+        ResultActions resultActions = performMigrateCategory(user, fromCategory.getId(), request);
 
         // then
         resultActions
                 .andDo(print())
                 .andExpect(status().isOk());
 
-        Assertions.assertTrue(spendingService.readSpending(id).get().equals(toCategory));
+        // 변경된 엔티티를 다시 로딩
+        Spending updatedSpending = spendingService.readSpending(id).orElseThrow(() -> new IllegalStateException("Spending not found"));
+
+        Assertions.assertEquals(toCategory.getId(), updatedSpending.getSpendingCustomCategory().getId());
+        log.info("조회한 지출내역의 커스텀 카테고리 id {}", updatedSpending.getSpendingCustomCategory().getName());
     }
 
-    private ResultActions performMigrateCategory(User requestUser, Long fromCategoryId, Long toCategoryId, SpendingCategoryType categoryType) throws Exception {
-        UserDetails userDetails = SecurityUserDetails.from(requestUser);
-        SpendingCategory category = SpendingCategory.CUSTOM;
+    @Test
+    @DisplayName("지출 내역 카테고리 이동 (기본 카테고리)")
+    void migrateCategoryByCategory() throws Exception {
+        // given
+        User user = userService.createUser(UserFixture.GENERAL_USER.toUser());
+        SpendingCustomCategory fromCategory = spendingCustomCategoryService.createSpendingCustomCategory(SpendingCustomCategory.of("잉여비", SpendingCategory.LIVING, user));
+        Spending spending = spendingService.createSpending(SpendingFixture.GENERAL_SPENDING.toSpending(user));
+        Long id = spending.getId();
+        Long toCategoryId = Long.parseLong(SpendingCategory.LIVING.getCode());
 
-        return mockMvc.perform(MockMvcRequestBuilders.put("/v2/spendings/migrate/{fromCategoryId}", fromCategoryId)
+        SpendingMigrateDto request = new SpendingMigrateDto(toCategoryId, SpendingCategoryType.DEFAULT);
+
+        // when
+        ResultActions resultActions = performMigrateCategory(user, fromCategory.getId(), request);
+
+        // then
+        resultActions
+                .andDo(print())
+                .andExpect(status().isOk());
+
+        // TODO : Spending.getCategory() 메서드가 category getter가 아니라서 이렇게 복잡하게 검증해야함... 개선 필요할까?
+        Spending updatedSpending = spendingService.readSpending(id).get();
+        Spending expectedSpending = SpendingFixture.GENERAL_SPENDING.toSpending(user);
+
+        expectedSpending.update(
+                updatedSpending.getAmount(),
+                SpendingCategory.LIVING,
+                updatedSpending.getSpendAt(),
+                updatedSpending.getAccountName(),
+                updatedSpending.getMemo(),
+                null
+        );
+
+        // 아직 작업중...
+        Assertions.assertNull(updatedSpending.getSpendingCustomCategory());
+        log.info("{}", updatedSpending.getSpendingCustomCategory());
+        Assertions.assertTrue(updatedSpending.getCategory().name().equals("생활"));
+        log.info("{}", updatedSpending.getCategory().name());
+    }
+
+
+    private ResultActions performMigrateCategory(User requestUser, Long fromCategoryId, SpendingMigrateDto request) throws Exception {
+        UserDetails userDetails = SecurityUserDetails.from(requestUser);
+
+        return mockMvc.perform(MockMvcRequestBuilders.patch("/v2/spendings/migration/{fromCategoryId}", fromCategoryId)
                 .with(user(userDetails))
                 .contentType("application/json")
-                .content(objectMapper.writeValueAsString(toCategoryId))
-                .content(objectMapper.writeValueAsString(category)));
-
+                .content(objectMapper.writeValueAsString(request)));
     }
 }
