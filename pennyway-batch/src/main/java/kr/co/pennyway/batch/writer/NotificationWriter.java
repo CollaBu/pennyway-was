@@ -6,6 +6,7 @@ import kr.co.pennyway.domain.domains.notification.repository.NotificationReposit
 import kr.co.pennyway.domain.domains.notification.type.Announcement;
 import kr.co.pennyway.infra.common.event.NotificationEvent;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.context.ApplicationEventPublisher;
@@ -19,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class NotificationWriter implements ItemWriter<DeviceTokenOwner> {
@@ -28,6 +30,7 @@ public class NotificationWriter implements ItemWriter<DeviceTokenOwner> {
     @Override
     @Transactional
     public void write(@NonNull Chunk<? extends DeviceTokenOwner> owners) throws Exception {
+        log.info("Writer 실행: {}", owners.size());
         LocalDateTime publishedAt = LocalDateTime.now();
 
         List<Long> userIds = new ArrayList<>();
