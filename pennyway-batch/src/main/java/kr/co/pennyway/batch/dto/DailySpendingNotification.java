@@ -4,16 +4,17 @@ import kr.co.pennyway.domain.domains.device.dto.DeviceTokenOwner;
 import kr.co.pennyway.domain.domains.notification.type.Announcement;
 import lombok.Builder;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 @Builder
 public record DailySpendingNotification(
         Long userId,
         String title,
         String content,
-        List<String> deviceTokens
+        Set<String> deviceTokens
 ) {
     public DailySpendingNotification {
         Objects.requireNonNull(userId, "userId must not be null");
@@ -29,7 +30,7 @@ public record DailySpendingNotification(
      */
     public static DailySpendingNotification from(DeviceTokenOwner owner) {
         Announcement announcement = Announcement.DAILY_SPENDING;
-        List<String> deviceTokens = new ArrayList<>();
+        Set<String> deviceTokens = new HashSet<>();
         deviceTokens.add(owner.deviceToken());
 
         return DailySpendingNotification.builder()
@@ -42,5 +43,12 @@ public record DailySpendingNotification(
 
     public void addDeviceToken(String deviceToken) {
         deviceTokens.add(deviceToken);
+    }
+
+    /**
+     * DeviceToken을 List로 변환하여 View를 반환한다.
+     */
+    public List<String> deviceTokensForList() {
+        return List.copyOf(deviceTokens);
     }
 }
