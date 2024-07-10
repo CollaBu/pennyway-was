@@ -22,7 +22,6 @@ public interface DeviceTokenCustomRepository {
      *      LEFT JOIN user u ON d.user_id = u.id
      *      WHERE d.activated = true AND u.account_book_notify = true
      *      ORDER BY u.id ASC
-     *      GROUP BY u.id
      *      LIMIT ${pageable.pageSize} OFFSET ${pageable.offset}
      *      ;
      * }
