@@ -82,10 +82,11 @@ public class SpendingController implements SpendingApi {
 
     @Override
     @PatchMapping({"migration/{fromCategoryId}"})
-    @PreAuthorize("isAuthenticated() and @spendingCategoryManager.hasPermissions(principal.userId, #fromCategoryId) and @spendingCategoryManager.hasPermissions(principal.userId, #toCategoryId)")
+    @PreAuthorize("isAuthenticated()") // TODO: 권한검사 추가 필요 (ToCategory가 커스텀 예외인가? 에 따라 권한검사가 필요하거나 필요없으므로 SpEL로 한번만에 안됨
     public ResponseEntity<?> migrateSpendings(@PathVariable Long fromCategoryId,
                                               @RequestBody SpendingMigrateDto request) {
         spendingUseCase.migrateSpendings(fromCategoryId, request);
+
         return ResponseEntity.ok(SuccessResponse.noContent());
     }
 
