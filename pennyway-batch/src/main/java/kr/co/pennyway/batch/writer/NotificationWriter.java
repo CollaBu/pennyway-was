@@ -33,18 +33,18 @@ public class NotificationWriter implements ItemWriter<DeviceTokenOwner> {
         log.info("Writer 실행: {}", owners.size());
         LocalDateTime publishedAt = LocalDateTime.now();
 
-        List<Long> userIds = new ArrayList<>();
         Map<Long, DailySpendingNotification> notificationMap = new HashMap<>();
 
         for (DeviceTokenOwner owner : owners) {
-            userIds.add(owner.userId());
             notificationMap.computeIfAbsent(owner.userId(), k -> DailySpendingNotification.from(owner)).addDeviceToken(owner.deviceToken());
         }
+
+        List<Long> userIds = new ArrayList<>(notificationMap.keySet());
 
         notificationRepository.saveDailySpendingAnnounceInBulk(userIds, publishedAt, Announcement.DAILY_SPENDING);
 
         for (DailySpendingNotification notification : notificationMap.values()) {
-            publisher.publishEvent(NotificationEvent.of(notification.title(), notification.content(), notification.deviceTokens(), ""));
+            publisher.publishEvent(NotificationEvent.of(notification.title(), notification.content(), notification.deviceTokensForList(), ""));
         }
     }
 }
