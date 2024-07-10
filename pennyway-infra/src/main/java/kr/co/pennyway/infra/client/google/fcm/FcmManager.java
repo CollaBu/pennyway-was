@@ -32,12 +32,14 @@ public class FcmManager {
     }
 
     private ApiFuture<String> sendSingleMessage(NotificationEvent event) {
+        log.info("단일 메시지 전송 : {}", event);
         Message message = event.buildSingleMessage().setApnsConfig(getApnsConfig(event)).build();
 
         return firebaseMessaging.sendAsync(message);
     }
 
     private ApiFuture<BatchResponse> sendMulticastMessage(NotificationEvent event) {
+        log.info("다중 메시지 전송 : {}", event);
         MulticastMessage messages = event.buildMulticastMessage().setApnsConfig(getApnsConfig(event)).build();
 
         return firebaseMessaging.sendEachForMulticastAsync(messages);
