@@ -3,6 +3,7 @@ package kr.co.pennyway.api.apis.ledger.integration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.pennyway.api.apis.ledger.dto.SpendingIdsDto;
 import kr.co.pennyway.api.apis.ledger.dto.SpendingReq;
+import kr.co.pennyway.api.common.query.SpendingCategoryType;
 import kr.co.pennyway.api.common.security.authentication.SecurityUserDetails;
 import kr.co.pennyway.api.config.ExternalApiDBTestConfig;
 import kr.co.pennyway.api.config.ExternalApiIntegrationTest;
@@ -385,5 +386,39 @@ public class SpendingControllerIntegrationTest extends ExternalApiDBTestConfig {
                     .with(user(userDetails))
                     .content(objectMapper.writeValueAsString(req)));
         }
+    }
+
+    @Test
+    @DisplayName("지출 내역 카테고리 이동")
+    void migrateCategory() throws Exception {
+        // given
+        User user = userService.createUser(UserFixture.GENERAL_USER.toUser());
+        SpendingCustomCategory fromCategory = spendingCustomCategoryService.createSpendingCustomCategory(SpendingCustomCategory.of("잉여비", SpendingCategory.LIVING, user));
+        SpendingCustomCategory toCategory = spendingCustomCategoryService.createSpendingCustomCategory(SpendingCustomCategory.of("식비", SpendingCategory.FOOD, user));
+
+        Spending spending = spendingService.createSpending(SpendingFixture.CUSTOM_CATEGORY_SPENDING.toCustomCategorySpending(user, fromCategory));
+        Long id = spending.getId();
+
+        // when
+        ResultActions resultActions = performMigrateCategory(user, fromCategory.getId(), toCategory.getId(), SpendingCategoryType.CUSTOM);
+
+        // then
+        resultActions
+                .andDo(print())
+                .andExpect(status().isOk());
+
+        Assertions.assertTrue(spendingService.readSpending(id).get().equals(toCategory));
+    }
+
+    private ResultActions performMigrateCategory(User requestUser, Long fromCategoryId, Long toCategoryId, SpendingCategoryType categoryType) throws Exception {
+        UserDetails userDetails = SecurityUserDetails.from(requestUser);
+        SpendingCategory category = SpendingCategory.CUSTOM;
+
+        return mockMvc.perform(MockMvcRequestBuilders.put("/v2/spendings/migrate/{fromCategoryId}", fromCategoryId)
+                .with(user(userDetails))
+                .contentType("application/json")
+                .content(objectMapper.writeValueAsString(toCategoryId))
+                .content(objectMapper.writeValueAsString(category)));
+
     }
 }
