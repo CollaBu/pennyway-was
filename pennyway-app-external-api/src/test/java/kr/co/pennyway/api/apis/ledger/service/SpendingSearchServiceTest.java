@@ -4,9 +4,12 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import kr.co.pennyway.api.config.ExternalApiDBTestConfig;
 import kr.co.pennyway.api.config.ExternalApiIntegrationTest;
+import kr.co.pennyway.api.config.fixture.SpendingCustomCategoryFixture;
 import kr.co.pennyway.api.config.fixture.SpendingFixture;
 import kr.co.pennyway.api.config.fixture.UserFixture;
 import kr.co.pennyway.domain.domains.spending.domain.Spending;
+import kr.co.pennyway.domain.domains.spending.domain.SpendingCustomCategory;
+import kr.co.pennyway.domain.domains.spending.service.SpendingCustomCategoryService;
 import kr.co.pennyway.domain.domains.spending.service.SpendingService;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.service.UserService;
@@ -35,6 +38,8 @@ class SpendingSearchServiceTest extends ExternalApiDBTestConfig {
     private SpendingService spendingService;
     @Autowired
     private NamedParameterJdbcTemplate jdbcTemplate;
+    @Autowired
+    private SpendingCustomCategoryService spendingCustomCategoryService;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -59,7 +64,9 @@ class SpendingSearchServiceTest extends ExternalApiDBTestConfig {
     void testReadSpendingsLazyLoading() {
         // given
         User user = userService.createUser(UserFixture.GENERAL_USER.toUser());
-        SpendingFixture.bulkInsertSpending(user, 100, true, jdbcTemplate);
+        SpendingCustomCategory spendingCustomCategory = SpendingCustomCategoryFixture.GENERAL_SPENDING_CUSTOM_CATEGORY.toCustomSpendingCategory(user);
+        spendingCustomCategoryService.createSpendingCustomCategory(spendingCustomCategory);
+        SpendingFixture.bulkInsertSpending(user, 100, spendingCustomCategory.getId(), jdbcTemplate);
 
         // when
         List<Spending> spendings = spendingService.readSpendings(user.getId(), LocalDate.now().getYear(), LocalDate.now().getMonthValue());
@@ -76,8 +83,7 @@ class SpendingSearchServiceTest extends ExternalApiDBTestConfig {
         // then
         log.info("쿼리문 실행 횟수: {}", statistics.getPrepareStatementCount());
         log.info("readSpendings로 조회해온 지출 내역 개수: {}", size);
-
-        Assertions.assertEquals(2, statistics.getPrepareStatementCount());
+        Assertions.assertEquals(3, statistics.getPrepareStatementCount());
 
         boolean isSortedDescending = IntStream.range(0, spendings.size() - 1)
                 .allMatch(i -> !spendings.get(i).getSpendAt().isBefore(spendings.get(i + 1).getSpendAt()));

@@ -114,7 +114,7 @@ public class TargetAmountIntegrationTest extends ExternalApiDBTestConfig {
         void getTargetAmountAndTotalSpending() throws Exception {
             // given
             User user = createUserWithCreatedAt(LocalDateTime.now().minusYears(2), jdbcTemplate);
-            SpendingFixture.bulkInsertSpending(user, 300, false, jdbcTemplate);
+            SpendingFixture.bulkInsertSpending(user, 300, 0L, jdbcTemplate);
             TargetAmountFixture.bulkInsertTargetAmount(user, jdbcTemplate);
 
             // when
@@ -156,7 +156,7 @@ public class TargetAmountIntegrationTest extends ExternalApiDBTestConfig {
         void getTargetAmountsAndTotalSpendings() throws Exception {
             // given
             User user = createUserWithCreatedAt(LocalDateTime.now().minusYears(2).plusMonths(2), jdbcTemplate);
-            SpendingFixture.bulkInsertSpending(user, 300, false, jdbcTemplate);
+            SpendingFixture.bulkInsertSpending(user, 300, 0L, jdbcTemplate);
             TargetAmountFixture.bulkInsertTargetAmount(user, jdbcTemplate);
 
             // when

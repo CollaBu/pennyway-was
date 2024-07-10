@@ -52,7 +52,13 @@ public class SpendingUseCase {
         return SpendingMapper.toSpendingSearchResIndividual(updatedSpending);
     }
 
+    @Transactional
     public void deleteSpending(Long spendingId) {
         spendingDeleteService.deleteSpending(spendingId);
+    }
+
+    @Transactional
+    public void deleteSpendings(List<Long> spendingIds) {
+        spendingDeleteService.deleteSpendings(spendingIds);
     }
 }
