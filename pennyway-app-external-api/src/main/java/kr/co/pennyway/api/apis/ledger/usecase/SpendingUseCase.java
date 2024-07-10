@@ -7,6 +7,7 @@ import kr.co.pennyway.api.apis.ledger.service.SpendingDeleteService;
 import kr.co.pennyway.api.apis.ledger.service.SpendingSaveService;
 import kr.co.pennyway.api.apis.ledger.service.SpendingSearchService;
 import kr.co.pennyway.api.apis.ledger.service.SpendingUpdateService;
+import kr.co.pennyway.api.common.query.SpendingCategoryType;
 import kr.co.pennyway.common.annotation.UseCase;
 import kr.co.pennyway.domain.domains.spending.domain.Spending;
 import lombok.RequiredArgsConstructor;
@@ -60,5 +61,10 @@ public class SpendingUseCase {
     @Transactional
     public void deleteSpendings(List<Long> spendingIds) {
         spendingDeleteService.deleteSpendings(spendingIds);
+    }
+
+    @Transactional
+    public void migrateSpendings(Long fromCategoryId, Long toCategoryId, SpendingCategoryType toType) {
+        spendingUpdateService.migrateSpendings(fromCategoryId, toCategoryId, toType);
     }
 }
