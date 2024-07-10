@@ -42,9 +42,10 @@ public class DeviceTokenCustomRepositoryImpl implements DeviceTokenCustomReposit
                 .fetch();
 
         JPAQuery<Long> count = queryFactory
-                .select(deviceToken.count())
+                .select(deviceToken.id.count())
                 .from(deviceToken)
-                .where(deviceToken.activated.isTrue());
+                .leftJoin(user).on(deviceToken.user.id.eq(user.id))
+                .where(deviceToken.activated.isTrue().and(user.notifySetting.accountBookNotify.isTrue()));
 
         return PageableExecutionUtils.getPage(content, pageable, () -> count.fetch().size());
     }
