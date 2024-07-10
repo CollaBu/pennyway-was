@@ -20,7 +20,7 @@ public class SpendingNotifyScheduler {
     private final JobLauncher jobLauncher;
     private final Job dailyNotificationJob;
 
-    @Scheduled(cron = "${cron.daily-spending-notify}")
+    @Scheduled(cron = "0 0 20 * * ?")
     public void runDailyNotificationJob() {
         JobParameters jobParameters = new JobParametersBuilder()
                 .addLong("time", System.currentTimeMillis())

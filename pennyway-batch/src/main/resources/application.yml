@@ -6,18 +6,15 @@ spring:
 
   batch:
     job:
-      enabled: false # 애플리케이션 시작 시 자동으로 실행 방지
+      enabled: false
 
   task:
     scheduling:
       pool:
-        size: 5 # Task 실행을 위한 Thread Pool Size
+        size: 5
       shutdown:
         await-termination: true # 애플리케이션 종료 시 모든 Task가 종료될 때까지 대기
         await-termination-period: 60000 # 대기 시간 60초
-
-cron:
-  daily-spending-notification: 0 0 20 * * ? # 매일 20시에 실행
 
 ---
 spring:
