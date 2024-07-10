@@ -17,9 +17,9 @@ public class ActiveDeviceTokenReader {
     private final DeviceTokenRepository deviceTokenRepository;
 
     @Bean
-    public RepositoryItemReader<DeviceTokenOwner> activeDeviceTokenReader() {
+    public RepositoryItemReader<DeviceTokenOwner> execute() {
         return new RepositoryItemReaderBuilder<DeviceTokenOwner>()
-                .name("activeDeviceTokenReader")
+                .name("execute")
                 .repository(deviceTokenRepository)
                 .methodName("findActivatedDeviceTokenOwners")
                 .pageSize(100)

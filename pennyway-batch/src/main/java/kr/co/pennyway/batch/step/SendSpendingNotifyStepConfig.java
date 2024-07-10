@@ -24,7 +24,7 @@ public class SendSpendingNotifyStepConfig {
     public Step sendSpendingNotifyStep(PlatformTransactionManager transactionManager) {
         return new StepBuilder("sendSpendingNotifyStep", jobRepository)
                 .<DeviceTokenOwner, DeviceTokenOwner>chunk(100, transactionManager)
-                .reader(reader.activeDeviceTokenReader())
+                .reader(reader.execute())
                 .processor(processor)
                 .writer(writer)
                 .build();
