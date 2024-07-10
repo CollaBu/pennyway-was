@@ -2,9 +2,9 @@ package kr.co.pennyway.api.apis.ledger.controller;
 
 import kr.co.pennyway.api.apis.ledger.api.SpendingApi;
 import kr.co.pennyway.api.apis.ledger.dto.SpendingIdsDto;
+import kr.co.pennyway.api.apis.ledger.dto.SpendingMigrateDto;
 import kr.co.pennyway.api.apis.ledger.dto.SpendingReq;
 import kr.co.pennyway.api.apis.ledger.usecase.SpendingUseCase;
-import kr.co.pennyway.api.common.query.SpendingCategoryType;
 import kr.co.pennyway.api.common.response.SuccessResponse;
 import kr.co.pennyway.api.common.security.authentication.SecurityUserDetails;
 import kr.co.pennyway.domain.domains.spending.exception.SpendingErrorCode;
@@ -80,12 +80,12 @@ public class SpendingController implements SpendingApi {
         return ResponseEntity.ok(SuccessResponse.noContent());
     }
 
+    @Override
     @PatchMapping({"migration/{fromCategoryId}"})
     @PreAuthorize("isAuthenticated() and @spendingCategoryManager.hasPermissions(principal.userId, #fromCategoryId) and @spendingCategoryManager.hasPermissions(principal.userId, #toCategoryId)")
     public ResponseEntity<?> migrateSpendings(@PathVariable Long fromCategoryId,
-                                              @RequestBody Long toCategoryId,
-                                              @RequestBody SpendingCategoryType toType) {
-        spendingUseCase.migrateSpendings(fromCategoryId, toCategoryId, toType);
+                                              @RequestBody SpendingMigrateDto request) {
+        spendingUseCase.migrateSpendings(fromCategoryId, request);
         return ResponseEntity.ok(SuccessResponse.noContent());
     }
 

@@ -1,5 +1,6 @@
 package kr.co.pennyway.api.apis.ledger.service;
 
+import kr.co.pennyway.api.apis.ledger.dto.SpendingMigrateDto;
 import kr.co.pennyway.api.apis.ledger.dto.SpendingReq;
 import kr.co.pennyway.api.common.query.SpendingCategoryType;
 import kr.co.pennyway.domain.domains.spending.domain.Spending;
@@ -35,11 +36,11 @@ public class SpendingUpdateService {
     }
 
     @Transactional
-    public void migrateSpendings(Long fromCategoryId, Long toCategoryId, SpendingCategoryType toType) {
-        if (toType.equals(SpendingCategoryType.CUSTOM)) {
-            spendingService.migrateSpendingsByCategoryId(fromCategoryId, toCategoryId);
+    public void migrateSpendings(Long fromCategoryId, SpendingMigrateDto request) {
+        if (request.toType().equals(SpendingCategoryType.CUSTOM)) {
+            spendingService.migrateSpendingsByCategoryId(fromCategoryId, request.toCategoryId());
         } else {
-            SpendingCategory spendingCategory = SpendingCategory.fromCode(toCategoryId.toString());
+            SpendingCategory spendingCategory = SpendingCategory.fromCode(request.toCategoryId().toString());
             spendingService.migrateSpendingsByCategory(fromCategoryId, spendingCategory);
         }
     }

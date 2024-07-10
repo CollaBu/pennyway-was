@@ -12,9 +12,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.co.pennyway.api.apis.ledger.dto.SpendingIdsDto;
+import kr.co.pennyway.api.apis.ledger.dto.SpendingMigrateDto;
 import kr.co.pennyway.api.apis.ledger.dto.SpendingReq;
 import kr.co.pennyway.api.apis.ledger.dto.SpendingSearchRes;
-import kr.co.pennyway.api.common.query.SpendingCategoryType;
 import kr.co.pennyway.api.common.security.authentication.SecurityUserDetails;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -129,6 +129,5 @@ public interface SpendingApi {
             )
     }))
     ResponseEntity<?> migrateSpendings(@PathVariable Long fromCategoryId,
-                                       @RequestBody @Schema(description = "type이 default면 아이콘 코드(1~11), custom이면 카테고리 pk<br>지출내역을 이전하고자 하는 카테고리 ID") Long toCategoryId,
-                                       @RequestBody SpendingCategoryType toType);
+                                       @RequestBody SpendingMigrateDto request);
 }
