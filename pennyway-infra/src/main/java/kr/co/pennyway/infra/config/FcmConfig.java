@@ -6,8 +6,8 @@ import com.google.firebase.FirebaseOptions;
 import com.google.firebase.messaging.FirebaseMessaging;
 import jakarta.annotation.PostConstruct;
 import kr.co.pennyway.infra.client.google.fcm.FcmManager;
+import kr.co.pennyway.infra.common.event.FcmNotificationEventHandler;
 import kr.co.pennyway.infra.common.event.NotificationEventHandler;
-import kr.co.pennyway.infra.common.event.NotificationEventHandlerImpl;
 import kr.co.pennyway.infra.common.importer.PennywayInfraConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -53,6 +53,6 @@ public class FcmConfig implements PennywayInfraConfig {
 
     @Bean
     NotificationEventHandler notificationEventHandler(FcmManager fcmManager) {
-        return new NotificationEventHandlerImpl(fcmManager);
+        return new FcmNotificationEventHandler(fcmManager);
     }
 }

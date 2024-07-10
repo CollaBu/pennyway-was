@@ -14,7 +14,7 @@ import java.util.concurrent.Executors;
  */
 @Slf4j
 @RequiredArgsConstructor
-public class NotificationEventHandlerImpl implements NotificationEventHandler {
+public class FcmNotificationEventHandler implements NotificationEventHandler {
     private final FcmManager fcmManager;
 
     @Async
