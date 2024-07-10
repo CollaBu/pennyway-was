@@ -13,7 +13,7 @@ public interface NotificationCustomRepository {
      * <pre>
      * {@code
      * INSERT INTO notification(id, type, read_at, created_at, updated_at, receiver, announcement)
-     * SELECT NULL, '0', NOW(), NOW(), NOW(), u.id, '1'
+     * SELECT NULL, '0', NULL, NOW(), NOW(), u.id, '1'
      * FROM user u
      * WHERE u.id IN (?)
      * AND NOT EXISTS (
