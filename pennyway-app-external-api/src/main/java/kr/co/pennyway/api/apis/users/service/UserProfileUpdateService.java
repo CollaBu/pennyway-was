@@ -61,27 +61,17 @@ public class UserProfileUpdateService {
     }
 
     @Transactional
-    public void updateUsernameAndPhone(Long userId, String username, String phone, String code) {
+    public void updatePhone(Long userId, String phone, String code) {
         User user = readUserOrThrow(userId);
 
-        if (!user.getUsername().equals(username)) {
-            if (userService.isExistUsername(username)) {
-                throw new UserErrorException(UserErrorCode.ALREADY_EXIST_USERNAME);
-            }
+        phoneVerificationService.isValidCode(PhoneVerificationDto.VerifyCodeReq.of(phone, code), PhoneCodeKeyType.PHONE);
+        phoneCodeService.delete(phone, PhoneCodeKeyType.PHONE);
 
-            user.updateUsername(username);
+        if (userService.isExistPhone(phone)) {
+            throw new UserErrorException(UserErrorCode.ALREADY_EXIST_PHONE);
         }
 
-        if (!user.getPhone().equals(phone)) {
-            phoneVerificationService.isValidCode(PhoneVerificationDto.VerifyCodeReq.of(phone, code), PhoneCodeKeyType.PHONE);
-            phoneCodeService.delete(phone, PhoneCodeKeyType.PHONE);
-
-            if (userService.isExistPhone(phone)) {
-                throw new UserErrorException(UserErrorCode.ALREADY_EXIST_PHONE);
-            }
-
-            user.updatePhone(phone);
-        }
+        user.updatePhone(phone);
     }
 
     @Transactional
