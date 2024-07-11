@@ -60,8 +60,8 @@ public class UserAccountUseCase {
         userProfileUpdateService.updateProfileImage(userId, request.profileImageUrl());
     }
 
-    public void updateUsernameAndPhone(Long userId, UserProfileUpdateDto.UsernameAndPhoneReq request) {
-        userProfileUpdateService.updateUsernameAndPhone(userId, request.username(), request.phone(), request.code());
+    public void updatePhone(Long userId, UserProfileUpdateDto.PhoneReq request) {
+        userProfileUpdateService.updatePhone(userId, request.phone(), request.code());
     }
 
     public UserProfileUpdateDto.NotifySettingUpdateRes activateNotification(Long userId, NotifySetting.NotifyType type) {
