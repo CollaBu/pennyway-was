@@ -39,6 +39,10 @@ public class UserProfileUpdateService {
     public void updateUsername(Long userId, String newUsername) {
         User user = readUserOrThrow(userId);
 
+        if (userService.isExistUsername(newUsername)) {
+            throw new UserErrorException(UserErrorCode.ALREADY_EXIST_USERNAME);
+        }
+
         user.updateUsername(newUsername);
     }
 
