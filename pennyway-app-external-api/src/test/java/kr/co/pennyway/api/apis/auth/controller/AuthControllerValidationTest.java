@@ -80,7 +80,7 @@ public class AuthControllerValidationTest {
                 .andDo(print());
     }
 
-    @DisplayName("[2] 아이디는 5~20자의 영문 소문자, -, _, . 만 사용 가능합니다.")
+    @DisplayName("[2] 아이디는 영문 소문자, 숫자, 특수기호 (-), (_), (.) 만 사용하여, 5~20자의 아이디를 입력해 주세요")
     @Test
     void idValidError() throws Exception {
         // given
@@ -97,7 +97,7 @@ public class AuthControllerValidationTest {
         // then
         resultActions
                 .andExpect(status().isUnprocessableEntity())
-                .andExpect(jsonPath("$.fieldErrors.username").value("5~20자의 영문 소문자, -, _, . 만 사용 가능합니다."))
+                .andExpect(jsonPath("$.fieldErrors.username").value("영문 소문자, 숫자, 특수기호 (-), (_), (.) 만 사용하여, 5~20자의 아이디를 입력해 주세요"))
                 .andDo(print());
     }
 
@@ -118,7 +118,7 @@ public class AuthControllerValidationTest {
         // then
         resultActions
                 .andExpect(status().isUnprocessableEntity())
-                .andExpect(jsonPath("$.fieldErrors.name").value("2~8자의 한글, 영문 소문자, 숫자만 사용 가능합니다."))
+                .andExpect(jsonPath("$.fieldErrors.name").value("한글과 영문 대, 소문자만 가능해요"))
                 .andDo(print());
     }
 
@@ -213,7 +213,7 @@ public class AuthControllerValidationTest {
     @Test
     void signUp() throws Exception {
         // given
-        SignUpReq.General request = new SignUpReq.General("pennyway", "페니웨이123", "pennyway1234",
+        SignUpReq.General request = new SignUpReq.General("pennyway123", "페니웨이", "pennyway1234",
                 "010-1234-5678", "123456");
         ResponseCookie expectedCookie = ResponseCookie.from("refreshToken", "refreshToken")
                 .maxAge(Duration.ofDays(7).toSeconds()).httpOnly(true).path("/").build();
