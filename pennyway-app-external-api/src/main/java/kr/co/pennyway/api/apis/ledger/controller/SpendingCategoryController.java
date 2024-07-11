@@ -48,6 +48,14 @@ public class SpendingCategoryController implements SpendingCategoryApi {
     }
 
     @Override
+    @DeleteMapping("/{categoryId}")
+    @PreAuthorize("isAuthenticated() and @spendingCategoryManager.hasPermission(principal.userId, #categoryId)")
+    public ResponseEntity<?> deleteSpendingCategory(@PathVariable Long categoryId) {
+        spendingCategoryUseCase.deleteSpendingCategory(categoryId);
+
+        return ResponseEntity.ok(SuccessResponse.noContent());
+    }
+
     @GetMapping("/{categoryId}/spendings/count")
     @PreAuthorize("isAuthenticated() and @spendingCategoryManager.hasPermission(#user.getUserId(), #categoryId, #type)")
     public ResponseEntity<?> getSpendingTotalCountByCategory(
@@ -76,5 +84,16 @@ public class SpendingCategoryController implements SpendingCategoryApi {
         }
 
         return ResponseEntity.ok(SuccessResponse.from("spendings", spendingCategoryUseCase.getSpendingsByCategory(user.getUserId(), categoryId, pageable, type)));
+    }
+
+    @Override
+    @PatchMapping("/{categoryId}")
+    @PreAuthorize("isAuthenticated() and @spendingCategoryManager.hasPermission(principal.userId, #categoryId)")
+    public ResponseEntity<?> patchSpendingCategory(@PathVariable Long categoryId, @Validated SpendingCategoryDto.CreateParamReq param) {
+        if (SpendingCategory.CUSTOM.equals(param.icon())) {
+            throw new SpendingErrorException(SpendingErrorCode.INVALID_ICON);
+        }
+
+        return ResponseEntity.ok(SuccessResponse.from("spendingCategory", spendingCategoryUseCase.updateSpendingCategory(categoryId, param.name(), param.icon())));
     }
 }

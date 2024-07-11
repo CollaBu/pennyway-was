@@ -123,6 +123,11 @@ public class SpendingService {
         return spendingRepository.selectList(predicate, TotalSpendingAmount.class, bindings, queryHandler, sort);
     }
 
+    @Transactional
+    public void deleteSpendingsByCategoryIdInQuery(Long categoryId) {
+        spendingRepository.deleteAllByCategoryIdAndDeletedAtNullInQuery(categoryId);
+    }
+
     @Transactional(readOnly = true)
     public boolean isExistsSpending(Long userId, Long spendingId) {
         return spendingRepository.existsByIdAndUser_Id(spendingId, userId);
@@ -131,5 +136,15 @@ public class SpendingService {
     @Transactional
     public void deleteSpending(Spending spending) {
         spendingRepository.delete(spending);
+    }
+
+    @Transactional
+    public void deleteSpendingsInQuery(List<Long> spendingIds) {
+        spendingRepository.deleteAllByIdAndDeletedAtNullInQuery(spendingIds);
+    }
+
+    @Transactional(readOnly = true)
+    public long countByUserIdAndIdIn(Long userId, List<Long> spendingIds) {
+        return spendingRepository.countByUserIdAndIdIn(userId, spendingIds);
     }
 }
