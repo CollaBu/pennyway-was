@@ -48,7 +48,7 @@ public class UserAccountController implements UserAccountApi {
     @Override
     @PatchMapping("/name")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> putName(UserProfileUpdateDto.NameReq request, SecurityUserDetails user) {
+    public ResponseEntity<?> patchName(UserProfileUpdateDto.NameReq request, SecurityUserDetails user) {
         userAccountUseCase.updateName(user.getUserId(), request.name());
         return ResponseEntity.ok(SuccessResponse.noContent());
     }
@@ -56,7 +56,7 @@ public class UserAccountController implements UserAccountApi {
     @Override
     @PatchMapping("/username")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> putUsername(UserProfileUpdateDto.UsernameReq request, SecurityUserDetails user) {
+    public ResponseEntity<?> patchUsername(UserProfileUpdateDto.UsernameReq request, SecurityUserDetails user) {
         userAccountUseCase.updateUsername(user.getUserId(), request.username());
         return ResponseEntity.ok(SuccessResponse.noContent());
     }
@@ -78,10 +78,10 @@ public class UserAccountController implements UserAccountApi {
     }
 
     @Override
-    @PatchMapping("/profile")
+    @PatchMapping("/phone")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> patchProfile(@RequestBody @Validated UserProfileUpdateDto.UsernameAndPhoneReq request, @AuthenticationPrincipal SecurityUserDetails user) {
-        userAccountUseCase.updateUsernameAndPhone(user.getUserId(), request);
+    public ResponseEntity<?> patchPhone(@RequestBody @Validated UserProfileUpdateDto.PhoneReq request, @AuthenticationPrincipal SecurityUserDetails user) {
+        userAccountUseCase.updatePhone(user.getUserId(), request);
         return ResponseEntity.ok(SuccessResponse.noContent());
     }
 
@@ -110,7 +110,7 @@ public class UserAccountController implements UserAccountApi {
     @Override
     @PutMapping("/profile-image")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> postProfileImage(@Validated UserProfileUpdateDto.ProfileImageReq request, SecurityUserDetails user) {
+    public ResponseEntity<?> putProfileImage(@Validated UserProfileUpdateDto.ProfileImageReq request, SecurityUserDetails user) {
         userAccountUseCase.updateProfileImage(user.getUserId(), request);
         return ResponseEntity.ok(SuccessResponse.noContent());
     }
