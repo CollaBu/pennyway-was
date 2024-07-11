@@ -66,6 +66,14 @@ public interface UserAccountApi {
     ResponseEntity<?> patchName(@RequestBody @Validated UserProfileUpdateDto.NameReq request, @AuthenticationPrincipal SecurityUserDetails user);
 
     @Operation(summary = "사용자 아이디 수정")
+    @ApiResponse(responseCode = "409", content = @Content(mediaType = "application/json", examples = {
+            @ExampleObject(name = "검증 실패 - 이미 존재하는 아이디", description = "현재 사용하는 아이디로 요청해도 동일한 예외가 발생한다.", value = """
+                    {
+                        "code": "4091",
+                        "message": "이미 존재하는 아이디입니다."
+                    }
+                    """)
+    }))
     ResponseEntity<?> patchUsername(@RequestBody @Validated UserProfileUpdateDto.UsernameReq request, @AuthenticationPrincipal SecurityUserDetails user);
 
     @Operation(summary = "사용자 비밀번호 검증")
@@ -136,7 +144,7 @@ public interface UserAccountApi {
                             """)
             })),
             @ApiResponse(responseCode = "409", content = @Content(mediaType = "application/json", examples = {
-                    @ExampleObject(name = "검증 실패 - 이미 존재하는 휴대폰 번호", value = """
+                    @ExampleObject(name = "검증 실패 - 이미 존재하는 휴대폰 번호", description = "현재 사용하는 전화번호로 요청해도 동일한 예외가 발생한다.", value = """
                             {
                                 "code": "4091",
                                 "message": "이미 존재하는 휴대폰 번호입니다."
