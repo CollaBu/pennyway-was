@@ -32,7 +32,7 @@ public class CacheConfig {
 
     private final long defaultCacheTtlSec = 60;
     private final long securityUserCacheTtlSec = 30;
-    private final long oidcCacheTtlDay = 7;
+    private final long oidcCacheTtlDay = 3;
 
     public CacheConfig(
             @Value("${spring.data.redis.host}") String host,
