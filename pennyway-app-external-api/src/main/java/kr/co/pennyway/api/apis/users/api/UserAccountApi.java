@@ -63,10 +63,18 @@ public interface UserAccountApi {
     ResponseEntity<?> getMyAccount(@AuthenticationPrincipal SecurityUserDetails user);
 
     @Operation(summary = "사용자 이름 수정")
-    ResponseEntity<?> putName(@RequestBody @Validated UserProfileUpdateDto.NameReq request, @AuthenticationPrincipal SecurityUserDetails user);
+    ResponseEntity<?> patchName(@RequestBody @Validated UserProfileUpdateDto.NameReq request, @AuthenticationPrincipal SecurityUserDetails user);
 
     @Operation(summary = "사용자 아이디 수정")
-    ResponseEntity<?> putUsername(@RequestBody @Validated UserProfileUpdateDto.UsernameReq request, @AuthenticationPrincipal SecurityUserDetails user);
+    @ApiResponse(responseCode = "409", content = @Content(mediaType = "application/json", examples = {
+            @ExampleObject(name = "검증 실패 - 이미 존재하는 아이디", description = "현재 사용하는 아이디로 요청해도 동일한 예외가 발생한다.", value = """
+                    {
+                        "code": "4091",
+                        "message": "이미 존재하는 아이디입니다."
+                    }
+                    """)
+    }))
+    ResponseEntity<?> patchUsername(@RequestBody @Validated UserProfileUpdateDto.UsernameReq request, @AuthenticationPrincipal SecurityUserDetails user);
 
     @Operation(summary = "사용자 비밀번호 검증")
     @ApiResponses({
@@ -117,7 +125,7 @@ public interface UserAccountApi {
     })
     ResponseEntity<?> patchPassword(@RequestBody @Validated UserProfileUpdateDto.PasswordReq request, @AuthenticationPrincipal SecurityUserDetails user);
 
-    @Operation(summary = "사용자 프로필 수정")
+    @Operation(summary = "사용자 전화번호 수정")
     @ApiResponses({
             @ApiResponse(responseCode = "401", content = @Content(mediaType = "application/json", examples = {
                     @ExampleObject(name = "검증 실패", value = """
@@ -136,13 +144,7 @@ public interface UserAccountApi {
                             """)
             })),
             @ApiResponse(responseCode = "409", content = @Content(mediaType = "application/json", examples = {
-                    @ExampleObject(name = "검증 실패 - 이미 존재하는 아이디", value = """
-                            {
-                                "code": "4091",
-                                "message": "이미 존재하는 아이디입니다."
-                            }
-                            """),
-                    @ExampleObject(name = "검증 실패 - 이미 존재하는 휴대폰 번호", value = """
+                    @ExampleObject(name = "검증 실패 - 이미 존재하는 휴대폰 번호", description = "현재 사용하는 전화번호로 요청해도 동일한 예외가 발생한다.", value = """
                             {
                                 "code": "4091",
                                 "message": "이미 존재하는 휴대폰 번호입니다."
@@ -150,7 +152,7 @@ public interface UserAccountApi {
                             """)
             }))
     })
-    ResponseEntity<?> patchProfile(@RequestBody @Validated UserProfileUpdateDto.UsernameAndPhoneReq request, @AuthenticationPrincipal SecurityUserDetails user);
+    ResponseEntity<?> patchPhone(@RequestBody @Validated UserProfileUpdateDto.PhoneReq request, @AuthenticationPrincipal SecurityUserDetails user);
 
     @Operation(summary = "사용자 알림 활성화")
     @Parameter(name = "type", description = "알림 타입", examples = {
@@ -254,5 +256,5 @@ public interface UserAccountApi {
                             """)
             }))
     })
-    ResponseEntity<?> postProfileImage(@RequestBody @Validated UserProfileUpdateDto.ProfileImageReq request, @AuthenticationPrincipal SecurityUserDetails user);
+    ResponseEntity<?> putProfileImage(@RequestBody @Validated UserProfileUpdateDto.ProfileImageReq request, @AuthenticationPrincipal SecurityUserDetails user);
 }
