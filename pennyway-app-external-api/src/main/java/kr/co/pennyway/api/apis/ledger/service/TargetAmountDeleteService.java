@@ -16,7 +16,6 @@ public class TargetAmountDeleteService {
     @Transactional
     public void execute(Long targetAmountId) {
         TargetAmount targetAmount = targetAmountService.readTargetAmount(targetAmountId)
-                .filter(TargetAmount::isAllocatedAmount)
                 .orElseThrow(() -> new TargetAmountErrorException(TargetAmountErrorCode.NOT_FOUND_TARGET_AMOUNT));
 
         if (!targetAmount.isThatMonth()) {
