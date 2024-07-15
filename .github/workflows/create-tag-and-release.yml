@@ -37,7 +37,7 @@ jobs:
 
   release:
     needs: extract-info
-    if: ${{ needs.extract-info.outputs.module != 'Ignore' }}
+    if: ${{ needs.extract-info.outputs.module != 'Ignore' }} # Ignore로 시작하는 PR은 파이프라인 중단
     runs-on: ubuntu-latest
     permissions:
       contents: write
