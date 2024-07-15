@@ -17,4 +17,3 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           OPENAI_API_KEY: ${{ secrets.OPEN_API_KEY }}
           LANGUAGE: Korean
-          MODEL: GPT-4o
