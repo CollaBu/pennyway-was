@@ -30,7 +30,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 
 @Slf4j
 @ExtendWith(MockitoExtension.class)
-public class UserProfileUpdateServiceTest {
+public class PhoneUpdateServiceTest {
     private final Long userId = 1L;
     private User user = UserFixture.GENERAL_USER.toUser();
     @InjectMocks
@@ -50,33 +50,7 @@ public class UserProfileUpdateServiceTest {
     }
 
     @Test
-    @DisplayName("수정 요청한 아이디와 전화번호가 기존 정보와 일치할 경우, 변경이 발생하지 않는다.")
-    void updateSameUsermameAndPhone() {
-        // when
-        userProfileUpdateService.updateUsernameAndPhone(userId, user.getUsername(), user.getPhone(), "000000");
-
-        // then
-        verifyNoInteractions(awsS3Provider, phoneVerificationService, phoneCodeService);
-    }
-
-    @Test
-    @DisplayName("수정 요청한 아이디만 기존 정보와 다를 경우, 아이디만 변경이 발생한다.")
-    void updateDifferentUsername() {
-        // given
-        String newUsername = "newUsername";
-        String expectedPhone = user.getPhone();
-
-        // when
-        userProfileUpdateService.updateUsernameAndPhone(userId, newUsername, user.getPhone(), "000000");
-
-        // then
-        assertEquals(newUsername, user.getUsername());
-        assertEquals(expectedPhone, user.getPhone());
-        verifyNoInteractions(awsS3Provider, phoneVerificationService, phoneCodeService);
-    }
-
-    @Test
-    @DisplayName("수정 요청한 전화번호만 기존 정보와 다를 경우, 전화번호만 변경이 발생한다.")
+    @DisplayName("수정 요청한 전화번호가 DB에 존재하지 않고, 유효한 인증 코드를 가진 경우 수정에 성공한다.")
     void updateDifferentPhone() {
         // given
         String expectedUsername = user.getUsername();
@@ -85,7 +59,7 @@ public class UserProfileUpdateServiceTest {
         willDoNothing().given(phoneCodeService).delete(newPhone, PhoneCodeKeyType.PHONE);
 
         // when
-        userProfileUpdateService.updateUsernameAndPhone(userId, user.getUsername(), newPhone, "000000");
+        userProfileUpdateService.updatePhone(userId, newPhone, "000000");
 
         // then
         assertEquals(expectedUsername, user.getUsername());
@@ -93,24 +67,6 @@ public class UserProfileUpdateServiceTest {
         verifyNoInteractions(awsS3Provider);
     }
 
-    @Test
-    @DisplayName("수정 요청한 아이디가 이미 존재하면, ALREADY_EXIST_USERNAME 에러를 반환한다.")
-    void updateAlreadyExistUsername() {
-        // given
-        String newUsername = "newUsername";
-        given(userService.isExistUsername(newUsername)).willReturn(true);
-
-        // when
-        UserErrorException exception = assertThrows(UserErrorException.class, () -> userProfileUpdateService.updateUsernameAndPhone(userId, newUsername, user.getPhone(), "000000"));
-
-        // then
-        assertEquals(UserErrorCode.ALREADY_EXIST_USERNAME, exception.getBaseErrorCode());
-        verifyNoInteractions(awsS3Provider, phoneVerificationService, phoneCodeService);
-    }
-
-    /**
-     * 트랜잭션이 활성화되지 않아서, username 변경이 되지 않음을 확인할 수는 없다.
-     */
     @Test
     @DisplayName("수정 요청한 전화번호가 이미 존재하면, ALREADY_EXIST_PHONE 에러를 반환한다.")
     void updateAlreadyExistPhone() {
@@ -121,7 +77,7 @@ public class UserProfileUpdateServiceTest {
         willDoNothing().given(phoneCodeService).delete(newPhone, PhoneCodeKeyType.PHONE);
 
         // when
-        UserErrorException exception = assertThrows(UserErrorException.class, () -> userProfileUpdateService.updateUsernameAndPhone(userId, user.getUsername(), newPhone, "000000"));
+        UserErrorException exception = assertThrows(UserErrorException.class, () -> userProfileUpdateService.updatePhone(userId, newPhone, "000000"));
 
         // then
         assertEquals(UserErrorCode.ALREADY_EXIST_PHONE, exception.getBaseErrorCode());
