@@ -15,7 +15,6 @@ jobs:
       repository-projects: write
     outputs:
       module: ${{ steps.module_prefix.outputs.module }}
-      tag: ${{ steps.tag_version.outputs.new_tag }}
 
     steps:
       - name: Checkout PR
@@ -36,7 +35,19 @@ jobs:
             exit 1
           fi
 
-      # 병합된 PR commit 이력으로 부터 버전 추출 (ex. v1.0.0)
+  release:
+    needs: extract-info
+    if: ${{ needs.extract-info.outputs.module != 'Ignore' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      repository-projects: write
+
+    outputs:
+      tag: ${{ steps.tag_version.outputs.new_tag }}
+
+    steps:
       - name: version and tag
         id: tag_version
         uses: mathieudutour/github-tag-action@v6.2
@@ -62,17 +73,17 @@ jobs:
           body: ${{ steps.tag_version.outputs.changelog }}
 
   call-external-api-deploy:
-    needs: extract-info
+    needs: [ extract-info, release ]
     if: ${{ needs.extract-info.outputs.module == 'Api' }}
     uses: ./.github/workflows/deploy-external-api.yml
     secrets: inherit
     with:
-      tags: ${{ needs.extract-info.outputs.tag }}
+      tags: ${{ needs.release.outputs.tag }}
 
   call-batch-deploy:
-    needs: extract-info
+    needs: [ extract-info, release ]
     if: ${{ needs.extract-info.outputs.module == 'Batch' }}
     uses: ./.github/workflows/deploy-batch.yml
     secrets: inherit
     with:
-      tags: ${{ needs.extract-info.outputs.tag }}
+      tags: ${{ needs.release.outputs.tag }}
