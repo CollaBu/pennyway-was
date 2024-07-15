@@ -36,14 +36,22 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      # 4. Build Gradle
+      # 4. FCM Admin SDK 파일 생성
+      - name: Create Json
+        uses: jsdaniell/create-json@v1.2.2
+        with:
+          name: ${{ secrets.FIREBASE_ADMIN_SDK_FILE }}
+          json: ${{ secrets.FIREBASE_ADMIN_SDK }}
+          dir: ${{ secrets.FIREBASE_ADMIN_SDK_DIR }}
+
+      # 5. Build Gradle
       - name: Build Gradle
         run: |
           chmod +x ./gradlew
           ./gradlew :pennyway-batch:build --parallel --stacktrace --info -x test
         shell: bash
 
-      # 5. Docker 이미지 build 및 push
+      # 6. Docker 이미지 build 및 push
       - name: docker build and push
         run: |
           docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
@@ -52,7 +60,7 @@ jobs:
           docker push pennyway/pennyway-batch:${{ steps.get_version.outputs.VERSION }}
           docker push pennyway/pennyway-batch:latest
 
-      # 6. AWS SSM을 통한 Run-Command (Docker 이미지 pull 후 docker-compose를 통한 실행)
+      # 7. AWS SSM을 통한 Run-Command (Docker 이미지 pull 후 docker-compose를 통한 실행)
       - name: AWS SSM Send-Command
         uses: peterkimzz/aws-ssm-send-command@master
         id: ssm
