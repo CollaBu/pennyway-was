@@ -26,7 +26,7 @@ jobs:
         run: |
           PR_TITLE="${{ github.event.pull_request.title }}"
           echo "PR title : $PR_TITLE"
-          if [[ "$PR_TITLE" =~ ^(Api|Batch|Admin|Socket): ]]; then
+          if [[ "$PR_TITLE" =~ ^(Api|Batch|Admin|Socket|Ignore): ]]; then
             PREFIX="${BASH_REMATCH[1]}"
             echo "Prefix: $PREFIX"
             echo "module=$PREFIX" >> $GITHUB_OUTPUT
@@ -56,7 +56,7 @@ jobs:
           default_bump: patch
           release_branches: main,dev.*
           custom_release_rules: release:major, feat:minor:Features, refactor:minor:Refactoring, fix:patch:Bug Fixes, hotfix:patch:Hotfixes, docs:patch:Documentation, style:patch:Styles, perf:patch:Performance Improvements, test:patch:Tests, ci:patch:Continuous Integration, chore:patch:Chores, revert:patch:Reverts
-          tag_prefix: '${{ steps.module_prefix.outputs.module }}-v'
+          tag_prefix: '${{ needs.extract-info.outputs.module }}-v'
 
       # 추출된 버전 및 변경 이력 로그 출력
       - name: check output
