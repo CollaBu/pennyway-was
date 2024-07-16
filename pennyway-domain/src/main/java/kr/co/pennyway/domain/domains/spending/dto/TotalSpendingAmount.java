@@ -6,9 +6,9 @@ package kr.co.pennyway.domain.domains.spending.dto;
 public record TotalSpendingAmount(
         Integer year,
         Integer month,
-        Integer totalSpending
+        Long totalSpending
 ) {
-    public TotalSpendingAmount(Integer year, Integer month, Integer totalSpending) {
+    public TotalSpendingAmount(Integer year, Integer month, Long totalSpending) {
         this.year = year;
         this.month = month;
         this.totalSpending = totalSpending;
