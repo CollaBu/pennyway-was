@@ -32,9 +32,9 @@ public class SpendingCustomRepositoryImpl implements SpendingCustomRepository {
         TotalSpendingAmount result = queryFactory.select(
                         Projections.constructor(
                                 TotalSpendingAmount.class,
-                                spending.spendAt.year(),
-                                spending.spendAt.month(),
-                                spending.amount.sum()
+                                spending.spendAt.year().intValue(),
+                                spending.spendAt.month().intValue(),
+                                spending.amount.sum().longValue()
                         )
                 ).from(user)
                 .leftJoin(spending).on(user.id.eq(spending.user.id))

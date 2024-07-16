@@ -116,9 +116,9 @@ public class SpendingService {
         Sort sort = Sort.by(Sort.Order.desc("year(spendAt)"), Sort.Order.desc("month(spendAt)"));
 
         Map<String, Expression<?>> bindings = new LinkedHashMap<>();
-        bindings.put("year", spending.spendAt.year());
-        bindings.put("month", spending.spendAt.month());
-        bindings.put("totalSpending", spending.amount.sum());
+        bindings.put("year", spending.spendAt.year().intValue());
+        bindings.put("month", spending.spendAt.month().intValue());
+        bindings.put("totalSpending", spending.amount.sum().longValue());
 
         return spendingRepository.selectList(predicate, TotalSpendingAmount.class, bindings, queryHandler, sort);
     }
