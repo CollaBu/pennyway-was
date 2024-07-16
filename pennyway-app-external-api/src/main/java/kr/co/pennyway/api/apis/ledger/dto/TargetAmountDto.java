@@ -84,23 +84,23 @@ public class TargetAmountDto {
             @JsonInclude(JsonInclude.Include.NON_DEFAULT)
             int month,
             @Schema(description = "최근 목표 금액 정보. isPresent가 false인 경우 필드가 존재하지 않는다.", requiredMode = Schema.RequiredMode.REQUIRED)
-            @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-            int amount
+            @JsonInclude(JsonInclude.Include.NON_NULL)
+            Integer amount
     ) {
         public RecentTargetAmountRes {
             if (!isPresent) {
                 assert year == 0;
                 assert month == 0;
-                assert amount == 0;
+                assert amount == null;
             }
         }
 
         public static RecentTargetAmountRes notPresent() {
-            return new RecentTargetAmountRes(false, 0, 0, 0);
+            return new RecentTargetAmountRes(false, 0, 0, null);
         }
 
         public static RecentTargetAmountRes of(int year, int month, int amount) {
-            return (amount == -1) ? new RecentTargetAmountRes(false, 0, 0, 0) : new RecentTargetAmountRes(true, year, month, amount);
+            return (amount == -1) ? new RecentTargetAmountRes(false, 0, 0, null) : new RecentTargetAmountRes(true, year, month, amount);
         }
     }
 }
