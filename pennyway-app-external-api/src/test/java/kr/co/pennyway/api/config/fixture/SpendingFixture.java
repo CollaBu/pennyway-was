@@ -18,7 +18,8 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public enum SpendingFixture {
     GENERAL_SPENDING(10000, SpendingCategory.FOOD, LocalDateTime.now(), "카페인 수혈", "아메리카노 1잔"),
-    CUSTOM_CATEGORY_SPENDING(10000, SpendingCategory.CUSTOM, LocalDateTime.now(), "커스텀 카페인 수혈", "아메리카노 1잔");
+    CUSTOM_CATEGORY_SPENDING(10000, SpendingCategory.CUSTOM, LocalDateTime.now(), "커스텀 카페인 수혈", "아메리카노 1잔"),
+    MAX_SPENDING(Integer.MAX_VALUE, SpendingCategory.HOBBY, LocalDateTime.now(), "부가티", "이것이 인생");
 
     private final int amount;
     private final SpendingCategory category;

@@ -51,7 +51,7 @@ public class SpendingSearchRes {
             @Schema(description = "일")
             int day,
             @Schema(description = "일별 총 지출 금액")
-            int dailyTotalAmount,
+            long dailyTotalAmount,
             @Schema(description = "개별 지출 내역")
             List<Individual> individuals
     ) {

@@ -84,7 +84,7 @@ public class SpendingMapper {
     /**
      * 하루 지출 내역의 총 금액을 계산하는 메서드
      */
-    private static int calculateDailyTotalAmount(List<Spending> spendings) {
-        return spendings.stream().mapToInt(Spending::getAmount).sum();
+    private static long calculateDailyTotalAmount(List<Spending> spendings) {
+        return spendings.stream().mapToLong(Spending::getAmount).sum();
     }
 }
