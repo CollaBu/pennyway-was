@@ -78,29 +78,29 @@ public class TargetAmountDto {
             @Schema(description = "최근 목표 금액 존재 여부로써 데이터가 존재하지 않으면 false, 존재하면 true", example = "true", requiredMode = Schema.RequiredMode.REQUIRED)
             boolean isPresent,
             @Schema(description = "최근 목표 금액 년도 정보. isPresent가 false인 경우 필드가 존재하지 않는다.", example = "2024", requiredMode = Schema.RequiredMode.REQUIRED)
-            @JsonInclude(JsonInclude.Include.NON_NULL)
-            Integer year,
+            @JsonInclude(JsonInclude.Include.NON_DEFAULT)
+            int year,
             @Schema(description = "최근 목표 금액 월 정보. isPresent가 false인 경우 필드가 존재하지 않는다.", example = "6", requiredMode = Schema.RequiredMode.REQUIRED)
-            @JsonInclude(JsonInclude.Include.NON_NULL)
-            Integer month,
+            @JsonInclude(JsonInclude.Include.NON_DEFAULT)
+            int month,
             @Schema(description = "최근 목표 금액 정보. isPresent가 false인 경우 필드가 존재하지 않는다.", requiredMode = Schema.RequiredMode.REQUIRED)
-            @JsonInclude(JsonInclude.Include.NON_NULL)
-            Integer amount
+            @JsonInclude(JsonInclude.Include.NON_DEFAULT)
+            int amount
     ) {
         public RecentTargetAmountRes {
             if (!isPresent) {
-                assert year == null;
-                assert month == null;
-                assert amount == null;
+                assert year == 0;
+                assert month == 0;
+                assert amount == 0;
             }
         }
 
         public static RecentTargetAmountRes notPresent() {
-            return new RecentTargetAmountRes(false, null, null, null);
+            return new RecentTargetAmountRes(false, 0, 0, 0);
         }
 
-        public static RecentTargetAmountRes of(Integer year, Integer month, Integer amount) {
-            return (amount.equals(-1)) ? new RecentTargetAmountRes(false, null, null, null) : new RecentTargetAmountRes(true, year, month, amount);
+        public static RecentTargetAmountRes of(int year, int month, int amount) {
+            return (amount == -1) ? new RecentTargetAmountRes(false, 0, 0, 0) : new RecentTargetAmountRes(true, year, month, amount);
         }
     }
 }
