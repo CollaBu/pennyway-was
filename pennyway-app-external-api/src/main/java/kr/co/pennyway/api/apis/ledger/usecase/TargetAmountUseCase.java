@@ -57,7 +57,7 @@ public class TargetAmountUseCase {
     }
 
     @Transactional
-    public TargetAmountDto.TargetAmountInfo updateTargetAmount(Long targetAmountId, Integer amount) {
+    public TargetAmountDto.TargetAmountInfo updateTargetAmount(Long targetAmountId, int amount) {
         TargetAmount targetAmount = targetAmountSaveService.updateTargetAmount(targetAmountId, amount);
 
         return TargetAmountDto.TargetAmountInfo.from(targetAmount);
