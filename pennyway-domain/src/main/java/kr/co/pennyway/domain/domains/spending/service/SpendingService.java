@@ -46,11 +46,6 @@ public class SpendingService {
     }
 
     @Transactional(readOnly = true)
-    public Optional<TotalSpendingAmount> readTotalSpendingAmountByUserId(Long userId, LocalDate date) {
-        return spendingRepository.findTotalSpendingAmountByUserId(userId, date.getYear(), date.getMonthValue());
-    }
-
-    @Transactional(readOnly = true)
     public List<Spending> readSpendings(Long userId, int year, int month) {
         return spendingRepository.findByYearAndMonth(userId, year, month);
     }
@@ -104,6 +99,11 @@ public class SpendingService {
         Sort sort = pageable.getSort();
 
         return SliceUtil.toSlice(spendingRepository.findList(predicate, queryHandler, sort), pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<TotalSpendingAmount> readTotalSpendingAmountByUserId(Long userId, LocalDate date) {
+        return spendingRepository.findTotalSpendingAmountByUserId(userId, date.getYear(), date.getMonthValue());
     }
 
     @Transactional(readOnly = true)
