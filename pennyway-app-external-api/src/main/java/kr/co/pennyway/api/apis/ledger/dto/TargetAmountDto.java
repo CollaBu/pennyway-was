@@ -17,9 +17,8 @@ public class TargetAmountDto {
     @Schema(title = "목표 금액의 amount 유효성 검사를 위한 요청 파라미터", hidden = true)
     public record AmountParam(
             @Schema(description = "등록하려는 목표 금액 (0이상의 정수)", example = "100000", requiredMode = Schema.RequiredMode.REQUIRED)
-            @NotNull(message = "amount 값은 필수입니다.")
             @Min(value = 0, message = "amount 값은 0 이상이어야 합니다.")
-            Integer amount
+            int amount
     ) {
 
     }
@@ -40,44 +39,28 @@ public class TargetAmountDto {
     @Schema(title = "목표 금액 및 총 지출 금액 조회 응답")
     public record WithTotalSpendingRes(
             @Schema(description = "조회 년도", example = "2024", requiredMode = Schema.RequiredMode.REQUIRED)
-            @NotNull(message = "year 값은 필수입니다.")
-            Integer year,
+            int year,
             @Schema(description = "조회 월", example = "5", requiredMode = Schema.RequiredMode.REQUIRED)
-            @NotNull(message = "month 값은 필수입니다.")
-            Integer month,
+            int month,
             @Schema(description = "목표 금액", requiredMode = Schema.RequiredMode.REQUIRED)
             @NotNull(message = "targetAmountDetail 값은 필수입니다.")
             TargetAmountInfo targetAmountDetail,
             @Schema(description = "총 지출 금액", example = "100000", requiredMode = Schema.RequiredMode.REQUIRED)
-            @NotNull(message = "totalSpending 값은 필수입니다.")
-            Integer totalSpending,
+            long totalSpending,
             @Schema(description = "목표 금액과 총 지출 금액의 차액(총 치줄 금액 - 목표 금액). 양수면 초과, 음수면 절약", example = "-50000", requiredMode = Schema.RequiredMode.REQUIRED)
-            @NotNull(message = "diffAmount 값은 필수입니다.")
-            Integer diffAmount
+            long diffAmount
     ) {
     }
 
     @Schema(title = "목표 금액 상세 정보")
     public record TargetAmountInfo(
             @Schema(description = "목표 금액 pk. 실제 저장된 데이터가 아니라면 -1", example = "1", requiredMode = Schema.RequiredMode.REQUIRED)
-            @NotNull(message = "id 값은 필수입니다.")
-            Long id,
+            long id,
             @Schema(description = "목표 금액. -1이면 설정한 목표 금액이 존재하지 않음을 의미한다.", example = "50000", requiredMode = Schema.RequiredMode.REQUIRED)
-            @NotNull(message = "amount 값은 필수입니다.")
-            Integer amount,
+            int amount,
             @Schema(description = "사용자 확인 여부", example = "true", requiredMode = Schema.RequiredMode.REQUIRED)
             boolean isRead
     ) {
-        public TargetAmountInfo {
-            if (id == null) {
-                id = -1L;
-            }
-
-            if (amount == null) {
-                amount = -1;
-            }
-        }
-
         /**
          * {@link TargetAmount} -> {@link TargetAmountInfo} 변환하는 메서드 <br/>
          * 만약, 인자로 들어온 값이 null이라면 모든 값을 -1로 초기화한 더미 데이터를 반환한다.
