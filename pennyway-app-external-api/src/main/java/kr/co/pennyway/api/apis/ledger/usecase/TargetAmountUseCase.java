@@ -39,6 +39,7 @@ public class TargetAmountUseCase {
     public TargetAmountDto.WithTotalSpendingRes getTargetAmountAndTotalSpending(Long userId, LocalDate date) {
         TargetAmount targetAmount = targetAmountSearchService.readTargetAmountThatMonth(userId, date);
         Optional<TotalSpendingAmount> totalSpending = spendingSearchService.readTotalSpendingAmountByUserIdThatMonth(userId, date);
+
         return TargetAmountMapper.toWithTotalSpendingResponse(targetAmount, totalSpending.orElse(null), date);
     }
 
