@@ -109,6 +109,6 @@ public class TargetAmountMapper {
      * @param valueMapper : Value로 변환할 Function
      */
     private static <T, U> Map<YearMonth, U> toYearMonthMap(List<T> list, Function<T, YearMonth> keyMapper, Function<T, U> valueMapper) {
-        return list.stream().collect(Collectors.toMap(keyMapper, valueMapper, (existing, replacement) -> existing));
+        return list.stream().collect(Collectors.toConcurrentMap(keyMapper, valueMapper, (existing, replacement) -> existing));
     }
 }
