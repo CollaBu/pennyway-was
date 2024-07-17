@@ -1,6 +1,7 @@
 package kr.co.pennyway.api.apis.notification.usecase;
 
 import kr.co.pennyway.api.apis.notification.dto.NotificationDto;
+import kr.co.pennyway.api.apis.notification.mapper.NotificationMapper;
 import kr.co.pennyway.api.apis.notification.service.NotificationSearchService;
 import kr.co.pennyway.common.annotation.UseCase;
 import kr.co.pennyway.domain.domains.notification.domain.Notification;
