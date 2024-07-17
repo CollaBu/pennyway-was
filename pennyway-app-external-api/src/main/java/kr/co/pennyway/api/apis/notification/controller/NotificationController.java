@@ -1,5 +1,6 @@
 package kr.co.pennyway.api.apis.notification.controller;
 
+import kr.co.pennyway.api.apis.notification.api.NotificationApi;
 import kr.co.pennyway.api.apis.notification.usecase.NotificationUseCase;
 import kr.co.pennyway.api.common.response.SuccessResponse;
 import kr.co.pennyway.api.common.security.authentication.SecurityUserDetails;
@@ -20,11 +21,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/v2/notifications")
-public class NotificationController {
+public class NotificationController implements NotificationApi {
     private static final String NOTIFICATIONS = "notifications";
 
     private final NotificationUseCase notificationUseCase;
 
+    @Override
     @GetMapping("")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> getNotifications(

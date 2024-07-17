@@ -54,7 +54,7 @@ public class NotificationDto {
             @Schema(description = "푸시 알림 행위자가 액션을 취한 대상 pk. ex) 피드 pk, 댓글 pk <type이 ANNOUNCEMENT면 존재하지 않음>", example = "3")
             @JsonInclude(JsonInclude.Include.NON_NULL)
             Long toId,
-            @Schema(description = "푸시 알림 생성 시간", example = "yyyy-MM-dd HH:mm:ss")
+            @Schema(description = "푸시 알림 생성 시간", example = "2024-07-17 12:00:00")
             @JsonSerialize(using = LocalDateTimeSerializer.class)
             @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
             LocalDateTime createdAt
@@ -70,7 +70,8 @@ public class NotificationDto {
 
             if (!notification.getType().equals(NoticeType.ANNOUNCEMENT)) {
                 builder.from(notification.getSenderName())
-                        .fromId(notification.getSender().getId()).toId(notification.getToId());
+                        .fromId(notification.getSender().getId())
+                        .toId(notification.getToId());
             }
 
             return builder.build();
