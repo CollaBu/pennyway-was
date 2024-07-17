@@ -64,6 +64,20 @@ public class Notification extends DateAuditable {
                 '}';
     }
 
+    public String createFormattedTitle() {
+        if (type.equals(NoticeType.ANNOUNCEMENT)) {
+            return announcement.createFormattedTitle(receiverName);
+        }
+        return ""; // TODO: 알림 종류가 신규로 추가될 때, 해당 로직을 구현해야 함.
+    }
+
+    public String createFormattedContent() {
+        if (type.equals(NoticeType.ANNOUNCEMENT)) {
+            return announcement.createFormattedContent(receiverName);
+        }
+        return ""; // TODO: 알림 종류가 신규로 추가될 때, 해당 로직을 구현해야 함.
+    }
+
     public static class Builder {
         private final NoticeType type;
         private final Announcement announcement;
