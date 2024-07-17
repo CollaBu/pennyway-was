@@ -27,7 +27,7 @@ public class NotificationController {
     @GetMapping("")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> getNotifications(
-            @PageableDefault(page = 0, size = 20) @SortDefault(sort = "notification.createdAt") Pageable pageable,
+            @PageableDefault(page = 0, size = 30) @SortDefault(sort = "notification.createdAt") Pageable pageable,
             @AuthenticationPrincipal SecurityUserDetails user
     ) {
         return ResponseEntity.ok(SuccessResponse.from(NOTIFICATIONS, notificationUseCase.getNotifications(user.getUserId(), pageable)));
