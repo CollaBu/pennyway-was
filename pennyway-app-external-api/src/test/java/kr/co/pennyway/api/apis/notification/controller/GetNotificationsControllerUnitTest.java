@@ -11,13 +11,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-
-import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -49,10 +48,12 @@ public class GetNotificationsControllerUnitTest {
     @DisplayName("쿼리 파라미터로 page 외의 파라미터는 기본값을 갖는다.")
     void getNotificationsWithDefaultParameters() throws Exception {
         // when
-        given(notificationUseCase.getNotifications(1L, any())).willReturn(List.of(NotificationRes.from(NotificationFixture.DAILY_SPENDING.toEntity())));
+        int page = 0, currentPageNumber = 0, pageSize = 20, numberOfElements = 1;
+        Pageable pa = Pageable.ofSize(pageSize).withPage(currentPageNumber);
+        given(notificationUseCase.getNotifications(1L, any())).willReturn(NotificationFixture.getSliceRes(pa, currentPageNumber, numberOfElements));
 
         // when
-        ResultActions result = performGetNotifications(1);
+        ResultActions result = performGetNotifications(page);
 
         // then
         result.andExpect(status().isOk());
