@@ -1,6 +1,7 @@
 package kr.co.pennyway.api.apis.notification.controller;
 
 import kr.co.pennyway.api.apis.notification.usecase.NotificationUseCase;
+import kr.co.pennyway.api.common.response.SuccessResponse;
 import kr.co.pennyway.api.common.security.authentication.SecurityUserDetails;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +20,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping("/v2/notifications")
 public class NotificationController {
+    private static final String NOTIFICATIONS = "notifications";
+
     private final NotificationUseCase notificationUseCase;
 
     @GetMapping("")
@@ -27,6 +30,6 @@ public class NotificationController {
             @PageableDefault(page = 0, size = 20) @SortDefault(sort = "notification.createdAt") Pageable pageable,
             @AuthenticationPrincipal SecurityUserDetails user
     ) {
-        return ResponseEntity.ok(notificationUseCase.getNotifications(user.getUserId(), pageable));
+        return ResponseEntity.ok(SuccessResponse.from(NOTIFICATIONS, notificationUseCase.getNotifications(user.getUserId(), pageable)));
     }
 }
