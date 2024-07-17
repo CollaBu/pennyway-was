@@ -30,19 +30,25 @@ public class Notification extends DateAuditable {
     private Announcement announcement; // 공지 종류
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "receiver")
-    private User receiver;
-
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sender")
     private User sender;
+    private String senderName;
 
-    private Notification(LocalDateTime readAt, NoticeType type, Announcement announcement, User receiver, User sender) {
-        this.readAt = readAt;
+    private Long toId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "receiver")
+    private User receiver;
+    private String receiverName;
+
+    private Notification(NoticeType type, Announcement announcement, User sender, String senderName, Long toId, User receiver, String receiverName) {
         this.type = Objects.requireNonNull(type);
         this.announcement = Objects.requireNonNull(announcement);
-        this.receiver = receiver;
-        this.sender = sender;
+        this.sender = (!type.equals(NoticeType.ANNOUNCEMENT)) ? Objects.requireNonNull(sender) : sender;
+        this.senderName = (!type.equals(NoticeType.ANNOUNCEMENT)) ? Objects.requireNonNull(senderName) : senderName;
+        this.toId = toId;
+        this.receiver = Objects.requireNonNull(receiver);
+        this.receiverName = Objects.requireNonNull(receiverName);
     }
 
     @Override
@@ -52,39 +58,71 @@ public class Notification extends DateAuditable {
                 ", readAt=" + readAt +
                 ", type=" + type +
                 ", announcement=" + announcement +
+                ", senderName='" + senderName + '\'' +
+                ", toId=" + toId +
+                ", receiverName='" + receiverName + '\'' +
                 '}';
     }
 
+    /**
+     * 공지 제목을 생성한다.
+     * <br>
+     * 이 메서드는 내부적으로 알림 타입의 종류에 따라 공지 제목을 포맷팅한다.
+     *
+     * @apiNote 이 메서드는 {@link NoticeType#ANNOUNCEMENT} 타입에 대해서만 동작한다. 다른 타입의 알림을 포맷팅해야 하는 경우 해당 메서드를 확장해야 한다.
+     */
+    public String createFormattedTitle() {
+        if (type.equals(NoticeType.ANNOUNCEMENT)) {
+            return announcement.createFormattedTitle(receiverName);
+        }
+        return ""; // TODO: 알림 종류가 신규로 추가될 때, 해당 로직을 구현해야 함.
+    }
+
+    /**
+     * 공지 내용을 생성한다.
+     * <br>
+     * 이 메서드는 내부적으로 알림 타입의 종류에 따라 공지 내용을 포맷팅한다.
+     *
+     * @apiNote 이 메서드는 {@link NoticeType#ANNOUNCEMENT} 타입에 대해서만 동작한다. 다른 타입의 알림을 포맷팅해야 하는 경우 해당 메서드를 확장해야 한다.
+     */
+    public String createFormattedContent() {
+        if (type.equals(NoticeType.ANNOUNCEMENT)) {
+            return announcement.createFormattedContent(receiverName);
+        }
+        return ""; // TODO: 알림 종류가 신규로 추가될 때, 해당 로직을 구현해야 함.
+    }
+
     public static class Builder {
-        private LocalDateTime readAt;
-        private NoticeType type;
-        private Announcement announcement;
+        private final NoticeType type;
+        private final Announcement announcement;
+        private final User receiver;
+        private final String receiverName;
 
-        private User receiver = null;
-        private User sender = null;
+        private User sender;
+        private String senderName;
 
-        public Builder(NoticeType type, Announcement announcement) {
+        private Long toId;
+
+        public Builder(NoticeType type, Announcement announcement, User receiver) {
             this.type = type;
             this.announcement = announcement;
-        }
-
-        public Builder readAt(LocalDateTime readAt) {
-            this.readAt = readAt;
-            return this;
-        }
-
-        public Builder receiver(User receiver) {
             this.receiver = receiver;
-            return this;
+            this.receiverName = receiver.getName();
         }
 
         public Builder sender(User sender) {
             this.sender = sender;
+            this.senderName = sender.getName();
+            return this;
+        }
+
+        public Builder toId(Long toId) {
+            this.toId = toId;
             return this;
         }
 
         public Notification build() {
-            return new Notification(readAt, type, announcement, receiver, sender);
+            return new Notification(type, announcement, sender, senderName, toId, receiver, receiverName);
         }
     }
 }

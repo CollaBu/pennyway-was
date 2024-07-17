@@ -22,13 +22,39 @@ public enum Announcement implements LegacyCommonType {
         this.content = content;
     }
 
+    /**
+     * 수신자의 이름을 받아서 공지 제목을 생성한다.
+     * <br>
+     * 만약 해당 타입의 제목에서 % 문자가 없다면 그대로 반환한다.
+     *
+     * @param name 수신자의 이름
+     * @return 포맷팅된 공지 제목
+     */
     public String createFormattedTitle(String name) {
         validateName(name);
+
+        if (this.title.indexOf("%") == -1) {
+            return this.title;
+        }
+
         return String.format(title, name);
     }
 
+    /**
+     * 수신자의 이름을 받아서 공지 내용을 생성한다.
+     * <br>
+     * 만약 해당 타입의 내용에서 % 문자가 없다면 그대로 반환한다.
+     *
+     * @param name 수신자의 이름
+     * @return 포맷팅된 공지 내용
+     */
     public String createFormattedContent(String name) {
         validateName(name);
+
+        if (this.content.indexOf("%") == -1) {
+            return this.content;
+        }
+
         return String.format(content, name);
     }
 

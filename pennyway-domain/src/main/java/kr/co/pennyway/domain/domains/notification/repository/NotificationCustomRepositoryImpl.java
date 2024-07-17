@@ -1,6 +1,7 @@
 package kr.co.pennyway.domain.domains.notification.repository;
 
 import kr.co.pennyway.domain.domains.notification.type.Announcement;
+import kr.co.pennyway.domain.domains.notification.type.NoticeType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
@@ -9,7 +10,6 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,31 +19,31 @@ import java.util.List;
 public class NotificationCustomRepositoryImpl implements NotificationCustomRepository {
     private final JdbcTemplate jdbcTemplate;
 
-    private int batchSize = 500;
+    private final int BATCH_SIZE = 500;
 
     @Override
-    public void saveDailySpendingAnnounceInBulk(List<Long> userIds, LocalDateTime publishedAt, Announcement announcement) {
+    public void saveDailySpendingAnnounceInBulk(List<Long> userIds, Announcement announcement) {
         int batchCount = 0;
         List<Long> subItems = new ArrayList<>();
 
         for (int i = 0; i < userIds.size(); ++i) {
             subItems.add(userIds.get(i));
 
-            if ((i + 1) % batchSize == 0) {
-                batchCount = batchInsert(batchCount, subItems, publishedAt, announcement);
+            if ((i + 1) % BATCH_SIZE == 0) {
+                batchCount = batchInsert(batchCount, subItems, NoticeType.ANNOUNCEMENT, announcement);
             }
         }
 
         if (!subItems.isEmpty()) {
-            batchInsert(batchCount, subItems, publishedAt, announcement);
+            batchInsert(batchCount, subItems, NoticeType.ANNOUNCEMENT, announcement);
         }
 
         log.info("Notification saved. announcement: {}, count: {}", announcement, userIds.size());
     }
 
-    private int batchInsert(int batchCount, List<Long> userIds, LocalDateTime publishedAt, Announcement announcement) {
-        String sql = "INSERT INTO notification(id, type, read_at, created_at, updated_at, receiver, announcement) " +
-                "SELECT NULL, '0', NULL, NOW(), NOW(), u.id, ? " +
+    private int batchInsert(int batchCount, List<Long> userIds, NoticeType noticeType, Announcement announcement) {
+        String sql = "INSERT INTO notification(id, read_at, type, announcement, created_at, updated_at, receiver, receiver_name) " +
+                "SELECT NULL, NULL, ?, ?, NOW(), NOW(), u.id, u.name " +
                 "FROM user u " +
                 "WHERE u.id IN (?) " +
                 "AND NOT EXISTS ( " +
@@ -52,16 +52,18 @@ public class NotificationCustomRepositoryImpl implements NotificationCustomRepos
                 "	WHERE n.receiver = u.id " +
                 "    AND n.created_at >= CURDATE() " +
                 "    AND n.created_at < CURDATE() + INTERVAL 1 DAY " +
-                "	AND n.type = '0' " +
+                "	AND n.type = ? " +
                 "	AND n.announcement = ? " +
                 ");";
 
         jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
             @Override
             public void setValues(PreparedStatement ps, int i) throws SQLException {
-                ps.setString(1, announcement.getCode());
-                ps.setLong(2, userIds.get(i));
-                ps.setString(3, announcement.getCode());
+                ps.setString(1, noticeType.getCode());
+                ps.setString(2, announcement.getCode());
+                ps.setLong(3, userIds.get(i));
+                ps.setString(4, noticeType.getCode());
+                ps.setString(5, announcement.getCode());
             }
 
             @Override
