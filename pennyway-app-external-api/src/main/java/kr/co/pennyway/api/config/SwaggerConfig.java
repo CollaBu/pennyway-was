@@ -65,11 +65,21 @@ public class SwaggerConfig {
 
     @Bean
     public GroupedOpenApi userApi() {
-        String[] targets = {"kr.co.pennyway.api.apis.users"};
+        String[] targets = {"kr.co.pennyway.api.apis.users", "kr.co.pennyway.api.apis.notification"};
 
         return GroupedOpenApi.builder()
                 .packagesToScan(targets)
                 .group("사용자 기본 기능")
+                .build();
+    }
+
+    @Bean
+    public GroupedOpenApi storageApi() {
+        String[] targets = {"kr.co.pennyway.api.apis.storage"};
+
+        return GroupedOpenApi.builder()
+                .packagesToScan(targets)
+                .group("정적 파일 저장")
                 .build();
     }
 
