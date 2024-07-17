@@ -6,6 +6,7 @@ import kr.co.pennyway.api.common.security.authentication.SecurityUserDetails;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.SortDefault;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +28,7 @@ public class NotificationController {
     @GetMapping("")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> getNotifications(
-            @PageableDefault(page = 0, size = 30) @SortDefault(sort = "notification.createdAt") Pageable pageable,
+            @PageableDefault(page = 0, size = 30) @SortDefault(sort = "notification.createdAt", direction = Sort.Direction.DESC) Pageable pageable,
             @AuthenticationPrincipal SecurityUserDetails user
     ) {
         return ResponseEntity.ok(SuccessResponse.from(NOTIFICATIONS, notificationUseCase.getNotifications(user.getUserId(), pageable)));
