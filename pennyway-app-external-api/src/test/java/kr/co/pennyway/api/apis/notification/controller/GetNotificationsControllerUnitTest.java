@@ -2,6 +2,7 @@ package kr.co.pennyway.api.apis.notification.controller;
 
 import kr.co.pennyway.api.apis.notification.usecase.NotificationUseCase;
 import kr.co.pennyway.api.config.WebConfig;
+import kr.co.pennyway.api.config.fixture.NotificationFixture;
 import kr.co.pennyway.api.config.supporter.WithSecurityMockUser;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -50,7 +51,7 @@ public class GetNotificationsControllerUnitTest {
         // when
         int page = 0, currentPageNumber = 0, pageSize = 20, numberOfElements = 1;
         Pageable pa = Pageable.ofSize(pageSize).withPage(currentPageNumber);
-        given(notificationUseCase.getNotifications(1L, any())).willReturn(NotificationFixture.getSliceRes(pa, currentPageNumber, numberOfElements));
+        given(notificationUseCase.getNotifications(1L, any())).willReturn(NotificationFixture.createSliceRes(pa, currentPageNumber, numberOfElements));
 
         // when
         ResultActions result = performGetNotifications(page);
