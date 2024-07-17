@@ -64,6 +64,13 @@ public class Notification extends DateAuditable {
                 '}';
     }
 
+    /**
+     * 공지 제목을 생성한다.
+     * <br>
+     * 이 메서드는 내부적으로 알림 타입의 종류에 따라 공지 제목을 포맷팅한다.
+     *
+     * @apiNote 이 메서드는 {@link NoticeType#ANNOUNCEMENT} 타입에 대해서만 동작한다. 다른 타입의 알림을 포맷팅해야 하는 경우 해당 메서드를 확장해야 한다.
+     */
     public String createFormattedTitle() {
         if (type.equals(NoticeType.ANNOUNCEMENT)) {
             return announcement.createFormattedTitle(receiverName);
@@ -71,6 +78,13 @@ public class Notification extends DateAuditable {
         return ""; // TODO: 알림 종류가 신규로 추가될 때, 해당 로직을 구현해야 함.
     }
 
+    /**
+     * 공지 내용을 생성한다.
+     * <br>
+     * 이 메서드는 내부적으로 알림 타입의 종류에 따라 공지 내용을 포맷팅한다.
+     *
+     * @apiNote 이 메서드는 {@link NoticeType#ANNOUNCEMENT} 타입에 대해서만 동작한다. 다른 타입의 알림을 포맷팅해야 하는 경우 해당 메서드를 확장해야 한다.
+     */
     public String createFormattedContent() {
         if (type.equals(NoticeType.ANNOUNCEMENT)) {
             return announcement.createFormattedContent(receiverName);
