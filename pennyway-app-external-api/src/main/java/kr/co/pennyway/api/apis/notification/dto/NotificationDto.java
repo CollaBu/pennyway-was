@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Builder;
 import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
@@ -29,6 +30,7 @@ public class NotificationDto {
         }
     }
 
+    @Builder
     @Schema(title = "푸시 알림 상세 정보", description = "푸시 알림 pk, 읽음 여부, 제목, 내용, 타입 그리고 딥 링크 정보를 담고 있다.")
     public record Info(
             @Schema(description = "푸시 알림 pk", example = "1")
