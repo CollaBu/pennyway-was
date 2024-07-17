@@ -1,5 +1,6 @@
 package kr.co.pennyway.api.apis.notification.controller;
 
+import kr.co.pennyway.api.apis.notification.dto.NotificationDto;
 import kr.co.pennyway.api.apis.notification.usecase.NotificationUseCase;
 import kr.co.pennyway.api.config.WebConfig;
 import kr.co.pennyway.api.config.fixture.NotificationFixture;
@@ -63,6 +64,29 @@ public class GetNotificationsControllerUnitTest {
         result.andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.notifications.currentPageNumber").value(page));
+    }
+
+    @Test
+    @WithSecurityMockUser
+    @DisplayName("응답은 무한 스크롤 방식으로 제공되며, content, currentPageNumber, pageSize, numberOfElements, hasNext 필드를 포함한다.")
+    void getNotificationsWithInfiniteScroll() throws Exception {
+        // when
+        int page = 0, currentPageNumber = 0, pageSize = 20, numberOfElements = 1;
+        Pageable pa = Pageable.ofSize(pageSize).withPage(currentPageNumber);
+        NotificationDto.SliceRes sliceRes = NotificationFixture.createSliceRes(pa, currentPageNumber, numberOfElements);
+        given(notificationUseCase.getNotifications(eq(1L), any())).willReturn(sliceRes);
+
+        // when
+        ResultActions result = performGetNotifications(page);
+
+        // then
+        result.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.notifications.content").exists())
+                .andExpect(jsonPath("$.data.notifications.currentPageNumber").value(sliceRes.currentPageNumber()))
+                .andExpect(jsonPath("$.data.notifications.pageSize").value(sliceRes.pageSize()))
+                .andExpect(jsonPath("$.data.notifications.numberOfElements").value(sliceRes.numberOfElements()))
+                .andExpect(jsonPath("$.data.notifications.hasNext").value(sliceRes.hasNext()));
     }
 
     private ResultActions performGetNotifications(int page) throws Exception {
