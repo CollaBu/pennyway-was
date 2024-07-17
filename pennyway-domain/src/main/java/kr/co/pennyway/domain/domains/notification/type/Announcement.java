@@ -24,11 +24,21 @@ public enum Announcement implements LegacyCommonType {
 
     public String createFormattedTitle(String name) {
         validateName(name);
+
+        if (this.title.indexOf("%") == -1) {
+            return this.title;
+        }
+
         return String.format(title, name);
     }
 
     public String createFormattedContent(String name) {
         validateName(name);
+
+        if (this.content.indexOf("%") == -1) {
+            return this.content;
+        }
+
         return String.format(content, name);
     }
 
