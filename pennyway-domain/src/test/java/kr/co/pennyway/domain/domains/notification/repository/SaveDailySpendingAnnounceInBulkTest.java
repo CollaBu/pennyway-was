@@ -22,7 +22,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.springframework.test.util.AssertionErrors.assertEquals;
@@ -51,7 +50,6 @@ public class SaveDailySpendingAnnounceInBulkTest extends ContainerMySqlTestConfi
         // when
         notificationRepository.saveDailySpendingAnnounceInBulk(
                 List.of(user1.getId(), user2.getId(), user3.getId()),
-                LocalDateTime.now(),
                 Announcement.DAILY_SPENDING
         );
 
@@ -70,20 +68,19 @@ public class SaveDailySpendingAnnounceInBulkTest extends ContainerMySqlTestConfi
         User user1 = userRepository.save(createUser("jayang"));
         User user2 = userRepository.save(createUser("mock"));
 
-        Notification notification = new Notification.Builder(NoticeType.ANNOUNCEMENT, Announcement.DAILY_SPENDING)
-                .receiver(user1)
+        Notification notification = new Notification.Builder(NoticeType.ANNOUNCEMENT, Announcement.DAILY_SPENDING, user1)
                 .build();
         notificationRepository.save(notification);
 
         // when
         notificationRepository.saveDailySpendingAnnounceInBulk(
                 List.of(user1.getId(), user2.getId()),
-                LocalDateTime.now(),
                 Announcement.DAILY_SPENDING
         );
 
         // then
         List<Notification> notifications = notificationRepository.findAll();
+        log.debug("notifications: {}", notifications);
         assertEquals("알림이 중복 저장되지 않아야 한다.", 2, notifications.size());
     }
 

@@ -14,7 +14,6 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,7 +30,6 @@ public class NotificationWriter implements ItemWriter<DeviceTokenOwner> {
     @Transactional
     public void write(@NonNull Chunk<? extends DeviceTokenOwner> owners) throws Exception {
         log.info("Writer 실행: {}", owners.size());
-        LocalDateTime publishedAt = LocalDateTime.now();
 
         Map<Long, DailySpendingNotification> notificationMap = new HashMap<>();
 
@@ -41,7 +39,7 @@ public class NotificationWriter implements ItemWriter<DeviceTokenOwner> {
 
         List<Long> userIds = new ArrayList<>(notificationMap.keySet());
 
-        notificationRepository.saveDailySpendingAnnounceInBulk(userIds, publishedAt, Announcement.DAILY_SPENDING);
+        notificationRepository.saveDailySpendingAnnounceInBulk(userIds, Announcement.DAILY_SPENDING);
 
         for (DailySpendingNotification notification : notificationMap.values()) {
             publisher.publishEvent(NotificationEvent.of(notification.title(), notification.content(), notification.deviceTokensForList(), ""));
