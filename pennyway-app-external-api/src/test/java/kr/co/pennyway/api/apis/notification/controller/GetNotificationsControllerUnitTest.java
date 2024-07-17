@@ -4,7 +4,9 @@ import kr.co.pennyway.api.apis.notification.dto.NotificationDto;
 import kr.co.pennyway.api.apis.notification.usecase.NotificationUseCase;
 import kr.co.pennyway.api.config.WebConfig;
 import kr.co.pennyway.api.config.fixture.NotificationFixture;
+import kr.co.pennyway.api.config.fixture.UserFixture;
 import kr.co.pennyway.api.config.supporter.WithSecurityMockUser;
+import kr.co.pennyway.domain.domains.notification.domain.Notification;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,6 +21,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -55,7 +59,11 @@ public class GetNotificationsControllerUnitTest {
         // when
         int page = 0, currentPageNumber = 0, pageSize = 20, numberOfElements = 1;
         Pageable pa = Pageable.ofSize(pageSize).withPage(currentPageNumber);
-        given(notificationUseCase.getNotifications(eq(1L), any())).willReturn(NotificationFixture.createSliceRes(pa, currentPageNumber, numberOfElements));
+
+        Notification notification = NotificationFixture.ANNOUNCEMENT_DAILY_SPENDING.toEntity(UserFixture.GENERAL_USER.toUser());
+        NotificationDto.Info info = NotificationDto.Info.from(notification);
+
+        given(notificationUseCase.getNotifications(eq(1L), any())).willReturn(NotificationDto.SliceRes.from(List.of(info), pa, numberOfElements, false));
 
         // when
         ResultActions result = performGetNotifications(page);
@@ -73,7 +81,11 @@ public class GetNotificationsControllerUnitTest {
         // when
         int page = 0, currentPageNumber = 0, pageSize = 20, numberOfElements = 1;
         Pageable pa = Pageable.ofSize(pageSize).withPage(currentPageNumber);
-        NotificationDto.SliceRes sliceRes = NotificationFixture.createSliceRes(pa, currentPageNumber, numberOfElements);
+
+        Notification notification = NotificationFixture.ANNOUNCEMENT_DAILY_SPENDING.toEntity(UserFixture.GENERAL_USER.toUser());
+        NotificationDto.Info info = NotificationDto.Info.from(notification);
+        NotificationDto.SliceRes sliceRes = NotificationDto.SliceRes.from(List.of(info), pa, numberOfElements, false);
+
         given(notificationUseCase.getNotifications(eq(1L), any())).willReturn(sliceRes);
 
         // when
