@@ -15,25 +15,10 @@ public class NotificationMapper {
      */
     public static NotificationDto.SliceRes toSliceRes(Slice<Notification> notifications, Pageable pageable) {
         return NotificationDto.SliceRes.from(
-                notifications.getContent().stream().map(NotificationMapper::toRes).toList(),
+                notifications.getContent().stream().map(NotificationDto.Info::from).toList(),
                 pageable,
                 notifications.getNumberOfElements(),
                 notifications.hasNext()
         );
-    }
-
-    /**
-     * Notification 정보를 추출하여 응답 형태로 변환한다.
-     */
-    private static NotificationDto.Info toRes(Notification notification) {
-        String title = notification.createFormattedTitle();
-        String content = notification.createFormattedContent();
-
-        return NotificationDto.Info.builder()
-                .id(notification.getId())
-                .title(title)
-                .content(content)
-                .createdAt(notification.getCreatedAt())
-                .build();
     }
 }
