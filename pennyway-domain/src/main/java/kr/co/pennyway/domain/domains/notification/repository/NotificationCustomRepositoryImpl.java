@@ -52,7 +52,7 @@ public class NotificationCustomRepositoryImpl implements NotificationCustomRepos
                 "	WHERE n.receiver = u.id " +
                 "    AND n.created_at >= CURDATE() " +
                 "    AND n.created_at < CURDATE() + INTERVAL 1 DAY " +
-                "	AND n.type = '0' " +
+                "	AND n.type = ? " +
                 "	AND n.announcement = ? " +
                 ");";
 
@@ -62,7 +62,8 @@ public class NotificationCustomRepositoryImpl implements NotificationCustomRepos
                 ps.setString(1, noticeType.getCode());
                 ps.setString(2, announcement.getCode());
                 ps.setLong(3, userIds.get(i));
-                ps.setString(4, announcement.getCode());
+                ps.setString(4, noticeType.getCode());
+                ps.setString(5, announcement.getCode());
             }
 
             @Override
