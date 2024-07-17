@@ -7,9 +7,9 @@ import kr.co.pennyway.api.config.supporter.WithSecurityMockUser;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.data.domain.Pageable;
@@ -20,9 +20,12 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = {NotificationController.class}, excludeFilters = {
@@ -31,7 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class GetNotificationsControllerUnitTest {
     @Autowired
     private MockMvc mockMvc;
-    @Mock
+    @MockBean
     private NotificationUseCase notificationUseCase;
 
     @BeforeEach
@@ -51,13 +54,15 @@ public class GetNotificationsControllerUnitTest {
         // when
         int page = 0, currentPageNumber = 0, pageSize = 20, numberOfElements = 1;
         Pageable pa = Pageable.ofSize(pageSize).withPage(currentPageNumber);
-        given(notificationUseCase.getNotifications(1L, any())).willReturn(NotificationFixture.createSliceRes(pa, currentPageNumber, numberOfElements));
+        given(notificationUseCase.getNotifications(eq(1L), any())).willReturn(NotificationFixture.createSliceRes(pa, currentPageNumber, numberOfElements));
 
         // when
         ResultActions result = performGetNotifications(page);
 
         // then
-        result.andExpect(status().isOk());
+        result.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.notifications.currentPageNumber").value(page));
     }
 
     private ResultActions performGetNotifications(int page) throws Exception {
