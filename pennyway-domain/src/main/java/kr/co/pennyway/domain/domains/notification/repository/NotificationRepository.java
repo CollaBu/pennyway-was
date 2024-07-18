@@ -13,4 +13,8 @@ public interface NotificationRepository extends ExtendedRepository<Notification,
     @Transactional
     @Query("update Notification n set n.readAt = current_timestamp where n.id in ?1")
     void updateReadAtByIds(List<Long> notificationIds);
+
+    @Transactional(readOnly = true)
+    @Query("select count(n) from Notification n where n.id in ?1 and n.receiver.id = ?2 and n.readAt is null")
+    long countUnreadNotificationsByIds(List<Long> notificationIds, Long userId);
 }
