@@ -97,7 +97,7 @@ public class NotificationRepositoryUnitTest extends ContainerMySqlTestConfig {
                 new Notification.Builder(NoticeType.ANNOUNCEMENT, Announcement.DAILY_SPENDING, user).build()));
 
         // when
-        notificationRepository.updateReadAtByIds(notifications.stream().map(Notification::getId).toList());
+        notificationRepository.updateReadAtByIdsInBulk(notifications.stream().map(Notification::getId).toList());
 
         // then
         notificationRepository.findAll().forEach(notification -> {
@@ -118,7 +118,7 @@ public class NotificationRepositoryUnitTest extends ContainerMySqlTestConfig {
                 new Notification.Builder(NoticeType.ANNOUNCEMENT, Announcement.DAILY_SPENDING, user).build()));
         List<Long> ids = notifications.stream().map(Notification::getId).toList();
 
-        notificationRepository.updateReadAtByIds(List.of(ids.get(1)));
+        notificationRepository.updateReadAtByIdsInBulk(List.of(ids.get(1)));
 
         // when
         long count = notificationRepository.countUnreadNotificationsByIds(

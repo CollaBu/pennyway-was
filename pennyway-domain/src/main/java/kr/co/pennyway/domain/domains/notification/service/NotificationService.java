@@ -14,6 +14,8 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Slf4j
 @DomainService
 @RequiredArgsConstructor
@@ -33,5 +35,15 @@ public class NotificationService {
         Sort sort = pageable.getSort();
 
         return SliceUtil.toSlice(notificationRepository.findList(predicate, queryHandler, sort), pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public long countUnreadNotifications(Long userId, List<Long> notificationIds) {
+        return notificationRepository.countUnreadNotificationsByIds(userId, notificationIds);
+    }
+
+    @Transactional(readOnly = true)
+    public void updateReadAtByIdsInBulk(List<Long> notificationIds) {
+        notificationRepository.updateReadAtByIdsInBulk(notificationIds);
     }
 }

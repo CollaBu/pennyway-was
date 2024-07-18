@@ -12,7 +12,7 @@ public interface NotificationRepository extends ExtendedRepository<Notification,
     @Modifying(clearAutomatically = true)
     @Transactional
     @Query("update Notification n set n.readAt = current_timestamp where n.id in ?1")
-    void updateReadAtByIds(List<Long> notificationIds);
+    void updateReadAtByIdsInBulk(List<Long> notificationIds);
 
     @Transactional(readOnly = true)
     @Query("select count(n) from Notification n where n.receiver.id = ?1 and n.id in ?2 and n.readAt is null")
