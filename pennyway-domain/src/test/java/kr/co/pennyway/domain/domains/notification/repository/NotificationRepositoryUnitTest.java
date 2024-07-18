@@ -122,8 +122,8 @@ public class NotificationRepositoryUnitTest extends ContainerMySqlTestConfig {
 
         // when
         long count = notificationRepository.countUnreadNotificationsByIds(
-                notifications.stream().map(Notification::getId).toList(),
-                user.getId()
+                user.getId(),
+                notifications.stream().map(Notification::getId).toList()
         );
 
         // then

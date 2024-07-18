@@ -15,6 +15,6 @@ public interface NotificationRepository extends ExtendedRepository<Notification,
     void updateReadAtByIds(List<Long> notificationIds);
 
     @Transactional(readOnly = true)
-    @Query("select count(n) from Notification n where n.id in ?1 and n.receiver.id = ?2 and n.readAt is null")
-    long countUnreadNotificationsByIds(List<Long> notificationIds, Long userId);
+    @Query("select count(n) from Notification n where n.receiver.id = ?1 and n.id in ?2 and n.readAt is null")
+    long countUnreadNotificationsByIds(Long userId, List<Long> notificationIds);
 }
