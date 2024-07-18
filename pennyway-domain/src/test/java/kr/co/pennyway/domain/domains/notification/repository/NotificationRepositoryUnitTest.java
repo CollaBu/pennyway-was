@@ -106,6 +106,30 @@ public class NotificationRepositoryUnitTest extends ContainerMySqlTestConfig {
         });
     }
 
+    @Test
+    @DisplayName("사용자의 읽지 않은 알림 개수를 조회할 수 있다.")
+    void countUnreadNotificationsByIds() {
+        // given
+        User user = userRepository.save(createUser("jayang"));
+
+        List<Notification> notifications = notificationRepository.saveAll(List.of(
+                new Notification.Builder(NoticeType.ANNOUNCEMENT, Announcement.DAILY_SPENDING, user).build(),
+                new Notification.Builder(NoticeType.ANNOUNCEMENT, Announcement.DAILY_SPENDING, user).build(),
+                new Notification.Builder(NoticeType.ANNOUNCEMENT, Announcement.DAILY_SPENDING, user).build()));
+        List<Long> ids = notifications.stream().map(Notification::getId).toList();
+
+        notificationRepository.updateReadAtByIds(List.of(ids.get(1)));
+
+        // when
+        long count = notificationRepository.countUnreadNotificationsByIds(
+                notifications.stream().map(Notification::getId).toList(),
+                user.getId()
+        );
+
+        // then
+        assertEquals("읽지 않은 알림 개수가 2개여야 한다.", 2L, count);
+    }
+
     private User createUser(String name) {
         return User.builder()
                 .username("test")
