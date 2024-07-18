@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 import static org.springframework.test.util.AssertionErrors.assertEquals;
+import static org.springframework.test.util.AssertionErrors.assertNotNull;
 
 @Slf4j
 @DataJpaTest(properties = {"spring.jpa.hibernate.ddl-auto=create"})
@@ -32,7 +33,7 @@ import static org.springframework.test.util.AssertionErrors.assertEquals;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Import(TestJpaConfig.class)
 @ActiveProfiles("test")
-public class SaveDailySpendingAnnounceInBulkTest extends ContainerMySqlTestConfig {
+public class NotificationRepositoryUnitTest extends ContainerMySqlTestConfig {
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -82,6 +83,51 @@ public class SaveDailySpendingAnnounceInBulkTest extends ContainerMySqlTestConfi
         List<Notification> notifications = notificationRepository.findAll();
         log.debug("notifications: {}", notifications);
         assertEquals("알림이 중복 저장되지 않아야 한다.", 2, notifications.size());
+    }
+
+    @Test
+    @DisplayName("사용자의 여러 알림을 읽음 처리할 수 있다.")
+    void updateReadAtSuccessfully() {
+        // given
+        User user = userRepository.save(createUser("jayang"));
+
+        List<Notification> notifications = notificationRepository.saveAll(List.of(
+                new Notification.Builder(NoticeType.ANNOUNCEMENT, Announcement.DAILY_SPENDING, user).build(),
+                new Notification.Builder(NoticeType.ANNOUNCEMENT, Announcement.DAILY_SPENDING, user).build(),
+                new Notification.Builder(NoticeType.ANNOUNCEMENT, Announcement.DAILY_SPENDING, user).build()));
+
+        // when
+        notificationRepository.updateReadAtByIdsInBulk(notifications.stream().map(Notification::getId).toList());
+
+        // then
+        notificationRepository.findAll().forEach(notification -> {
+            log.info("notification: {}", notification);
+            assertNotNull("알림이 읽음 처리 되어야 한다.", notification.getReadAt());
+        });
+    }
+
+    @Test
+    @DisplayName("사용자의 읽지 않은 알림 개수를 조회할 수 있다.")
+    void countUnreadNotificationsByIds() {
+        // given
+        User user = userRepository.save(createUser("jayang"));
+
+        List<Notification> notifications = notificationRepository.saveAll(List.of(
+                new Notification.Builder(NoticeType.ANNOUNCEMENT, Announcement.DAILY_SPENDING, user).build(),
+                new Notification.Builder(NoticeType.ANNOUNCEMENT, Announcement.DAILY_SPENDING, user).build(),
+                new Notification.Builder(NoticeType.ANNOUNCEMENT, Announcement.DAILY_SPENDING, user).build()));
+        List<Long> ids = notifications.stream().map(Notification::getId).toList();
+
+        notificationRepository.updateReadAtByIdsInBulk(List.of(ids.get(1)));
+
+        // when
+        long count = notificationRepository.countUnreadNotificationsByIds(
+                user.getId(),
+                notifications.stream().map(Notification::getId).toList()
+        );
+
+        // then
+        assertEquals("읽지 않은 알림 개수가 2개여야 한다.", 2L, count);
     }
 
     private User createUser(String name) {

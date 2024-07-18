@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotEmpty;
 import kr.co.pennyway.domain.domains.notification.domain.Notification;
 import kr.co.pennyway.domain.domains.notification.type.NoticeType;
 import lombok.Builder;
@@ -14,6 +15,14 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public class NotificationDto {
+    @Schema(title = "푸시 알림 읽음 처리 요청")
+    public record ReadReq(
+            @Schema(description = "푸시 알림 pk 리스트", example = "[1, 2, 3]")
+            @NotEmpty(message = "notificationIds는 비어있을 수 없습니다.")
+            List<Long> notificationIds
+    ) {
+    }
+
     @Schema(title = "푸시 알림 슬라이스 응답")
     public record SliceRes(
             @Schema(description = "푸시 알림 리스트")
