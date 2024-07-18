@@ -26,7 +26,7 @@ public class NotificationUseCase {
         return NotificationMapper.toSliceRes(notifications, pageable);
     }
 
-    public void updateNotificationsToRead(Long userId, List<Long> notificationIds) {
-        notificationSaveService.updateNotificationsToRead(userId, notificationIds);
+    public void updateNotificationsToRead(List<Long> notificationIds) {
+        notificationSaveService.updateNotificationsToRead(notificationIds);
     }
 }

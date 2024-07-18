@@ -18,7 +18,7 @@ public class NotificationSaveService {
      *
      * @param notificationIds 읽음 처리할 알림 ID 목록
      */
-    public void updateNotificationsToRead(Long userId, List<Long> notificationIds) {
+    public void updateNotificationsToRead(List<Long> notificationIds) {
         notificationService.updateReadAtByIdsInBulk(notificationIds);
     }
 }
