@@ -20,9 +20,11 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+import static org.springframework.test.util.AssertionErrors.assertEquals;
 import static org.springframework.test.util.AssertionErrors.assertNotNull;
 
 @Slf4j
@@ -31,11 +33,57 @@ import static org.springframework.test.util.AssertionErrors.assertNotNull;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Import(TestJpaConfig.class)
 @ActiveProfiles("test")
-public class NotificationUpdateReadAtRepositoryUnitTest extends ContainerMySqlTestConfig {
+public class NotificationRepositoryUnitTest extends ContainerMySqlTestConfig {
     @Autowired
     private UserRepository userRepository;
     @Autowired
     private NotificationRepository notificationRepository;
+
+    @Test
+    @Transactional
+    @DisplayName("여러 사용자에게 일일 소비 알림을 저장할 수 있다.")
+    public void saveDailySpendingAnnounceInBulk() {
+        // given
+        User user1 = userRepository.save(createUser("jayang"));
+        User user2 = userRepository.save(createUser("mock"));
+        User user3 = userRepository.save(createUser("test"));
+
+        // when
+        notificationRepository.saveDailySpendingAnnounceInBulk(
+                List.of(user1.getId(), user2.getId(), user3.getId()),
+                Announcement.DAILY_SPENDING
+        );
+
+        // then
+        notificationRepository.findAll().forEach(notification -> {
+            log.info("notification: {}", notification);
+            assertEquals("알림 타입이 일일 소비 알림이어야 한다.", Announcement.DAILY_SPENDING, notification.getAnnouncement());
+        });
+    }
+
+    @Test
+    @Transactional
+    @DisplayName("이미 당일에 알림을 받은 사용자에게 데이터가 중복 저장되지 않아야 한다.")
+    public void notSaveDuplicateNotification() {
+        // given
+        User user1 = userRepository.save(createUser("jayang"));
+        User user2 = userRepository.save(createUser("mock"));
+
+        Notification notification = new Notification.Builder(NoticeType.ANNOUNCEMENT, Announcement.DAILY_SPENDING, user1)
+                .build();
+        notificationRepository.save(notification);
+
+        // when
+        notificationRepository.saveDailySpendingAnnounceInBulk(
+                List.of(user1.getId(), user2.getId()),
+                Announcement.DAILY_SPENDING
+        );
+
+        // then
+        List<Notification> notifications = notificationRepository.findAll();
+        log.debug("notifications: {}", notifications);
+        assertEquals("알림이 중복 저장되지 않아야 한다.", 2, notifications.size());
+    }
 
     @Test
     @DisplayName("사용자의 여러 알림을 읽음 처리할 수 있다.")
@@ -43,13 +91,13 @@ public class NotificationUpdateReadAtRepositoryUnitTest extends ContainerMySqlTe
         // given
         User user = userRepository.save(createUser("jayang"));
 
-        notificationRepository.saveAll(List.of(
+        List<Notification> notifications = notificationRepository.saveAll(List.of(
                 new Notification.Builder(NoticeType.ANNOUNCEMENT, Announcement.DAILY_SPENDING, user).build(),
                 new Notification.Builder(NoticeType.ANNOUNCEMENT, Announcement.DAILY_SPENDING, user).build(),
                 new Notification.Builder(NoticeType.ANNOUNCEMENT, Announcement.DAILY_SPENDING, user).build()));
 
         // when
-        notificationRepository.updateReadAtByIds(List.of(1L, 2L, 3L));
+        notificationRepository.updateReadAtByIds(notifications.stream().map(Notification::getId).toList());
 
         // then
         notificationRepository.findAll().forEach(notification -> {
