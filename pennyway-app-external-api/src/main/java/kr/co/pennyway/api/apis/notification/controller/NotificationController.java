@@ -1,6 +1,7 @@
 package kr.co.pennyway.api.apis.notification.controller;
 
 import kr.co.pennyway.api.apis.notification.api.NotificationApi;
+import kr.co.pennyway.api.apis.notification.dto.NotificationDto;
 import kr.co.pennyway.api.apis.notification.usecase.NotificationUseCase;
 import kr.co.pennyway.api.common.response.SuccessResponse;
 import kr.co.pennyway.api.common.security.authentication.SecurityUserDetails;
@@ -13,9 +14,8 @@ import org.springframework.data.web.SortDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
@@ -34,5 +34,12 @@ public class NotificationController implements NotificationApi {
             @AuthenticationPrincipal SecurityUserDetails user
     ) {
         return ResponseEntity.ok(SuccessResponse.from(NOTIFICATIONS, notificationUseCase.getNotifications(user.getUserId(), pageable)));
+    }
+
+    @PatchMapping("")
+    @PreAuthorize("isAuthenticated() and @notificationManager.hasPermission(#user.getUserId(), #readReq.notificationIds())")
+    public ResponseEntity<?> readNotifications(@RequestBody @Validated NotificationDto.ReadReq readReq, @AuthenticationPrincipal SecurityUserDetails user) {
+        notificationUseCase.readNotifications(user.getUserId(), notificationIds);
+        return ResponseEntity.ok(SuccessResponse.noContent());
     }
 }
