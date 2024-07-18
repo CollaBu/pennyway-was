@@ -42,7 +42,7 @@ public class NotificationService {
         return notificationRepository.countUnreadNotificationsByIds(userId, notificationIds);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public void updateReadAtByIdsInBulk(List<Long> notificationIds) {
         notificationRepository.updateReadAtByIdsInBulk(notificationIds);
     }
