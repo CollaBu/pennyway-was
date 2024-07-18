@@ -36,8 +36,9 @@ public class NotificationController implements NotificationApi {
         return ResponseEntity.ok(SuccessResponse.from(NOTIFICATIONS, notificationUseCase.getNotifications(user.getUserId(), pageable)));
     }
 
+    @Override
     @PatchMapping("")
-    @PreAuthorize("isAuthenticated() and @notificationManager.hasPermission(#principal.userId, #readReq.notificationIds())")
+    @PreAuthorize("isAuthenticated() and @notificationManager.hasPermission(principal.userId, #readReq.notificationIds())")
     public ResponseEntity<?> updateNotifications(@RequestBody @Validated NotificationDto.ReadReq readReq) {
         notificationUseCase.updateNotificationsToRead(readReq.notificationIds());
         return ResponseEntity.ok(SuccessResponse.noContent());

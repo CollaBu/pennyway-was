@@ -5,11 +5,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.media.SchemaProperty;
+import io.swagger.v3.oas.annotations.media.*;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.co.pennyway.api.apis.notification.dto.NotificationDto;
 import kr.co.pennyway.api.common.security.authentication.SecurityUserDetails;
@@ -19,6 +17,8 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.SortDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.RequestBody;
 
 @Tag(name = "[알림 API]")
 public interface NotificationApi {
@@ -60,4 +60,18 @@ public interface NotificationApi {
             @PageableDefault(page = 0, size = 30) @SortDefault(sort = "notification.createdAt", direction = Sort.Direction.DESC) Pageable pageable,
             @AuthenticationPrincipal SecurityUserDetails user
     );
+
+    @Operation(summary = "수신한 알림 읽음 처리", description = "사용자가 수신한 알림을 읽음처리 합니다. 단, 읽음 처리할 알림의 pk는 사용자가 receiver여야 하며, 미확인 알림만 포함되어 있어야 합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "알림 읽음 처리 성공"),
+            @ApiResponse(responseCode = "403", description = "사용자가 접근할 권한이 없는 pk가 포함되어 있거나, 이미 읽음 처리된 알림이 하나라도 존재하는 경우", content = @Content(examples =
+            @ExampleObject("""
+                    {
+                      "code": "4030",
+                      "message": "ACCESS_TO_THE_REQUESTED_RESOURCE_IS_FORBIDDEN"
+                    }
+                    """)
+            ))
+    })
+    ResponseEntity<?> updateNotifications(@RequestBody @Validated NotificationDto.ReadReq readReq);
 }
