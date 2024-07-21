@@ -9,7 +9,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.co.pennyway.api.apis.ledger.dto.SpendingCategoryDto;
-import kr.co.pennyway.api.apis.ledger.dto.SpendingMigrateDto;
 import kr.co.pennyway.api.apis.ledger.dto.SpendingSearchRes;
 import kr.co.pennyway.api.common.query.SpendingCategoryType;
 import kr.co.pennyway.api.common.security.authentication.SecurityUserDetails;
@@ -21,7 +20,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 
@@ -132,7 +130,16 @@ public interface SpendingCategoryApi {
     ResponseEntity<?> patchSpendingCategory(@PathVariable Long categoryId, @Validated SpendingCategoryDto.CreateParamReq param);
 
     @Operation(summary = "지출 내역 카테코리 이동", method = "PATCH", description = "카테고리에 존재하는 지출내역들을 다른 카테고리로 옮깁니다.")
-    @Parameter(name = "fromCategoryId", description = "type이 default면 아이콘 코드(1~11), custom이면 카테고리 pk<br>지출내역을 가져오고자 하는 카테고리 ID", required = true, in = ParameterIn.PATH)
+    @Parameters({
+            @Parameter(name = "fromId", description = "현재 선택된 카테고리 ID", required = true, in = ParameterIn.PATH),
+            @Parameter(name = "fromType", description = "현재 선택된 지출 카테고리 타입", required = true, in = ParameterIn.QUERY, examples = {
+                    @ExampleObject(name = "기본", value = "default"), @ExampleObject(name = "사용자 정의", value = "custom")
+            }),
+            @Parameter(name = "toId", description = "이동 하고자 하는 카테고리 ID", required = true, in = ParameterIn.QUERY),
+            @Parameter(name = "toType", description = "이동 하고자 하는 지출 카테고리 타입", required = true, in = ParameterIn.QUERY, examples = {
+                    @ExampleObject(name = "기본", value = "default"), @ExampleObject(name = "사용자 정의", value = "custom")
+            })
+    })
     @ApiResponse(responseCode = "403", description = "지출 카테고리에 대한 권한이 없습니다.", content = @Content(examples = {
             @ExampleObject(name = "지출 카테고리 권한 오류", description = "지출 카테고리에 대한 권한이 없습니다.",
                     value = """
@@ -143,8 +150,12 @@ public interface SpendingCategoryApi {
                             """
             )
     }))
-    ResponseEntity<?> migrateSpendingsByCategory(@PathVariable Long fromCategoryId,
-                                                 @RequestBody SpendingMigrateDto request);
+    public ResponseEntity<?> migrateSpendingsByCategory(
+            @PathVariable Long fromId,
+            @RequestParam(value = "fromType") SpendingCategoryType fromType,
+            @RequestParam(value = "toId") Long toId,
+            @RequestParam(value = "toType") SpendingCategoryType toType
+    );
 }
 
 

@@ -1,6 +1,5 @@
 package kr.co.pennyway.api.apis.ledger.usecase;
 
-import kr.co.pennyway.api.apis.ledger.dto.SpendingMigrateDto;
 import kr.co.pennyway.api.apis.ledger.dto.SpendingReq;
 import kr.co.pennyway.api.apis.ledger.dto.SpendingSearchRes;
 import kr.co.pennyway.api.apis.ledger.mapper.SpendingMapper;
@@ -63,8 +62,4 @@ public class SpendingUseCase {
         spendingDeleteService.deleteSpendings(spendingIds);
     }
 
-    @Transactional
-    public void migrateSpendings(Long fromCategoryId, SpendingMigrateDto request) {
-        spendingUpdateService.migrateSpendings(fromCategoryId, request);
-    }
 }

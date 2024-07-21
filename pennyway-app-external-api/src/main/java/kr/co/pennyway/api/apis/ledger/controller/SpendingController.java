@@ -2,7 +2,6 @@ package kr.co.pennyway.api.apis.ledger.controller;
 
 import kr.co.pennyway.api.apis.ledger.api.SpendingApi;
 import kr.co.pennyway.api.apis.ledger.dto.SpendingIdsDto;
-import kr.co.pennyway.api.apis.ledger.dto.SpendingMigrateDto;
 import kr.co.pennyway.api.apis.ledger.dto.SpendingReq;
 import kr.co.pennyway.api.apis.ledger.usecase.SpendingUseCase;
 import kr.co.pennyway.api.common.response.SuccessResponse;
@@ -77,16 +76,6 @@ public class SpendingController implements SpendingApi {
     @PreAuthorize("isAuthenticated() and @spendingManager.hasPermissions(#user.getUserId(), #spendingIds.spendingIds())")
     public ResponseEntity<?> deleteSpendings(@RequestBody SpendingIdsDto spendingIds, @AuthenticationPrincipal SecurityUserDetails user) {
         spendingUseCase.deleteSpendings(spendingIds.spendingIds());
-        return ResponseEntity.ok(SuccessResponse.noContent());
-    }
-
-    @Override
-    @PatchMapping({"migration/{fromCategoryId}"})
-    @PreAuthorize("isAuthenticated()") // TODO: 권한검사 추가 필요 (ToCategory가 커스텀 예외인가? 에 따라 권한검사가 필요하거나 필요없으므로 SpEL로 한번만에 안됨
-    public ResponseEntity<?> migrateSpendings(@PathVariable Long fromCategoryId,
-                                              @RequestBody SpendingMigrateDto request) {
-        spendingUseCase.migrateSpendings(fromCategoryId, request);
-
         return ResponseEntity.ok(SuccessResponse.noContent());
     }
 
