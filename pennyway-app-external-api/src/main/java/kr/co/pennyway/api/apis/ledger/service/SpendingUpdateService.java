@@ -2,6 +2,7 @@ package kr.co.pennyway.api.apis.ledger.service;
 
 import kr.co.pennyway.api.apis.ledger.dto.SpendingReq;
 import kr.co.pennyway.api.common.query.SpendingCategoryType;
+import kr.co.pennyway.api.common.security.authorization.SpendingCategoryManager;
 import kr.co.pennyway.domain.domains.spending.domain.Spending;
 import kr.co.pennyway.domain.domains.spending.domain.SpendingCustomCategory;
 import kr.co.pennyway.domain.domains.spending.exception.SpendingErrorCode;
@@ -11,6 +12,7 @@ import kr.co.pennyway.domain.domains.spending.service.SpendingService;
 import kr.co.pennyway.domain.domains.spending.type.SpendingCategory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class SpendingUpdateService {
     private final SpendingService spendingService;
     private final SpendingCustomCategoryService spendingCustomCategoryService;
+    private final SpendingCategoryManager spendingCategoryManager;
 
     @Transactional
     public Spending updateSpending(Long spendingId, SpendingReq request) {
@@ -35,7 +38,11 @@ public class SpendingUpdateService {
     }
 
     @Transactional
-    public void migrateSpendings(Long fromId, SpendingCategoryType fromType, Long toId, SpendingCategoryType toType) {
+    public void migrateSpendings(Long fromId, SpendingCategoryType fromType, Long toId, SpendingCategoryType toType, Long userId) {
+        if (!(spendingCategoryManager.hasPermission(userId, fromId, fromType) && spendingCategoryManager.hasPermission(userId, toId, toType))) {
+            throw new AccessDeniedException("ACCESS_TO_THE_REQUESTED_RESOURCE_IS_FORBIDDEN");
+        }
+
         if (fromType.equals(SpendingCategoryType.DEFAULT)) {
             SpendingCategory fromCategory = SpendingCategory.fromCode(fromId.toString());
             if (toType.equals(SpendingCategoryType.CUSTOM)) {

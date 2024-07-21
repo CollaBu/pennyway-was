@@ -154,7 +154,8 @@ public interface SpendingCategoryApi {
             @PathVariable Long fromId,
             @RequestParam(value = "fromType") SpendingCategoryType fromType,
             @RequestParam(value = "toId") Long toId,
-            @RequestParam(value = "toType") SpendingCategoryType toType
+            @RequestParam(value = "toType") SpendingCategoryType toType,
+            @AuthenticationPrincipal SecurityUserDetails user
     );
 }
 

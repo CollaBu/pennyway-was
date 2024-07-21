@@ -68,7 +68,7 @@ public class SpendingCategoryUseCase {
     }
 
     @Transactional
-    public void migrateSpendingsByCategory(Long fromId, SpendingCategoryType fromType, Long toId, SpendingCategoryType toType) {
-        spendingUpdateService.migrateSpendings(fromId, fromType, toId, toType);
+    public void migrateSpendingsByCategory(Long fromId, SpendingCategoryType fromType, Long toId, SpendingCategoryType toType, Long userId) {
+        spendingUpdateService.migrateSpendings(fromId, fromType, toId, toType, userId);
     }
 }

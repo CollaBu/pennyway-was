@@ -104,9 +104,11 @@ public class SpendingCategoryController implements SpendingCategoryApi {
             @PathVariable Long fromId,
             @RequestParam(value = "fromType") SpendingCategoryType fromType,
             @RequestParam(value = "toId") Long toId,
-            @RequestParam(value = "toType") SpendingCategoryType toType
+            @RequestParam(value = "toType") SpendingCategoryType toType,
+            @AuthenticationPrincipal SecurityUserDetails user
     ) {
-        spendingCategoryUseCase.migrateSpendingsByCategory(fromId, fromType, toId, toType);
+        Long userId = user.getUserId();
+        spendingCategoryUseCase.migrateSpendingsByCategory(fromId, fromType, toId, toType, userId);
 
         return ResponseEntity.ok(SuccessResponse.noContent());
     }
