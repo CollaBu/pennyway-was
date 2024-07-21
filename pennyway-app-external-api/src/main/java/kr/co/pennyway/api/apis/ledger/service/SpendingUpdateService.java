@@ -1,6 +1,5 @@
 package kr.co.pennyway.api.apis.ledger.service;
 
-import kr.co.pennyway.api.apis.ledger.dto.SpendingMigrateDto;
 import kr.co.pennyway.api.apis.ledger.dto.SpendingReq;
 import kr.co.pennyway.api.common.query.SpendingCategoryType;
 import kr.co.pennyway.domain.domains.spending.domain.Spending;
@@ -36,12 +35,22 @@ public class SpendingUpdateService {
     }
 
     @Transactional
-    public void migrateSpendings(Long fromCategoryId, SpendingMigrateDto request) {
-        if (request.toType().equals(SpendingCategoryType.CUSTOM)) {
-            spendingService.migrateSpendingsByCategoryId(fromCategoryId, request.toCategoryId());
+    public void migrateSpendings(Long fromId, SpendingCategoryType fromType, Long toId, SpendingCategoryType toType) {
+        if (fromType.equals(SpendingCategoryType.DEFAULT)) {
+            SpendingCategory fromCategory = SpendingCategory.fromCode(fromId.toString());
+            if (toType.equals(SpendingCategoryType.CUSTOM)) {
+                spendingService.migrateCategoryByCategoryId(fromCategory, toId);
+            } else {
+                SpendingCategory spendingCategory = SpendingCategory.fromCode(toId.toString());
+                spendingService.migrateCategoryByCategory(fromCategory, spendingCategory);
+            }
         } else {
-            SpendingCategory spendingCategory = SpendingCategory.fromCode(request.toCategoryId().toString());
-            spendingService.migrateSpendingsByCategory(fromCategoryId, spendingCategory);
+            if (toType.equals(SpendingCategoryType.CUSTOM)) {
+                spendingService.migrateCustomCategoryByCategoryId(fromId, toId);
+            } else {
+                SpendingCategory spendingCategory = SpendingCategory.fromCode(toId.toString());
+                spendingService.migrateCustomCategoryByCategory(fromId, spendingCategory);
+            }
         }
     }
 }

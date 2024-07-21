@@ -149,12 +149,24 @@ public class SpendingService {
     }
 
     @Transactional
-    public void migrateSpendingsByCategoryId(Long fromId, Long toId) {
-        spendingRepository.updateSpendingCustomCategoryInQuery(fromId, toId);
+    public void migrateCategoryByCategoryId(SpendingCategory fromCategory, Long toId) {
+        SpendingCategory custom = SpendingCategory.CUSTOM;
+        spendingRepository.migrateCategoryByCategoryIdInQuery(fromCategory, toId, custom);
     }
 
     @Transactional
-    public void migrateSpendingsByCategory(Long fromId, SpendingCategory toCategory) {
-        spendingRepository.updateCategoryInQuery(fromId, toCategory);
+    public void migrateCategoryByCategory(SpendingCategory fromCategory, SpendingCategory toCategory) {
+
+        spendingRepository.migrateCategoryByCategoryInQuery(fromCategory, toCategory);
+    }
+
+    @Transactional
+    public void migrateCustomCategoryByCategoryId(Long fromId, Long toId) {
+        spendingRepository.migrateCustomCategoryByCategoryIdInQuery(fromId, toId);
+    }
+
+    @Transactional
+    public void migrateCustomCategoryByCategory(Long fromId, SpendingCategory toCategory) {
+        spendingRepository.migrateCustomCategoryByCategoryInQuery(fromId, toCategory);
     }
 }
