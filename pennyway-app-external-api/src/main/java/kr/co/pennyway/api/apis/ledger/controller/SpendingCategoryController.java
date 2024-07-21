@@ -96,4 +96,6 @@ public class SpendingCategoryController implements SpendingCategoryApi {
 
         return ResponseEntity.ok(SuccessResponse.from("spendingCategory", spendingCategoryUseCase.updateSpendingCategory(categoryId, param.name(), param.icon())));
     }
+
+
 }

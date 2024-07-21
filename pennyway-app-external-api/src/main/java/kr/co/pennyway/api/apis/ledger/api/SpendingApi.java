@@ -12,7 +12,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.co.pennyway.api.apis.ledger.dto.SpendingIdsDto;
-import kr.co.pennyway.api.apis.ledger.dto.SpendingMigrateDto;
 import kr.co.pennyway.api.apis.ledger.dto.SpendingReq;
 import kr.co.pennyway.api.apis.ledger.dto.SpendingSearchRes;
 import kr.co.pennyway.api.common.security.authentication.SecurityUserDetails;
@@ -115,19 +114,4 @@ public interface SpendingApi {
             )
     }))
     ResponseEntity<?> deleteSpendings(@RequestBody SpendingIdsDto spendingIds, @AuthenticationPrincipal SecurityUserDetails user);
-
-    @Operation(summary = "지출 내역 카테코리 이동", method = "PATCH", description = "카테고리에 존재하는 지출내역들을 다른 카테고리로 옮깁니다.")
-    @Parameter(name = "fromCategoryId", description = "type이 default면 아이콘 코드(1~11), custom이면 카테고리 pk<br>지출내역을 가져오고자 하는 카테고리 ID", required = true, in = ParameterIn.PATH)
-    @ApiResponse(responseCode = "403", description = "지출 카테고리에 대한 권한이 없습니다.", content = @Content(examples = {
-            @ExampleObject(name = "지출 카테고리 권한 오류", description = "지출 카테고리에 대한 권한이 없습니다.",
-                    value = """
-                            {
-                            "code": "4030",
-                            "message": "ACCESS_TO_THE_REQUESTED_RESOURCE_IS_FORBIDDEN"
-                            }
-                            """
-            )
-    }))
-    ResponseEntity<?> migrateSpendings(@PathVariable Long fromCategoryId,
-                                       @RequestBody SpendingMigrateDto request);
 }
