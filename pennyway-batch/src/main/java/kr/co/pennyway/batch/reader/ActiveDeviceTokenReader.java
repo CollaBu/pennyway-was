@@ -2,12 +2,12 @@ package kr.co.pennyway.batch.reader;
 
 import com.querydsl.core.types.Projections;
 import jakarta.persistence.EntityManagerFactory;
+import kr.co.pennyway.batch.common.dto.DeviceTokenOwner;
 import kr.co.pennyway.batch.common.reader.QuerydslNoOffsetPagingItemReader;
 import kr.co.pennyway.batch.common.reader.expression.Expression;
 import kr.co.pennyway.batch.common.reader.options.QuerydslNoOffsetNumberOptions;
 import kr.co.pennyway.batch.common.reader.options.QuerydslNoOffsetOptions;
 import kr.co.pennyway.domain.domains.device.domain.QDeviceToken;
-import kr.co.pennyway.domain.domains.device.dto.DeviceTokenOwner;
 import kr.co.pennyway.domain.domains.user.domain.QUser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

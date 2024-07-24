@@ -1,7 +1,7 @@
 package kr.co.pennyway.batch.writer;
 
 import kr.co.pennyway.batch.common.dto.DailySpendingNotification;
-import kr.co.pennyway.domain.domains.device.dto.DeviceTokenOwner;
+import kr.co.pennyway.batch.common.dto.DeviceTokenOwner;
 import kr.co.pennyway.domain.domains.notification.repository.NotificationRepository;
 import kr.co.pennyway.domain.domains.notification.type.Announcement;
 import kr.co.pennyway.infra.common.event.NotificationEvent;
