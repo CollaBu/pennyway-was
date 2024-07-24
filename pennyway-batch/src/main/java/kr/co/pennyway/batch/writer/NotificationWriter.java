@@ -7,6 +7,7 @@ import kr.co.pennyway.domain.domains.notification.type.Announcement;
 import kr.co.pennyway.infra.common.event.NotificationEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.context.ApplicationEventPublisher;
@@ -27,6 +28,7 @@ public class NotificationWriter implements ItemWriter<DeviceTokenOwner> {
     private final ApplicationEventPublisher publisher;
 
     @Override
+    @StepScope
     @Transactional
     public void write(@NonNull Chunk<? extends DeviceTokenOwner> owners) throws Exception {
         log.info("Writer 실행: {}", owners.size());

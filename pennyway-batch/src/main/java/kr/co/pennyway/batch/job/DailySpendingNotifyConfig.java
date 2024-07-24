@@ -6,6 +6,7 @@ import kr.co.pennyway.domain.domains.device.dto.DeviceTokenOwner;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
+import org.springframework.batch.core.configuration.annotation.JobScope;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
@@ -33,10 +34,11 @@ public class DailySpendingNotifyConfig {
     }
 
     @Bean
+    @JobScope
     public Step dailyNotificationStep(PlatformTransactionManager transactionManager) {
         return new StepBuilder("sendSpendingNotifyStep", jobRepository)
                 .<DeviceTokenOwner, DeviceTokenOwner>chunk(1000, transactionManager)
-                .reader(reader.execute())
+                .reader(reader.querydslNoOffsetPagingItemReader())
                 .writer(writer)
                 .build();
     }
