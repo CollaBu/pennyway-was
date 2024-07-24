@@ -19,7 +19,7 @@ import java.util.List;
 public class NotificationCustomRepositoryImpl implements NotificationCustomRepository {
     private final JdbcTemplate jdbcTemplate;
 
-    private final int BATCH_SIZE = 500;
+    private final int BATCH_SIZE = 1000;
 
     @Override
     public void saveDailySpendingAnnounceInBulk(List<Long> userIds, Announcement announcement) {
@@ -54,7 +54,7 @@ public class NotificationCustomRepositoryImpl implements NotificationCustomRepos
                 "    AND n.created_at < CURDATE() + INTERVAL 1 DAY " +
                 "	AND n.type = ? " +
                 "	AND n.announcement = ? " +
-                ");";
+                ")";
 
         jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
             @Override
