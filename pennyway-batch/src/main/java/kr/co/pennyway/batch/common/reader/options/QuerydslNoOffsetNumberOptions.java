@@ -39,7 +39,9 @@ public class QuerydslNoOffsetNumberOptions<T, N extends Number & Comparable<?>> 
     /**
      * QEintity의 NumberPath 필드를 사용하여 offset을 설정하는 옵션을 생성합니다.
      * <p>
-     * 만약, 쿼리의 응답을 QEntity가 아닌 Dto를 사용한 경우 마지막으로 조회한 offset의 값이 저장된 필드를 idName으로 지정해야 하며, Number 타입이어야 합니다.
+     * 만약, 쿼리의 응답을 QEntity가 아닌 Dto를 사용한 경우 마지막으로 조회한 offset의 값이 저장된 필드를 idName으로 지정해야 하며, 참조될 dto의 필드는 Number 타입이어야 합니다.
+     * <p>
+     * 해당 클래스는 idName의 유효성을 검사하지 않습니다. 따라서, idName에 해당하는 필드가 존재하지 않거나 타입이 다른 경우 예기치 못한 에러가 발생할 수 있습니다.
      *
      * @param field      {@link NumberPath} : offset으로 사용할 필드
      * @param expression {@link Expression} : 정렬 방향
