@@ -1,4 +1,4 @@
-package kr.co.pennyway.batch.dto;
+package kr.co.pennyway.batch.common.dto;
 
 import kr.co.pennyway.domain.domains.device.dto.DeviceTokenOwner;
 import kr.co.pennyway.domain.domains.notification.type.Announcement;
