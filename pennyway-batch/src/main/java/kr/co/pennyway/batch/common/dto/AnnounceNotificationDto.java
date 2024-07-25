@@ -9,24 +9,24 @@ import java.util.Objects;
 import java.util.Set;
 
 @Builder
-public record DailySpendingNotification(
+public record AnnounceNotificationDto(
         Long userId,
         String title,
         String content,
         Set<String> deviceTokens
 ) {
-    public DailySpendingNotification {
+    public AnnounceNotificationDto {
         Objects.requireNonNull(userId, "userId must not be null");
         Objects.requireNonNull(title, "title must not be null");
         Objects.requireNonNull(content, "content must not be null");
         Objects.requireNonNull(deviceTokens, "deviceTokens must not be null");
     }
 
-    public static DailySpendingNotification from(DeviceTokenOwner owner, Announcement announcement) {
+    public static AnnounceNotificationDto from(DeviceTokenOwner owner, Announcement announcement) {
         Set<String> deviceTokens = new HashSet<>();
         deviceTokens.add(owner.deviceToken());
 
-        return DailySpendingNotification.builder()
+        return AnnounceNotificationDto.builder()
                 .userId(owner.userId())
                 .title(announcement.createFormattedTitle(owner.name()))
                 .content(announcement.createFormattedContent(owner.name()))
