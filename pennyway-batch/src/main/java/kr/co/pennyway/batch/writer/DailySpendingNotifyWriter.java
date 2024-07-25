@@ -23,7 +23,7 @@ import java.util.Map;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class NotificationWriter implements ItemWriter<DeviceTokenOwner> {
+public class DailySpendingNotifyWriter implements ItemWriter<DeviceTokenOwner> {
     private final NotificationRepository notificationRepository;
     private final ApplicationEventPublisher publisher;
 
