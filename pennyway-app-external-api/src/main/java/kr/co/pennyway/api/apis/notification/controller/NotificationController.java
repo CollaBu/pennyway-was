@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RequestMapping("/v2/notifications")
 public class NotificationController implements NotificationApi {
+    private static final String HAS_UNREAD = "hasUnread";
     private static final String NOTIFICATIONS = "notifications";
 
     private final NotificationUseCase notificationUseCase;
@@ -34,6 +35,12 @@ public class NotificationController implements NotificationApi {
             @AuthenticationPrincipal SecurityUserDetails user
     ) {
         return ResponseEntity.ok(SuccessResponse.from(NOTIFICATIONS, notificationUseCase.getNotifications(user.getUserId(), pageable)));
+    }
+
+    @GetMapping("/unread")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> getUnreadNotifications(@AuthenticationPrincipal SecurityUserDetails user) {
+        return ResponseEntity.ok(SuccessResponse.from(HAS_UNREAD, notificationUseCase.hasUnreadNotification(user.getUserId())));
     }
 
     @Override
