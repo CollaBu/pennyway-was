@@ -39,7 +39,7 @@ public class NotificationService {
 
     @Transactional(readOnly = true)
     public boolean readUnreadNotification(Long userId) {
-        return notificationRepository.existsTopByReceiver_IdAndReadAtIsNull(userId);
+        return notificationRepository.existsUnreadNotification(userId);
     }
 
     @Transactional(readOnly = true)
