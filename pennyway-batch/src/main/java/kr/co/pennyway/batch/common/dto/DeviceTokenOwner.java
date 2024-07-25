@@ -5,6 +5,7 @@ package kr.co.pennyway.batch.common.dto;
  */
 public record DeviceTokenOwner(
         Long userId,
+        Long deviceTokenId,
         String name,
         String deviceToken
 ) {
