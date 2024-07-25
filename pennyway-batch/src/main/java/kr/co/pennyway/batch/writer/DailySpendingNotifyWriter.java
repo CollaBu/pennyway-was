@@ -1,6 +1,6 @@
 package kr.co.pennyway.batch.writer;
 
-import kr.co.pennyway.batch.common.dto.DailySpendingNotification;
+import kr.co.pennyway.batch.common.dto.AnnounceNotificationDto;
 import kr.co.pennyway.batch.common.dto.DeviceTokenOwner;
 import kr.co.pennyway.domain.domains.notification.repository.NotificationRepository;
 import kr.co.pennyway.domain.domains.notification.type.Announcement;
@@ -23,7 +23,7 @@ import java.util.Map;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class NotificationWriter implements ItemWriter<DeviceTokenOwner> {
+public class DailySpendingNotifyWriter implements ItemWriter<DeviceTokenOwner> {
     private final NotificationRepository notificationRepository;
     private final ApplicationEventPublisher publisher;
 
@@ -33,17 +33,17 @@ public class NotificationWriter implements ItemWriter<DeviceTokenOwner> {
     public void write(@NonNull Chunk<? extends DeviceTokenOwner> owners) throws Exception {
         log.info("Writer 실행: {}", owners.size());
 
-        Map<Long, DailySpendingNotification> notificationMap = new HashMap<>();
+        Map<Long, AnnounceNotificationDto> notificationMap = new HashMap<>();
 
         for (DeviceTokenOwner owner : owners) {
-            notificationMap.computeIfAbsent(owner.userId(), k -> DailySpendingNotification.from(owner)).addDeviceToken(owner.deviceToken());
+            notificationMap.computeIfAbsent(owner.userId(), k -> AnnounceNotificationDto.from(owner, Announcement.DAILY_SPENDING)).addDeviceToken(owner.deviceToken());
         }
 
         List<Long> userIds = new ArrayList<>(notificationMap.keySet());
 
         notificationRepository.saveDailySpendingAnnounceInBulk(userIds, Announcement.DAILY_SPENDING);
 
-        for (DailySpendingNotification notification : notificationMap.values()) {
+        for (AnnounceNotificationDto notification : notificationMap.values()) {
             publisher.publishEvent(NotificationEvent.of(notification.title(), notification.content(), notification.deviceTokensForList(), ""));
         }
     }

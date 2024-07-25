@@ -3,41 +3,44 @@ package kr.co.pennyway.batch.common.dto;
 import kr.co.pennyway.domain.domains.notification.type.Announcement;
 import lombok.Builder;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
 @Builder
-public record DailySpendingNotification(
+public record AnnounceNotificationDto(
         Long userId,
         String title,
         String content,
         Set<String> deviceTokens
 ) {
-    public DailySpendingNotification {
+    public AnnounceNotificationDto {
         Objects.requireNonNull(userId, "userId must not be null");
         Objects.requireNonNull(title, "title must not be null");
         Objects.requireNonNull(content, "content must not be null");
         Objects.requireNonNull(deviceTokens, "deviceTokens must not be null");
     }
 
-    /**
-     * {@link DeviceTokenOwner}를 DailySpendingNotification DTO로 변환하는 정적 팩토리 메서드
-     * <p>
-     * DeviceToken은 List로 변환되어 멤버 변수로 관리하게 된다.
-     */
-    public static DailySpendingNotification from(DeviceTokenOwner owner) {
-        Announcement announcement = Announcement.DAILY_SPENDING;
+    public static AnnounceNotificationDto from(DeviceTokenOwner owner, Announcement announcement) {
         Set<String> deviceTokens = new HashSet<>();
         deviceTokens.add(owner.deviceToken());
 
-        return DailySpendingNotification.builder()
+        return AnnounceNotificationDto.builder()
                 .userId(owner.userId())
-                .title(announcement.createFormattedTitle(owner.name()))
-                .content(announcement.getContent())
+                .title(createFormattedTitle(owner, announcement))
+                .content(announcement.createFormattedContent(owner.name()))
                 .deviceTokens(deviceTokens)
                 .build();
+    }
+
+    private static String createFormattedTitle(DeviceTokenOwner owner, Announcement announcement) {
+        if (announcement.equals(Announcement.MONTHLY_TARGET_AMOUNT)) {
+            return announcement.createFormattedTitle(String.valueOf(LocalDateTime.now().getMonthValue()));
+        }
+
+        return announcement.createFormattedTitle(owner.name());
     }
 
     public void addDeviceToken(String deviceToken) {

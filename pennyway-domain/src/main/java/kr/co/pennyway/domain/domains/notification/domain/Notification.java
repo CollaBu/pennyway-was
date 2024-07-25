@@ -72,10 +72,19 @@ public class Notification extends DateAuditable {
      * @apiNote 이 메서드는 {@link NoticeType#ANNOUNCEMENT} 타입에 대해서만 동작한다. 다른 타입의 알림을 포맷팅해야 하는 경우 해당 메서드를 확장해야 한다.
      */
     public String createFormattedTitle() {
-        if (type.equals(NoticeType.ANNOUNCEMENT)) {
-            return announcement.createFormattedTitle(receiverName);
+        if (!type.equals(NoticeType.ANNOUNCEMENT)) {
+            return ""; // TODO: 알림 종류가 신규로 추가될 때, 해당 로직을 구현해야 함.
         }
-        return ""; // TODO: 알림 종류가 신규로 추가될 때, 해당 로직을 구현해야 함.
+
+        return formatAnnouncementTitle();
+    }
+
+    private String formatAnnouncementTitle() {
+        if (announcement.equals(Announcement.MONTHLY_TARGET_AMOUNT)) {
+            return announcement.createFormattedTitle(String.valueOf(getCreatedAt().getMonthValue()));
+        }
+
+        return announcement.createFormattedTitle(receiverName);
     }
 
     /**
@@ -86,10 +95,11 @@ public class Notification extends DateAuditable {
      * @apiNote 이 메서드는 {@link NoticeType#ANNOUNCEMENT} 타입에 대해서만 동작한다. 다른 타입의 알림을 포맷팅해야 하는 경우 해당 메서드를 확장해야 한다.
      */
     public String createFormattedContent() {
-        if (type.equals(NoticeType.ANNOUNCEMENT)) {
-            return announcement.createFormattedContent(receiverName);
+        if (!type.equals(NoticeType.ANNOUNCEMENT)) {
+            return ""; // TODO: 알림 종류가 신규로 추가될 때, 해당 로직을 구현해야 함.
         }
-        return ""; // TODO: 알림 종류가 신규로 추가될 때, 해당 로직을 구현해야 함.
+
+        return announcement.createFormattedContent(receiverName);
     }
 
     public static class Builder {
