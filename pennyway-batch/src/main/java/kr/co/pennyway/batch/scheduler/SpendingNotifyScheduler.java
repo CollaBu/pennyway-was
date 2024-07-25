@@ -19,6 +19,7 @@ import org.springframework.stereotype.Component;
 public class SpendingNotifyScheduler {
     private final JobLauncher jobLauncher;
     private final Job dailyNotificationJob;
+    private final Job monthlyNotificationJob;
 
     @Scheduled(cron = "0 0 20 * * ?")
     public void runDailyNotificationJob() {
@@ -31,6 +32,20 @@ public class SpendingNotifyScheduler {
         } catch (JobExecutionAlreadyRunningException | JobRestartException
                  | JobInstanceAlreadyCompleteException | JobParametersInvalidException e) {
             log.error("Failed to run dailyNotificationJob", e);
+        }
+    }
+
+    @Scheduled(cron = "0 0 10 1 * ?")
+    public void runMonthlyNotificationJob() {
+        JobParameters jobParameters = new JobParametersBuilder()
+                .addLong("time", System.currentTimeMillis())
+                .toJobParameters();
+
+        try {
+            jobLauncher.run(monthlyNotificationJob, jobParameters);
+        } catch (JobExecutionAlreadyRunningException | JobRestartException
+                 | JobInstanceAlreadyCompleteException | JobParametersInvalidException e) {
+            log.error("Failed to run monthlyNotificationJob", e);
         }
     }
 }
