@@ -61,6 +61,10 @@ public interface NotificationApi {
             @AuthenticationPrincipal SecurityUserDetails user
     );
 
+    @Operation(summary = "수신한 알림 중 미확인 알림 존재 여부 조회")
+    @ApiResponse(responseCode = "200", description = "미확인 알림 존재 여부 조회 성공", content = @Content(schemaProperties = @SchemaProperty(name = "hasUnread", schema = @Schema(type = "boolean"))))
+    ResponseEntity<?> getUnreadNotifications(@AuthenticationPrincipal SecurityUserDetails user);
+
     @Operation(summary = "수신한 알림 읽음 처리", description = "사용자가 수신한 알림을 읽음처리 합니다. 단, 읽음 처리할 알림의 pk는 사용자가 receiver여야 하며, 미확인 알림만 포함되어 있어야 합니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "알림 읽음 처리 성공"),

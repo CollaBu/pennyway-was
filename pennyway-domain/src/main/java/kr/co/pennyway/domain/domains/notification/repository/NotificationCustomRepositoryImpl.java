@@ -1,5 +1,7 @@
 package kr.co.pennyway.domain.domains.notification.repository;
 
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import kr.co.pennyway.domain.domains.notification.domain.QNotification;
 import kr.co.pennyway.domain.domains.notification.type.Announcement;
 import kr.co.pennyway.domain.domains.notification.type.NoticeType;
 import lombok.RequiredArgsConstructor;
@@ -17,9 +19,22 @@ import java.util.List;
 @Repository
 @RequiredArgsConstructor
 public class NotificationCustomRepositoryImpl implements NotificationCustomRepository {
+    private final JPAQueryFactory queryFactory;
     private final JdbcTemplate jdbcTemplate;
 
+    private final QNotification notification = QNotification.notification;
+
     private final int BATCH_SIZE = 1000;
+
+    @Override
+    public boolean existsUnreadNotification(Long userId) {
+        return queryFactory
+                .select(notification.id)
+                .from(notification)
+                .where(notification.receiver.id.eq(userId)
+                        .and(notification.readAt.isNull()))
+                .fetchFirst() != null;
+    }
 
     @Override
     public void saveDailySpendingAnnounceInBulk(List<Long> userIds, Announcement announcement) {

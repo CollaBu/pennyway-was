@@ -26,6 +26,10 @@ public class NotificationUseCase {
         return NotificationMapper.toSliceRes(notifications, pageable);
     }
 
+    public boolean hasUnreadNotification(Long userId) {
+        return notificationSearchService.isExistsUnreadNotification(userId);
+    }
+
     public void updateNotificationsToRead(List<Long> notificationIds) {
         notificationSaveService.updateNotificationsToRead(notificationIds);
     }

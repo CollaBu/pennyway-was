@@ -20,12 +20,13 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.springframework.test.util.AssertionErrors.assertEquals;
-import static org.springframework.test.util.AssertionErrors.assertNotNull;
+import static org.springframework.test.util.AssertionErrors.*;
 
 @Slf4j
 @DataJpaTest(properties = {"spring.jpa.hibernate.ddl-auto=create"})
@@ -128,6 +129,51 @@ public class NotificationRepositoryUnitTest extends ContainerMySqlTestConfig {
 
         // then
         assertEquals("읽지 않은 알림 개수가 2개여야 한다.", 2L, count);
+    }
+
+    @Test
+    @DisplayName("사용자의 읽지 않은 알림이 존재하면 true를 반환한다.")
+    void existsTopByReceiver_IdAndReadAtIsNull() {
+        // given
+        User user = userRepository.save(createUser("jayang"));
+
+        Notification notification1 = new Notification.Builder(NoticeType.ANNOUNCEMENT, Announcement.DAILY_SPENDING, user).build();
+        Notification notification2 = new Notification.Builder(NoticeType.ANNOUNCEMENT, Announcement.DAILY_SPENDING, user).build();
+        Notification notification3 = new Notification.Builder(NoticeType.ANNOUNCEMENT, Announcement.DAILY_SPENDING, user).build();
+
+        ReflectionTestUtils.setField(notification1, "readAt", LocalDateTime.now());
+        ReflectionTestUtils.setField(notification2, "readAt", LocalDateTime.now());
+
+        notificationRepository.saveAll(List.of(notification1, notification2, notification3));
+
+        // when
+        boolean exists = notificationRepository.existsUnreadNotification(user.getId());
+
+        // then
+        assertTrue("읽지 않은 알림이 존재하면 true를 반환해야 한다.", exists);
+    }
+
+    @Test
+    @DisplayName("사용자의 읽지 않은 알림이 존재하지 않으면 false를 반환한다.")
+    void notExistsTopByReceiver_IdAndReadAtIsNull() {
+        // given
+        User user = userRepository.save(createUser("jayang"));
+
+        Notification notification1 = new Notification.Builder(NoticeType.ANNOUNCEMENT, Announcement.DAILY_SPENDING, user).build();
+        Notification notification2 = new Notification.Builder(NoticeType.ANNOUNCEMENT, Announcement.DAILY_SPENDING, user).build();
+        Notification notification3 = new Notification.Builder(NoticeType.ANNOUNCEMENT, Announcement.DAILY_SPENDING, user).build();
+
+        ReflectionTestUtils.setField(notification1, "readAt", LocalDateTime.now());
+        ReflectionTestUtils.setField(notification2, "readAt", LocalDateTime.now());
+        ReflectionTestUtils.setField(notification3, "readAt", LocalDateTime.now());
+
+        notificationRepository.saveAll(List.of(notification1, notification2, notification3));
+
+        // when
+        boolean exists = notificationRepository.existsUnreadNotification(user.getId());
+
+        // then
+        assertFalse("읽지 않은 알림이 존재하지 않으면 false를 반환해야 한다.", exists);
     }
 
     private User createUser(String name) {

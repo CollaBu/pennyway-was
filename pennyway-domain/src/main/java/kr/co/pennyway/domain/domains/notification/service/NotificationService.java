@@ -38,6 +38,11 @@ public class NotificationService {
     }
 
     @Transactional(readOnly = true)
+    public boolean isExistsUnreadNotification(Long userId) {
+        return notificationRepository.existsUnreadNotification(userId);
+    }
+
+    @Transactional(readOnly = true)
     public long countUnreadNotifications(Long userId, List<Long> notificationIds) {
         return notificationRepository.countUnreadNotificationsByIds(userId, notificationIds);
     }

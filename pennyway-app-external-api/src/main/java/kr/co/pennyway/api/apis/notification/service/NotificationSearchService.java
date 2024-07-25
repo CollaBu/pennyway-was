@@ -19,4 +19,9 @@ public class NotificationSearchService {
     public Slice<Notification> getNotifications(Long userId, Pageable pageable) {
         return notificationService.readNotificationsSlice(userId, pageable);
     }
+
+    @Transactional(readOnly = true)
+    public boolean isExistsUnreadNotification(Long userId) {
+        return notificationService.isExistsUnreadNotification(userId);
+    }
 }
