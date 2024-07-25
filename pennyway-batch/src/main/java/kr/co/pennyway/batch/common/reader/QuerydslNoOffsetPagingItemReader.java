@@ -13,6 +13,7 @@ import java.util.function.Function;
 
 public class QuerydslNoOffsetPagingItemReader<T> extends QuerydslPagingItemReader<T> {
     private QuerydslNoOffsetOptions<T> options;
+    private Function<JPAQueryFactory, JPAQuery<T>> idSelectQuery;
 
     private QuerydslNoOffsetPagingItemReader() {
         super();
@@ -26,6 +27,15 @@ public class QuerydslNoOffsetPagingItemReader<T> extends QuerydslPagingItemReade
         super(entityManagerFactory, pageSize, queryFunction);
         setName(ClassUtils.getShortName(QuerydslNoOffsetPagingItemReader.class));
         this.options = options;
+    }
+
+    public QuerydslNoOffsetPagingItemReader(EntityManagerFactory entityManagerFactory,
+                                            int pageSize,
+                                            QuerydslNoOffsetOptions<T> options,
+                                            Function<JPAQueryFactory, JPAQuery<T>> queryFunction,
+                                            Function<JPAQueryFactory, JPAQuery<T>> idSelectQuery) {
+        this(entityManagerFactory, pageSize, options, queryFunction);
+        this.idSelectQuery = idSelectQuery;
     }
 
     @Override
@@ -47,7 +57,7 @@ public class QuerydslNoOffsetPagingItemReader<T> extends QuerydslPagingItemReade
     protected JPAQuery<T> createQuery() {
         JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);
         JPAQuery<T> query = queryFunction.apply(queryFactory);
-        options.initKeys(query, getPage()); // 제일 첫번째 페이징시 시작해야할 ID 찾기
+        options.initKeys((idSelectQuery != null) ? idSelectQuery.apply(queryFactory) : query, getPage()); // 제일 첫번째 페이징시 시작해야할 ID 찾기
 
         return options.createQuery(query, getPage());
     }
