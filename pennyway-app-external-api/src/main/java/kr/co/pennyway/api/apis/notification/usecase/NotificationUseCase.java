@@ -27,7 +27,7 @@ public class NotificationUseCase {
     }
 
     public boolean hasUnreadNotification(Long userId) {
-        return notificationSearchService.hasUnreadNotification(userId);
+        return notificationSearchService.isExistsUnreadNotification(userId);
     }
 
     public void updateNotificationsToRead(List<Long> notificationIds) {
