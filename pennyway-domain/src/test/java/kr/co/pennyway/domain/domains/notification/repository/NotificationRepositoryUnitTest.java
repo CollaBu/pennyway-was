@@ -26,8 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.springframework.test.util.AssertionErrors.assertEquals;
-import static org.springframework.test.util.AssertionErrors.assertNotNull;
+import static org.springframework.test.util.AssertionErrors.*;
 
 @Slf4j
 @DataJpaTest(properties = {"spring.jpa.hibernate.ddl-auto=create"})
@@ -148,10 +147,10 @@ public class NotificationRepositoryUnitTest extends ContainerMySqlTestConfig {
         notificationRepository.saveAll(List.of(notification1, notification2, notification3));
 
         // when
-        boolean exists = notificationRepository.existsTopByReceiver_IdAndReadAtIsNull(user.getId());
+        boolean exists = notificationRepository.existsUnreadNotification(user.getId());
 
         // then
-        assertEquals("읽지 않은 알림이 존재하면 true를 반환해야 한다.", true, exists);
+        assertTrue("읽지 않은 알림이 존재하면 true를 반환해야 한다.", exists);
     }
 
     @Test
@@ -171,10 +170,10 @@ public class NotificationRepositoryUnitTest extends ContainerMySqlTestConfig {
         notificationRepository.saveAll(List.of(notification1, notification2, notification3));
 
         // when
-        boolean exists = notificationRepository.existsTopByReceiver_IdAndReadAtIsNull(user.getId());
+        boolean exists = notificationRepository.existsUnreadNotification(user.getId());
 
         // then
-        assertEquals("읽지 않은 알림이 존재하지 않으면 false를 반환해야 한다.", false, exists);
+        assertFalse("읽지 않은 알림이 존재하지 않으면 false를 반환해야 한다.", exists);
     }
 
     private User createUser(String name) {
