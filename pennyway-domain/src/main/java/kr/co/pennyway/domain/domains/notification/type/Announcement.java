@@ -62,5 +62,9 @@ public enum Announcement implements LegacyCommonType {
         if (!StringUtils.hasText(name)) {
             throw new IllegalArgumentException("name must not be empty");
         }
+
+        if (this == NOT_ANNOUNCE) {
+            throw new IllegalArgumentException("NOT_ANNOUNCE type is not allowed");
+        }
     }
 }

@@ -22,20 +22,14 @@ public record DailySpendingNotification(
         Objects.requireNonNull(deviceTokens, "deviceTokens must not be null");
     }
 
-    /**
-     * {@link DeviceTokenOwner}를 DailySpendingNotification DTO로 변환하는 정적 팩토리 메서드
-     * <p>
-     * DeviceToken은 List로 변환되어 멤버 변수로 관리하게 된다.
-     */
-    public static DailySpendingNotification from(DeviceTokenOwner owner) {
-        Announcement announcement = Announcement.DAILY_SPENDING;
+    public static DailySpendingNotification from(DeviceTokenOwner owner, Announcement announcement) {
         Set<String> deviceTokens = new HashSet<>();
         deviceTokens.add(owner.deviceToken());
 
         return DailySpendingNotification.builder()
                 .userId(owner.userId())
                 .title(announcement.createFormattedTitle(owner.name()))
-                .content(announcement.getContent())
+                .content(announcement.createFormattedContent(owner.name()))
                 .deviceTokens(deviceTokens)
                 .build();
     }
