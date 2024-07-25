@@ -3,6 +3,7 @@ package kr.co.pennyway.batch.common.dto;
 import kr.co.pennyway.domain.domains.notification.type.Announcement;
 import lombok.Builder;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -28,10 +29,18 @@ public record AnnounceNotificationDto(
 
         return AnnounceNotificationDto.builder()
                 .userId(owner.userId())
-                .title(announcement.createFormattedTitle(owner.name()))
+                .title(createFormattedTitle(owner, announcement))
                 .content(announcement.createFormattedContent(owner.name()))
                 .deviceTokens(deviceTokens)
                 .build();
+    }
+
+    private static String createFormattedTitle(DeviceTokenOwner owner, Announcement announcement) {
+        if (announcement.equals(Announcement.MONTHLY_TARGET_AMOUNT)) {
+            return announcement.createFormattedTitle(String.valueOf(LocalDateTime.now().getMonthValue()));
+        }
+
+        return announcement.createFormattedTitle(owner.name());
     }
 
     public void addDeviceToken(String deviceToken) {
