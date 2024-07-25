@@ -11,7 +11,7 @@ public class QuerydslNoOffsetStringOptions<T> extends QuerydslNoOffsetOptions<T>
     private final StringPath field;
     private String currentId;
     private String lastId;
-    
+
     private QuerydslNoOffsetStringOptions(@Nonnull StringPath field,
                                           @Nonnull Expression expression) {
         super(field, expression);
@@ -22,7 +22,7 @@ public class QuerydslNoOffsetStringOptions<T> extends QuerydslNoOffsetOptions<T>
                                           @Nonnull Expression expression,
                                           String idName) {
         super(idName, expression);
-        this.field = null;
+        this.field = field;
     }
 
     /**
