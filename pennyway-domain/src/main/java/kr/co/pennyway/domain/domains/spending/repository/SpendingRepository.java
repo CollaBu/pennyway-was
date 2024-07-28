@@ -35,20 +35,20 @@ public interface SpendingRepository extends ExtendedRepository<Spending, Long>, 
     @Modifying(clearAutomatically = true)
     @Transactional
     @Query("UPDATE Spending s SET s.spendingCustomCategory.id = :toCategoryId, s.category = :custom WHERE s.category = :fromCategory AND s.deletedAt IS NULL")
-    void migrateCategoryByCategoryIdInQuery(SpendingCategory fromCategory, Long toCategoryId, SpendingCategory custom);
+    void updateCategoryByCategoryIdInQuery(SpendingCategory fromCategory, Long toCategoryId, SpendingCategory custom);
 
     @Modifying(clearAutomatically = true)
     @Transactional
     @Query("UPDATE Spending s SET s.category = :toCategory WHERE s.category = :fromCategory AND s.deletedAt IS NULL")
-    void migrateCategoryByCategoryInQuery(SpendingCategory fromCategory, SpendingCategory toCategory);
+    void updateCategoryByCategoryInQuery(SpendingCategory fromCategory, SpendingCategory toCategory);
 
     @Modifying(clearAutomatically = true)
     @Transactional
     @Query("UPDATE Spending s SET s.spendingCustomCategory.id = :toCategoryId WHERE s.spendingCustomCategory.id = :fromCategoryId AND s.deletedAt IS NULL")
-    void migrateCustomCategoryByCategoryIdInQuery(Long fromCategoryId, Long toCategoryId);
+    void updateCustomCategoryByCategoryIdInQuery(Long fromCategoryId, Long toCategoryId);
 
     @Modifying(clearAutomatically = true)
     @Transactional
     @Query("UPDATE Spending s SET s.spendingCustomCategory = null, s.category = :toCategory WHERE s.spendingCustomCategory.id = :fromCategoryId AND s.deletedAt IS NULL")
-    void migrateCustomCategoryByCategoryInQuery(Long fromCategoryId, SpendingCategory toCategory);
+    void updateCustomCategoryByCategoryInQuery(Long fromCategoryId, SpendingCategory toCategory);
 }
