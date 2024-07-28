@@ -41,17 +41,17 @@ public class SpendingUpdateService {
         if (fromType.equals(SpendingCategoryType.DEFAULT)) {
             SpendingCategory fromCategory = SpendingCategory.fromCode(fromId.toString());
             if (toType.equals(SpendingCategoryType.CUSTOM)) {
-                spendingService.migrateCategoryByCategoryId(fromCategory, toId);
+                spendingService.updateCategoryByCategoryId(fromCategory, toId);
             } else {
                 SpendingCategory spendingCategory = SpendingCategory.fromCode(toId.toString());
-                spendingService.migrateCategoryByCategory(fromCategory, spendingCategory);
+                spendingService.updateCategoryByCategory(fromCategory, spendingCategory);
             }
         } else {
             if (toType.equals(SpendingCategoryType.CUSTOM)) {
-                spendingService.migrateCustomCategoryByCategoryId(fromId, toId);
+                spendingService.updateCustomCategoryByCategoryId(fromId, toId);
             } else {
                 SpendingCategory spendingCategory = SpendingCategory.fromCode(toId.toString());
-                spendingService.migrateCustomCategoryByCategory(fromId, spendingCategory);
+                spendingService.updateCustomCategoryByCategory(fromId, spendingCategory);
             }
         }
     }
