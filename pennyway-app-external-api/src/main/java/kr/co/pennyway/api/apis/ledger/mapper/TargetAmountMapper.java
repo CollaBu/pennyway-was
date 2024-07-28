@@ -22,7 +22,7 @@ public class TargetAmountMapper {
      * @param totalSpending {@link TotalSpendingAmount} : 값이 없을 경우 null
      */
     public static TargetAmountDto.WithTotalSpendingRes toWithTotalSpendingResponse(TargetAmount targetAmount, TotalSpendingAmount totalSpending, LocalDate date) {
-        Integer totalSpendingAmount = (totalSpending != null) ? totalSpending.totalSpending() : 0;
+        long totalSpendingAmount = (totalSpending != null) ? totalSpending.totalSpending() : 0L;
 
         return createWithTotalSpendingRes(targetAmount, totalSpendingAmount, date);
     }
@@ -38,8 +38,8 @@ public class TargetAmountMapper {
         LocalDate startAt = getOldestDate(targetAmounts);
         int monthLength = (endAt.getYear() - startAt.getYear()) * 12 + (endAt.getMonthValue() - startAt.getMonthValue());
 
-        Map<YearMonth, TargetAmount> targetAmountsByDates = toYearMonthMap(targetAmounts, targetAmount -> YearMonth.of(targetAmount.getCreatedAt().getYear(), targetAmount.getCreatedAt().getMonthValue()), Function.identity());
-        Map<YearMonth, Integer> totalSpendingAmounts = toYearMonthMap(totalSpendings, totalSpendingAmount -> YearMonth.of(totalSpendingAmount.year(), totalSpendingAmount.month()), TotalSpendingAmount::totalSpending);
+        Map<YearMonth, TargetAmount> targetAmountsByDates = toYearMonthMap(targetAmounts, ta -> YearMonth.from(ta.getCreatedAt()), Function.identity());
+        Map<YearMonth, Long> totalSpendingAmounts = toYearMonthMap(totalSpendings, TotalSpendingAmount::getYearMonth, TotalSpendingAmount::totalSpending);
 
         return createWithTotalSpendingResponses(targetAmountsByDates, totalSpendingAmounts, startAt, monthLength).stream()
                 .sorted(Comparator.comparing(TargetAmountDto.WithTotalSpendingRes::year).reversed()
@@ -53,42 +53,39 @@ public class TargetAmountMapper {
      * @return {@link TargetAmountDto.RecentTargetAmountRes}
      */
     public static TargetAmountDto.RecentTargetAmountRes toRecentTargetAmountResponse(Optional<TargetAmount> targetAmount) {
-        if (targetAmount.isEmpty()) {
-            return TargetAmountDto.RecentTargetAmountRes.notPresent();
-        }
-
-        Integer year = targetAmount.get().getCreatedAt().getYear();
-        Integer month = targetAmount.get().getCreatedAt().getMonthValue();
-        Integer amount = targetAmount.get().getAmount();
-
-        return TargetAmountDto.RecentTargetAmountRes.of(year, month, amount);
+        return targetAmount.map(ta -> {
+            LocalDate createdAt = ta.getCreatedAt().toLocalDate();
+            return TargetAmountDto.RecentTargetAmountRes.of(createdAt.getYear(), createdAt.getMonthValue(), ta.getAmount());
+        }).orElseGet(TargetAmountDto.RecentTargetAmountRes::notPresent);
     }
 
-    private static List<TargetAmountDto.WithTotalSpendingRes> createWithTotalSpendingResponses(Map<YearMonth, TargetAmount> targetAmounts, Map<YearMonth, Integer> totalSpendings, LocalDate startAt, int monthLength) {
+    private static List<TargetAmountDto.WithTotalSpendingRes> createWithTotalSpendingResponses(Map<YearMonth, TargetAmount> targetAmounts, Map<YearMonth, Long> totalSpendings, LocalDate startAt, int monthLength) {
         List<TargetAmountDto.WithTotalSpendingRes> withTotalSpendingResponses = new ArrayList<>(monthLength + 1);
+        LocalDate date = startAt;
 
         for (int i = 0; i < monthLength + 1; i++) {
-            LocalDate date = startAt.plusMonths(i);
-            YearMonth yearMonth = YearMonth.of(date.getYear(), date.getMonthValue());
+            YearMonth yearMonth = YearMonth.from(date);
 
-            TargetAmount targetAmount = targetAmounts.getOrDefault(yearMonth, null);
-            Integer totalSpending = totalSpendings.getOrDefault(yearMonth, 0);
+            TargetAmount targetAmount = targetAmounts.get(yearMonth);
+            Long totalSpending = totalSpendings.getOrDefault(yearMonth, 0L);
 
             withTotalSpendingResponses.add(createWithTotalSpendingRes(targetAmount, totalSpending, date));
+            date = date.plusMonths(1);
         }
 
         return withTotalSpendingResponses;
     }
 
-    private static TargetAmountDto.WithTotalSpendingRes createWithTotalSpendingRes(TargetAmount targetAmount, Integer totalSpending, LocalDate date) {
+    private static TargetAmountDto.WithTotalSpendingRes createWithTotalSpendingRes(TargetAmount targetAmount, Long totalSpending, LocalDate date) {
         TargetAmountDto.TargetAmountInfo targetAmountInfo = TargetAmountDto.TargetAmountInfo.from(targetAmount);
+        long diffAmount = (targetAmountInfo.amount() == -1) ? 0 : totalSpending - (long) targetAmountInfo.amount();
 
         return TargetAmountDto.WithTotalSpendingRes.builder()
                 .year(date.getYear())
                 .month(date.getMonthValue())
                 .targetAmountDetail(targetAmountInfo)
                 .totalSpending(totalSpending)
-                .diffAmount((targetAmountInfo.amount() == -1) ? 0 : totalSpending - targetAmountInfo.amount())
+                .diffAmount(diffAmount)
                 .build();
     }
 
@@ -112,12 +109,6 @@ public class TargetAmountMapper {
      * @param valueMapper : Value로 변환할 Function
      */
     private static <T, U> Map<YearMonth, U> toYearMonthMap(List<T> list, Function<T, YearMonth> keyMapper, Function<T, U> valueMapper) {
-        return list.stream().collect(
-                Collectors.toMap(
-                        keyMapper,
-                        valueMapper,
-                        (existing, replacement) -> existing
-                )
-        );
+        return list.stream().collect(Collectors.toConcurrentMap(keyMapper, valueMapper, (existing, replacement) -> existing));
     }
 }

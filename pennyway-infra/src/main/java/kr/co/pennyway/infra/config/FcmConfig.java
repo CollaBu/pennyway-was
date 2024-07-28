@@ -5,6 +5,9 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.messaging.FirebaseMessaging;
 import jakarta.annotation.PostConstruct;
+import kr.co.pennyway.infra.client.google.fcm.FcmManager;
+import kr.co.pennyway.infra.common.event.FcmNotificationEventHandler;
+import kr.co.pennyway.infra.common.event.NotificationEventHandler;
 import kr.co.pennyway.infra.common.importer.PennywayInfraConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,7 +19,6 @@ import java.io.IOException;
 
 @Slf4j
 @Profile({"local", "dev", "prod"})
-// TODO: 2024.05.17 우선 테스트 통과를 위해 임시로 처리함. Push Notification 기능 테스트 시 문제가 발생하면 수정이 필요함.
 public class FcmConfig implements PennywayInfraConfig {
     private final ClassPathResource firebaseResource;
     private final String projectId;
@@ -42,5 +44,15 @@ public class FcmConfig implements PennywayInfraConfig {
     @Bean
     FirebaseMessaging firebaseMessaging() {
         return FirebaseMessaging.getInstance(FirebaseApp.getInstance());
+    }
+
+    @Bean
+    FcmManager fcmManager(FirebaseMessaging firebaseMessaging) {
+        return new FcmManager(firebaseMessaging);
+    }
+
+    @Bean
+    NotificationEventHandler notificationEventHandler(FcmManager fcmManager) {
+        return new FcmNotificationEventHandler(fcmManager);
     }
 }

@@ -11,7 +11,7 @@ public class UserProfileUpdateDto {
     public record NameReq(
             @Schema(description = "이름", example = "페니웨이")
             @NotBlank(message = "이름을 입력해주세요")
-            @Pattern(regexp = "^[가-힣a-z0-9]{2,8}$", message = "2~8자의 한글, 영문 소문자, 숫자만 사용 가능합니다.")
+            @Pattern(regexp = "^[가-힣a-zA-Z]{2,8}$", message = "한글과 영문 대, 소문자만 가능해요")
             String name
     ) {
     }
@@ -20,7 +20,7 @@ public class UserProfileUpdateDto {
     public record UsernameReq(
             @Schema(description = "아이디", example = "pennyway")
             @NotBlank(message = "아이디를 입력해주세요")
-            @Pattern(regexp = "^[a-z-_.]{5,20}$", message = "5~20자의 영문 소문자, -, _, . 만 사용 가능합니다.")
+            @Pattern(regexp = "^[a-z0-9-_.]{5,20}$", message = "영문 소문자, 숫자, 특수기호 (-), (_), (.) 만 사용하여, 5~20자의 아이디를 입력해 주세요")
             String username
     ) {
     }
@@ -69,11 +69,7 @@ public class UserProfileUpdateDto {
     }
 
     @Schema(title = "사용자 아이디, 전화번호 변경 DTO")
-    public record UsernameAndPhoneReq(
-            @Schema(description = "변경할 아이디", example = "pennyway")
-            @NotBlank(message = "아이디를 입력해주세요")
-            @Pattern(regexp = "^[a-z-_.]{5,20}$", message = "5~20자의 영문 소문자, -, _, . 만 사용 가능합니다.")
-            String username,
+    public record PhoneReq(
             @Schema(description = "전화번호", example = "010-2629-4624")
             @NotBlank(message = "전화번호는 필수입니다.")
             @Pattern(regexp = "^01[01]-\\d{4}-\\d{4}$", message = "전화번호 형식이 올바르지 않습니다.")

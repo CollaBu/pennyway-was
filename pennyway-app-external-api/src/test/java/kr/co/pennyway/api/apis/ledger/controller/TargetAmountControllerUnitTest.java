@@ -3,11 +3,12 @@ package kr.co.pennyway.api.apis.ledger.controller;
 import kr.co.pennyway.api.apis.ledger.dto.TargetAmountDto;
 import kr.co.pennyway.api.apis.ledger.usecase.TargetAmountUseCase;
 import kr.co.pennyway.api.config.WebConfig;
-import kr.co.pennyway.api.config.fixture.UserFixture;
 import kr.co.pennyway.api.config.supporter.WithSecurityMockUser;
-import kr.co.pennyway.domain.domains.target.domain.TargetAmount;
 import kr.co.pennyway.domain.domains.target.exception.TargetAmountErrorCode;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -30,7 +31,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(controllers = {TargetAmountController.class}, excludeFilters = {
         @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = WebConfig.class)})
 @ActiveProfiles("test")
-@TestClassOrder(ClassOrderer.OrderAnnotation.class)
 public class TargetAmountControllerUnitTest {
     @Autowired
     private MockMvc mockMvc;
@@ -111,8 +111,8 @@ public class TargetAmountControllerUnitTest {
         @WithSecurityMockUser
         void putTargetAmountWithValidRequest() throws Exception {
             // given
-            Integer amount = 100000;
-            given(targetAmountUseCase.updateTargetAmount(1L, amount)).willReturn(TargetAmountDto.TargetAmountInfo.from(TargetAmount.of(amount, UserFixture.GENERAL_USER.toUser())));
+            int amount = 100000;
+            given(targetAmountUseCase.updateTargetAmount(1L, amount)).willReturn(TargetAmountDto.TargetAmountInfo.from(null));
 
             // when
             ResultActions result = performPutTargetAmount(1L, amount);

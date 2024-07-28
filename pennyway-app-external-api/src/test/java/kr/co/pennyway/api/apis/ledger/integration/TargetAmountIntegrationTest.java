@@ -8,6 +8,7 @@ import kr.co.pennyway.api.config.ExternalApiIntegrationTest;
 import kr.co.pennyway.api.config.fixture.SpendingFixture;
 import kr.co.pennyway.api.config.fixture.TargetAmountFixture;
 import kr.co.pennyway.api.config.fixture.UserFixture;
+import kr.co.pennyway.domain.domains.spending.service.SpendingService;
 import kr.co.pennyway.domain.domains.target.domain.TargetAmount;
 import kr.co.pennyway.domain.domains.target.service.TargetAmountService;
 import kr.co.pennyway.domain.domains.user.domain.User;
@@ -27,9 +28,11 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Slf4j
@@ -45,6 +48,10 @@ public class TargetAmountIntegrationTest extends ExternalApiDBTestConfig {
 
     @Autowired
     private TargetAmountService targetAmountService;
+
+    @Autowired
+    private SpendingService spendingService;
+
     @PersistenceContext
     private EntityManager em;
 
@@ -137,6 +144,26 @@ public class TargetAmountIntegrationTest extends ExternalApiDBTestConfig {
 
             // then
             result.andDo(print()).andExpect(status().isNotFound());
+        }
+
+        @Test
+        @DisplayName("당월 지출 금액의 총합이 int 범위를 초과해도 200 OK 응답을 반환한다.")
+        @Transactional
+        void getTargetAmountAndTotalSpendingWithIntOverflow() throws Exception {
+            // given
+            User user = userService.createUser(UserFixture.GENERAL_USER.toUser());
+            TargetAmount targetAmount = targetAmountService.createTargetAmount(TargetAmountFixture.GENERAL_TARGET_AMOUNT.toTargetAmount(user));
+            spendingService.createSpending(SpendingFixture.MAX_SPENDING.toSpending(user));
+            spendingService.createSpending(SpendingFixture.MAX_SPENDING.toSpending(user));
+
+            // when
+            ResultActions result = performGetTargetAmountAndTotalSpending(user, LocalDate.now());
+
+            // then
+            result.andDo(print())
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.data.targetAmount.totalSpending").value("4294967294"))
+                    .andExpect(jsonPath("$.data.targetAmount.diffAmount").value(String.valueOf(4294967294L - (long) targetAmount.getAmount())));
         }
 
         private ResultActions performGetTargetAmountAndTotalSpending(User requestUser, LocalDate date) throws Exception {
@@ -270,18 +297,21 @@ public class TargetAmountIntegrationTest extends ExternalApiDBTestConfig {
         }
 
         @Test
-        @DisplayName("당월 목표 금액 pk에 대한 접근 권한이 있지만, amount가 이미 -1인 경우 404 Not Found 에러 응답을 반환한다.")
-        @Transactional
+        @DisplayName("당월 목표 금액 pk에 대한 접근 권한이 있으며, amount == -1이어도 isRead가 true로 변경된다.")
         void deleteTargetAmountNotFound() throws Exception {
             // given
             User user = userService.createUser(UserFixture.GENERAL_USER.toUser());
             TargetAmount targetAmount = targetAmountService.createTargetAmount(TargetAmount.of(-1, user));
+            Long targetAmountId = targetAmount.getId();
 
             // when
             ResultActions result = performDeleteTargetAmount(targetAmount.getId(), user);
 
             // then
-            result.andDo(print()).andExpect(status().isNotFound());
+            result.andDo(print()).andExpect(status().isOk());
+            TargetAmount deletedTargetAmount = targetAmountService.readTargetAmount(targetAmountId).orElseThrow();
+            assertEquals(-1, deletedTargetAmount.getAmount());
+            assertTrue(deletedTargetAmount.isRead());
         }
 
         @Test

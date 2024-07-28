@@ -36,7 +36,7 @@ public class TargetAmountSaveService {
     }
 
     @Transactional
-    public TargetAmount updateTargetAmount(Long targetAmountId, Integer amount) {
+    public TargetAmount updateTargetAmount(Long targetAmountId, int amount) {
         TargetAmount targetAmount = targetAmountService.readTargetAmount(targetAmountId)
                 .orElseThrow(() -> new TargetAmountErrorException(TargetAmountErrorCode.NOT_FOUND_TARGET_AMOUNT));
 

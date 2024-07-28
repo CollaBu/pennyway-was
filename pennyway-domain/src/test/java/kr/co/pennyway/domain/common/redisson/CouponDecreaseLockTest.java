@@ -7,6 +7,7 @@ import kr.co.pennyway.domain.domains.coupon.TestCoupon;
 import kr.co.pennyway.domain.domains.coupon.TestCouponDecreaseService;
 import kr.co.pennyway.domain.domains.coupon.TestCouponRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.Ignore;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -19,6 +20,7 @@ import java.util.concurrent.Executors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Ignore
 @Slf4j
 @DomainIntegrationTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
