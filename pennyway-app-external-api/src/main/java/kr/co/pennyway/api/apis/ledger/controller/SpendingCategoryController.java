@@ -98,8 +98,8 @@ public class SpendingCategoryController implements SpendingCategoryApi {
     }
 
     @Override
-    @PatchMapping({"{fromCategoryId}/migration"})
-    @PreAuthorize("isAuthenticated()") // TODO: 권한검사 추가 필요 (ToCategory가 커스텀 예외인가? 에 따라 권한검사가 필요하거나 필요없으므로 SpEL로 한번만에 안됨
+    @PatchMapping({"{fromId}/migration"})
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> migrateSpendingsByCategory(
             @PathVariable Long fromId,
             @RequestParam(value = "fromType") SpendingCategoryType fromType,

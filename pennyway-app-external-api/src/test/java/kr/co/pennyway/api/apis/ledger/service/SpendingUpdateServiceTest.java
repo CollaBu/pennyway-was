@@ -1,6 +1,7 @@
 package kr.co.pennyway.api.apis.ledger.service;
 
 import kr.co.pennyway.api.apis.ledger.dto.SpendingReq;
+import kr.co.pennyway.api.common.security.authorization.SpendingCategoryManager;
 import kr.co.pennyway.api.config.fixture.UserFixture;
 import kr.co.pennyway.domain.domains.spending.domain.Spending;
 import kr.co.pennyway.domain.domains.spending.domain.SpendingCustomCategory;
@@ -31,6 +32,8 @@ public class SpendingUpdateServiceTest {
     private SpendingCustomCategoryService spendingCustomCategoryService;
     @Mock
     private SpendingService spendingService;
+    @Mock
+    private SpendingCategoryManager spendingCategoryManager;
 
     private Spending spending;
     private Spending spendingWithCustomCategory;
@@ -42,7 +45,7 @@ public class SpendingUpdateServiceTest {
 
     @BeforeEach
     void setUp() {
-        spendingUpdateService = new SpendingUpdateService(spendingService, spendingCustomCategoryService);
+        spendingUpdateService = new SpendingUpdateService(spendingService, spendingCustomCategoryService, spendingCategoryManager);
 
         request = new SpendingReq(10000, -1L, SpendingCategory.FOOD, LocalDate.now(), "소비처", "메모");
         requestWithCustomCategory = new SpendingReq(10000, 1L, SpendingCategory.CUSTOM, LocalDate.now(), "소비처", "메모");
