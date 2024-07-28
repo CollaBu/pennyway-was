@@ -99,7 +99,7 @@ public class SpendingCategoryController implements SpendingCategoryApi {
 
     @Override
     @PatchMapping({"{fromId}/migration"})
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("isAuthenticated() and @spendingCategoryManager.hasPermission(principal.userId, #fromId, #fromType) and @spendingCategoryManager.hasPermission(principal.userId, #toId, #toType)")
     public ResponseEntity<?> migrateSpendingsByCategory(
             @PathVariable Long fromId,
             @RequestParam(value = "fromType") SpendingCategoryType fromType,

@@ -12,7 +12,6 @@ import kr.co.pennyway.domain.domains.spending.service.SpendingService;
 import kr.co.pennyway.domain.domains.spending.type.SpendingCategory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,10 +38,6 @@ public class SpendingUpdateService {
 
     @Transactional
     public void migrateSpendings(Long fromId, SpendingCategoryType fromType, Long toId, SpendingCategoryType toType, Long userId) {
-        if (!(spendingCategoryManager.hasPermission(userId, fromId, fromType) && spendingCategoryManager.hasPermission(userId, toId, toType))) {
-            throw new AccessDeniedException("ACCESS_TO_THE_REQUESTED_RESOURCE_IS_FORBIDDEN");
-        }
-
         if (fromType.equals(SpendingCategoryType.DEFAULT)) {
             SpendingCategory fromCategory = SpendingCategory.fromCode(fromId.toString());
             if (toType.equals(SpendingCategoryType.CUSTOM)) {
