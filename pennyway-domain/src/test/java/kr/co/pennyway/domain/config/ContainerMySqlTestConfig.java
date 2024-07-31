@@ -28,7 +28,7 @@ public class ContainerMySqlTestConfig {
 
     @DynamicPropertySource
     public static void setRedisProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", () -> String.format("jdbc:mysql://%s:%s/pennyway?serverTimezone=UTC&characterEncoding=utf8", MYSQL_CONTAINER.getHost(), MYSQL_CONTAINER.getMappedPort(3306)));
+        registry.add("spring.datasource.url", () -> String.format("jdbc:mysql://%s:%s/pennyway?serverTimezone=Asia/Seoul&characterEncoding=utf8&postfileSQL=true&logger=Slf4JLogger&rewriteBatchedStatements=true", MYSQL_CONTAINER.getHost(), MYSQL_CONTAINER.getMappedPort(3306)));
         registry.add("spring.datasource.username", () -> "root");
         registry.add("spring.datasource.password", () -> "testpass");
     }
