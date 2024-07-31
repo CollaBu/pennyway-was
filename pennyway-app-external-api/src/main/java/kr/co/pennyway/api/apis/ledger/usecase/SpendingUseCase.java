@@ -61,4 +61,5 @@ public class SpendingUseCase {
     public void deleteSpendings(List<Long> spendingIds) {
         spendingDeleteService.deleteSpendings(spendingIds);
     }
+
 }

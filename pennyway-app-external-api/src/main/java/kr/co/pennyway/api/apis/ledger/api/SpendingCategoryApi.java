@@ -128,6 +128,35 @@ public interface SpendingCategoryApi {
     })
     @ApiResponse(responseCode = "200", description = "지출 카테고리 등록 성공", content = @Content(mediaType = "application/json", schemaProperties = @SchemaProperty(name = "spendingCategory", schema = @Schema(implementation = SpendingCategoryDto.Res.class))))
     ResponseEntity<?> patchSpendingCategory(@PathVariable Long categoryId, @Validated SpendingCategoryDto.CreateParamReq param);
+
+    @Operation(summary = "지출 내역 카테코리 이동", method = "PATCH", description = "카테고리에 존재하는 지출내역들을 다른 카테고리로 옮깁니다.")
+    @Parameters({
+            @Parameter(name = "fromId", description = "현재 선택된 카테고리 ID", required = true, in = ParameterIn.PATH),
+            @Parameter(name = "fromType", description = "현재 선택된 지출 카테고리 타입", required = true, in = ParameterIn.QUERY, examples = {
+                    @ExampleObject(name = "기본", value = "default"), @ExampleObject(name = "사용자 정의", value = "custom")
+            }),
+            @Parameter(name = "toId", description = "이동 하고자 하는 카테고리 ID", required = true, in = ParameterIn.QUERY),
+            @Parameter(name = "toType", description = "이동 하고자 하는 지출 카테고리 타입", required = true, in = ParameterIn.QUERY, examples = {
+                    @ExampleObject(name = "기본", value = "default"), @ExampleObject(name = "사용자 정의", value = "custom")
+            })
+    })
+    @ApiResponse(responseCode = "403", description = "지출 카테고리에 대한 권한이 없습니다.", content = @Content(examples = {
+            @ExampleObject(name = "지출 카테고리 권한 오류", description = "지출 카테고리에 대한 권한이 없습니다.",
+                    value = """
+                            {
+                            "code": "4030",
+                            "message": "ACCESS_TO_THE_REQUESTED_RESOURCE_IS_FORBIDDEN"
+                            }
+                            """
+            )
+    }))
+    public ResponseEntity<?> migrateSpendingsByCategory(
+            @PathVariable Long fromId,
+            @RequestParam(value = "fromType") SpendingCategoryType fromType,
+            @RequestParam(value = "toId") Long toId,
+            @RequestParam(value = "toType") SpendingCategoryType toType,
+            @AuthenticationPrincipal SecurityUserDetails user
+    );
 }
 
 

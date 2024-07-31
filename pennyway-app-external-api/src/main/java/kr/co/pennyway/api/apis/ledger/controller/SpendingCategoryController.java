@@ -96,4 +96,22 @@ public class SpendingCategoryController implements SpendingCategoryApi {
 
         return ResponseEntity.ok(SuccessResponse.from("spendingCategory", spendingCategoryUseCase.updateSpendingCategory(categoryId, param.name(), param.icon())));
     }
+
+    @Override
+    @PatchMapping({"{fromId}/migration"})
+    @PreAuthorize("isAuthenticated() and @spendingCategoryManager.hasPermission(principal.userId, #fromId, #fromType) and @spendingCategoryManager.hasPermission(principal.userId, #toId, #toType)")
+    public ResponseEntity<?> migrateSpendingsByCategory(
+            @PathVariable Long fromId,
+            @RequestParam(value = "fromType") SpendingCategoryType fromType,
+            @RequestParam(value = "toId") Long toId,
+            @RequestParam(value = "toType") SpendingCategoryType toType,
+            @AuthenticationPrincipal SecurityUserDetails user
+    ) {
+        Long userId = user.getUserId();
+        spendingCategoryUseCase.migrateSpendingsByCategory(fromId, fromType, toId, toType, userId);
+
+        return ResponseEntity.ok(SuccessResponse.noContent());
+    }
+
+
 }

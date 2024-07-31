@@ -1,5 +1,6 @@
 package kr.co.pennyway.api.apis.ledger.integration;
 
+import kr.co.pennyway.api.common.query.SpendingCategoryType;
 import kr.co.pennyway.api.common.security.authentication.SecurityUserDetails;
 import kr.co.pennyway.api.config.ExternalApiDBTestConfig;
 import kr.co.pennyway.api.config.ExternalApiIntegrationTest;
@@ -10,6 +11,7 @@ import kr.co.pennyway.domain.domains.spending.domain.Spending;
 import kr.co.pennyway.domain.domains.spending.domain.SpendingCustomCategory;
 import kr.co.pennyway.domain.domains.spending.service.SpendingCustomCategoryService;
 import kr.co.pennyway.domain.domains.spending.service.SpendingService;
+import kr.co.pennyway.domain.domains.spending.type.SpendingCategory;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.service.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -70,5 +72,107 @@ public class SpendingCategoryIntegrationTest extends ExternalApiDBTestConfig {
                 .with(user(userDetails)));
     }
 
+
+    @Test
+    @DisplayName("사용자는 커스텀 카테고리에서 기본 카테고리로 지출내역들을 옮길 수 있다.")
+    void migrateSpendingsCtoD() throws Exception {
+        // given
+        User user = userService.createUser(UserFixture.GENERAL_USER.toUser());
+        SpendingCustomCategory fromCategory = spendingCustomCategoryService.createSpendingCustomCategory(SpendingCustomCategoryFixture.GENERAL_SPENDING_CUSTOM_CATEGORY.toCustomSpendingCategory(user));
+        Spending spending = spendingService.createSpending(SpendingFixture.CUSTOM_CATEGORY_SPENDING.toCustomCategorySpending(user, fromCategory));
+        Long spendingId = spending.getId();
+        SpendingCategory toCategory = SpendingCategory.TRANSPORTATION;
+
+        // when
+        ResultActions resultActions = performMigrateSpendingsByCategory(fromCategory.getId(), SpendingCategoryType.CUSTOM, 2L, SpendingCategoryType.DEFAULT, user);
+
+        // then
+        resultActions
+                .andDo(print())
+                .andExpect(status().isOk());
+
+        Spending spendingAfterMigration = spendingService.readSpending(spendingId).orElseThrow();
+        Assertions.assertEquals(spendingAfterMigration.getCategory().icon(), toCategory);
+        Assertions.assertEquals(spendingAfterMigration.getSpendingCustomCategory(), null);
+    }
+
+    @Test
+    @DisplayName("사용자는 커스텀 카테고리에서 커스텀 카테고리로 지출내역들을 옮길 수 있다.")
+    void migrateSpendingsCtoC() throws Exception {
+        // given
+        User user = userService.createUser(UserFixture.GENERAL_USER.toUser());
+        SpendingCustomCategory fromCategory = spendingCustomCategoryService.createSpendingCustomCategory(SpendingCustomCategoryFixture.GENERAL_SPENDING_CUSTOM_CATEGORY.toCustomSpendingCategory(user));
+        Spending spending = spendingService.createSpending(SpendingFixture.CUSTOM_CATEGORY_SPENDING.toCustomCategorySpending(user, fromCategory));
+
+        SpendingCustomCategory toCategory = spendingCustomCategoryService.createSpendingCustomCategory(SpendingCustomCategoryFixture.GENERAL_SPENDING_CUSTOM_CATEGORY.toCustomSpendingCategory(user));
+        Long toCategoryId = toCategory.getId();
+        Long spendingId = spending.getId();
+
+        // when
+        ResultActions resultActions = performMigrateSpendingsByCategory(fromCategory.getId(), SpendingCategoryType.CUSTOM, toCategoryId, SpendingCategoryType.CUSTOM, user);
+
+        // then
+        resultActions
+                .andDo(print())
+                .andExpect(status().isOk());
+
+        Spending spendingAfterMigration = spendingService.readSpending(spendingId).orElseThrow();
+        Assertions.assertEquals(spendingAfterMigration.getSpendingCustomCategory().getId(), toCategory.getId());
+    }
+
+    @Test
+    @DisplayName("사용자는 기본 카테고리에서 커스텀 카테고리로 지출내역들을 옮길 수 있다.")
+    void migrateSpendingsDtoC() throws Exception {
+        // given
+        User user = userService.createUser(UserFixture.GENERAL_USER.toUser());
+        Spending spending = spendingService.createSpending(SpendingFixture.GENERAL_SPENDING.toSpending(user));
+
+        SpendingCustomCategory toCategory = spendingCustomCategoryService.createSpendingCustomCategory(SpendingCustomCategoryFixture.GENERAL_SPENDING_CUSTOM_CATEGORY.toCustomSpendingCategory(user));
+        Long toCategoryId = toCategory.getId();
+        Long spendingId = spending.getId();
+
+        // when
+        ResultActions resultActions = performMigrateSpendingsByCategory(1L, SpendingCategoryType.DEFAULT, toCategoryId, SpendingCategoryType.CUSTOM, user);
+
+        // then
+        resultActions
+                .andDo(print())
+                .andExpect(status().isOk());
+
+        Spending spendingAfterMigration = spendingService.readSpending(spendingId).orElseThrow();
+        Assertions.assertEquals(spendingAfterMigration.getSpendingCustomCategory().getId(), toCategory.getId());
+    }
+
+    @Test
+    @DisplayName("사용자는 기본 카테고리에서 기본 카테고리로 지출내역들을 옮길 수 있다.")
+    void migrateSpendingsDtoD() throws Exception {
+        // given
+        User user = userService.createUser(UserFixture.GENERAL_USER.toUser());
+        Spending spending = spendingService.createSpending(SpendingFixture.GENERAL_SPENDING.toSpending(user));
+        Long spendingId = spending.getId();
+        SpendingCategory toCategory = SpendingCategory.TRANSPORTATION;
+
+        // when
+        ResultActions resultActions = performMigrateSpendingsByCategory(1L, SpendingCategoryType.DEFAULT, 2L, SpendingCategoryType.DEFAULT, user);
+
+        // then
+        resultActions
+                .andDo(print())
+                .andExpect(status().isOk());
+
+        Spending spendingAfterMigration = spendingService.readSpending(spendingId).orElseThrow();
+        Assertions.assertEquals(spendingAfterMigration.getCategory().icon(), toCategory);
+    }
+
+    private ResultActions performMigrateSpendingsByCategory(Long fromId, SpendingCategoryType fromType, Long toId, SpendingCategoryType toType, User requestUser) throws Exception {
+        UserDetails userDetails = SecurityUserDetails.from(requestUser);
+
+        return mockMvc.perform(MockMvcRequestBuilders.patch("/v2/spending-categories/{fromId}/migration", fromId)
+                .param("fromType", fromType.toString())
+                .param("toId", toId.toString())
+                .param("toType", toType.toString())
+                .with(user(userDetails))
+                .contentType("application/json"));
+    }
 
 }

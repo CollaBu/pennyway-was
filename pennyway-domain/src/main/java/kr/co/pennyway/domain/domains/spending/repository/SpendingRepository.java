@@ -31,4 +31,24 @@ public interface SpendingRepository extends ExtendedRepository<Spending, Long>, 
     @Transactional
     @Query("UPDATE Spending s SET s.deletedAt = NOW() where s.id IN :spendingIds AND s.deletedAt IS NULL")
     void deleteAllByIdAndDeletedAtNullInQuery(List<Long> spendingIds);
+
+    @Modifying(clearAutomatically = true)
+    @Transactional
+    @Query("UPDATE Spending s SET s.spendingCustomCategory.id = :toCategoryId, s.category = :custom WHERE s.category = :fromCategory AND s.deletedAt IS NULL")
+    void updateCategoryByCustomCategoryInQuery(SpendingCategory fromCategory, Long toCategoryId, SpendingCategory custom);
+
+    @Modifying(clearAutomatically = true)
+    @Transactional
+    @Query("UPDATE Spending s SET s.category = :toCategory WHERE s.category = :fromCategory AND s.deletedAt IS NULL")
+    void updateCategoryByCategoryInQuery(SpendingCategory fromCategory, SpendingCategory toCategory);
+
+    @Modifying(clearAutomatically = true)
+    @Transactional
+    @Query("UPDATE Spending s SET s.spendingCustomCategory.id = :toCategoryId WHERE s.spendingCustomCategory.id = :fromCategoryId AND s.deletedAt IS NULL")
+    void updateCustomCategoryByCustomCategoryInQuery(Long fromCategoryId, Long toCategoryId);
+
+    @Modifying(clearAutomatically = true)
+    @Transactional
+    @Query("UPDATE Spending s SET s.spendingCustomCategory = null, s.category = :toCategory WHERE s.spendingCustomCategory.id = :fromCategoryId AND s.deletedAt IS NULL")
+    void updateCustomCategoryByCategoryInQuery(Long fromCategoryId, SpendingCategory toCategory);
 }
