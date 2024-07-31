@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 @Table(name = "spending_custom_category")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @SQLRestriction("deleted_at IS NULL")
-@SQLDelete(sql = "UPDATE spending_category SET deleted_at = NOW() WHERE id = ?")
+@SQLDelete(sql = "UPDATE spending_custom_category SET deleted_at = NOW() WHERE id = ?")
 public class SpendingCustomCategory extends DateAuditable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
