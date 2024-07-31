@@ -41,14 +41,14 @@ public class SpendingUpdateService {
         if (fromType.equals(SpendingCategoryType.DEFAULT)) {
             SpendingCategory fromCategory = SpendingCategory.fromCode(fromId.toString());
             if (toType.equals(SpendingCategoryType.CUSTOM)) {
-                spendingService.updateCategoryByCategoryId(fromCategory, toId);
+                spendingService.updateCategoryByCustomCategory(fromCategory, toId);
             } else {
                 SpendingCategory spendingCategory = SpendingCategory.fromCode(toId.toString());
                 spendingService.updateCategoryByCategory(fromCategory, spendingCategory);
             }
         } else {
             if (toType.equals(SpendingCategoryType.CUSTOM)) {
-                spendingService.updateCustomCategoryByCategoryId(fromId, toId);
+                spendingService.updateCustomCategoryByCustomCategory(fromId, toId);
             } else {
                 SpendingCategory spendingCategory = SpendingCategory.fromCode(toId.toString());
                 spendingService.updateCustomCategoryByCategory(fromId, spendingCategory);

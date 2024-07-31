@@ -35,7 +35,7 @@ public interface SpendingRepository extends ExtendedRepository<Spending, Long>, 
     @Modifying(clearAutomatically = true)
     @Transactional
     @Query("UPDATE Spending s SET s.spendingCustomCategory.id = :toCategoryId, s.category = :custom WHERE s.category = :fromCategory AND s.deletedAt IS NULL")
-    void updateCategoryByCategoryIdInQuery(SpendingCategory fromCategory, Long toCategoryId, SpendingCategory custom);
+    void updateCategoryByCustomCategoryInQuery(SpendingCategory fromCategory, Long toCategoryId, SpendingCategory custom);
 
     @Modifying(clearAutomatically = true)
     @Transactional
@@ -45,7 +45,7 @@ public interface SpendingRepository extends ExtendedRepository<Spending, Long>, 
     @Modifying(clearAutomatically = true)
     @Transactional
     @Query("UPDATE Spending s SET s.spendingCustomCategory.id = :toCategoryId WHERE s.spendingCustomCategory.id = :fromCategoryId AND s.deletedAt IS NULL")
-    void updateCustomCategoryByCategoryIdInQuery(Long fromCategoryId, Long toCategoryId);
+    void updateCustomCategoryByCustomCategoryInQuery(Long fromCategoryId, Long toCategoryId);
 
     @Modifying(clearAutomatically = true)
     @Transactional
