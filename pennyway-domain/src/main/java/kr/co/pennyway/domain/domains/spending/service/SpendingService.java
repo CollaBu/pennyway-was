@@ -149,9 +149,9 @@ public class SpendingService {
     }
 
     @Transactional
-    public void updateCategoryByCategoryId(SpendingCategory fromCategory, Long toId) {
+    public void updateCategoryByCustomCategory(SpendingCategory fromCategory, Long toId) {
         SpendingCategory custom = SpendingCategory.CUSTOM;
-        spendingRepository.updateCategoryByCategoryIdInQuery(fromCategory, toId, custom);
+        spendingRepository.updateCategoryByCustomCategoryInQuery(fromCategory, toId, custom);
     }
 
     @Transactional
@@ -161,8 +161,8 @@ public class SpendingService {
     }
 
     @Transactional
-    public void updateCustomCategoryByCategoryId(Long fromId, Long toId) {
-        spendingRepository.updateCustomCategoryByCategoryIdInQuery(fromId, toId);
+    public void updateCustomCategoryByCustomCategory(Long fromId, Long toId) {
+        spendingRepository.updateCustomCategoryByCustomCategoryInQuery(fromId, toId);
     }
 
     @Transactional
