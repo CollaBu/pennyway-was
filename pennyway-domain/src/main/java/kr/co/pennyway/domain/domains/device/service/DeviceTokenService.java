@@ -40,4 +40,9 @@ public class DeviceTokenService {
     public void deleteDevice(DeviceToken deviceToken) {
         deviceTokenRepository.delete(deviceToken);
     }
+
+    @Transactional
+    public void deleteDevicesByUserIdInQuery(Long userId) {
+        deviceTokenRepository.deleteAllByUserIdInQuery(userId);
+    }
 }
