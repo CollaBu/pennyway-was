@@ -1,9 +1,11 @@
 package kr.co.pennyway.api.apis.users.usecase;
 
-import com.querydsl.jpa.impl.JPAQueryFactory;
 import kr.co.pennyway.api.apis.users.service.UserDeleteService;
 import kr.co.pennyway.api.config.ExternalApiDBTestConfig;
+import kr.co.pennyway.api.config.TestJpaConfig;
 import kr.co.pennyway.api.config.fixture.DeviceTokenFixture;
+import kr.co.pennyway.api.config.fixture.SpendingCustomCategoryFixture;
+import kr.co.pennyway.api.config.fixture.SpendingFixture;
 import kr.co.pennyway.api.config.fixture.UserFixture;
 import kr.co.pennyway.domain.config.JpaConfig;
 import kr.co.pennyway.domain.domains.device.domain.DeviceToken;
@@ -11,6 +13,8 @@ import kr.co.pennyway.domain.domains.device.service.DeviceTokenService;
 import kr.co.pennyway.domain.domains.oauth.domain.Oauth;
 import kr.co.pennyway.domain.domains.oauth.service.OauthService;
 import kr.co.pennyway.domain.domains.oauth.type.Provider;
+import kr.co.pennyway.domain.domains.spending.domain.Spending;
+import kr.co.pennyway.domain.domains.spending.domain.SpendingCustomCategory;
 import kr.co.pennyway.domain.domains.spending.service.SpendingCustomCategoryService;
 import kr.co.pennyway.domain.domains.spending.service.SpendingService;
 import kr.co.pennyway.domain.domains.user.domain.User;
@@ -25,7 +29,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,6 +42,7 @@ import static org.springframework.test.util.AssertionErrors.*;
 @DataJpaTest(properties = "spring.jpa.hibernate.ddl-auto=create")
 @ContextConfiguration(classes = {JpaConfig.class, UserDeleteService.class, UserService.class, OauthService.class, DeviceTokenService.class, SpendingService.class, SpendingCustomCategoryService.class})
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@Import(TestJpaConfig.class)
 public class UserDeleteServiceTest extends ExternalApiDBTestConfig {
     @Autowired
     private UserService userService;
@@ -56,9 +61,6 @@ public class UserDeleteServiceTest extends ExternalApiDBTestConfig {
 
     @Autowired
     private SpendingCustomCategoryService spendingCustomCategoryService;
-
-    @MockBean
-    private JPAQueryFactory queryFactory;
 
     @Test
     @Transactional
@@ -120,6 +122,26 @@ public class UserDeleteServiceTest extends ExternalApiDBTestConfig {
         assertDoesNotThrow(() -> userDeleteService.execute(user.getId()));
         assertTrue("사용자가 삭제되어 있어야 한다.", userService.readUser(user.getId()).isEmpty());
         assertFalse("디바이스가 비활성화 있어야 한다.", deviceTokenService.readDeviceByUserIdAndToken(user.getId(), deviceToken.getToken()).get().getActivated());
+    }
+
+    @Test
+    @Transactional
+    @DisplayName("사용자가 등록한 지출 정보는 삭제되어야 한다.")
+    void deleteAccountWithSpending() {
+        // given
+        User user = userService.createUser(UserFixture.GENERAL_USER.toUser());
+
+        SpendingCustomCategory category = spendingCustomCategoryService.createSpendingCustomCategory(SpendingCustomCategoryFixture.GENERAL_SPENDING_CUSTOM_CATEGORY.toCustomSpendingCategory(user));
+
+        Spending spending1 = spendingService.createSpending(SpendingFixture.GENERAL_SPENDING.toSpending(user));
+        Spending spending2 = spendingService.createSpending(SpendingFixture.CUSTOM_CATEGORY_SPENDING.toCustomCategorySpending(user, category));
+        Spending spending3 = spendingService.createSpending(SpendingFixture.MAX_SPENDING.toSpending(user));
+
+        // when - then
+        assertDoesNotThrow(() -> userDeleteService.execute(user.getId()));
+        assertTrue("사용자가 삭제되어 있어야 한다.", userService.readUser(user.getId()).isEmpty());
+        assertTrue("지출 정보가 삭제되어 있어야 한다.", spendingService.readSpendings(user.getId(), spending1.getSpendAt().getYear(), spending1.getSpendAt().getMonthValue()).isEmpty());
+        assertTrue("지출 카테고리가 삭제되어 있어야 한다.", spendingCustomCategoryService.readSpendingCustomCategory(category.getId()).isEmpty());
     }
 
     private Oauth createOauth(Provider provider, String providerId, User user) {
