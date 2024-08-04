@@ -40,4 +40,9 @@ public class SpendingCustomCategoryService {
     public void deleteSpendingCustomCategory(Long categoryId) {
         spendingCustomCategoryRepository.deleteById(categoryId);
     }
+
+    @Transactional
+    public void deleteSpendingCustomCategoriesByUserIdInQuery(Long userId) {
+        spendingCustomCategoryRepository.deleteAllByUserIdInQuery(userId);
+    }
 }

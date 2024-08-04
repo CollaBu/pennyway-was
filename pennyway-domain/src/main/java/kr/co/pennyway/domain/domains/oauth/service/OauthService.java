@@ -54,7 +54,7 @@ public class OauthService {
     }
 
     @Transactional
-    public void deleteOauthsByUserId(Long userId) {
+    public void deleteOauthsByUserIdInQuery(Long userId) {
         oauthRepository.deleteAllByUser_IdAndDeletedAtNullInQuery(userId);
     }
 }
