@@ -123,24 +123,9 @@ public class SpendingService {
         return spendingRepository.selectList(predicate, TotalSpendingAmount.class, bindings, queryHandler, sort);
     }
 
-    @Transactional
-    public void deleteSpendingsByCategoryIdInQuery(Long categoryId) {
-        spendingRepository.deleteAllByCategoryIdAndDeletedAtNullInQuery(categoryId);
-    }
-
     @Transactional(readOnly = true)
     public boolean isExistsSpending(Long userId, Long spendingId) {
         return spendingRepository.existsByIdAndUser_Id(spendingId, userId);
-    }
-
-    @Transactional
-    public void deleteSpending(Spending spending) {
-        spendingRepository.delete(spending);
-    }
-
-    @Transactional
-    public void deleteSpendingsInQuery(List<Long> spendingIds) {
-        spendingRepository.deleteAllByIdAndDeletedAtNullInQuery(spendingIds);
     }
 
     @Transactional(readOnly = true)
@@ -168,5 +153,25 @@ public class SpendingService {
     @Transactional
     public void updateCustomCategoryByCategory(Long fromId, SpendingCategory toCategory) {
         spendingRepository.updateCustomCategoryByCategoryInQuery(fromId, toCategory);
+    }
+
+    @Transactional
+    public void deleteSpending(Spending spending) {
+        spendingRepository.delete(spending);
+    }
+
+    @Transactional
+    public void deleteSpendingsInQuery(List<Long> spendingIds) {
+        spendingRepository.deleteAllByIdAndDeletedAtNullInQuery(spendingIds);
+    }
+
+    @Transactional
+    public void deleteSpendingsByUserIdInQuery(Long userId) {
+        spendingRepository.deleteAllByUserIdInQuery(userId);
+    }
+
+    @Transactional
+    public void deleteSpendingsByCategoryIdInQuery(Long categoryId) {
+        spendingRepository.deleteAllByCategoryIdAndDeletedAtNullInQuery(categoryId);
     }
 }

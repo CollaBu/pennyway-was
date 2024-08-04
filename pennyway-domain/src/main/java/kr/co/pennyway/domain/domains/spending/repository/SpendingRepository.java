@@ -13,11 +13,6 @@ public interface SpendingRepository extends ExtendedRepository<Spending, Long>, 
     @Transactional(readOnly = true)
     boolean existsByIdAndUser_Id(Long id, Long userId);
 
-    @Transactional
-    @Modifying(clearAutomatically = true)
-    @Query("UPDATE Spending s SET s.deletedAt = NOW() WHERE s.spendingCustomCategory.id = :categoryId AND s.deletedAt IS NULL")
-    void deleteAllByCategoryIdAndDeletedAtNullInQuery(Long categoryId);
-
     @Transactional(readOnly = true)
     int countByUser_IdAndSpendingCustomCategory_Id(Long userId, Long categoryId);
 
@@ -26,11 +21,6 @@ public interface SpendingRepository extends ExtendedRepository<Spending, Long>, 
 
     @Transactional(readOnly = true)
     long countByUserIdAndIdIn(Long userId, List<Long> spendingIds);
-
-    @Modifying(clearAutomatically = true)
-    @Transactional
-    @Query("UPDATE Spending s SET s.deletedAt = NOW() where s.id IN :spendingIds AND s.deletedAt IS NULL")
-    void deleteAllByIdAndDeletedAtNullInQuery(List<Long> spendingIds);
 
     @Modifying(clearAutomatically = true)
     @Transactional
@@ -51,4 +41,19 @@ public interface SpendingRepository extends ExtendedRepository<Spending, Long>, 
     @Transactional
     @Query("UPDATE Spending s SET s.spendingCustomCategory = null, s.category = :toCategory WHERE s.spendingCustomCategory.id = :fromCategoryId AND s.deletedAt IS NULL")
     void updateCustomCategoryByCategoryInQuery(Long fromCategoryId, SpendingCategory toCategory);
+
+    @Modifying(clearAutomatically = true)
+    @Transactional
+    @Query("UPDATE Spending s SET s.deletedAt = NOW() where s.id IN :spendingIds AND s.deletedAt IS NULL")
+    void deleteAllByIdAndDeletedAtNullInQuery(List<Long> spendingIds);
+
+    @Modifying(clearAutomatically = true)
+    @Transactional
+    @Query("UPDATE Spending s SET s.deletedAt = NOW() WHERE s.user.id = :userId AND s.deletedAt IS NULL")
+    void deleteAllByUserIdInQuery(Long userId);
+
+    @Transactional
+    @Modifying(clearAutomatically = true)
+    @Query("UPDATE Spending s SET s.deletedAt = NOW() WHERE s.spendingCustomCategory.id = :categoryId AND s.deletedAt IS NULL")
+    void deleteAllByCategoryIdAndDeletedAtNullInQuery(Long categoryId);
 }
