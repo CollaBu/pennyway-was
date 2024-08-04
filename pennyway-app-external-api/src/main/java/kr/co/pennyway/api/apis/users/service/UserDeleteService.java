@@ -1,5 +1,6 @@
 package kr.co.pennyway.api.apis.users.service;
 
+import kr.co.pennyway.domain.domains.device.service.DeviceTokenService;
 import kr.co.pennyway.domain.domains.oauth.service.OauthService;
 import kr.co.pennyway.domain.domains.spending.service.SpendingCustomCategoryService;
 import kr.co.pennyway.domain.domains.spending.service.SpendingService;
@@ -24,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserDeleteService {
     private final UserService userService;
     private final OauthService oauthService;
+    private final DeviceTokenService deviceTokenService;
 
     private final SpendingService spendingService;
     private final SpendingCustomCategoryService spendingCustomCategoryService;
@@ -43,6 +45,7 @@ public class UserDeleteService {
         // TODO: [2024-05-03] 하나라도 채팅방의 방장으로 참여하는 경우 삭제 불가능 처리
 
         oauthService.deleteOauthsByUserIdInQuery(userId);
+        deviceTokenService.deleteDevicesByUserIdInQuery(userId);
 
         spendingService.deleteSpendingsByUserIdInQuery(userId);
         spendingCustomCategoryService.deleteSpendingCustomCategoriesByUserIdInQuery(userId);
