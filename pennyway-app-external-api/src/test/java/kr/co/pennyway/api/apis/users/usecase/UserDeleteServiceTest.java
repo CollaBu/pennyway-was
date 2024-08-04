@@ -11,10 +11,13 @@ import kr.co.pennyway.domain.domains.device.service.DeviceTokenService;
 import kr.co.pennyway.domain.domains.oauth.domain.Oauth;
 import kr.co.pennyway.domain.domains.oauth.service.OauthService;
 import kr.co.pennyway.domain.domains.oauth.type.Provider;
+import kr.co.pennyway.domain.domains.spending.service.SpendingCustomCategoryService;
+import kr.co.pennyway.domain.domains.spending.service.SpendingService;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorCode;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorException;
 import kr.co.pennyway.domain.domains.user.service.UserService;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,12 +31,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.springframework.test.util.AssertionErrors.assertEquals;
-import static org.springframework.test.util.AssertionErrors.assertTrue;
+import static org.springframework.test.util.AssertionErrors.*;
 
+@Slf4j
 @ExtendWith(MockitoExtension.class)
 @DataJpaTest(properties = "spring.jpa.hibernate.ddl-auto=create")
-@ContextConfiguration(classes = {JpaConfig.class, UserDeleteService.class, UserService.class, OauthService.class, DeviceTokenService.class})
+@ContextConfiguration(classes = {JpaConfig.class, UserDeleteService.class, UserService.class, OauthService.class, DeviceTokenService.class, SpendingService.class, SpendingCustomCategoryService.class})
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class UserDeleteServiceTest extends ExternalApiDBTestConfig {
     @Autowired
@@ -47,6 +50,12 @@ public class UserDeleteServiceTest extends ExternalApiDBTestConfig {
 
     @Autowired
     private UserDeleteService userDeleteService;
+
+    @Autowired
+    private SpendingService spendingService;
+
+    @Autowired
+    private SpendingCustomCategoryService spendingCustomCategoryService;
 
     @MockBean
     private JPAQueryFactory queryFactory;
@@ -90,6 +99,7 @@ public class UserDeleteServiceTest extends ExternalApiDBTestConfig {
 
         // when - then
         assertDoesNotThrow(() -> userDeleteService.execute(user.getId()));
+
         assertTrue("사용자가 삭제되어 있어야 한다.", userService.readUser(user.getId()).isEmpty());
         assertTrue("카카오 계정이 삭제되어 있어야 한다.", oauthService.readOauth(kakao.getId()).get().isDeleted());
         assertTrue("구글 계정이 삭제되어 있어야 한다.", oauthService.readOauth(google.getId()).get().isDeleted());
@@ -97,7 +107,7 @@ public class UserDeleteServiceTest extends ExternalApiDBTestConfig {
 
     @Test
     @Transactional
-    @DisplayName("사용자 삭제 시, 디바이스 정보는 CASCADE로 삭제되어야 한다.")
+    @DisplayName("사용자 삭제 시, 디바이스 정보는 비활성화되어야 한다.")
     void deleteAccountWithDevices() {
         // given
         User user = UserFixture.GENERAL_USER.toUser();
@@ -109,7 +119,7 @@ public class UserDeleteServiceTest extends ExternalApiDBTestConfig {
         // when - then
         assertDoesNotThrow(() -> userDeleteService.execute(user.getId()));
         assertTrue("사용자가 삭제되어 있어야 한다.", userService.readUser(user.getId()).isEmpty());
-        assertTrue("디바이스가 삭제되어 있어야 한다.", deviceTokenService.readDeviceByUserIdAndToken(user.getId(), deviceToken.getToken()).isEmpty());
+        assertFalse("디바이스가 비활성화 있어야 한다.", deviceTokenService.readDeviceByUserIdAndToken(user.getId(), deviceToken.getToken()).get().getActivated());
     }
 
     private Oauth createOauth(Provider provider, String providerId, User user) {
