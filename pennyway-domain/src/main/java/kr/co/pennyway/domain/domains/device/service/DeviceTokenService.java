@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -24,16 +23,6 @@ public class DeviceTokenService {
     @Transactional
     public Optional<DeviceToken> readDeviceByUserIdAndToken(Long userId, String token) {
         return deviceTokenRepository.findByUser_IdAndToken(userId, token);
-    }
-
-    @Transactional(readOnly = true)
-    public List<DeviceToken> readDevicesByUserId(Long userId) {
-        return deviceTokenRepository.findAllByUser_Id(userId);
-    }
-
-    @Transactional
-    public void deleteDevice(Long deviceId) {
-        deviceTokenRepository.deleteById(deviceId);
     }
 
     @Transactional
