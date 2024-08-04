@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface DeviceTokenRepository extends JpaRepository<DeviceToken, Long> {
+    @Query("SELECT d FROM DeviceToken d WHERE d.user.id = :userId AND d.token = :token")
     Optional<DeviceToken> findByUser_IdAndToken(Long userId, String token);
 
     List<DeviceToken> findAllByUser_Id(Long userId);
