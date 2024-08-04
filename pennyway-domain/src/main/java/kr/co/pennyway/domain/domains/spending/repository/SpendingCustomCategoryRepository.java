@@ -17,6 +17,6 @@ public interface SpendingCustomCategoryRepository extends JpaRepository<Spending
 
     @Modifying(clearAutomatically = true)
     @Transactional
-    @Query("UPDATE SpendingCustomCategory s SET s.deletedAt = NOW() WHERE s.user.id = :userId AND s.deletedAt IS NULL")
+    @Query("UPDATE SpendingCustomCategory s SET s.deletedAt = NOW() WHERE s.user.id = :userId")
     void deleteAllByUserIdInQuery(Long userId);
 }

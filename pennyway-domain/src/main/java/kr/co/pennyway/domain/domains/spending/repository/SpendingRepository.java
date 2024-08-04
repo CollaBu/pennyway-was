@@ -24,36 +24,36 @@ public interface SpendingRepository extends ExtendedRepository<Spending, Long>, 
 
     @Modifying(clearAutomatically = true)
     @Transactional
-    @Query("UPDATE Spending s SET s.spendingCustomCategory.id = :toCategoryId, s.category = :custom WHERE s.category = :fromCategory AND s.deletedAt IS NULL")
+    @Query("UPDATE Spending s SET s.spendingCustomCategory.id = :toCategoryId, s.category = :custom WHERE s.category = :fromCategory")
     void updateCategoryByCustomCategoryInQuery(SpendingCategory fromCategory, Long toCategoryId, SpendingCategory custom);
 
     @Modifying(clearAutomatically = true)
     @Transactional
-    @Query("UPDATE Spending s SET s.category = :toCategory WHERE s.category = :fromCategory AND s.deletedAt IS NULL")
+    @Query("UPDATE Spending s SET s.category = :toCategory WHERE s.category = :fromCategory")
     void updateCategoryByCategoryInQuery(SpendingCategory fromCategory, SpendingCategory toCategory);
 
     @Modifying(clearAutomatically = true)
     @Transactional
-    @Query("UPDATE Spending s SET s.spendingCustomCategory.id = :toCategoryId WHERE s.spendingCustomCategory.id = :fromCategoryId AND s.deletedAt IS NULL")
+    @Query("UPDATE Spending s SET s.spendingCustomCategory.id = :toCategoryId WHERE s.spendingCustomCategory.id = :fromCategoryId")
     void updateCustomCategoryByCustomCategoryInQuery(Long fromCategoryId, Long toCategoryId);
 
     @Modifying(clearAutomatically = true)
     @Transactional
-    @Query("UPDATE Spending s SET s.spendingCustomCategory = null, s.category = :toCategory WHERE s.spendingCustomCategory.id = :fromCategoryId AND s.deletedAt IS NULL")
+    @Query("UPDATE Spending s SET s.spendingCustomCategory = null, s.category = :toCategory WHERE s.spendingCustomCategory.id = :fromCategoryId")
     void updateCustomCategoryByCategoryInQuery(Long fromCategoryId, SpendingCategory toCategory);
 
     @Modifying(clearAutomatically = true)
     @Transactional
-    @Query("UPDATE Spending s SET s.deletedAt = NOW() where s.id IN :spendingIds AND s.deletedAt IS NULL")
+    @Query("UPDATE Spending s SET s.deletedAt = NOW() where s.id IN :spendingIds")
     void deleteAllByIdAndDeletedAtNullInQuery(List<Long> spendingIds);
 
     @Modifying(clearAutomatically = true)
     @Transactional
-    @Query("UPDATE Spending s SET s.deletedAt = NOW() WHERE s.user.id = :userId AND s.deletedAt IS NULL")
+    @Query("UPDATE Spending s SET s.deletedAt = NOW() WHERE s.user.id = :userId")
     void deleteAllByUserIdInQuery(Long userId);
 
     @Transactional
     @Modifying(clearAutomatically = true)
-    @Query("UPDATE Spending s SET s.deletedAt = NOW() WHERE s.spendingCustomCategory.id = :categoryId AND s.deletedAt IS NULL")
+    @Query("UPDATE Spending s SET s.deletedAt = NOW() WHERE s.spendingCustomCategory.id = :categoryId")
     void deleteAllByCategoryIdAndDeletedAtNullInQuery(Long categoryId);
 }
