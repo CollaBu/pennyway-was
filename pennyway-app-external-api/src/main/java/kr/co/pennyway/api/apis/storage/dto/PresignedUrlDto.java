@@ -14,8 +14,6 @@ public class PresignedUrlDto {
             @Schema(description = "파일 확장자", example = "jpg/png/jpeg")
             @NotBlank(message = "파일 확장자는 필수입니다.")
             String ext,
-            @Schema(description = "사용자 ID", example = "1")
-            String userId,
             @Schema(description = "채팅방 ID", example = "12345678-1234-5678-1234-567812345678")
             String chatroomId
     ) {

@@ -10,11 +10,11 @@ import lombok.extern.slf4j.Slf4j;
 @UseCase
 @RequiredArgsConstructor
 public class StorageUseCase {
-	private final AwsS3Provider awsS3Provider;
+    private final AwsS3Provider awsS3Provider;
 
-	public PresignedUrlDto.Res getPresignedUrl(PresignedUrlDto.Req request) {
-		return PresignedUrlDto.Res.of(
-				awsS3Provider.generatedPresignedUrl(request.type(), request.ext(), request.userId(), request.chatroomId())
-		);
-	}
+    public PresignedUrlDto.Res getPresignedUrl(Long userId, PresignedUrlDto.Req request) {
+        return PresignedUrlDto.Res.of(
+                awsS3Provider.generatedPresignedUrl(request.type(), request.ext(), userId.toString(), request.chatroomId())
+        );
+    }
 }
