@@ -1,7 +1,5 @@
 package kr.co.pennyway.api.apis.users.service;
 
-import kr.co.pennyway.api.apis.users.dto.UserProfileDto;
-import kr.co.pennyway.api.apis.users.mapper.UserProfileMapper;
 import kr.co.pennyway.domain.domains.oauth.domain.Oauth;
 import kr.co.pennyway.domain.domains.oauth.service.OauthService;
 import kr.co.pennyway.domain.domains.user.domain.User;
@@ -24,10 +22,12 @@ public class UserProfileSearchService {
     private final OauthService oauthService;
 
     @Transactional(readOnly = true)
-    public UserProfileDto readMyAccount(Long userId) {
-        User user = userService.readUser(userId).orElseThrow(() -> new UserErrorException(UserErrorCode.NOT_FOUND));
-        Set<Oauth> oauths = oauthService.readOauthsByUserId(userId).stream().filter(oauth -> !oauth.isDeleted()).collect(Collectors.toUnmodifiableSet());
+    public User readMyAccount(Long userId) {
+        return userService.readUser(userId).orElseThrow(() -> new UserErrorException(UserErrorCode.NOT_FOUND));
+    }
 
-        return UserProfileMapper.toUserProfileDto(user, oauths);
+    @Transactional(readOnly = true)
+    public Set<Oauth> readMyOauths(Long userId) {
+        return oauthService.readOauthsByUserId(userId).stream().filter(oauth -> !oauth.isDeleted()).collect(Collectors.toUnmodifiableSet());
     }
 }

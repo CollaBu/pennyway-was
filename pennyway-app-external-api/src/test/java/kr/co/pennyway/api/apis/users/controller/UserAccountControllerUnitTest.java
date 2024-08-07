@@ -540,6 +540,7 @@ public class UserAccountControllerUnitTest {
         void registerProfileImageSuccess() throws Exception {
             // given
             String profileImageUrl = "delete/profile/1/154aa3bd-da02-4311-a735-3bf7e4bb68d2_1717446100295.jpeg";
+            given(userAccountUseCase.updateProfileImage(1L, new UserProfileUpdateDto.ProfileImageReq(profileImageUrl))).willReturn("https://cdn.com/adj.jbg");
 
             // when
             ResultActions result = performRegisterProfileImageRequest(profileImageUrl);

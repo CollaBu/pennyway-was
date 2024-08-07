@@ -239,6 +239,7 @@ public interface UserAccountApi {
 
     @Operation(summary = "사용자 프로필 사진 등록", description = "사용자의 프로필 사진을 수정합니다.")
     @ApiResponses({
+            @ApiResponse(responseCode = "200", content = @Content(schemaProperties = @SchemaProperty(name = "profileImageUrl", schema = @Schema(implementation = String.class, example = "https://cdn.co.kr/abc.jpg", description = "이미지 저장 경로")))),
             @ApiResponse(responseCode = "400", content = @Content(mediaType = "application/json", examples = {
                     @ExampleObject(name = "프로필 사진 URL이 유효하지 않은 경우", value = """
                             {
@@ -257,4 +258,15 @@ public interface UserAccountApi {
             }))
     })
     ResponseEntity<?> putProfileImage(@RequestBody @Validated UserProfileUpdateDto.ProfileImageReq request, @AuthenticationPrincipal SecurityUserDetails user);
+
+    @Operation(summary = "사용자 프로필 사진 삭제", description = "사용자의 프로필 사진을 삭제합니다.")
+    @ApiResponse(responseCode = "404", content = @Content(mediaType = "application/json", examples = {
+            @ExampleObject(name = "프로필 사진 URL이 존재하지 않는 경우", value = """
+                    {
+                        "code": "4040",
+                        "message": "프로필 이미지가 할당되지 않았습니다."
+                    }
+                    """)
+    }))
+    ResponseEntity<?> deleteProfileImage(@AuthenticationPrincipal SecurityUserDetails user);
 }

@@ -10,9 +10,6 @@ import kr.co.pennyway.domain.domains.user.exception.UserErrorCode;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorException;
 import kr.co.pennyway.domain.domains.user.service.UserService;
 import kr.co.pennyway.infra.client.aws.s3.AwsS3Provider;
-import kr.co.pennyway.infra.client.aws.s3.ObjectKeyType;
-import kr.co.pennyway.infra.common.exception.StorageErrorCode;
-import kr.co.pennyway.infra.common.exception.StorageException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -46,22 +43,34 @@ public class UserProfileUpdateService {
         user.updateUsername(newUsername);
     }
 
+    /**
+     * 프로필 이미지를 업데이트한다.
+     *
+     * @return 사용자가 이미 프로필 이미지를 가지고 있는 경우, 값을 교체하고 이전 이미지 키를 반환한다. (없으면 null 반환)
+     */
     @Transactional
-    public void updateProfileImage(Long userId, String profileImageUrl) {
+    public String updateProfileImage(Long userId, String profileImageKey) {
+        User user = readUserOrThrow(userId);
+        String oldProfileImageUrl = user.getProfileImageUrl();
+
+        user.updateProfileImageUrl(profileImageKey);
+
+        return oldProfileImageUrl;
+    }
+
+    @Transactional
+    public String deleteProfileImage(Long userId) {
         User user = readUserOrThrow(userId);
 
-        // Profile Image 존재 여부 확인
-        if (!awsS3Provider.isObjectExist(profileImageUrl)) {
-            log.info("프로필 이미지 URL이 유효하지 않습니다.");
-            throw new StorageException(StorageErrorCode.NOT_FOUND);
+        String profileImageUrl = user.getProfileImageUrl();
+
+        if (profileImageUrl == null) {
+            throw new UserErrorException(UserErrorCode.NOT_ALLOCATED_PROFILE_IMAGE);
         }
 
-        // Profile Image 원본 저장
-        awsS3Provider.copyObject(ObjectKeyType.PROFILE, profileImageUrl);
+        user.updateProfileImageUrl(null);
 
-        // Profile Image URL 업데이트
-        String originKey = ObjectKeyType.PROFILE.convertDeleteKeyToOriginKey(profileImageUrl);
-        user.updateProfileImageUrl(awsS3Provider.getObjectPrefix() + originKey);
+        return profileImageUrl;
     }
 
     @Transactional

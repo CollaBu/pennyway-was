@@ -12,7 +12,7 @@ import java.util.Set;
 
 @Mapper
 public class UserProfileMapper {
-    public static UserProfileDto toUserProfileDto(User user, Set<Oauth> oauths) {
+    public static UserProfileDto toUserProfileDto(User user, Set<Oauth> oauths, String objectPrefix) {
         boolean kakao, google, apple;
         kakao = google = apple = false;
 
@@ -24,7 +24,9 @@ public class UserProfileMapper {
             }
         }
 
-        return UserProfileDto.from(user, OauthAccountDto.of(kakao, google, apple));
+        String profileImageUrl = (user.getProfileImageUrl() == null) ? "" : objectPrefix + user.getProfileImageUrl();
+
+        return UserProfileDto.from(user, profileImageUrl, OauthAccountDto.of(kakao, google, apple));
     }
 
     public static UserProfileUpdateDto.NotifySettingUpdateRes toNotifySettingUpdateRes(NotifySetting.NotifyType type, Boolean flag) {
