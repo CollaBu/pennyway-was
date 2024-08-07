@@ -30,6 +30,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web:3.2.3'
     implementation 'org.springframework.boot:spring-boot-starter-validation:3.2.3'
 
+    /* Actuator */
+    implementation 'org.springframework.boot:spring-boot-starter-actuator:3.3.2'
+
     /* testcontainer */
     testImplementation "org.junit.jupiter:junit-jupiter:5.8.1"
     testImplementation "org.testcontainers:testcontainers:1.19.7"
