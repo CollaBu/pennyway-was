@@ -45,4 +45,8 @@ public class AwsS3Adapter {
 
         awsS3Provider.deleteObject(key);
     }
+
+    public String getObjectPrefix() {
+        return awsS3Provider.getObjectPrefix();
+    }
 }
