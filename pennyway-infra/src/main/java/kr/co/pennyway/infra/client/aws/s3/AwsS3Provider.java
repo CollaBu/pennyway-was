@@ -145,4 +145,18 @@ public class AwsS3Provider {
     public String getObjectPrefix() {
         return awsS3Config.getObjectPrefix();
     }
+
+    public void deleteObject(String key) {
+        try {
+            DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder()
+                    .bucket(awsS3Config.getBucketName())
+                    .key(key)
+                    .build();
+
+            s3Client.deleteObject(deleteObjectRequest);
+        } catch (Exception e) {
+            log.error("파일 삭제 중 오류 발생", e);
+            throw new StorageException(StorageErrorCode.INVALID_FILE);
+        }
+    }
 }
