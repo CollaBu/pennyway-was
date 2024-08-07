@@ -115,6 +115,7 @@ public class UserAccountController implements UserAccountApi {
         return ResponseEntity.ok(SuccessResponse.noContent());
     }
 
+    @Override
     @DeleteMapping("/profile-image")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> deleteProfileImage(@AuthenticationPrincipal SecurityUserDetails user) {
