@@ -63,6 +63,11 @@ public class UserProfileUpdateService {
         User user = readUserOrThrow(userId);
 
         String profileImageUrl = user.getProfileImageUrl();
+
+        if (profileImageUrl == null) {
+            throw new UserErrorException(UserErrorCode.NOT_ALLOCATED_PROFILE_IMAGE);
+        }
+
         user.updateProfileImageUrl(null);
 
         return profileImageUrl;
