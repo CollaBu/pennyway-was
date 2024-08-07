@@ -19,6 +19,9 @@ public enum UserErrorCode implements BaseErrorCode {
     ALREADY_WITHDRAWAL(StatusCode.FORBIDDEN, ReasonCode.ACCESS_TO_THE_REQUESTED_RESOURCE_IS_FORBIDDEN, "이미 탈퇴한 유저입니다."),
     DO_NOT_GENERAL_SIGNED_UP(StatusCode.FORBIDDEN, ReasonCode.ACCESS_TO_THE_REQUESTED_RESOURCE_IS_FORBIDDEN, "일반 회원가입 계정이 아닙니다."),
 
+    /* 404 NOT_FOUND */
+    NOT_ALLOCATED_PROFILE_IMAGE(StatusCode.NOT_FOUND, ReasonCode.REQUESTED_RESOURCE_NOT_FOUND, "프로필 이미지가 할당되지 않았습니다."),
+
     /* 409 Conflict */
     ALREADY_SIGNUP(StatusCode.CONFLICT, ReasonCode.RESOURCE_ALREADY_EXISTS, "이미 회원가입한 유저입니다."),
     ALREADY_EXIST_USERNAME(StatusCode.CONFLICT, ReasonCode.RESOURCE_ALREADY_EXISTS, "이미 존재하는 아이디입니다."),
