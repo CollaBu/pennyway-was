@@ -19,6 +19,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.HttpMessageNotWritableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -53,6 +54,21 @@ public class GlobalExceptionHandler {
         ErrorResponse response = ErrorResponse.of(e.getBaseErrorCode().causedBy().getCode(), e.getBaseErrorCode().getExplainError());
 
         return ResponseEntity.status(e.getBaseErrorCode().causedBy().statusCode().getCode()).body(response);
+    }
+
+    /**
+     * API 호출 시 'Method' 내에 데이터 값이 유효하지 않은 경우
+     *
+     * @see HttpRequestMethodNotSupportedException
+     */
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    @JsonView(CustomJsonView.Common.class)
+    protected ErrorResponse handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException e) {
+        log.warn("handleHttpRequestMethodNotSupportedException : {}", e.getMessage());
+        String code = String.valueOf(StatusCode.BAD_REQUEST.getCode() * 10 + ReasonCode.INVALID_REQUEST.getCode());
+
+        return ErrorResponse.of(code, e.getMessage());
     }
 
     /**
