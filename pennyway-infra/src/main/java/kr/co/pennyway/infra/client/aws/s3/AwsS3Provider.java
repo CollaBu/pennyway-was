@@ -81,7 +81,6 @@ public class AwsS3Provider {
      * @param ext        : 파일 확장자 (jpg, png, jpeg)
      * @param userId     : 사용자 ID (PK) - PROFILE, CHAT_PROFILE
      * @param chatroomId : 채팅방 ID (PK) - CHATROOM_PROFILE, CHAT, CHAT_PROFILE
-     * @return
      */
     private Map<String, String> generateObjectKeyVariables(String type, String ext, String userId, String chatroomId) {
         ObjectKeyType objectType;
@@ -125,13 +124,15 @@ public class AwsS3Provider {
      * @param sourceKey : 복사할 파일의 키
      * @return 복사된 파일의 키
      */
-    public void copyObject(ObjectKeyType type, String sourceKey) {
+    public String copyObject(ObjectKeyType type, String sourceKey) {
+        String originKey = type.convertDeleteKeyToOriginKey(sourceKey);
+
         try {
             CopyObjectRequest copyObjRequest = CopyObjectRequest.builder()
                     .sourceBucket(awsS3Config.getBucketName())
                     .sourceKey(sourceKey)
                     .destinationBucket(awsS3Config.getBucketName())
-                    .destinationKey(type.convertDeleteKeyToOriginKey(sourceKey))
+                    .destinationKey(originKey)
                     .storageClass(StorageClass.ONEZONE_IA)
                     .build();
 
@@ -140,6 +141,8 @@ public class AwsS3Provider {
             log.error("파일 복사 중 오류 발생", e);
             throw new StorageException(StorageErrorCode.INVALID_FILE);
         }
+
+        return originKey;
     }
 
     public String getObjectPrefix() {
