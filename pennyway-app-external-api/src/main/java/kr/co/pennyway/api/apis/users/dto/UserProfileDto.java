@@ -65,7 +65,7 @@ public record UserProfileDto(
                 .username(user.getUsername())
                 .name(user.getName())
                 .passwordUpdatedAt(user.getPasswordUpdatedAt())
-                .profileImageUrl(profileImageUrl)
+                .profileImageUrl(Objects.toString(profileImageUrl, ""))
                 .phone(user.getPhone())
                 .profileVisibility(user.getProfileVisibility())
                 .locked(user.isLocked())
