@@ -43,11 +43,19 @@ public class UserProfileUpdateService {
         user.updateUsername(newUsername);
     }
 
+    /**
+     * 프로필 이미지를 업데이트한다.
+     *
+     * @return 사용자가 이미 프로필 이미지를 가지고 있는 경우, 값을 교체하고 이전 이미지 키를 반환한다. (없으면 null 반환)
+     */
     @Transactional
-    public void updateProfileImage(Long userId, String profileImageKey) {
+    public String updateProfileImage(Long userId, String profileImageKey) {
         User user = readUserOrThrow(userId);
+        String oldProfileImageUrl = user.getProfileImageUrl();
 
         user.updateProfileImageUrl(profileImageKey);
+
+        return oldProfileImageUrl;
     }
 
     @Transactional

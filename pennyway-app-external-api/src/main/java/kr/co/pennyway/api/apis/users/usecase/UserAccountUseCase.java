@@ -71,7 +71,17 @@ public class UserAccountUseCase {
     public void updateProfileImage(Long userId, UserProfileUpdateDto.ProfileImageReq request) {
         String originImageUrl = awsS3Adapter.saveImage(request.profileImageUrl(), ObjectKeyType.PROFILE);
 
-        userProfileUpdateService.updateProfileImage(userId, originImageUrl);
+        String oldImageUrl = userProfileUpdateService.updateProfileImage(userId, originImageUrl);
+
+        if (oldImageUrl != null) {
+            awsS3Adapter.deleteImage(oldImageUrl);
+        }
+    }
+
+    public void deleteProfileImage(Long userId) {
+        String profileImageUrl = userProfileUpdateService.deleteProfileImage(userId);
+
+        awsS3Adapter.deleteImage(profileImageUrl);
     }
 
     public void updatePhone(Long userId, UserProfileUpdateDto.PhoneReq request) {
@@ -88,12 +98,6 @@ public class UserAccountUseCase {
         userProfileUpdateService.updateNotifySetting(userId, type, Boolean.FALSE);
 
         return UserProfileMapper.toNotifySettingUpdateRes(type, Boolean.FALSE);
-    }
-
-    public void deleteProfileImage(Long userId) {
-        String profileImageUrl = userProfileUpdateService.deleteProfileImage(userId);
-
-        awsS3Adapter.deleteImage(profileImageUrl);
     }
 
     public void deleteAccount(Long userId) {
