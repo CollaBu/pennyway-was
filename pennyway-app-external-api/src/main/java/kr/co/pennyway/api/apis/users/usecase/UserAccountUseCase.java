@@ -68,14 +68,15 @@ public class UserAccountUseCase {
         passwordUpdateService.execute(userId, oldPassword, newPassword);
     }
 
-    public void updateProfileImage(Long userId, UserProfileUpdateDto.ProfileImageReq request) {
+    public String updateProfileImage(Long userId, UserProfileUpdateDto.ProfileImageReq request) {
         String originImageUrl = awsS3Adapter.saveImage(request.profileImageUrl(), ObjectKeyType.PROFILE);
-
         String oldImageUrl = userProfileUpdateService.updateProfileImage(userId, originImageUrl);
 
         if (oldImageUrl != null) {
             awsS3Adapter.deleteImage(oldImageUrl);
         }
+
+        return awsS3Adapter.getObjectPrefix() + originImageUrl;
     }
 
     public void deleteProfileImage(Long userId) {

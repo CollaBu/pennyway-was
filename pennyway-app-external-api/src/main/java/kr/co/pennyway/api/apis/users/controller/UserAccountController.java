@@ -111,8 +111,7 @@ public class UserAccountController implements UserAccountApi {
     @PutMapping("/profile-image")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> putProfileImage(@Validated UserProfileUpdateDto.ProfileImageReq request, @AuthenticationPrincipal SecurityUserDetails user) {
-        userAccountUseCase.updateProfileImage(user.getUserId(), request);
-        return ResponseEntity.ok(SuccessResponse.noContent());
+        return ResponseEntity.ok(SuccessResponse.from("profileImageUrl", userAccountUseCase.updateProfileImage(user.getUserId(), request)));
     }
 
     @Override
