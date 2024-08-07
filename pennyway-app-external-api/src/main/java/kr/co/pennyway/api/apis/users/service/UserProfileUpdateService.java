@@ -10,9 +10,6 @@ import kr.co.pennyway.domain.domains.user.exception.UserErrorCode;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorException;
 import kr.co.pennyway.domain.domains.user.service.UserService;
 import kr.co.pennyway.infra.client.aws.s3.AwsS3Provider;
-import kr.co.pennyway.infra.client.aws.s3.ObjectKeyType;
-import kr.co.pennyway.infra.common.exception.StorageErrorCode;
-import kr.co.pennyway.infra.common.exception.StorageException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -47,21 +44,20 @@ public class UserProfileUpdateService {
     }
 
     @Transactional
-    public void updateProfileImage(Long userId, String profileImageUrl) {
+    public void updateProfileImage(Long userId, String profileImageKey) {
         User user = readUserOrThrow(userId);
 
-        // Profile Image 존재 여부 확인
-        if (!awsS3Provider.isObjectExist(profileImageUrl)) {
-            log.info("프로필 이미지 URL이 유효하지 않습니다.");
-            throw new StorageException(StorageErrorCode.NOT_FOUND);
-        }
+        user.updateProfileImageUrl(profileImageKey);
+    }
 
-        // Profile Image 원본 저장
-        awsS3Provider.copyObject(ObjectKeyType.PROFILE, profileImageUrl);
+    @Transactional
+    public String deleteProfileImage(Long userId) {
+        User user = readUserOrThrow(userId);
 
-        // Profile Image URL 업데이트
-        String originKey = ObjectKeyType.PROFILE.convertDeleteKeyToOriginKey(profileImageUrl);
-        user.updateProfileImageUrl(awsS3Provider.getObjectPrefix() + originKey);
+        String profileImageUrl = user.getProfileImageUrl();
+        user.updateProfileImageUrl(null);
+
+        return profileImageUrl;
     }
 
     @Transactional

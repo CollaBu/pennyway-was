@@ -6,9 +6,11 @@ import kr.co.pennyway.api.apis.users.dto.UserProfileUpdateDto;
 import kr.co.pennyway.api.apis.users.mapper.DeviceTokenMapper;
 import kr.co.pennyway.api.apis.users.mapper.UserProfileMapper;
 import kr.co.pennyway.api.apis.users.service.*;
+import kr.co.pennyway.api.common.storage.AwsS3Adapter;
 import kr.co.pennyway.common.annotation.UseCase;
 import kr.co.pennyway.domain.domains.device.domain.DeviceToken;
 import kr.co.pennyway.domain.domains.user.domain.NotifySetting;
+import kr.co.pennyway.infra.client.aws.s3.ObjectKeyType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +27,8 @@ public class UserAccountUseCase {
     private final UserDeleteService userDeleteService;
 
     private final PasswordUpdateService passwordUpdateService;
+
+    private final AwsS3Adapter awsS3Adapter;
 
     @Transactional
     public DeviceTokenDto.RegisterRes registerDeviceToken(Long userId, DeviceTokenDto.RegisterReq request) {
@@ -57,7 +61,9 @@ public class UserAccountUseCase {
     }
 
     public void updateProfileImage(Long userId, UserProfileUpdateDto.ProfileImageReq request) {
-        userProfileUpdateService.updateProfileImage(userId, request.profileImageUrl());
+        String originImageUrl = awsS3Adapter.saveImage(request.profileImageUrl(), ObjectKeyType.PROFILE);
+
+        userProfileUpdateService.updateProfileImage(userId, originImageUrl);
     }
 
     public void updatePhone(Long userId, UserProfileUpdateDto.PhoneReq request) {
@@ -66,12 +72,20 @@ public class UserAccountUseCase {
 
     public UserProfileUpdateDto.NotifySettingUpdateRes activateNotification(Long userId, NotifySetting.NotifyType type) {
         userProfileUpdateService.updateNotifySetting(userId, type, Boolean.TRUE);
+
         return UserProfileMapper.toNotifySettingUpdateRes(type, Boolean.TRUE);
     }
 
     public UserProfileUpdateDto.NotifySettingUpdateRes deactivateNotification(Long userId, NotifySetting.NotifyType type) {
         userProfileUpdateService.updateNotifySetting(userId, type, Boolean.FALSE);
+
         return UserProfileMapper.toNotifySettingUpdateRes(type, Boolean.FALSE);
+    }
+
+    public void deleteProfileImage(Long userId) {
+        String profileImageUrl = userProfileUpdateService.deleteProfileImage(userId);
+
+        awsS3Adapter.deleteImage(profileImageUrl);
     }
 
     public void deleteAccount(Long userId) {
