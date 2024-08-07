@@ -9,11 +9,15 @@ import kr.co.pennyway.api.apis.users.service.*;
 import kr.co.pennyway.api.common.storage.AwsS3Adapter;
 import kr.co.pennyway.common.annotation.UseCase;
 import kr.co.pennyway.domain.domains.device.domain.DeviceToken;
+import kr.co.pennyway.domain.domains.oauth.domain.Oauth;
 import kr.co.pennyway.domain.domains.user.domain.NotifySetting;
+import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.infra.client.aws.s3.ObjectKeyType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Set;
 
 @Slf4j
 @UseCase
@@ -40,8 +44,12 @@ public class UserAccountUseCase {
         deviceTokenUnregisterService.execute(userId, token);
     }
 
+    @Transactional(readOnly = true)
     public UserProfileDto getMyAccount(Long userId) {
-        return userProfileSearchService.readMyAccount(userId);
+        User user = userProfileSearchService.readMyAccount(userId);
+        Set<Oauth> oauths = userProfileSearchService.readMyOauths(userId);
+
+        return UserProfileMapper.toUserProfileDto(user, oauths, awsS3Adapter.getObjectPrefix());
     }
 
     public void updateName(Long userId, String newName) {

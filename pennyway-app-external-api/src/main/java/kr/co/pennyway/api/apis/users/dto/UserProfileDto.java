@@ -59,13 +59,13 @@ public record UserProfileDto(
         Objects.requireNonNull(oauthAccount);
     }
 
-    public static UserProfileDto from(User user, OauthAccountDto oauthAccount) {
+    public static UserProfileDto from(User user, String profileImageUrl, OauthAccountDto oauthAccount) {
         return UserProfileDto.builder()
                 .id(user.getId())
                 .username(user.getUsername())
                 .name(user.getName())
                 .passwordUpdatedAt(user.getPasswordUpdatedAt())
-                .profileImageUrl(Objects.toString(user.getProfileImageUrl(), ""))
+                .profileImageUrl(profileImageUrl)
                 .phone(user.getPhone())
                 .profileVisibility(user.getProfileVisibility())
                 .locked(user.isLocked())
