@@ -110,8 +110,15 @@ public class UserAccountController implements UserAccountApi {
     @Override
     @PutMapping("/profile-image")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> putProfileImage(@Validated UserProfileUpdateDto.ProfileImageReq request, SecurityUserDetails user) {
+    public ResponseEntity<?> putProfileImage(@Validated UserProfileUpdateDto.ProfileImageReq request, @AuthenticationPrincipal SecurityUserDetails user) {
         userAccountUseCase.updateProfileImage(user.getUserId(), request);
+        return ResponseEntity.ok(SuccessResponse.noContent());
+    }
+
+    @DeleteMapping("/profile-image")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> deleteProfileImage(@AuthenticationPrincipal SecurityUserDetails user) {
+        userAccountUseCase.deleteProfileImage(user.getUserId());
         return ResponseEntity.ok(SuccessResponse.noContent());
     }
 }
