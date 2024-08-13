@@ -12,6 +12,11 @@ import java.lang.annotation.Target;
 public @interface ApiExceptionExplanation {
     Class<? extends BaseErrorCode> value();
 
+    /**
+     * BaseErrorCode를 구현한 Enum 클래스의 상수명
+     */
+    String constant();
+
     String name() default "";
 
     String mediaType() default "application/json";

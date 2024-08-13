@@ -56,17 +56,21 @@ public final class ApiExceptionExplainParser {
     @Builder(access = AccessLevel.PRIVATE)
     private record ExampleHolder(int httpStatus, String name, String mediaType, String description, Example holder) {
         static ExampleHolder from(ApiExceptionExplanation annotation) {
-            if (annotation instanceof BaseErrorCode errorCode) {
-                return ExampleHolder.builder()
-                        .httpStatus(errorCode.causedBy().statusCode().getCode())
-                        .name(StringUtils.hasText(annotation.name()) ? annotation.name() : errorCode.getExplainError())
-                        .mediaType(annotation.mediaType())
-                        .description(annotation.description())
-                        .holder(createExample(errorCode, annotation.summary(), annotation.description()))
-                        .build();
-            } else {
-                throw new IllegalArgumentException("Annotation must be an instance of BaseErrorCode");
-            }
+            BaseErrorCode errorCode = getErrorCode(annotation);
+
+            return ExampleHolder.builder()
+                    .httpStatus(errorCode.causedBy().statusCode().getCode())
+                    .name(StringUtils.hasText(annotation.name()) ? annotation.name() : errorCode.getExplainError())
+                    .mediaType(annotation.mediaType())
+                    .description(annotation.description())
+                    .holder(createExample(errorCode, annotation.summary(), annotation.description()))
+                    .build();
+        }
+
+        @SuppressWarnings("unchecked")
+        public static <E extends Enum<E> & BaseErrorCode> E getErrorCode(ApiExceptionExplanation annotation) {
+            Class<E> enumClass = (Class<E>) annotation.value();
+            return Enum.valueOf(enumClass, annotation.constant());
         }
 
         private static Example createExample(BaseErrorCode errorCode, String summary, String description) {
