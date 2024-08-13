@@ -14,7 +14,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.co.pennyway.api.apis.ledger.dto.SpendingIdsDto;
 import kr.co.pennyway.api.apis.ledger.dto.SpendingReq;
 import kr.co.pennyway.api.apis.ledger.dto.SpendingSearchRes;
+import kr.co.pennyway.api.common.annotation.ApiExceptionExplanation;
+import kr.co.pennyway.api.common.annotation.ApiResponseExplanations;
 import kr.co.pennyway.api.common.security.authentication.SecurityUserDetails;
+import kr.co.pennyway.domain.domains.spending.exception.SpendingErrorCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
@@ -64,19 +67,12 @@ public interface SpendingApi {
 
     @Operation(summary = "지출 내역 상세 조회", method = "GET", description = "지출 내역의 ID값으로 해당 지출의 상세 내역을 반환합니다.")
     @Parameter(name = "spendingId", description = "지출 내역 ID", example = "1", required = true, in = ParameterIn.PATH)
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", content = @Content(schemaProperties = @SchemaProperty(name = "spending", schema = @Schema(implementation = SpendingSearchRes.Individual.class)))),
-            @ApiResponse(responseCode = "404", description = "NOT_FOUND", content = @Content(examples = {
-                    @ExampleObject(name = "지출 내역 조회 오류",
-                            value = """
-                                    {
-                                    "code": "4040",
-                                    "message": "존재하지 않는 지출 내역입니다."
-                                    }
-                                    """
-                    )
-            }))
-    })
+    @ApiResponse(responseCode = "200", content = @Content(schemaProperties = @SchemaProperty(name = "spending", schema = @Schema(implementation = SpendingSearchRes.Individual.class))))
+    @ApiResponseExplanations(
+            errors = {
+                    @ApiExceptionExplanation(name = "지출 내역 조회 오류", description = "NOT_FOUND", value = SpendingErrorCode.class, constant = "NOT_FOUND_SPENDING")
+            }
+    )
     ResponseEntity<?> getSpendingDetail(@PathVariable Long spendingId, @AuthenticationPrincipal SecurityUserDetails user);
 
     @Operation(summary = "지출 내역 수정", method = "PUT", description = """
@@ -100,7 +96,6 @@ public interface SpendingApi {
             )
     }))
     ResponseEntity<?> deleteSpending(@PathVariable Long spendingId, @AuthenticationPrincipal SecurityUserDetails user);
-
 
     @Operation(summary = "지출 내역 복수 삭제", method = "DELETE", description = "사용자의 지출 내역의 ID목록으로 해당 지출 내역들을 삭제 합니다.")
     @ApiResponse(responseCode = "403", description = "지출 내역에 대한 권한이 없습니다.", content = @Content(examples = {
