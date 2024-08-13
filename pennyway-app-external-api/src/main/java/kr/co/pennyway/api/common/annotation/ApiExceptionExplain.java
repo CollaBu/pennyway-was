@@ -12,5 +12,11 @@ import java.lang.annotation.Target;
 public @interface ApiExceptionExplain {
     Class<? extends BaseErrorCode> value();
 
+    String name() default "";
+
+    String mediaType() default "application/json";
+
+    String summary() default "";
+
     String description() default "";
 }
