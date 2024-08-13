@@ -4,9 +4,6 @@ import kr.co.pennyway.domain.domains.device.domain.DeviceToken;
 import kr.co.pennyway.domain.domains.device.exception.DeviceTokenErrorCode;
 import kr.co.pennyway.domain.domains.device.exception.DeviceTokenErrorException;
 import kr.co.pennyway.domain.domains.device.service.DeviceTokenService;
-import kr.co.pennyway.domain.domains.user.domain.User;
-import kr.co.pennyway.domain.domains.user.exception.UserErrorCode;
-import kr.co.pennyway.domain.domains.user.exception.UserErrorException;
 import kr.co.pennyway.domain.domains.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,9 +19,7 @@ public class DeviceTokenUnregisterService {
 
     @Transactional
     public void execute(Long userId, String token) {
-        User user = userService.readUser(userId).orElseThrow(() -> new UserErrorException(UserErrorCode.NOT_FOUND));
-
-        DeviceToken deviceToken = deviceTokenService.readDeviceByUserIdAndToken(user.getId(), token).orElseThrow(
+        DeviceToken deviceToken = deviceTokenService.readDeviceByUserIdAndToken(userId, token).orElseThrow(
                 () -> new DeviceTokenErrorException(DeviceTokenErrorCode.NOT_FOUND_DEVICE)
         );
 
