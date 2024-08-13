@@ -17,6 +17,8 @@ import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
+
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -30,6 +32,7 @@ public class ActiveDeviceTokenReader {
     @StepScope
     public QuerydslNoOffsetPagingItemReader<DeviceTokenOwner> querydslNoOffsetPagingItemReader() {
         QuerydslNoOffsetOptions<DeviceTokenOwner> options = QuerydslNoOffsetNumberOptions.of(deviceToken.id, Expression.ASC, "deviceTokenId");
+        LocalDateTime sevenDaysAgo = LocalDateTime.now().minusDays(7);
 
         return QuerydslNoOffsetPagingItemReaderBuilder.<DeviceTokenOwner>builder()
                 .entityManagerFactory(emf)
@@ -39,7 +42,9 @@ public class ActiveDeviceTokenReader {
                         .select(createConstructorExpression())
                         .from(deviceToken)
                         .innerJoin(user).on(deviceToken.user.id.eq(user.id))
-                        .where(deviceToken.activated.isTrue().and(user.notifySetting.accountBookNotify.isTrue()))
+                        .where(deviceToken.activated.isTrue()
+                                .and(user.notifySetting.accountBookNotify.isTrue())
+                                .and(deviceToken.lastSignedInAt.goe(sevenDaysAgo)))
                 )
                 .idSelectQuery(queryFactory -> queryFactory.select(createConstructorExpression()).from(deviceToken))
                 .build();
