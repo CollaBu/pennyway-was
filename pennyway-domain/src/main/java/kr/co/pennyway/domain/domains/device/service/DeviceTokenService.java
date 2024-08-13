@@ -24,12 +24,7 @@ public class DeviceTokenService {
     public Optional<DeviceToken> readDeviceByUserIdAndToken(Long userId, String token) {
         return deviceTokenRepository.findByUser_IdAndToken(userId, token);
     }
-
-    @Transactional
-    public void deleteDevice(DeviceToken deviceToken) {
-        deviceTokenRepository.delete(deviceToken);
-    }
-
+    
     @Transactional
     public void deleteDevicesByUserIdInQuery(Long userId) {
         deviceTokenRepository.deleteAllByUserIdInQuery(userId);

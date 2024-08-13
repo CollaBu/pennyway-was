@@ -8,8 +8,6 @@ import kr.co.pennyway.api.config.fixture.DeviceTokenFixture;
 import kr.co.pennyway.api.config.fixture.UserFixture;
 import kr.co.pennyway.domain.config.JpaConfig;
 import kr.co.pennyway.domain.domains.device.domain.DeviceToken;
-import kr.co.pennyway.domain.domains.device.exception.DeviceTokenErrorCode;
-import kr.co.pennyway.domain.domains.device.exception.DeviceTokenErrorException;
 import kr.co.pennyway.domain.domains.device.service.DeviceTokenService;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.service.UserService;
@@ -25,7 +23,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.util.AssertionErrors.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -101,7 +98,7 @@ public class DeviceTokenRegisterServiceTest extends ExternalApiDBTestConfig {
 
     @Test
     @Transactional
-    @DisplayName("[3] token 등록 요청이 들어왔을 때, 활성화되지 않은 디바이스 토큰이 존재하는 경우 NOT_ACTIVATED_DEVICE 에러를 반환한다.")
+    @DisplayName("[3] token 등록 요청이 들어왔을 때, 활성화되지 않은 디바이스 토큰이 존재하는 경우 토큰을 활성화 상태로 변경한다.")
     void registerNewDeviceWhenDeviceIsNotActivated() {
         // given
         DeviceToken originDeviceToken = DeviceTokenFixture.INIT.toDevice(requestUser);
@@ -109,8 +106,10 @@ public class DeviceTokenRegisterServiceTest extends ExternalApiDBTestConfig {
         deviceTokenService.createDevice(originDeviceToken);
         DeviceTokenDto.RegisterReq request = DeviceTokenFixture.INIT.toRegisterReq();
 
-        // when - then
-        DeviceTokenErrorException ex = assertThrows(DeviceTokenErrorException.class, () -> deviceTokenRegisterService.execute(requestUser.getId(), request.token()));
-        assertEquals("활성화되지 않은 디바이스 토큰이 존재하는 경우 Not Activated Device를 반환한다.", DeviceTokenErrorCode.NOT_ACTIVATED_DEVICE, ex.getBaseErrorCode());
+        // when
+        DeviceToken response = deviceTokenRegisterService.execute(requestUser.getId(), request.token());
+
+        // then
+        assertTrue("디바이스가 활성화 상태여야 한다.", response.getActivated());
     }
 }

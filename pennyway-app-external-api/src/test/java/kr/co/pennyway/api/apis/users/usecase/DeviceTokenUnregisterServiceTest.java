@@ -24,11 +24,9 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
-
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.util.AssertionErrors.assertEquals;
-import static org.springframework.test.util.AssertionErrors.assertNull;
+import static org.springframework.test.util.AssertionErrors.assertFalse;
 
 @ExtendWith(MockitoExtension.class)
 @DataJpaTest(properties = "spring.jpa.hibernate.ddl-auto=create")
@@ -56,7 +54,7 @@ public class DeviceTokenUnregisterServiceTest extends ExternalApiDBTestConfig {
 
     @Test
     @Transactional
-    @DisplayName("사용자 ID와 origin token에 매칭되는 활성 디바이스가 존재하는 경우 디바이스를 삭제한다.")
+    @DisplayName("사용자 ID와 origin token에 매칭되는 활성 디바이스가 존재하는 경우 디바이스를 비활성화한다.")
     void unregisterDevice() {
         // given
         DeviceToken deviceToken = DeviceTokenFixture.INIT.toDevice(requestUser);
@@ -66,8 +64,8 @@ public class DeviceTokenUnregisterServiceTest extends ExternalApiDBTestConfig {
         deviceTokenUnregisterService.execute(requestUser.getId(), deviceToken.getToken());
 
         // then
-        Optional<DeviceToken> deletedDevice = deviceTokenService.readDeviceByUserIdAndToken(requestUser.getId(), deviceToken.getToken());
-        assertNull("디바이스가 삭제되어 있어야 한다.", deletedDevice.orElse(null));
+        DeviceToken deletedDevice = deviceTokenService.readDeviceByUserIdAndToken(requestUser.getId(), deviceToken.getToken()).get();
+        assertFalse("디바이스가 비활성화 되어있어야 한다.", deletedDevice.isActivated());
     }
 
     @Test

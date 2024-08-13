@@ -27,14 +27,6 @@ public interface UserAccountApi {
     @Operation(summary = "디바이스 등록", description = "사용자의 디바이스 정보를 등록합니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", schemaProperties = @SchemaProperty(name = "deviceToken", schema = @Schema(implementation = DeviceTokenDto.RegisterRes.class)))),
-            @ApiResponse(responseCode = "400", content = @Content(mediaType = "application/json", examples = {
-                    @ExampleObject(name = "잘못된 디바이스 토큰 저장 요청", description = "서버에 동일한 이름의 토큰이 사용자에게 등록되어 있고, 해당 토큰이 만료처리되어 있을 경우에 해당한다. (애초에 발생해선 안 되는 에러)", value = """
-                            {
-                                "code": "4005",
-                                "message": "활성화되지 않은 디바이스 토큰 정보입니다."
-                            }
-                            """)
-            })),
             @ApiResponse(responseCode = "404", content = @Content(mediaType = "application/json", examples = {
                     @ExampleObject(name = "수정 요청 시, token에 매칭하는 디바이스 정보가 없는 경우", value = """
                             {
