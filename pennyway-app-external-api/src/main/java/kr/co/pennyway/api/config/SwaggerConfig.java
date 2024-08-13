@@ -42,7 +42,6 @@ public class SwaggerConfig {
 
         return new OpenAPI()
                 .info(apiInfo(activeProfile))
-                .addServersItem(new io.swagger.v3.oas.models.servers.Server().url(""))
                 .addSecurityItem(securityRequirement)
                 .components(securitySchemes());
     }
@@ -54,6 +53,7 @@ public class SwaggerConfig {
         return GroupedOpenApi.builder()
                 .packagesToScan(targets)
                 .group("전체 보기")
+                .addOperationCustomizer(customizer())
                 .build();
     }
 
@@ -64,6 +64,7 @@ public class SwaggerConfig {
         return GroupedOpenApi.builder()
                 .packagesToScan(targets)
                 .group("사용자 인증")
+                .addOperationCustomizer(customizer())
                 .build();
     }
 
@@ -74,6 +75,7 @@ public class SwaggerConfig {
         return GroupedOpenApi.builder()
                 .packagesToScan(targets)
                 .group("사용자 기본 기능")
+                .addOperationCustomizer(customizer())
                 .build();
     }
 
@@ -84,6 +86,7 @@ public class SwaggerConfig {
         return GroupedOpenApi.builder()
                 .packagesToScan(targets)
                 .group("정적 파일 저장")
+                .addOperationCustomizer(customizer())
                 .build();
     }
 
@@ -94,6 +97,7 @@ public class SwaggerConfig {
         return GroupedOpenApi.builder()
                 .packagesToScan(targets)
                 .group("지출 관리")
+                .addOperationCustomizer(customizer())
                 .build();
     }
 
@@ -104,6 +108,7 @@ public class SwaggerConfig {
         return GroupedOpenApi.builder()
                 .packagesToScan(targets)
                 .group("백오피스")
+                .addOperationCustomizer(customizer())
                 .build();
     }
 
