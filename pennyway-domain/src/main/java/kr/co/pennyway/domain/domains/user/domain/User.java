@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import kr.co.pennyway.domain.common.converter.ProfileVisibilityConverter;
 import kr.co.pennyway.domain.common.converter.RoleConverter;
 import kr.co.pennyway.domain.common.model.DateAuditable;
-import kr.co.pennyway.domain.domains.device.domain.DeviceToken;
 import kr.co.pennyway.domain.domains.user.type.ProfileVisibility;
 import kr.co.pennyway.domain.domains.user.type.Role;
 import lombok.AccessLevel;
@@ -18,8 +17,6 @@ import org.hibernate.annotations.SQLRestriction;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -53,9 +50,6 @@ public class User extends DateAuditable {
     private NotifySetting notifySetting;
     @ColumnDefault("NULL")
     private LocalDateTime deletedAt;
-
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    private List<DeviceToken> deviceTokens = new ArrayList<>();
 
     @Builder
     private User(String username, String name, String password, LocalDateTime passwordUpdatedAt, String profileImageUrl, String phone, Role role,
