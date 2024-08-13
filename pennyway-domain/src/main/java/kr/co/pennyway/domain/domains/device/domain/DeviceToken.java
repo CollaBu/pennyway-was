@@ -23,7 +23,7 @@ public class DeviceToken extends DateAuditable {
     @ColumnDefault("true")
     private Boolean activated;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
