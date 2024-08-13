@@ -1,14 +1,13 @@
 package kr.co.pennyway.domain.config;
 
+import kr.co.pennyway.domain.common.importer.PennywayDomainConfig;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
-@Configuration
-public class RedissonConfig {
+public class RedissonConfig implements PennywayDomainConfig {
     private static final String REDISSON_HOST_PREFIX = "redis://";
     private final String host;
     private final int port;
