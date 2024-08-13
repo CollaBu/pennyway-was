@@ -4,16 +4,20 @@ import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.servers.Server;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
+import kr.co.pennyway.api.common.swagger.ApiExceptionExplainParser;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.customizers.OperationCustomizer;
 import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.filter.ForwardedHeaderFilter;
+import org.springframework.web.method.HandlerMethod;
 
 @Configuration
 @OpenAPIDefinition(
@@ -38,7 +42,6 @@ public class SwaggerConfig {
 
         return new OpenAPI()
                 .info(apiInfo(activeProfile))
-                .addServersItem(new io.swagger.v3.oas.models.servers.Server().url(""))
                 .addSecurityItem(securityRequirement)
                 .components(securitySchemes());
     }
@@ -50,6 +53,7 @@ public class SwaggerConfig {
         return GroupedOpenApi.builder()
                 .packagesToScan(targets)
                 .group("전체 보기")
+                .addOperationCustomizer(customizer())
                 .build();
     }
 
@@ -60,6 +64,7 @@ public class SwaggerConfig {
         return GroupedOpenApi.builder()
                 .packagesToScan(targets)
                 .group("사용자 인증")
+                .addOperationCustomizer(customizer())
                 .build();
     }
 
@@ -70,6 +75,7 @@ public class SwaggerConfig {
         return GroupedOpenApi.builder()
                 .packagesToScan(targets)
                 .group("사용자 기본 기능")
+                .addOperationCustomizer(customizer())
                 .build();
     }
 
@@ -80,6 +86,7 @@ public class SwaggerConfig {
         return GroupedOpenApi.builder()
                 .packagesToScan(targets)
                 .group("정적 파일 저장")
+                .addOperationCustomizer(customizer())
                 .build();
     }
 
@@ -90,6 +97,7 @@ public class SwaggerConfig {
         return GroupedOpenApi.builder()
                 .packagesToScan(targets)
                 .group("지출 관리")
+                .addOperationCustomizer(customizer())
                 .build();
     }
 
@@ -100,12 +108,21 @@ public class SwaggerConfig {
         return GroupedOpenApi.builder()
                 .packagesToScan(targets)
                 .group("백오피스")
+                .addOperationCustomizer(customizer())
                 .build();
     }
 
     @Bean
     ForwardedHeaderFilter forwardedHeaderFilter() {
         return new ForwardedHeaderFilter();
+    }
+
+    @Bean
+    public OperationCustomizer customizer() {
+        return (Operation operation, HandlerMethod handlerMethod) -> {
+            ApiExceptionExplainParser.parse(operation, handlerMethod);
+            return operation;
+        };
     }
 
     private Components securitySchemes() {
