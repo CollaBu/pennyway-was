@@ -18,7 +18,7 @@ import java.lang.reflect.Method;
  */
 @Slf4j
 @Aspect
-@RequiredArgsConstructor(access = lombok.AccessLevel.PROTECTED)
+@RequiredArgsConstructor
 public class DistributedLockAspect {
     private static final String REDISSON_LOCK_PREFIX = "LOCK:";
 
