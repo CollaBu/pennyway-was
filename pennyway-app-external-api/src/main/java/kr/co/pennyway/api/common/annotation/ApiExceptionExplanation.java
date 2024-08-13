@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ApiExceptionExplain {
+public @interface ApiExceptionExplanation {
     Class<? extends BaseErrorCode> value();
 
     String name() default "";

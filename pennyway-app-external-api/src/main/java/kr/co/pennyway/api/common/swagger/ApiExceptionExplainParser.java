@@ -6,8 +6,8 @@ import io.swagger.v3.oas.models.media.Content;
 import io.swagger.v3.oas.models.media.MediaType;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
-import kr.co.pennyway.api.common.annotation.ApiExceptionExplain;
-import kr.co.pennyway.api.common.annotation.ApiResponseExplainations;
+import kr.co.pennyway.api.common.annotation.ApiExceptionExplanation;
+import kr.co.pennyway.api.common.annotation.ApiResponseExplanations;
 import kr.co.pennyway.api.common.response.ErrorResponse;
 import kr.co.pennyway.common.exception.BaseErrorCode;
 import lombok.AccessLevel;
@@ -22,14 +22,14 @@ import java.util.stream.Collectors;
 
 public final class ApiExceptionExplainParser {
     public static void parse(Operation operation, HandlerMethod handlerMethod) {
-        ApiResponseExplainations annotation = handlerMethod.getMethodAnnotation(ApiResponseExplainations.class);
+        ApiResponseExplanations annotation = handlerMethod.getMethodAnnotation(ApiResponseExplanations.class);
 
         if (annotation != null) {
             generateExceptionResponseDocs(operation, annotation.errors());
         }
     }
 
-    private static void generateExceptionResponseDocs(Operation operation, ApiExceptionExplain[] exceptions) {
+    private static void generateExceptionResponseDocs(Operation operation, ApiExceptionExplanation[] exceptions) {
         ApiResponses responses = operation.getResponses();
 
         Map<Integer, List<ExampleHolder>> holders = Arrays.stream(exceptions)
@@ -55,7 +55,7 @@ public final class ApiExceptionExplainParser {
 
     @Builder(access = AccessLevel.PRIVATE)
     private record ExampleHolder(int httpStatus, String name, String mediaType, String description, Example holder) {
-        static ExampleHolder from(ApiExceptionExplain annotation) {
+        static ExampleHolder from(ApiExceptionExplanation annotation) {
             if (annotation instanceof BaseErrorCode errorCode) {
                 return ExampleHolder.builder()
                         .httpStatus(errorCode.causedBy().statusCode().getCode())
