@@ -20,6 +20,15 @@ spring:
     hikari:
       maximum-pool-size: 2
 
+  data:
+    redis:
+      repositories:
+        enabled: false
+
+  autoconfigure:
+    exclude:
+      - org.redisson.spring.starter.RedissonAutoConfigurationV2
+
 ---
 spring:
   config:
