@@ -21,6 +21,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingRequestCookieException;
 import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -54,6 +55,21 @@ public class GlobalExceptionHandler {
         ErrorResponse response = ErrorResponse.of(e.getBaseErrorCode().causedBy().getCode(), e.getBaseErrorCode().getExplainError());
 
         return ResponseEntity.status(e.getBaseErrorCode().causedBy().statusCode().getCode()).body(response);
+    }
+
+    /**
+     * API 호출 시 'Cookie' 내에 데이터 값이 유효하지 않은 경우
+     *
+     * @see MissingRequestCookieException
+     */
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(MissingRequestCookieException.class)
+    @JsonView(CustomJsonView.Common.class)
+    protected ErrorResponse handleMissingRequestCookieException(MissingRequestCookieException e) {
+        log.warn("handleMissingRequestCookieException : {}", e.getMessage());
+        String code = String.valueOf(StatusCode.BAD_REQUEST.getCode() * 10 + ReasonCode.MISSING_REQUIRED_PARAMETER.getCode());
+
+        return ErrorResponse.of(code, e.getMessage());
     }
 
     /**
