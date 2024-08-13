@@ -1,9 +1,7 @@
 package kr.co.pennyway.domain.common.aop;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 
-@Component
 @RequiredArgsConstructor
 public class CallTransactionFactory {
     private final RedissonCallNewTransaction redissonCallNewTransaction;

@@ -20,6 +20,11 @@ spring:
     hikari:
       maximum-pool-size: 2
 
+  data:
+    redis:
+      repositories:
+        enabled: false
+
 ---
 spring:
   config:

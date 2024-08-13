@@ -1,14 +1,17 @@
 package kr.co.pennyway.domain.config;
 
+import kr.co.pennyway.domain.common.aop.CallTransactionFactory;
+import kr.co.pennyway.domain.common.aop.DistributedLockAspect;
+import kr.co.pennyway.domain.common.aop.RedissonCallNewTransaction;
+import kr.co.pennyway.domain.common.aop.RedissonCallSameTransaction;
+import kr.co.pennyway.domain.common.importer.PennywayDomainConfig;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
-@Configuration
-public class RedissonConfig {
+public class RedissonConfig implements PennywayDomainConfig {
     private static final String REDISSON_HOST_PREFIX = "redis://";
     private final String host;
     private final int port;
@@ -31,5 +34,25 @@ public class RedissonConfig {
                 .setAddress(REDISSON_HOST_PREFIX + host + ":" + port)
                 .setPassword(password);
         return Redisson.create(config);
+    }
+
+    @Bean
+    public RedissonCallNewTransaction redissonCallNewTransaction() {
+        return new RedissonCallNewTransaction();
+    }
+
+    @Bean
+    public RedissonCallSameTransaction redissonCallSameTransaction() {
+        return new RedissonCallSameTransaction();
+    }
+
+    @Bean
+    public CallTransactionFactory callTransactionFactory(RedissonCallNewTransaction redissonCallNewTransaction, RedissonCallSameTransaction redissonCallSameTransaction) {
+        return new CallTransactionFactory(redissonCallNewTransaction, redissonCallSameTransaction);
+    }
+
+    @Bean
+    public DistributedLockAspect distributedLockAspect(RedissonClient redissonClient, CallTransactionFactory callTransactionFactory) {
+        return new DistributedLockAspect(redissonClient, callTransactionFactory);
     }
 }

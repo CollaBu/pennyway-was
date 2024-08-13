@@ -2,11 +2,9 @@ package kr.co.pennyway.domain.common.aop;
 
 import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.ProceedingJoinPoint;
-import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-@Component
 @RequiredArgsConstructor
 public class RedissonCallSameTransaction implements CallTransaction {
     /**
