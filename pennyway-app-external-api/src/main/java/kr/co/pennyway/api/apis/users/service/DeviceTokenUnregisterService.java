@@ -23,6 +23,6 @@ public class DeviceTokenUnregisterService {
                 () -> new DeviceTokenErrorException(DeviceTokenErrorCode.NOT_FOUND_DEVICE)
         );
 
-        deviceTokenService.deleteDevice(deviceToken);
+        deviceToken.deactivate();
     }
 }
