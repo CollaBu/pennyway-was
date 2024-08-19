@@ -11,7 +11,7 @@ import java.util.stream.Stream;
 public enum SpendingCategory implements LegacyCommonType {
     CUSTOM("0", "사용자 정의"),
     FOOD("1", "식비"),
-    TRANSPORTATION("2", "교통비"),
+    TRANSPORTATION("2", "교통"),
     BEAUTY_OR_FASHION("3", "뷰티/패션"),
     CONVENIENCE_STORE("4", "편의점/마트"),
     EDUCATION("5", "교육"),
