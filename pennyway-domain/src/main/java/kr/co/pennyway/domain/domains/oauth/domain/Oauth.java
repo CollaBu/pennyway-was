@@ -92,7 +92,6 @@ public class Oauth {
                 ", oauthId='" + oauthId + '\'' +
                 ", createdAt=" + createdAt +
                 ", deletedAt=" + deletedAt +
-                ", user=" + user +
                 '}';
     }
 }
