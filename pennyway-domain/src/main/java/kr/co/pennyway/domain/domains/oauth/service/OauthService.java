@@ -48,6 +48,14 @@ public class OauthService {
         return oauthRepository.existsByUser_IdAndProvider(userId, provider);
     }
 
+    /**
+     * oauthId와 provider로 Oauth가 존재하는지 확인한다. 이 때, deletedAt이 null인 Oauth만 조회한다.
+     */
+    @Transactional(readOnly = true)
+    public boolean isExistOauthByOauthIdAndProvider(String oauthId, Provider provider) {
+        return oauthRepository.existsByOauthIdAndProviderAndDeletedAtIsNull(oauthId, provider);
+    }
+
     @Transactional
     public void deleteOauth(Oauth oauth) {
         oauthRepository.delete(oauth);

@@ -19,6 +19,8 @@ public interface OauthRepository extends JpaRepository<Oauth, Long> {
 
     boolean existsByUser_IdAndProvider(Long userId, Provider provider);
 
+    boolean existsByOauthIdAndProviderAndDeletedAtIsNull(String oauthId, Provider provider);
+
     @Transactional
     @Modifying(clearAutomatically = true)
     @Query("UPDATE Oauth o SET o.deletedAt = NOW() WHERE o.user.id = :userId AND o.deletedAt IS NULL")
