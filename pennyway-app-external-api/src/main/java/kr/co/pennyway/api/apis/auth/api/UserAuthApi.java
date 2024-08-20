@@ -13,7 +13,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.co.pennyway.api.apis.auth.dto.AuthStateDto;
 import kr.co.pennyway.api.apis.auth.dto.SignInReq;
+import kr.co.pennyway.api.common.annotation.ApiExceptionExplanation;
+import kr.co.pennyway.api.common.annotation.ApiResponseExplanations;
 import kr.co.pennyway.api.common.security.authentication.SecurityUserDetails;
+import kr.co.pennyway.domain.domains.oauth.exception.OauthErrorCode;
 import kr.co.pennyway.domain.domains.oauth.type.Provider;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -67,14 +70,12 @@ public interface UserAuthApi {
     @Parameter(name = "provider", description = "소셜 제공자", examples = {
             @ExampleObject(name = "카카오", value = "kakao"), @ExampleObject(name = "애플", value = "apple"), @ExampleObject(name = "구글", value = "google")
     }, required = true, in = ParameterIn.QUERY)
-    @ApiResponse(responseCode = "409", content = @Content(mediaType = "application/json", examples = {
-            @ExampleObject(name = "해당 provider로 로그인한 이력이 이미 존재함", value = """
-                    {
-                        "code": "4091",
-                        "message": "이미 해당 제공자로 가입된 사용자입니다."
-                    }
-                    """)
-    }))
+    @ApiResponseExplanations(
+            errors = {
+                    @ApiExceptionExplanation(value = OauthErrorCode.class, constant = "ALREADY_USED_OAUTH", name = "다른 사용자가 사용 중"),
+                    @ApiExceptionExplanation(value = OauthErrorCode.class, constant = "ALREADY_SIGNUP_OAUTH", name = "이미 연동된 계정")
+            }
+    )
     ResponseEntity<?> linkOauth(@RequestParam Provider provider, @RequestBody @Validated SignInReq.Oauth request, @AuthenticationPrincipal SecurityUserDetails user);
 
     @Operation(summary = "소셜 계정 연동 해제", description = "인증된 사용자의 소셜 계정 연동을 해제한다. 연동되지 않은 계정을 해제하려고 하는 경우에는 404 에러를 반환한다. 미인증 사용자는 해당 API를 사용할 수 없다.")

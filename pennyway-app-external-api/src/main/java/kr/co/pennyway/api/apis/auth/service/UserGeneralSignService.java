@@ -47,7 +47,7 @@ public class UserGeneralSignService {
         }
 
         log.info("소셜 회원가입 사용자입니다. user: {}", user.get());
-        return UserSyncDto.of(true, true, user.get().getId(), user.get().getUsername(), null);
+        return UserSyncDto.of(true, true, user.get().getId(), user.get().getUsername());
     }
 
     /**
