@@ -13,11 +13,13 @@ import java.util.Set;
 public interface OauthRepository extends JpaRepository<Oauth, Long> {
     Optional<Oauth> findByOauthIdAndProviderAndDeletedAtIsNull(String oauthId, Provider provider);
 
-    Optional<Oauth> findByUser_IdAndProvider(Long userId, Provider provider);
+    Optional<Oauth> findByUser_IdAndProviderAndDeletedAtIsNull(Long userId, Provider provider);
 
     Set<Oauth> findAllByUser_Id(Long userId);
 
-    boolean existsByUser_IdAndProvider(Long userId, Provider provider);
+    boolean existsByUser_IdAndProviderAndDeletedAtIsNull(Long userId, Provider provider);
+
+    boolean existsByOauthIdAndProviderAndDeletedAtIsNull(String oauthId, Provider provider);
 
     @Transactional
     @Modifying(clearAutomatically = true)

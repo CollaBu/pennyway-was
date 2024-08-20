@@ -49,7 +49,7 @@ public class UserAuthUseCase {
     public void linkOauth(Provider provider, SignInReq.Oauth request, Long userId) {
         OidcDecodePayload payload = oauthOidcHelper.getPayload(provider, request.oauthId(), request.idToken(), request.nonce());
 
-        UserSyncDto userSync = userOauthSignService.isLinkAllowed(userId, provider);
+        UserSyncDto userSync = userOauthSignService.isLinkAllowed(userId, request.oauthId(), provider);
         userOauthSignService.saveUser(null, userSync, provider, payload.sub());
     }
 

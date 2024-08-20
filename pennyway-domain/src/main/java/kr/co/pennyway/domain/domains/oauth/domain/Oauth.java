@@ -68,18 +68,6 @@ public class Oauth {
         return deletedAt != null;
     }
 
-    public void revertDelete(String oauthId) {
-        if (deletedAt == null) {
-            throw new IllegalStateException("삭제되지 않은 oauth 정보 갱신 요청입니다. oauthId: " + oauthId);
-        }
-        if (!StringUtils.hasText(oauthId)) {
-            throw new IllegalArgumentException("oauthId는 null이거나 빈 문자열이 될 수 없습니다.");
-        }
-
-        this.oauthId = oauthId;
-        this.deletedAt = null;
-    }
-
     @Override
     public String toString() {
         return "Oauth{" +
@@ -88,7 +76,6 @@ public class Oauth {
                 ", oauthId='" + oauthId + '\'' +
                 ", createdAt=" + createdAt +
                 ", deletedAt=" + deletedAt +
-                ", user=" + user +
                 '}';
     }
 }
