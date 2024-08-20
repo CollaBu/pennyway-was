@@ -76,13 +76,8 @@ public class UserOauthSignService {
 
         // 이미 해당 Oauth 계정에 연동되어 있는 경우
         if (oauth.isPresent() && !oauth.get().isDeleted()) {
-            if (oauth.get().isDeleted()) {
-                log.info("이미 연동 해지된 Oauth 계정입니다. userId: {}, provider: {}", userId, provider);
-
-            } else {
-                log.info("이미 해당 Oauth 계정에 연동되어 있습니다. userId: {}, provider: {}", userId, provider);
-                throw new OauthException(OauthErrorCode.ALREADY_SIGNUP_OAUTH);
-            }
+            log.info("이미 해당 Oauth 계정에 연동되어 있습니다. userId: {}, provider: {}", userId, provider);
+            throw new OauthException(OauthErrorCode.ALREADY_SIGNUP_OAUTH);
         }
 
         User user = userService.readUser(userId).orElseThrow(() -> new UserErrorException(UserErrorCode.NOT_FOUND));

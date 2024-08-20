@@ -34,7 +34,7 @@ public class OauthService {
     }
 
     @Transactional(readOnly = true)
-    public Optional<Oauth> readOauthByUserIdAndProvider(Long userId, Provider provider) {
+    public Optional<Oauth> readOauthByUserIdAndProvider(Long userId, Provider provider) { // delete_at 옵션 없어서 불안
         return oauthRepository.findByUser_IdAndProvider(userId, provider);
     }
 
@@ -44,7 +44,7 @@ public class OauthService {
     }
 
     @Transactional(readOnly = true)
-    public boolean isExistOauthAccount(Long userId, Provider provider) {
+    public boolean isExistOauthAccount(Long userId, Provider provider) { // delete_at 옵션 없어서 불안
         return oauthRepository.existsByUser_IdAndProvider(userId, provider);
     }
 
