@@ -48,15 +48,13 @@ public class UserOauthSignService {
             return UserSyncDto.signUpAllowed();
         }
 
-        Optional<Oauth> oauth = oauthService.readOauthByUserIdAndProvider(user.get().getId(), provider);
-
-        if (oauth.isPresent() && !oauth.get().isDeleted()) {
+        if (oauthService.isExistOauthByUserIdAndProvider(user.get().getId(), provider)) {
             log.info("이미 동일한 Provider로 가입된 사용자입니다. phone: {}, provider: {}", phone, provider);
             return UserSyncDto.abort(user.get().getId(), user.get().getUsername());
         }
 
         log.info("소셜 회원가입 사용자입니다. user: {}", user.get());
-        return UserSyncDto.of(true, true, user.get().getId(), user.get().getUsername(), UserSyncDto.OauthSync.from(oauth.orElse(null)));
+        return UserSyncDto.of(true, true, user.get().getId(), user.get().getUsername());
     }
 
     /**
@@ -78,7 +76,7 @@ public class UserOauthSignService {
 
         User user = userService.readUser(userId).orElseThrow(() -> new UserErrorException(UserErrorCode.NOT_FOUND));
 
-        return UserSyncDto.of(true, true, user.getId(), user.getUsername(), UserSyncDto.OauthSync.from(null));
+        return UserSyncDto.of(true, true, user.getId(), user.getUsername());
     }
 
     /**
