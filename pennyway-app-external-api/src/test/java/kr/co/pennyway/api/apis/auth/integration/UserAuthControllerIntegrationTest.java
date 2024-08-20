@@ -315,7 +315,6 @@ public class UserAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
 
         @Test
         @DisplayName("다른 계정에서 해당 소셜 계정을 연동했었던 이력이 있다면, 삭제 이력을 복구하고 사용자 정보를 갱신하여 연동에 성공한다.")
-        @Transactional
         void linkOauthWithDeletedOauth() throws Exception {
             // given
             User user1 = userService.createUser(UserFixture.GENERAL_USER.toUser());
