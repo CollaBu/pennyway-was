@@ -243,7 +243,7 @@ public class UserAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
         }
 
         @Test
-        @DisplayName("provider로 로그인한 이력이 있다면, 사용자는 계정 연동에 실패하고 409 에러를 반환한다.")
+        @DisplayName("이미 해당 소셜 계정에 연동했다면, ALREADY_SIGNUP_OAUTH 에러를 반환한다.")
         @Transactional
         void linkOauthWithHistory() throws Exception {
             // given
@@ -264,7 +264,7 @@ public class UserAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
         }
 
         @Test
-        @DisplayName("해당 provider가 soft delete된 이력이 존재한다면, deleted_at을 null로 업데이트하고 최신 oauth_id를 반영하여 계정 연동에 성공한다.")
+        @DisplayName("해당 소셜 계정으로 연동했었던 삭제 이력이 있다면, 삭제 이력을 복구하고 연동에 성공한다.")
         @Transactional
         void linkOauthWithDeletedHistory() throws Exception {
             // given
@@ -289,7 +289,7 @@ public class UserAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
         }
 
         @Test
-        @DisplayName("provider, oauthId에 해당하는 Oauth 데이터에 연동된 계정이 존재할 경우, 409 ALREADY_USED_OAUTH 에러를 반환한다.")
+        @DisplayName("다른 계정에 이미 해당 소셜 계정이 연동되어 있다면, 409 ALREADY_USED_OAUTH 에러를 반환한다.")
         @Transactional
         void linkOauthWithAlreadyUsedOauth() throws Exception {
             // given
@@ -314,7 +314,7 @@ public class UserAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
         }
 
         @Test
-        @DisplayName("provider, oauthId에 해당하는 Oauth 데이터가 다른 계정에 연동된 이력이 존재하나, soft delete 되었다면 user_id를 갱신해 연동에 성공한다.")
+        @DisplayName("다른 계정에서 해당 소셜 계정을 연동했었던 이력이 있다면, 삭제 이력을 복구하고 사용자 정보를 갱신하여 연동에 성공한다.")
         @Transactional
         void linkOauthWithDeletedOauth() throws Exception {
             // given
