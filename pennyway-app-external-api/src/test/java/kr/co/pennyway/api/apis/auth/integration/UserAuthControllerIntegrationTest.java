@@ -239,7 +239,7 @@ public class UserAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
 
             // then
             result.andExpect(status().isOk()).andDo(print());
-            assertTrue(oauthService.isExistOauthAccount(user.getId(), expectedProvider));
+            assertTrue(oauthService.isExistOauthByUserIdAndProvider(user.getId(), expectedProvider));
         }
 
         @Test
@@ -264,7 +264,7 @@ public class UserAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
         }
 
         @Test
-        @DisplayName("해당 소셜 계정으로 연동했었던 삭제 이력이 있다면, 삭제 이력을 복구하고 연동에 성공한다.")
+        @DisplayName("해당 소셜 계정으로 연동했었던 이력이 삭제되어 있다면, 새로운 데이터를 생성하고 연동에 성공한다.")
         @Transactional
         void linkOauthWithDeletedHistory() throws Exception {
             // given
@@ -314,7 +314,7 @@ public class UserAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
         }
 
         @Test
-        @DisplayName("다른 계정에서 해당 소셜 계정을 연동했었던 이력이 있다면, 삭제 이력을 복구하고 사용자 정보를 갱신하여 연동에 성공한다.")
+        @DisplayName("다른 계정에서 해당 소셜 계정을 연동했었던 삭제 이력이 있다면, 새로운 데이터를 생성하고 연동에 성공한다.")
         void linkOauthWithDeletedOauth() throws Exception {
             // given
             User user1 = userService.createUser(UserFixture.GENERAL_USER.toUser());
@@ -322,7 +322,6 @@ public class UserAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
             String oauthId = "oauthId";
             Oauth oauth = oauthService.createOauth(Oauth.of(provider, oauthId, user1));
             log.info("생성된 Oauth 정보 : {}", oauth);
-            Long deletedAuthPk = oauth.getId();
             oauthService.deleteOauth(oauth);
 
             User user2 = userService.createUser(UserFixture.OAUTH_USER.toUser());
@@ -337,7 +336,6 @@ public class UserAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
             Oauth savedOauth = oauthService.readOauthsByUserId(user2.getId()).stream().filter(o -> o.getProvider().equals(provider)).findFirst().orElse(null);
             assertNotNull(savedOauth);
             assertNull(savedOauth.getDeletedAt());
-            assertEquals(deletedAuthPk, savedOauth.getId());
             log.info("연동된 Oauth 정보 : {}", savedOauth);
         }
 
