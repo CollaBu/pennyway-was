@@ -288,6 +288,57 @@ public class UserAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
             log.info("연동된 Oauth 정보 : {}", savedOauth);
         }
 
+        @Test
+        @DisplayName("provider, oauthId에 해당하는 Oauth 데이터에 연동된 계정이 존재할 경우, 409 ALREADY_USED_OAUTH 에러를 반환한다.")
+        @Transactional
+        void linkOauthWithAlreadyUsedOauth() throws Exception {
+            // given
+            User user1 = userService.createUser(UserFixture.GENERAL_USER.toUser());
+            Provider provider = Provider.KAKAO;
+            String oauthId = "oauthId";
+            oauthService.createOauth(Oauth.of(provider, oauthId, user1));
+
+            User user2 = userService.createUser(UserFixture.GENERAL_USER.toUser());
+
+            given(oauthOidcHelper.getPayload(provider, oauthId, "idToken", "nonce")).willReturn(new OidcDecodePayload("iss", "aud", oauthId, "email"));
+
+            // when
+            ResultActions result = performLinkOauth(provider, oauthId, user2);
+
+            // then
+            result
+                    .andExpect(status().isConflict())
+                    .andExpect(jsonPath("$.code").value(OauthErrorCode.ALREADY_USED_OAUTH.causedBy().getCode()))
+                    .andExpect(jsonPath("$.message").value(OauthErrorCode.ALREADY_USED_OAUTH.getExplainError()))
+                    .andDo(print());
+        }
+
+        @Test
+        @DisplayName("provider, oauthId에 해당하는 Oauth 데이터가 다른 계정에 연동된 이력이 존재하나, soft delete 되었다면 user_id를 갱신해 연동에 성공한다.")
+        @Transactional
+        void linkOauthWithDeletedOauth() throws Exception {
+            // given
+            User user1 = userService.createUser(UserFixture.GENERAL_USER.toUser());
+            Provider provider = Provider.KAKAO;
+            String oauthId = "oauthId";
+            Oauth oauth = oauthService.createOauth(Oauth.of(provider, oauthId, user1));
+            oauthService.deleteOauth(oauth);
+
+            User user2 = userService.createUser(UserFixture.GENERAL_USER.toUser());
+
+            given(oauthOidcHelper.getPayload(provider, oauthId, "idToken", "nonce")).willReturn(new OidcDecodePayload("iss", "aud", oauthId, "email"));
+
+            // when
+            ResultActions result = performLinkOauth(provider, oauthId, user2);
+
+            // then
+            result.andExpect(status().isOk()).andDo(print());
+            Oauth savedOauth = oauthService.readOauthByOauthIdAndProvider(oauthId, provider).orElse(null);
+            assertNotNull(savedOauth);
+            assertNull(savedOauth.getDeletedAt());
+            log.info("연동된 Oauth 정보 : {}", savedOauth);
+        }
+
         private ResultActions performLinkOauth(Provider provider, String oauthId, User requestUser) throws Exception {
             UserDetails userDetails = SecurityUserDetails.from(requestUser);
             SignInReq.Oauth request = new SignInReq.Oauth(oauthId, "idToken", "nonce");
