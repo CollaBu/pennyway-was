@@ -33,14 +33,6 @@ public class OauthService {
         return oauthRepository.findByOauthIdAndProviderAndDeletedAtIsNull(oauthId, provider);
     }
 
-    /**
-     * userId와 provider로 Oauth를 조회한다. 이 때, deletedAt이 null인 Oauth만 조회한다.
-     */
-    @Transactional(readOnly = true)
-    public Optional<Oauth> readOauthByUserIdAndProvider(Long userId, Provider provider) { // delete_at 옵션 없어서 불안
-        return oauthRepository.findByUser_IdAndProviderAndDeletedAtIsNull(userId, provider);
-    }
-
     @Transactional(readOnly = true)
     public Set<Oauth> readOauthsByUserId(Long userId) {
         return oauthRepository.findAllByUser_Id(userId);
@@ -50,7 +42,7 @@ public class OauthService {
      * userId와 provider로 Oauth가 존재하는지 확인한다. 이 때, deletedAt이 null인 Oauth만 조회한다.
      */
     @Transactional(readOnly = true)
-    public boolean isExistOauthByUserIdAndProvider(Long userId, Provider provider) { // delete_at 옵션 없어서 불안
+    public boolean isExistOauthByUserIdAndProvider(Long userId, Provider provider) {
         return oauthRepository.existsByUser_IdAndProviderAndDeletedAtIsNull(userId, provider);
     }
 
