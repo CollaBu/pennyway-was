@@ -322,9 +322,11 @@ public class UserAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
             Provider provider = Provider.KAKAO;
             String oauthId = "oauthId";
             Oauth oauth = oauthService.createOauth(Oauth.of(provider, oauthId, user1));
+            log.info("생성된 Oauth 정보 : {}", oauth);
+            Long deletedAuthPk = oauth.getId();
             oauthService.deleteOauth(oauth);
 
-            User user2 = userService.createUser(UserFixture.GENERAL_USER.toUser());
+            User user2 = userService.createUser(UserFixture.OAUTH_USER.toUser());
 
             given(oauthOidcHelper.getPayload(provider, oauthId, "idToken", "nonce")).willReturn(new OidcDecodePayload("iss", "aud", oauthId, "email"));
 
@@ -333,9 +335,10 @@ public class UserAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
 
             // then
             result.andExpect(status().isOk()).andDo(print());
-            Oauth savedOauth = oauthService.readOauthByOauthIdAndProvider(oauthId, provider).orElse(null);
+            Oauth savedOauth = oauthService.readOauthsByUserId(user2.getId()).stream().filter(o -> o.getProvider().equals(provider)).findFirst().orElse(null);
             assertNotNull(savedOauth);
             assertNull(savedOauth.getDeletedAt());
+            assertEquals(deletedAuthPk, savedOauth.getId());
             log.info("연동된 Oauth 정보 : {}", savedOauth);
         }
 
