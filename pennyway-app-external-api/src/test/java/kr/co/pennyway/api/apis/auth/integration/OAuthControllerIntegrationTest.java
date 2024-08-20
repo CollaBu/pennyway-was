@@ -527,7 +527,7 @@ public class OAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
         @Test
         @WithAnonymousUser
         @Transactional
-        @DisplayName("같은 provider로 Oauth 로그인 이력이 soft delete 되었으면, Oauth 정보가 복구되고 새로운 oauth_id를 반영한다.")
+        @DisplayName("같은 provider로 Oauth 로그인 이력이 soft delete 되었으면, 새로운 Oauth 정보가 추가되고 로그인에 성공한다.")
         void signUpWithDeletedOauth() throws Exception {
             // given
             Provider provider = Provider.KAKAO;
@@ -552,10 +552,8 @@ public class OAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
                     .andDo(print());
             Oauth savedOauth = oauthService.readOauthByOauthIdAndProvider("newOauthId", provider).get();
             assertEquals(user.getId(), savedOauth.getUser().getId());
-            assertEquals(oauth.getId(), savedOauth.getId());
             assertEquals("newOauthId", savedOauth.getOauthId());
             assertFalse(savedOauth.isDeleted());
-            log.debug("oauth : {}", savedOauth);
         }
 
         private ResultActions performOauthSignUpAccountLinking(Provider provider, String code, String oauthId) throws Exception {

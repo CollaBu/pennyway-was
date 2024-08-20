@@ -281,11 +281,6 @@ public class UserAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
 
             // then
             result.andExpect(status().isOk()).andDo(print());
-            Oauth savedOauth = oauthService.readOauth(oauth.getId()).orElse(null);
-            assertNotNull(savedOauth);
-            assertEquals("newOauthId", savedOauth.getOauthId());
-            assertNull(savedOauth.getDeletedAt());
-            log.info("연동된 Oauth 정보 : {}", savedOauth);
         }
 
         @Test
@@ -336,7 +331,6 @@ public class UserAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
             Oauth savedOauth = oauthService.readOauthsByUserId(user2.getId()).stream().filter(o -> o.getProvider().equals(provider)).findFirst().orElse(null);
             assertNotNull(savedOauth);
             assertNull(savedOauth.getDeletedAt());
-            log.info("연동된 Oauth 정보 : {}", savedOauth);
         }
 
         private ResultActions performLinkOauth(Provider provider, String oauthId, User requestUser) throws Exception {
