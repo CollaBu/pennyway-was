@@ -10,8 +10,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.co.pennyway.api.apis.ledger.dto.SpendingCategoryDto;
 import kr.co.pennyway.api.apis.ledger.dto.SpendingSearchRes;
+import kr.co.pennyway.api.common.annotation.ApiExceptionExplanation;
+import kr.co.pennyway.api.common.annotation.ApiResponseExplanations;
 import kr.co.pennyway.api.common.query.SpendingCategoryType;
 import kr.co.pennyway.api.common.security.authentication.SecurityUserDetails;
+import kr.co.pennyway.domain.domains.spending.exception.SpendingErrorCode;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -93,20 +96,14 @@ public interface SpendingCategoryApi {
             }),
             @Parameter(name = "size", description = "페이지 사이즈 (default: 30)", example = "30", in = ParameterIn.QUERY),
             @Parameter(name = "page", description = "페이지 번호 (default: 0)", example = "0", in = ParameterIn.QUERY),
-            @Parameter(name = "sort", description = "정렬 기준 (default: sending.spendAt)", example = "spending.spendAt", in = ParameterIn.QUERY),
-            @Parameter(name = "direction", description = "정렬 방식 (default: DESC)", example = "DESC", in = ParameterIn.QUERY),
+            @Parameter(name = "sort", description = "정렬 기준 (default: 소비내역 내림차순, 식별값 오름차순)", example = "spending.spendAt,DESC&sort=spending.id,ASC", in = ParameterIn.QUERY, allowReserved = true),
             @Parameter(name = "pageable", hidden = true)
     })
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "지출 내역 조회 성공", content = @Content(mediaType = "application/json", schemaProperties = @SchemaProperty(name = "spendings", schema = @Schema(implementation = SpendingSearchRes.MonthSlice.class)))),
-            @ApiResponse(responseCode = "400", description = "type과 categoryId 미스 매치", content = @Content(examples =
-            @ExampleObject(name = "type과 categoryId가 유효하지 않은 조합", description = "type이 default면서, categoryId가 CUSTOM(0) 혹은 OTHER(12)일 수는 없다.", value = """
-                        {
-                            "code": "4005",
-                            "message": "type의 정보와 categoryId의 정보가 존재할 수 없는 조합입니다."
-                        }
-                    """
-            )))
+    })
+    @ApiResponseExplanations(errors = {
+            @ApiExceptionExplanation(value = SpendingErrorCode.class, constant = "INVALID_TYPE_WITH_CATEGORY_ID", name = "type과 categoryId 미스 매치", description = "type이 default면서, categoryId가 CUSTOM(0) 혹은 OTHER(12)일 수는 없다.")
     })
     ResponseEntity<?> getSpendingsByCategory(
             @PathVariable(value = "categoryId") Long categoryId,
