@@ -76,7 +76,10 @@ public class SpendingCategoryController implements SpendingCategoryApi {
     public ResponseEntity<?> getSpendingsByCategory(
             @PathVariable(value = "categoryId") Long categoryId,
             @RequestParam(value = "type") SpendingCategoryType type,
-            @PageableDefault(size = 30, page = 0) @SortDefault(sort = "spending.spendAt", direction = Sort.Direction.DESC) Pageable pageable,
+            @PageableDefault(size = 30, page = 0) @SortDefault.SortDefaults({
+                    @SortDefault(sort = "spending.spendAt", direction = Sort.Direction.DESC),
+                    @SortDefault(sort = "spending.id", direction = Sort.Direction.ASC)
+            }) Pageable pageable,
             @AuthenticationPrincipal SecurityUserDetails user
     ) {
         if (type.equals(SpendingCategoryType.DEFAULT) && (categoryId.equals(0L) || categoryId.equals(12L))) {

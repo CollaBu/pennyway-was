@@ -93,8 +93,7 @@ public interface SpendingCategoryApi {
             }),
             @Parameter(name = "size", description = "페이지 사이즈 (default: 30)", example = "30", in = ParameterIn.QUERY),
             @Parameter(name = "page", description = "페이지 번호 (default: 0)", example = "0", in = ParameterIn.QUERY),
-            @Parameter(name = "sort", description = "정렬 기준 (default: sending.spendAt)", example = "spending.spendAt", in = ParameterIn.QUERY),
-            @Parameter(name = "direction", description = "정렬 방식 (default: DESC)", example = "DESC", in = ParameterIn.QUERY),
+            @Parameter(name = "sort", description = "정렬 기준 (default: 소비내역 내림차순, 식별값 오름차순)", example = "spending.spendAt,DESC&sort=spending.id,ASC", in = ParameterIn.QUERY, allowReserved = true),
             @Parameter(name = "pageable", hidden = true)
     })
     @ApiResponses({
