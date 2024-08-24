@@ -7,6 +7,25 @@ on:
         description: '배포할 Api 모듈 태그 정보 (Api-v*.*.*)'
         required: true
         type: string
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: 'Log level'
+        required: true
+        default: 'warning'
+        type: choice
+        options:
+          - info
+          - warning
+          - debug
+      tags:
+        description: 'Test scenario tags'
+        required: false
+        type: boolean
+      environment:
+        description: 'Environment to run tests against'
+        type: environment
+        required: false
 
 permissions:
   contents: read
@@ -64,6 +83,8 @@ jobs:
       - name: AWS SSM Send-Command
         uses: peterkimzz/aws-ssm-send-command@master
         id: ssm
+        env:
+          VERSION: ${{ steps.get_version.outputs.VERSION }}
         with:
           aws-region: ${{ secrets.AWS_REGION }}
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -74,4 +95,5 @@ jobs:
             docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
             docker system prune -a -f
             docker pull pennyway/pennyway-was
-            docker-compose up -d
+            chmod +x deploy.sh
+            bash -x ./deploy.sh
