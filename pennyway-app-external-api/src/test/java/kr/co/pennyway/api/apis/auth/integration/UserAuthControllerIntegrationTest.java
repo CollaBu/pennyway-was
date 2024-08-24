@@ -239,11 +239,11 @@ public class UserAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
 
             // then
             result.andExpect(status().isOk()).andDo(print());
-            assertTrue(oauthService.isExistOauthAccount(user.getId(), expectedProvider));
+            assertTrue(oauthService.isExistOauthByUserIdAndProvider(user.getId(), expectedProvider));
         }
 
         @Test
-        @DisplayName("provider로 로그인한 이력이 있다면, 사용자는 계정 연동에 실패하고 409 에러를 반환한다.")
+        @DisplayName("이미 해당 소셜 계정에 연동했다면, ALREADY_SIGNUP_OAUTH 에러를 반환한다.")
         @Transactional
         void linkOauthWithHistory() throws Exception {
             // given
@@ -264,7 +264,7 @@ public class UserAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
         }
 
         @Test
-        @DisplayName("해당 provider가 soft delete된 이력이 존재한다면, deleted_at을 null로 업데이트하고 최신 oauth_id를 반영하여 계정 연동에 성공한다.")
+        @DisplayName("해당 소셜 계정으로 연동했었던 이력이 삭제되어 있다면, 새로운 데이터를 생성하고 연동에 성공한다.")
         @Transactional
         void linkOauthWithDeletedHistory() throws Exception {
             // given
@@ -281,11 +281,56 @@ public class UserAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
 
             // then
             result.andExpect(status().isOk()).andDo(print());
-            Oauth savedOauth = oauthService.readOauth(oauth.getId()).orElse(null);
+        }
+
+        @Test
+        @DisplayName("다른 계정에 이미 해당 소셜 계정이 연동되어 있다면, 409 ALREADY_USED_OAUTH 에러를 반환한다.")
+        @Transactional
+        void linkOauthWithAlreadyUsedOauth() throws Exception {
+            // given
+            User user1 = userService.createUser(UserFixture.GENERAL_USER.toUser());
+            Provider provider = Provider.KAKAO;
+            String oauthId = "oauthId";
+            oauthService.createOauth(Oauth.of(provider, oauthId, user1));
+
+            User user2 = userService.createUser(UserFixture.GENERAL_USER.toUser());
+
+            given(oauthOidcHelper.getPayload(provider, oauthId, "idToken", "nonce")).willReturn(new OidcDecodePayload("iss", "aud", oauthId, "email"));
+
+            // when
+            ResultActions result = performLinkOauth(provider, oauthId, user2);
+
+            // then
+            result
+                    .andExpect(status().isConflict())
+                    .andExpect(jsonPath("$.code").value(OauthErrorCode.ALREADY_USED_OAUTH.causedBy().getCode()))
+                    .andExpect(jsonPath("$.message").value(OauthErrorCode.ALREADY_USED_OAUTH.getExplainError()))
+                    .andDo(print());
+        }
+
+        @Test
+        @DisplayName("다른 계정에서 해당 소셜 계정을 연동했었던 삭제 이력이 있다면, 새로운 데이터를 생성하고 연동에 성공한다.")
+        void linkOauthWithDeletedOauth() throws Exception {
+            // given
+            User user1 = userService.createUser(UserFixture.GENERAL_USER.toUser());
+            Provider provider = Provider.KAKAO;
+            String oauthId = "oauthId";
+            Oauth oauth = oauthService.createOauth(Oauth.of(provider, oauthId, user1));
+            log.info("생성된 Oauth 정보 : {}", oauth);
+            oauthService.deleteOauth(oauth);
+
+            User user2 = userService.createUser(UserFixture.OAUTH_USER.toUser());
+
+            given(oauthOidcHelper.getPayload(provider, oauthId, "idToken", "nonce")).willReturn(new OidcDecodePayload("iss", "aud", oauthId, "email"));
+
+            // when
+            ResultActions result = performLinkOauth(provider, oauthId, user2);
+
+            // then
+            result.andExpect(status().isOk()).andDo(print());
+            Oauth savedOauth = oauthService.readOauthsByUserId(user2.getId()).stream().filter(o -> o.getProvider().equals(provider)).findFirst().orElse(null);
             assertNotNull(savedOauth);
-            assertEquals("newOauthId", savedOauth.getOauthId());
             assertNull(savedOauth.getDeletedAt());
-            log.info("연동된 Oauth 정보 : {}", savedOauth);
         }
 
         private ResultActions performLinkOauth(Provider provider, String oauthId, User requestUser) throws Exception {

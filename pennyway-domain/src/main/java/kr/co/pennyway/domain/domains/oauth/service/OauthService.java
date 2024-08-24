@@ -34,18 +34,24 @@ public class OauthService {
     }
 
     @Transactional(readOnly = true)
-    public Optional<Oauth> readOauthByUserIdAndProvider(Long userId, Provider provider) {
-        return oauthRepository.findByUser_IdAndProvider(userId, provider);
-    }
-
-    @Transactional(readOnly = true)
     public Set<Oauth> readOauthsByUserId(Long userId) {
         return oauthRepository.findAllByUser_Id(userId);
     }
 
+    /**
+     * userId와 provider로 Oauth가 존재하는지 확인한다. 이 때, deletedAt이 null인 Oauth만 조회한다.
+     */
     @Transactional(readOnly = true)
-    public boolean isExistOauthAccount(Long userId, Provider provider) {
-        return oauthRepository.existsByUser_IdAndProvider(userId, provider);
+    public boolean isExistOauthByUserIdAndProvider(Long userId, Provider provider) {
+        return oauthRepository.existsByUser_IdAndProviderAndDeletedAtIsNull(userId, provider);
+    }
+
+    /**
+     * oauthId와 provider로 Oauth가 존재하는지 확인한다. 이 때, deletedAt이 null인 Oauth만 조회한다.
+     */
+    @Transactional(readOnly = true)
+    public boolean isExistOauthByOauthIdAndProvider(String oauthId, Provider provider) {
+        return oauthRepository.existsByOauthIdAndProviderAndDeletedAtIsNull(oauthId, provider);
     }
 
     @Transactional
