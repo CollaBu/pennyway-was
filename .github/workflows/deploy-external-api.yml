@@ -83,6 +83,8 @@ jobs:
       - name: AWS SSM Send-Command
         uses: peterkimzz/aws-ssm-send-command@master
         id: ssm
+        env:
+          VERSION: ${{ steps.get_version.outputs.VERSION }}
         with:
           aws-region: ${{ secrets.AWS_REGION }}
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -93,52 +95,5 @@ jobs:
             docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
             docker system prune -a -f
             docker pull pennyway/pennyway-was
-            
-            # 현재 활성 포트 확인
-            CURRENT_PORT=$(docker-compose ps | grep "was" | grep -oP "0.0.0.0:\K\d+")
-            
-            if [ "$CURRENT_PORT" == "8080" ]; then
-              NEW_PORT="8081"
-            else
-              NEW_PORT="8080"
-            fi
-            
-            # docker-compose.yml 파일 업데이트
-            sed -i "s/WAS_PORT=.*/WAS_PORT=$NEW_PORT/" .env
-            sed -i "s/WAS_VERSION=.*/WAS_VERSION=${{ steps.get_version.outputs.VERSION }}/" .env
-            
-            # 새 버전 배포
-            docker-compose up -d was
-            
-            # 새 버전 헬스 체크
-            for i in {1..30}; do
-              if curl -s http://localhost:$NEW_PORT/health | grep -q "UP"; then
-                echo "New version is healthy"
-            
-                # 이전 버전 종료
-                if [ -n "$CURRENT_PORT" ]; then
-                  docker-compose stop was
-                  docker-compose rm -f was
-                fi
-            
-                echo "Deployment successful"
-                exit 0
-              fi
-              sleep 10
-            done
-            
-            echo "New version failed health check. Rolling back."
-            docker-compose stop was
-            docker-compose rm -f was
-            sed -i "s/WAS_PORT=.*/WAS_PORT=$CURRENT_PORT/" .env
-            sed -i "s/WAS_VERSION=.*/$CURRENT_VERSION/" .env
-            docker-compose up -d was
-            exit 1
-
-      # 8. 배포 결과 확인
-      - name: Check deployment result
-        if: failure()
-        run: |
-          echo "Deployment failed. Please check the logs and take necessary actions."
-          exit 1
-
+            chmod +x deploy.sh
+            bash -x ./deploy.sh
