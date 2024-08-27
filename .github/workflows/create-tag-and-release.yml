@@ -1,0 +1,89 @@
+name: Tag and Release
+
+on:
+  pull_request:
+    types: [ closed ]
+
+jobs:
+  extract-info:
+    # PR이 merge 되었을 때만 실행 (merge가 아닌 close는 제외)
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      repository-projects: write
+    outputs:
+      module: ${{ steps.module_prefix.outputs.module }}
+
+    steps:
+      - name: Checkout PR
+        uses: actions/checkout@v4
+
+      # PR 제목으로 부터 모듈명 추출 (ex. Api, Batch, Admin, Socket)
+      - name: extract PR info
+        id: module_prefix
+        run: |
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          echo "PR title : $PR_TITLE"
+          if [[ "$PR_TITLE" =~ ^(Api|Batch|Admin|Socket|Ignore): ]]; then
+            PREFIX="${BASH_REMATCH[1]}"
+            echo "Prefix: $PREFIX"
+            echo "module=$PREFIX" >> $GITHUB_OUTPUT
+          else
+            echo "PR title does not match the pattern"
+            exit 1
+          fi
+
+  release:
+    needs: extract-info
+    if: ${{ needs.extract-info.outputs.module != 'Ignore' }} # Ignore로 시작하는 PR은 파이프라인 중단
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      repository-projects: write
+
+    outputs:
+      tag: ${{ steps.tag_version.outputs.new_tag }}
+
+    steps:
+      - name: version and tag
+        id: tag_version
+        uses: mathieudutour/github-tag-action@v6.2
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          default_bump: patch
+          release_branches: main,dev.*
+          custom_release_rules: release:major, feat:minor:Features, refactor:minor:Refactoring, fix:patch:Bug Fixes, hotfix:patch:Hotfixes, docs:patch:Documentation, style:patch:Styles, perf:patch:Performance Improvements, test:patch:Tests, ci:patch:Continuous Integration, cd:patch:Continuous Deployment, chore:patch:Chores, revert:patch:Reverts
+          tag_prefix: '${{ needs.extract-info.outputs.module }}-v'
+
+      # 추출된 버전 및 변경 이력 로그 출력
+      - name: check output
+        run: |
+          echo "new_tag : ${{ steps.tag_version.outputs.new_tag }}"
+          echo "change_log : ${{ steps.tag_version.outputs.changelog }}"
+
+      # GitHub Release 생성
+      - name: Create a GitHub release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ steps.tag_version.outputs.new_tag }}
+          name: ${{ steps.tag_version.outputs.new_tag }}
+          body: ${{ steps.tag_version.outputs.changelog }}
+
+  call-external-api-deploy:
+    needs: [ extract-info, release ]
+    if: ${{ needs.extract-info.outputs.module == 'Api' }}
+    uses: ./.github/workflows/deploy-external-api.yml
+    secrets: inherit
+    with:
+      tags: ${{ needs.release.outputs.tag }}
+
+  call-batch-deploy:
+    needs: [ extract-info, release ]
+    if: ${{ needs.extract-info.outputs.module == 'Batch' }}
+    uses: ./.github/workflows/deploy-batch.yml
+    secrets: inherit
+    with:
+      tags: ${{ needs.release.outputs.tag }}

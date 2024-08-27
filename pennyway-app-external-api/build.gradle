@@ -1,0 +1,43 @@
+plugins {
+    id 'java'
+}
+
+bootJar { enabled = true }
+jar { enabled = false }
+
+group = 'kr.co'
+version = 'unspecified'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation project(':pennyway-common')
+    implementation project(':pennyway-domain')
+    implementation project(':pennyway-infra')
+
+    /* Security */
+    implementation 'org.springframework.boot:spring-boot-starter-security:3.2.4'
+    testImplementation 'org.springframework.security:spring-security-test:6.2.3'
+
+    /* Swagger */
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.4.0'
+
+    /* jackson */
+    implementation group: 'org.openapitools', name: 'jackson-databind-nullable', version: '0.2.6'
+
+    implementation 'org.springframework.boot:spring-boot-starter-web:3.2.3'
+    implementation 'org.springframework.boot:spring-boot-starter-validation:3.2.3'
+
+    /* Actuator */
+    implementation 'org.springframework.boot:spring-boot-starter-actuator:3.3.2'
+
+    /* testcontainer */
+    testImplementation "org.junit.jupiter:junit-jupiter:5.8.1"
+    testImplementation "org.testcontainers:testcontainers:1.19.7"
+    testImplementation "org.testcontainers:junit-jupiter:1.19.7"
+    testImplementation "org.testcontainers:mysql:1.19.7"
+    testImplementation "com.redis.testcontainers:testcontainers-redis-junit:1.6.4"
+    testImplementation "org.springframework.cloud:spring-cloud-contract-wiremock:4.1.2"
+}

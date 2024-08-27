@@ -1,0 +1,56 @@
+spring:
+  profiles:
+    group:
+      local: common, domain, infra
+      dev: common, domain, infra
+
+jwt:
+  secret-key:
+    access-token: ${JWT_ACCESS_SECRET_KEY:exampleSecretKeyForPennywaySystemAccessSecretKeyTestForPadding}
+    refresh-token: ${JWT_REFRESH_SECRET_KEY:exampleSecretKeyForPennywaySystemRefreshSecretKeyTestForPadding}
+  expiration-time:
+    # milliseconds 단위
+    access-token: ${JWT_ACCESS_EXPIRATION_TIME:1800000} # 30m (30 * 60 * 1000)
+    refresh-token: ${JWT_REFRESH_EXPIRATION_TIME:604800000} # 7d (7 * 24 * 60 * 60 * 1000)
+
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+
+springdoc:
+  default-consumes-media-type: application/json;charset=UTF-8
+  default-produces-media-type: application/json;charset=UTF-8
+  swagger-ui:
+    path: /swagger-ui
+    disable-swagger-default-url: true
+    display-request-duration: true
+    operations-sorter: alpha
+  api-docs:
+    groups:
+      enabled: true
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+springdoc:
+  default-consumes-media-type: application/json;charset=UTF-8
+  default-produces-media-type: application/json;charset=UTF-8
+  swagger-ui:
+    path: /swagger-ui
+    disable-swagger-default-url: true
+    display-request-duration: true
+    operations-sorter: alpha
+  api-docs:
+    groups:
+      enabled: true
+
+---
+spring:
+  config:
+    activate:
+      on-profile: test

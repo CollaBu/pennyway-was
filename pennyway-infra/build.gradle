@@ -1,0 +1,36 @@
+bootJar { enabled = false }
+jar { enabled = true }
+
+dependencies {
+    implementation project(':pennyway-common')
+
+    /* jwt */
+    api group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.12.5'
+    runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.12.5'
+    runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.12.5'
+
+    /* httpclient */
+    implementation 'org.apache.httpcomponents:httpclient:4.5.14'
+    implementation 'org.apache.httpcomponents.client5:httpclient5:5.3.1'
+    implementation 'org.apache.httpcomponents:httpcore:4.4.16'
+
+    /* redis */
+    api 'org.springframework.boot:spring-boot-starter-data-redis'
+
+    /* feign */
+    implementation platform("org.springframework.cloud:spring-cloud-dependencies:2023.0.1")
+    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign:4.1.1'
+    implementation 'io.github.openfeign:feign-okhttp:13.2'
+
+    /* aws */
+    implementation platform("software.amazon.awssdk:bom:2.25.26")
+    implementation 'software.amazon.awssdk:sns:2.25.26'
+    implementation 'software.amazon.awssdk:s3:2.25.26'
+
+    /* mail */
+    implementation 'org.springframework.boot:spring-boot-starter-mail:3.2.3'
+
+    /* firebase */
+    implementation 'com.google.firebase:firebase-admin:9.2.0'
+
+}
