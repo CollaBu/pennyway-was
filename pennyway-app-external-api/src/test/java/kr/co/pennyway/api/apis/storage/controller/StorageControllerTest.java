@@ -2,7 +2,6 @@ package kr.co.pennyway.api.apis.storage.controller;
 
 import kr.co.pennyway.api.apis.storage.dto.PresignedUrlDto;
 import kr.co.pennyway.api.apis.storage.usecase.StorageUseCase;
-import kr.co.pennyway.api.config.WebConfig;
 import kr.co.pennyway.api.config.supporter.WithSecurityMockUser;
 import kr.co.pennyway.infra.common.exception.StorageErrorCode;
 import kr.co.pennyway.infra.common.exception.StorageException;
@@ -12,8 +11,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -26,8 +23,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(controllers = StorageController.class, excludeFilters = {
-        @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = WebConfig.class)})
+@WebMvcTest(controllers = StorageController.class)
 @ActiveProfiles("test")
 class StorageControllerTest {
     @Autowired

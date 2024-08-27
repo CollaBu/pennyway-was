@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.pennyway.api.apis.users.dto.DeviceTokenDto;
 import kr.co.pennyway.api.apis.users.dto.UserProfileUpdateDto;
 import kr.co.pennyway.api.apis.users.usecase.UserAccountUseCase;
-import kr.co.pennyway.api.config.WebConfig;
 import kr.co.pennyway.api.config.fixture.DeviceTokenFixture;
 import kr.co.pennyway.api.config.supporter.WithSecurityMockUser;
 import kr.co.pennyway.common.exception.StatusCode;
@@ -16,8 +15,6 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -35,8 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(controllers = {UserAccountController.class}, excludeFilters = {
-        @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = WebConfig.class)})
+@WebMvcTest(controllers = {UserAccountController.class})
 @ActiveProfiles("local")
 @TestClassOrder(ClassOrderer.OrderAnnotation.class)
 public class UserAccountControllerUnitTest {

@@ -5,7 +5,6 @@ import kr.co.pennyway.api.apis.auth.dto.SignUpReq;
 import kr.co.pennyway.api.apis.auth.usecase.AuthUseCase;
 import kr.co.pennyway.api.common.security.jwt.Jwts;
 import kr.co.pennyway.api.common.util.CookieUtil;
-import kr.co.pennyway.api.config.WebConfig;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -13,8 +12,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseCookie;
 import org.springframework.test.context.ActiveProfiles;
@@ -31,8 +28,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(controllers = {AuthController.class}, excludeFilters = {
-        @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = WebConfig.class)})
+@WebMvcTest(controllers = {AuthController.class})
 @ActiveProfiles("local")
 public class AuthControllerValidationTest {
 

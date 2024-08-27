@@ -4,8 +4,6 @@ import kr.co.pennyway.api.apis.ledger.dto.SpendingSearchRes;
 import kr.co.pennyway.api.apis.ledger.usecase.SpendingCategoryUseCase;
 import kr.co.pennyway.api.common.query.SpendingCategoryType;
 import kr.co.pennyway.api.config.supporter.WithSecurityMockUser;
-import kr.co.pennyway.domain.common.redis.sign.SignEventLogService;
-import kr.co.pennyway.infra.common.jwt.JwtProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -35,10 +33,6 @@ public class GetSpendingsByCategoryControllerTest {
 
     @MockBean
     private SpendingCategoryUseCase spendingCategoryUseCase;
-    @MockBean
-    private SignEventLogService signEventLogService;
-    @MockBean
-    private JwtProvider accessTokenProvider;
 
     @BeforeEach
     void setUp(WebApplicationContext webApplicationContext) {
