@@ -3,9 +3,7 @@ package kr.co.pennyway.api.apis.ledger.controller;
 import kr.co.pennyway.api.apis.ledger.dto.SpendingCategoryDto;
 import kr.co.pennyway.api.apis.ledger.usecase.SpendingCategoryUseCase;
 import kr.co.pennyway.api.config.supporter.WithSecurityMockUser;
-import kr.co.pennyway.domain.common.redis.sign.SignEventLogService;
 import kr.co.pennyway.domain.domains.spending.type.SpendingCategory;
-import kr.co.pennyway.infra.common.jwt.JwtProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -26,10 +24,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(SpendingCategoryController.class)
 @ActiveProfiles("test")
 public class SpendingCategoryUpdateControllerTest {
-    @MockBean
-    private SignEventLogService signEventLogService;
-    @MockBean
-    private JwtProvider accessTokenProvider;
     @MockBean
     private SpendingCategoryUseCase spendingCategoryUseCase;
     @Autowired

@@ -2,7 +2,6 @@ package kr.co.pennyway.api.apis.notification.controller;
 
 import kr.co.pennyway.api.apis.notification.dto.NotificationDto;
 import kr.co.pennyway.api.apis.notification.usecase.NotificationUseCase;
-import kr.co.pennyway.api.config.WebConfig;
 import kr.co.pennyway.api.config.fixture.NotificationFixture;
 import kr.co.pennyway.api.config.fixture.UserFixture;
 import kr.co.pennyway.api.config.supporter.WithSecurityMockUser;
@@ -13,8 +12,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -33,8 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(controllers = {NotificationController.class}, excludeFilters = {
-        @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = WebConfig.class)})
+@WebMvcTest(controllers = {NotificationController.class})
 @ActiveProfiles("test")
 public class GetNotificationsControllerUnitTest {
     @Autowired
