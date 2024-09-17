@@ -1,4 +1,4 @@
-package kr.co.pennyway.api.common.security.jwt;
+package kr.co.pennyway.infra.common.util;
 
 import kr.co.pennyway.infra.common.jwt.JwtClaims;
 
