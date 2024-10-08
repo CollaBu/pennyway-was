@@ -17,8 +17,8 @@
 
 ### 🏷️ Directory Structure
 
-```agsl
-pennyway-common
+```
+pennyway-app-external-api
 ├── src
 │   ├── main
 │   │   ├── java.kr.co.pennyway
