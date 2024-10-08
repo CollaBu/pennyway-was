@@ -10,7 +10,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum PennywayInfraConfigGroup {
     FCM(FcmConfig.class),
-    DistributedCoordinationConfig(DistributedCoordinationConfig.class),
+    DISTRIBUTED_COORDINATION_CONFIG(DistributedCoordinationConfig.class),
     MESSAGE_BROKER_CONFIG(MessageBrokerConfig.class);
 
     private final Class<? extends PennywayInfraConfig> configClass;

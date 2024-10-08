@@ -18,7 +18,7 @@ import org.springframework.context.annotation.Configuration;
 })
 @EnablePennywayInfraConfig({
         PennywayInfraConfigGroup.FCM,
-        PennywayInfraConfigGroup.DistributedCoordinationConfig
+        PennywayInfraConfigGroup.DISTRIBUTED_COORDINATION_CONFIG
 })
 public class InfraConfig {
 }
