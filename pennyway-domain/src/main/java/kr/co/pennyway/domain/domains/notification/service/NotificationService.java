@@ -26,7 +26,7 @@ public class NotificationService {
 
     @Transactional(readOnly = true)
     public Slice<Notification> readNotificationsSlice(Long userId, Pageable pageable) {
-        Predicate predicate = notification.receiver.id.eq(userId).and(notification.readAt.isNull());
+        Predicate predicate = notification.receiver.id.eq(userId).and(notification.readAt.isNotNull());
 
         QueryHandler queryHandler = query -> query
                 .offset(pageable.getOffset())
@@ -39,7 +39,9 @@ public class NotificationService {
 
     @Transactional(readOnly = true)
     public List<Notification> readUnreadNotifications(Long userId) {
-        return notificationRepository.findByReceiver_IdAndReadAtIsNull(userId);
+        Predicate predicate = notification.receiver.id.eq(userId).and(notification.readAt.isNull());
+
+        return notificationRepository.findList(predicate, null, null);
     }
 
     @Transactional(readOnly = true)
