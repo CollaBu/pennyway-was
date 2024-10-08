@@ -26,7 +26,7 @@ jobs:
         run: |
           PR_TITLE="${{ github.event.pull_request.title }}"
           echo "PR title : $PR_TITLE"
-          if [[ "$PR_TITLE" =~ ^(Api|Batch|Admin|Socket|Ignore): ]]; then
+          if [[ "$PR_TITLE" =~ ^(Api|Batch|Admin|Socket|Realy|Ignore): ]]; then
             PREFIX="${BASH_REMATCH[1]}"
             echo "Prefix: $PREFIX"
             echo "module=$PREFIX" >> $GITHUB_OUTPUT
