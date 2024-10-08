@@ -61,6 +61,10 @@ oauth2:
         jwks-uri: ${APPLE_JWKS_URI:http://localhost}
         secret: ${APPLE_CLIENT_SECRET:pennyway-jayang-was}
 
+distributed-coordination:
+  chat-server:
+    url: ${CHAT_SERVER_URL:ws://localhost:8000/chat}
+
 ---
 spring:
   config:
