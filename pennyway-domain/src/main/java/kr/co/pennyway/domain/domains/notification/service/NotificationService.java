@@ -26,7 +26,7 @@ public class NotificationService {
 
     @Transactional(readOnly = true)
     public Slice<Notification> readNotificationsSlice(Long userId, Pageable pageable) {
-        Predicate predicate = notification.receiver.id.eq(userId);
+        Predicate predicate = notification.receiver.id.eq(userId).and(notification.readAt.isNull());
 
         QueryHandler queryHandler = query -> query
                 .offset(pageable.getOffset())
