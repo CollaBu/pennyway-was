@@ -17,7 +17,8 @@ import org.springframework.context.annotation.Configuration;
         KakaoOidcProperties.class
 })
 @EnablePennywayInfraConfig({
-        PennywayInfraConfigGroup.FCM
+        PennywayInfraConfigGroup.FCM,
+        PennywayInfraConfigGroup.DistributedCoordinationConfig
 })
 public class InfraConfig {
 }
