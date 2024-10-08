@@ -38,5 +38,5 @@ pennyway-app-external-api
 │   └── test
 ├── build.gradle
 ├── README.md
-└── settings.gradle
+└── Dockerfile
 ```
