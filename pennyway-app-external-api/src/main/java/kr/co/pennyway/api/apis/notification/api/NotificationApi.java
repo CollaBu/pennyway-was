@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 @Tag(name = "[알림 API]")
 public interface NotificationApi {
-    @Operation(summary = "수신한 읽음 알림 목록 무한 스크롤 조회")
+    @Operation(summary = "수신한 알림 중 확인한 알림 목록 무한 스크롤 조회")
     @Parameters({
             @Parameter(
                     in = ParameterIn.QUERY,
@@ -61,7 +61,7 @@ public interface NotificationApi {
             @AuthenticationPrincipal SecurityUserDetails user
     );
 
-    @Operation(summary = "수신한 미확인 알림 목록 조회")
+    @Operation(summary = "수신한 알림 중 미확인 알림 목록 조회")
     @ApiResponse(responseCode = "200", description = "미확인 알림 목록 조회 성공", content = @Content(schemaProperties = @SchemaProperty(name = "notifications", array = @ArraySchema(schema = @Schema(implementation = NotificationDto.Info.class)))))
     ResponseEntity<?> getUnreadNotifications(@AuthenticationPrincipal SecurityUserDetails user);
 
