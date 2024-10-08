@@ -58,7 +58,7 @@ pennyway:
     chat:
       queue: ${RABBITMQ_CHAT_QUEUE:chat.queue}
       exchange: ${RABBITMQ_CHAT_EXCHANGE:chat.exchange}
-      routing: ${RABBITMQ_CHAT_ROUTING:chat.room.*}
+      routing-key: ${RABBITMQ_CHAT_ROUTING:chat.room.*}
 
 oauth2:
   client:

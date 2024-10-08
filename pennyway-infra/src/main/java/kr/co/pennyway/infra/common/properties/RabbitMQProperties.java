@@ -10,5 +10,5 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class RabbitMQProperties {
     private final String exchange;
     private final String queue;
-    private final String routing;
+    private final String routingKey;
 }
