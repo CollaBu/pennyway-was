@@ -20,7 +20,7 @@ jobs:
       - name: Checkout PR
         uses: actions/checkout@v4
 
-      # PR 제목으로 부터 모듈명 추출 (ex. Api, Batch, Admin, Socket)
+      # PR 제목으로 부터 모듈명 추출 (ex. Api, Batch, Admin, Socket, Relay, Ingore: 파이프라인 무시)
       - name: extract PR info
         id: module_prefix
         run: |
@@ -84,6 +84,22 @@ jobs:
     needs: [ extract-info, release ]
     if: ${{ needs.extract-info.outputs.module == 'Batch' }}
     uses: ./.github/workflows/deploy-batch.yml
+    secrets: inherit
+    with:
+      tags: ${{ needs.release.outputs.tag }}
+
+  call-socket-deploy:
+    needs: [ extract-info, release ]
+    if: ${{ needs.extract-info.outputs.module == 'Socket' }}
+    uses: ./.github/workflows/deploy-socket.yml
+    secrets: inherit
+    with:
+      tags: ${{ needs.release.outputs.tag }}
+
+  call-socket-relay-deploy:
+    needs: [ extract-info, release ]
+    if: ${{ needs.extract-info.outputs.module == 'Relay' }}
+    uses: ./.github/workflows/deploy-socket-relay.yml
     secrets: inherit
     with:
       tags: ${{ needs.release.outputs.tag }}
