@@ -30,17 +30,24 @@ public class NotificationController implements NotificationApi {
     @Override
     @GetMapping("")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> getNotifications(
+    public ResponseEntity<?> getReadNotifications(
             @PageableDefault(page = 0, size = 30) @SortDefault(sort = "notification.createdAt", direction = Sort.Direction.DESC) Pageable pageable,
             @AuthenticationPrincipal SecurityUserDetails user
     ) {
-        return ResponseEntity.ok(SuccessResponse.from(NOTIFICATIONS, notificationUseCase.getNotifications(user.getUserId(), pageable)));
+        return ResponseEntity.ok(SuccessResponse.from(NOTIFICATIONS, notificationUseCase.getReadNotifications(user.getUserId(), pageable)));
     }
 
     @Override
     @GetMapping("/unread")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> getUnreadNotifications(@AuthenticationPrincipal SecurityUserDetails user) {
+        return ResponseEntity.ok(SuccessResponse.from(NOTIFICATIONS, notificationUseCase.getUnreadNotifications(user.getUserId())));
+    }
+
+    @Override
+    @GetMapping("/unread/exist")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> getHasUnreadNotification(@AuthenticationPrincipal SecurityUserDetails user) {
         return ResponseEntity.ok(SuccessResponse.from(HAS_UNREAD, notificationUseCase.hasUnreadNotification(user.getUserId())));
     }
 

@@ -7,9 +7,22 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 
+import java.util.Comparator;
+import java.util.List;
+
 @Slf4j
 @Mapper
 public class NotificationMapper {
+    /**
+     * Notification 타입을 NotificationDto.Info 타입으로 변환한다.
+     */
+    public static List<NotificationDto.Info> toInfoList(List<Notification> notifications) {
+        return notifications.stream()
+                .map(NotificationDto.Info::from)
+                .sorted(Comparator.comparing(NotificationDto.Info::id).reversed())
+                .toList();
+    }
+
     /**
      * Slice<Notification> 타입을 무한 스크롤 응답 형태로 변환한다.
      */

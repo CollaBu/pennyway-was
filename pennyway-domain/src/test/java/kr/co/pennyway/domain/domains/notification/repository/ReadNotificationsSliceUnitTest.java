@@ -28,6 +28,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -64,6 +65,7 @@ public class ReadNotificationsSliceUnitTest extends ContainerMySqlTestConfig {
         List<Notification> notifications = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             Notification notification = new Notification.Builder(NoticeType.ANNOUNCEMENT, Announcement.DAILY_SPENDING, user).build();
+            ReflectionTestUtils.setField(notification, "readAt", LocalDateTime.now());
             notifications.add(notification);
         }
         bulkInsertNotifications(notifications);
@@ -97,8 +99,8 @@ public class ReadNotificationsSliceUnitTest extends ContainerMySqlTestConfig {
 
     private void bulkInsertNotifications(List<Notification> notifications) {
         String sql = String.format("""
-                INSERT INTO `%s` (type, announcement, created_at, updated_at, receiver, receiver_name)
-                VALUES (:type, :announcement, :createdAt, :updatedAt, :receiver, :receiverName);
+                INSERT INTO `%s` (type, announcement, created_at, updated_at, receiver, receiver_name, read_at)
+                VALUES (:type, :announcement, :createdAt, :updatedAt, :receiver, :receiverName, :readAt);
                 """, "notification");
 
         LocalDateTime date = LocalDateTime.now();
@@ -112,7 +114,8 @@ public class ReadNotificationsSliceUnitTest extends ContainerMySqlTestConfig {
                     .addValue("createdAt", date)
                     .addValue("updatedAt", date)
                     .addValue("receiver", notification.getReceiver().getId())
-                    .addValue("receiverName", notification.getReceiverName());
+                    .addValue("receiverName", notification.getReceiverName())
+                    .addValue("readAt", notification.getReadAt());
             date = date.minusDays(1);
         }
 
