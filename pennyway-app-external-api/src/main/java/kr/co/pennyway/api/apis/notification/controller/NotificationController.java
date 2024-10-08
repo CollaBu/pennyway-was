@@ -40,7 +40,7 @@ public class NotificationController implements NotificationApi {
     @Override
     @GetMapping("/unread")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> getUnreadNotifications(@AuthenticationPrincipal SecurityUserDetails user) {
+    public ResponseEntity<?> getHasUnreadNotification(@AuthenticationPrincipal SecurityUserDetails user) {
         return ResponseEntity.ok(SuccessResponse.from(HAS_UNREAD, notificationUseCase.hasUnreadNotification(user.getUserId())));
     }
 
