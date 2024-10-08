@@ -9,6 +9,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 public interface NotificationRepository extends ExtendedRepository<Notification, Long>, NotificationCustomRepository {
+    @Transactional(readOnly = true)
+    List<Notification> findByReceiver_IdAndReadAtIsNull(Long userId);
+
     @Modifying(clearAutomatically = true)
     @Transactional
     @Query("update Notification n set n.readAt = current_timestamp where n.id in ?1")

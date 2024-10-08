@@ -38,6 +38,11 @@ public class NotificationService {
     }
 
     @Transactional(readOnly = true)
+    public List<Notification> readUnreadNotifications(Long userId) {
+        return notificationRepository.findByReceiver_IdAndReadAtIsNull(userId);
+    }
+
+    @Transactional(readOnly = true)
     public boolean isExistsUnreadNotification(Long userId) {
         return notificationRepository.existsUnreadNotification(userId);
     }

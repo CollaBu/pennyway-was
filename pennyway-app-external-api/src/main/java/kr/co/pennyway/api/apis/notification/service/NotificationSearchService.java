@@ -9,6 +9,8 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -18,6 +20,11 @@ public class NotificationSearchService {
     @Transactional(readOnly = true)
     public Slice<Notification> getNotifications(Long userId, Pageable pageable) {
         return notificationService.readNotificationsSlice(userId, pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Notification> getUnreadNotifications(Long userId) {
+        return notificationService.readUnreadNotifications(userId);
     }
 
     @Transactional(readOnly = true)
