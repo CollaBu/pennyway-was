@@ -38,6 +38,11 @@ public class NotificationController implements NotificationApi {
     }
 
     @Override
+    public ResponseEntity<?> getUnreadNotifications(@AuthenticationPrincipal SecurityUserDetails user) {
+        return null;
+    }
+
+    @Override
     @GetMapping("/unread")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> getHasUnreadNotification(@AuthenticationPrincipal SecurityUserDetails user) {
