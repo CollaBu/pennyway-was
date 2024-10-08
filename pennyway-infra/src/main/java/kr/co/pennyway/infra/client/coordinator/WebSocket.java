@@ -7,5 +7,9 @@ public final class WebSocket {
         public ChatServerUrl {
             Objects.requireNonNull(url, "url must not be null");
         }
+
+        public static ChatServerUrl of(String url) {
+            return new ChatServerUrl(url);
+        }
     }
 }
