@@ -5,4 +5,6 @@ include 'pennyway-batch'
 include 'pennyway-domain'
 include 'pennyway-infra'
 include 'pennyway-common'
+include 'pennyway-socket'
+include 'pennyway-socket-relay'
 

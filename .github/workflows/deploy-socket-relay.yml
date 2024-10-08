@@ -1,0 +1,77 @@
+name: Continuous Deployment - Socket Relay
+
+on:
+  workflow_call:
+    inputs:
+      tags:
+        description: '배포할 Relay 모듈 태그 정보 (Relay-v*.*.*)'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  deployment:
+    runs-on: ubuntu-20.04
+
+    steps:
+      # 1. Compare branch 코드 내려 받기
+      - name: Checkout PR
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.push.base_ref }}
+
+      # 2. 버전 정보 추출 (태그 정보에서 *.*.*만 추출)
+      - name: Get Version
+        id: get_version
+        run: |
+          RELEASE_VERSION_WITHOUT_V="$(cut -d'v' -f2 <<< ${{ inputs.tags }})"
+          echo "VERSION=$RELEASE_VERSION_WITHOUT_V" >> $GITHUB_OUTPUT
+
+      # 3. 자바 환경 설정
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      # 4. FCM Admin SDK 파일 생성
+      - name: Create Json
+        uses: jsdaniell/create-json@v1.2.2
+        with:
+          name: ${{ secrets.FIREBASE_ADMIN_SDK_FILE }}
+          json: ${{ secrets.FIREBASE_ADMIN_SDK }}
+          dir: ${{ secrets.FIREBASE_ADMIN_SDK_DIR }}
+
+      # 5. Build Gradle
+      - name: Build Gradle
+        run: |
+          chmod +x ./gradlew
+          ./gradlew :pennyway-socket-relay:build --parallel --stacktrace --info -x test
+        shell: bash
+
+      # 6. Docker 이미지 build 및 push
+      - name: docker build and push
+        run: |
+          docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+          docker build -t pennyway/pennyway-socket-relay:${{ steps.get_version.outputs.VERSION }} ./pennyway-socket-relay
+          docker build -t pennyway/pennyway-socket-relay:latest ./pennyway-socket-relay
+          docker push pennyway/pennyway-socket-relay:${{ steps.get_version.outputs.VERSION }}
+          docker push pennyway/pennyway-socket-relay:latest
+
+      # 7. AWS SSM을 통한 Run-Command (Docker 이미지 pull 후 docker-compose를 통한 실행)
+      - name: AWS SSM Send-Command
+        uses: peterkimzz/aws-ssm-send-command@master
+        id: ssm
+        with:
+          aws-region: ${{ secrets.AWS_REGION }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          instance-ids: ${{ secrets.AWS_DEV_INSTANCE_ID }}
+          working-directory: /home/ubuntu
+          command: |
+            docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+            docker system prune -a -f
+            docker pull pennyway/pennyway-socket-relay
+            docker-compose up -d
