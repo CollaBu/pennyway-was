@@ -20,10 +20,16 @@ public class NotificationUseCase {
     private final NotificationSearchService notificationSearchService;
     private final NotificationSaveService notificationSaveService;
 
-    public NotificationDto.SliceRes getNotifications(Long userId, Pageable pageable) {
+    public NotificationDto.SliceRes getReadNotifications(Long userId, Pageable pageable) {
         Slice<Notification> notifications = notificationSearchService.getNotifications(userId, pageable);
 
         return NotificationMapper.toSliceRes(notifications, pageable);
+    }
+
+    public List<NotificationDto.Info> getUnreadNotifications(Long userId) {
+        List<Notification> notifications = notificationSearchService.getUnreadNotifications(userId);
+
+        return NotificationMapper.toInfoList(notifications);
     }
 
     public boolean hasUnreadNotification(Long userId) {
