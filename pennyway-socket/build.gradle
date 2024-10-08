@@ -16,4 +16,7 @@ dependencies {
     implementation project(':pennyway-common')
     implementation project(':pennyway-domain')
     implementation project(':pennyway-infra')
+
+    /* Web Socket */
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
 }
