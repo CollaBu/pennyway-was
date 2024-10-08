@@ -30,7 +30,7 @@ public class NotificationController implements NotificationApi {
     @Override
     @GetMapping("")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> getNotifications(
+    public ResponseEntity<?> getReadNotifications(
             @PageableDefault(page = 0, size = 30) @SortDefault(sort = "notification.createdAt", direction = Sort.Direction.DESC) Pageable pageable,
             @AuthenticationPrincipal SecurityUserDetails user
     ) {

@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 @Tag(name = "[알림 API]")
 public interface NotificationApi {
-    @Operation(summary = "수신한 알림 목록 무한 스크롤 조회")
+    @Operation(summary = "수신한 읽음 알림 목록 무한 스크롤 조회")
     @Parameters({
             @Parameter(
                     in = ParameterIn.QUERY,
@@ -56,7 +56,7 @@ public interface NotificationApi {
                     )
             ), @Parameter(name = "pageable", hidden = true)})
     @ApiResponse(responseCode = "200", description = "알림 목록 조회 성공", content = @Content(schemaProperties = @SchemaProperty(name = "notifications", schema = @Schema(implementation = NotificationDto.SliceRes.class))))
-    ResponseEntity<?> getNotifications(
+    ResponseEntity<?> getReadNotifications(
             @PageableDefault(page = 0, size = 30) @SortDefault(sort = "notification.createdAt", direction = Sort.Direction.DESC) Pageable pageable,
             @AuthenticationPrincipal SecurityUserDetails user
     );
