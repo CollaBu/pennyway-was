@@ -1,10 +1,10 @@
-name: Continuous Deployment - Socket
+name: Continuous Deployment - Socket Relay
 
 on:
   workflow_call:
     inputs:
       tags:
-        description: '배포할 Socket 모듈 태그 정보 (Socket-v*.*.*)'
+        description: '배포할 Relay 모듈 태그 정보 (Relay-v*.*.*)'
         required: true
         type: string
 
@@ -48,17 +48,17 @@ jobs:
       - name: Build Gradle
         run: |
           chmod +x ./gradlew
-          ./gradlew :pennyway-socket:build --parallel --stacktrace --info -x test
+          ./gradlew :pennyway-socket-relay:build --parallel --stacktrace --info -x test
         shell: bash
 
       # 6. Docker 이미지 build 및 push
       - name: docker build and push
         run: |
           docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-          docker build -t pennyway/pennyway-socket:${{ steps.get_version.outputs.VERSION }} ./pennyway-socket
-          docker build -t pennyway/pennyway-socket:latest ./pennyway-socket
-          docker push pennyway/pennyway-socket:${{ steps.get_version.outputs.VERSION }}
-          docker push pennyway/pennyway-socket:latest
+          docker build -t pennyway/pennyway-socket-relay:${{ steps.get_version.outputs.VERSION }} ./pennyway-socket-relay
+          docker build -t pennyway/pennyway-socket-relay:latest ./pennyway-socket-relay
+          docker push pennyway/pennyway-socket-relay:${{ steps.get_version.outputs.VERSION }}
+          docker push pennyway/pennyway-socket-relay:latest
 
       # 7. AWS SSM을 통한 Run-Command (Docker 이미지 pull 후 docker-compose를 통한 실행)
       - name: AWS SSM Send-Command
@@ -73,5 +73,5 @@ jobs:
           command: |
             docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
             docker system prune -a -f
-            docker pull pennyway/pennyway-socket
+            docker pull pennyway/pennyway-socket-relay
             docker-compose up -d
