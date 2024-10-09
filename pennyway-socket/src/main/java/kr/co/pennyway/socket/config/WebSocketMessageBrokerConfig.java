@@ -33,9 +33,12 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
         config.enableStompBrokerRelay("/queue", "/topic", "/exchange", "/amq/queue")
+                .setAutoStartup(true)
                 .setTcpClient(createTcpClient())
                 .setSystemLogin(messageBrokerProperties.getSystemId())
                 .setSystemPasscode(messageBrokerProperties.getSystemPassword())
+                .setClientLogin(messageBrokerProperties.getClientId())
+                .setClientPasscode(messageBrokerProperties.getClientPassword())
                 .setRelayHost(messageBrokerProperties.getHost())
                 .setRelayPort(messageBrokerProperties.getPort());
 

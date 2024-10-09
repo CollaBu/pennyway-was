@@ -19,6 +19,8 @@ message-broker:
     port: ${MESSAGE_BROKER_PORT:5672}
     system-id: ${MESSAGE_BROKER_SYSTEM_ID:guest}
     system-password: ${MESSAGE_BROKER_SYSTEM_PASSWORD:guest}
+    client-id: ${MESSAGE_BROKER_CLIENT_ID:guest}
+    client-password: ${MESSAGE_BROKER_CLIENT_PASSWORD:guest}
     user-prefix: ${MESSAGE_BROKER_USER_PREFIX:/usr}
     publish-exchange: ${MESSAGE_BROKER_PUBLISH_EXCHANGE:/topic}
 
