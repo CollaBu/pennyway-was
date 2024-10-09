@@ -1,4 +1,4 @@
-package kr.co.pennyway.relay;
+package kr.co.pennyway;
 
 import jakarta.annotation.PostConstruct;
 import org.springframework.boot.SpringApplication;
