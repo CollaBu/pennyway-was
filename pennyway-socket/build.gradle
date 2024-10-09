@@ -19,4 +19,7 @@ dependencies {
 
     /* Web Socket */
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
+
+    /* Reactor Netty */
+    implementation "org.springframework.boot:spring-boot-starter-reactor-netty"
 }

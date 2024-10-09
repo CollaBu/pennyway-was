@@ -8,7 +8,7 @@ pennyway:
   socket:
     chat:
       endpoint: ${SOCKET_CHAT_ENDPOINT:/ws}
-      allowded-origin-patterns: ${ALLOWED_ORIGIN_PATTERNS:http://localhost:3000}
+      allowed-origin-patterns: ${ALLOWED_ORIGIN_PATTERNS:*}
 
 message-broker:
   external:
@@ -16,7 +16,7 @@ message-broker:
     port: ${MESSAGE_BROKER_PORT:5672}
     system-id: ${MESSAGE_BROKER_SYSTEM_ID:guest}
     system-password: ${MESSAGE_BROKER_SYSTEM_PASSWORD:guest}
-    user-prefix: ${MESSAGE_BROKER_USER_PREFIX:/user}
+    user-prefix: ${MESSAGE_BROKER_USER_PREFIX:/usr}
     publish-exchange: ${MESSAGE_BROKER_PUBLISH_EXCHANGE:/topic}
 
 ---
