@@ -4,6 +4,9 @@ spring:
       local: common, domain, infra
       dev: common, domain, infra
 
+server:
+  port: ${SOCKET_SERVER_PORT:8081}
+
 pennyway:
   socket:
     chat:
