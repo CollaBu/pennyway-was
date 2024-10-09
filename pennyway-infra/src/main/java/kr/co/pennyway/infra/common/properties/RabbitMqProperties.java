@@ -13,4 +13,15 @@ public class RabbitMqProperties {
     private final String username;
     private final String password;
     private final String virtualHost;
+
+    @Override
+    public String toString() {
+        return "RabbitMqProperties{" +
+                "host='" + host + '\'' +
+                ", port=" + port +
+                ", username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                ", virtualHost='" + virtualHost + '\'' +
+                '}';
+    }
 }

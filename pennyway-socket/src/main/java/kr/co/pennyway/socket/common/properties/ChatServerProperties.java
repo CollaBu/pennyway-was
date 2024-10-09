@@ -12,4 +12,12 @@ import java.util.List;
 public class ChatServerProperties {
     private final String endpoint;
     private final List<String> allowedOriginPatterns;
+
+    @Override
+    public String toString() {
+        return "ChatServerProperties{" +
+                "endpoint='" + endpoint + '\'' +
+                ", allowedOriginPatterns=" + allowedOriginPatterns +
+                '}';
+    }
 }
