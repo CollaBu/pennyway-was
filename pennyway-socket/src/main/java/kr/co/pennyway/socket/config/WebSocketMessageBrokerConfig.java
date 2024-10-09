@@ -1,13 +1,20 @@
 package kr.co.pennyway.socket.config;
 
+import kr.co.pennyway.socket.common.interceptor.StompExceptionInterceptor;
+import kr.co.pennyway.socket.common.interceptor.StompInboundInterceptor;
 import kr.co.pennyway.socket.common.properties.ChatServerProperties;
 import kr.co.pennyway.socket.common.properties.MessageBrokerProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.MessageChannel;
+import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
+import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.simp.stomp.StompReactorNettyCodec;
+import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.messaging.tcp.reactor.ReactorNettyTcpClient;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
@@ -24,10 +31,15 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
     private final ChatServerProperties chatServerProperties;
     private final MessageBrokerProperties messageBrokerProperties;
 
+    private final StompInboundInterceptor stompInboundInterceptor;
+    private final StompExceptionInterceptor stompExceptionInterceptor;
+
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint(chatServerProperties.getEndpoint())
                 .setAllowedOriginPatterns(chatServerProperties.getAllowedOriginPatterns().toArray(new String[0]));
+
+        registry.setErrorHandler(stompExceptionInterceptor);
     }
 
     @Override
@@ -45,6 +57,23 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
         config.setUserDestinationPrefix(messageBrokerProperties.getUserPrefix());
         config.setPathMatcher(new AntPathMatcher("."));
         config.setApplicationDestinationPrefixes(messageBrokerProperties.getPublishExchange());
+    }
+
+    @Override
+    public void configureClientInboundChannel(ChannelRegistration registration) {
+        registration.interceptors(stompInboundInterceptor);
+    }
+
+    @Override
+    public void configureClientOutboundChannel(ChannelRegistration registration) {
+        registration.interceptors(new ChannelInterceptor() {
+            @Override
+            public Message<?> preSend(Message<?> message, MessageChannel channel) {
+                StompHeaderAccessor accessor = StompHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
+                log.info("Outbound message: {}", accessor.getMessage());
+                return message;
+            }
+        });
     }
 
     private ReactorNettyTcpClient<byte[]> createTcpClient() {
