@@ -24,6 +24,10 @@ message-broker:
     user-prefix: ${MESSAGE_BROKER_USER_PREFIX:/usr}
     publish-exchange: ${MESSAGE_BROKER_PUBLISH_EXCHANGE:/topic}
 
+jwt:
+  secret-key:
+    access-token: ${JWT_ACCESS_SECRET_KEY:exampleSecretKeyForPennywaySystemAccessSecretKeyTestForPadding}
+
 ---
 spring:
   config:

@@ -16,7 +16,6 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.Date;
@@ -27,18 +26,15 @@ import static kr.co.pennyway.socket.common.security.jwt.AccessTokenClaimKeys.USE
 
 @Slf4j
 @Primary
-@Component("chatAccessTokenProvider")
+@Component
 public class AccessTokenProvider implements JwtProvider {
     private final SecretKey secretKey;
-    private final Duration tokenExpiration;
 
     public AccessTokenProvider(
-            @Value("${jwt.secret-key.access-token}") String jwtSecretKey,
-            @Value("${jwt.expiration-time.access-token}") Duration tokenExpiration
+            @Value("${jwt.secret-key.access-token}") String jwtSecretKey
     ) {
         final byte[] secretKeyBytes = Base64.getDecoder().decode(jwtSecretKey);
         this.secretKey = Keys.hmacShaKeyFor(secretKeyBytes);
-        this.tokenExpiration = tokenExpiration;
     }
 
     @Override
