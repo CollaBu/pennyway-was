@@ -4,6 +4,26 @@ spring:
       local: common, domain, infra
       dev: common, domain, infra
 
+server:
+  port: ${SOCKET_SERVER_PORT:8081}
+
+pennyway:
+  socket:
+    chat:
+      endpoint: ${SOCKET_CHAT_ENDPOINT:/ws}
+      allowed-origin-patterns: ${ALLOWED_ORIGIN_PATTERNS:*}
+
+message-broker:
+  external:
+    host: ${MESSAGE_BROKER_HOST:localhost}
+    port: ${MESSAGE_BROKER_PORT:5672}
+    system-id: ${MESSAGE_BROKER_SYSTEM_ID:guest}
+    system-password: ${MESSAGE_BROKER_SYSTEM_PASSWORD:guest}
+    client-id: ${MESSAGE_BROKER_CLIENT_ID:guest}
+    client-password: ${MESSAGE_BROKER_CLIENT_PASSWORD:guest}
+    user-prefix: ${MESSAGE_BROKER_USER_PREFIX:/usr}
+    publish-exchange: ${MESSAGE_BROKER_PUBLISH_EXCHANGE:/topic}
+
 ---
 spring:
   config:

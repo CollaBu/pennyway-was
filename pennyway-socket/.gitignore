@@ -40,3 +40,7 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+
+### Test ###
+src/main/resources/compose.yml
+src/main/resources/static/

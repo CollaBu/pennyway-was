@@ -33,4 +33,12 @@ dependencies {
     /* firebase */
     implementation 'com.google.firebase:firebase-admin:9.2.0'
 
+    /* Web Socket */
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+
+    /* RabbitMQ */
+    implementation 'org.springframework.boot:spring-boot-starter-amqp'
+
+    /* TSID Generator */
+    implementation 'com.github.f4b6a3:tsid-creator:5.2.6'
 }
