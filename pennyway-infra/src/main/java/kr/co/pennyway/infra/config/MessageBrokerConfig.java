@@ -7,13 +7,15 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import kr.co.pennyway.infra.client.broker.MessageBrokerAdapter;
 import kr.co.pennyway.infra.common.importer.PennywayInfraConfig;
-import kr.co.pennyway.infra.common.properties.RabbitMQProperties;
+import kr.co.pennyway.infra.common.properties.ChatExchangeProperties;
+import kr.co.pennyway.infra.common.properties.RabbitMqProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.core.TopicExchange;
 import org.springframework.amqp.rabbit.annotation.EnableRabbit;
+import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitMessagingTemplate;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -21,21 +23,23 @@ import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
 
 @EnableRabbit
 @RequiredArgsConstructor
-@EnableConfigurationProperties(RabbitMQProperties.class)
+@EnableConfigurationProperties({ChatExchangeProperties.class, RabbitMqProperties.class})
 public class MessageBrokerConfig implements PennywayInfraConfig {
-    private final RabbitMQProperties rabbitMQProperties;
+    private final RabbitMqProperties rabbitMqProperties;
+    private final ChatExchangeProperties chatExchangeProperties;
 
     @Bean
     public Queue chatQueue() {
-        return new Queue(rabbitMQProperties.getQueue(), true);
+        return new Queue(chatExchangeProperties.getQueue(), true);
     }
 
     @Bean
     public TopicExchange chatExchange() {
-        return new TopicExchange(rabbitMQProperties.getExchange());
+        return new TopicExchange(chatExchangeProperties.getExchange());
     }
 
     @Bean
@@ -43,7 +47,7 @@ public class MessageBrokerConfig implements PennywayInfraConfig {
         return BindingBuilder
                 .bind(chatQueue)
                 .to(chatExchange)
-                .with(rabbitMQProperties.getRoutingKey());
+                .with(chatExchangeProperties.getRoutingKey());
     }
 
     @Bean
@@ -58,6 +62,20 @@ public class MessageBrokerConfig implements PennywayInfraConfig {
         objectMapper.registerModule(dateTimeModule);
 
         return new Jackson2JsonMessageConverter(objectMapper);
+    }
+
+    @Bean
+    @Primary
+    public ConnectionFactory createConnectionFactory() {
+        CachingConnectionFactory factory = new CachingConnectionFactory();
+
+        factory.setHost(rabbitMqProperties.getHost());
+        factory.setUsername(rabbitMqProperties.getUsername());
+        factory.setPassword(rabbitMqProperties.getPassword());
+        factory.setPort(rabbitMqProperties.getPort());
+        factory.setVirtualHost(rabbitMqProperties.getVirtualHost());
+
+        return factory;
     }
 
     @Bean
