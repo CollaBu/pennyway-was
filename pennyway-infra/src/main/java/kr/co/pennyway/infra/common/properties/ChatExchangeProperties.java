@@ -7,7 +7,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Getter
 @RequiredArgsConstructor
 @ConfigurationProperties(prefix = "pennyway.rabbitmq.chat")
-public class RabbitMQProperties {
+public class ChatExchangeProperties {
     private final String exchange;
     private final String queue;
     private final String routingKey;
