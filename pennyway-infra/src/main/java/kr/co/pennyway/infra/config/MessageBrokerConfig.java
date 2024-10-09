@@ -19,10 +19,12 @@ import org.springframework.amqp.rabbit.core.RabbitMessagingTemplate;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 
 @EnableRabbit
 @RequiredArgsConstructor
+@EnableConfigurationProperties(RabbitMQProperties.class)
 public class MessageBrokerConfig implements PennywayInfraConfig {
     private final RabbitMQProperties rabbitMQProperties;
 
@@ -59,14 +61,14 @@ public class MessageBrokerConfig implements PennywayInfraConfig {
     }
 
     @Bean
-    public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory, MessageConverter messageConverter) {
+    public RabbitTemplate customRabbitTemplate(ConnectionFactory connectionFactory, MessageConverter messageConverter) {
         RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
         rabbitTemplate.setMessageConverter(messageConverter);
         return rabbitTemplate;
     }
 
     @Bean
-    public RabbitMessagingTemplate rabbitMessagingTemplate(RabbitTemplate rabbitTemplate) {
+    public RabbitMessagingTemplate customRabbitMessagingTemplate(RabbitTemplate rabbitTemplate) {
         return new RabbitMessagingTemplate(rabbitTemplate);
     }
 
