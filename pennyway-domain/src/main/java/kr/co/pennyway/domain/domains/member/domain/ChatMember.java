@@ -1,0 +1,81 @@
+package kr.co.pennyway.domain.domains.member.domain;
+
+import jakarta.persistence.*;
+import kr.co.pennyway.domain.common.model.DateAuditable;
+import kr.co.pennyway.domain.domains.chatroom.domain.ChatRoom;
+import kr.co.pennyway.domain.domains.user.domain.User;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
+import org.springframework.util.StringUtils;
+
+import java.time.LocalDateTime;
+import java.util.Objects;
+
+@Entity
+@Getter
+@Table(name = "chat_member")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@DynamicInsert
+@SQLRestriction("deleted_at IS NULL")
+@SQLDelete(sql = "UPDATE chat_member SET deleted_at = NOW() WHERE id = ?")
+public class ChatMember extends DateAuditable {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String name;
+    private String profileImageUrl;
+
+    @ColumnDefault("false")
+    private boolean banned;
+    @ColumnDefault("true")
+    private boolean notifyEnabled;
+
+    @ColumnDefault("NULL")
+    private LocalDateTime deletedAt;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "chat_room_id")
+    private ChatRoom chatRoom;
+
+    @Builder
+    public ChatMember(String name, String profileImageUrl, User user, ChatRoom chatRoom) {
+        validate(name, user, chatRoom);
+
+        this.name = name;
+        this.profileImageUrl = profileImageUrl;
+        this.user = user;
+        this.chatRoom = chatRoom;
+    }
+
+    private void validate(String name, User user, ChatRoom chatRoom) {
+        if (!StringUtils.hasText(name)) {
+            throw new IllegalArgumentException("name은 null이거나 빈 문자열이 될 수 없습니다.");
+        }
+
+        Objects.requireNonNull(user, "user는 null이 될 수 없습니다.");
+        Objects.requireNonNull(chatRoom, "chatRoom은 null이 될 수 없습니다.");
+    }
+
+    @Override
+    public String toString() {
+        return "ChatMember{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", profileImageUrl='" + profileImageUrl + '\'' +
+                ", banned=" + banned +
+                ", notifyEnabled=" + notifyEnabled +
+                ", deletedAt=" + deletedAt +
+                '}';
+    }
+}
