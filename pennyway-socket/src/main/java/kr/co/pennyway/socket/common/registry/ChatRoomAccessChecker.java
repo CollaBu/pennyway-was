@@ -15,7 +15,11 @@ public class ChatRoomAccessChecker implements ResourceAccessChecker {
 
     @Override
     public boolean hasPermission(String path, Principal principal) {
-        return isChatRoomAccess(getChatRoomId(path), principal);
+        return isChatRoomAccessPermit(getChatRoomId(path), principal);
+    }
+
+    public boolean hasPermission(Long chatRoomId, Principal principal) {
+        return isChatRoomAccessPermit(chatRoomId, principal);
     }
 
     /**
@@ -29,7 +33,7 @@ public class ChatRoomAccessChecker implements ResourceAccessChecker {
         return Long.parseLong(split[split.length - 1]);
     }
 
-    private boolean isChatRoomAccess(Long chatRoomId, Principal principal) {
+    private boolean isChatRoomAccessPermit(Long chatRoomId, Principal principal) {
         return chatMemberService.isExists(chatRoomId, Long.parseLong(principal.getName()));
     }
 }
