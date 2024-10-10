@@ -6,7 +6,8 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @EnablePennywayInfraConfig({
-        PennywayInfraConfigGroup.MESSAGE_BROKER_CONFIG
+        PennywayInfraConfigGroup.MESSAGE_BROKER_CONFIG,
+        PennywayInfraConfigGroup.GUID_GENERATOR_CONFIG
 })
 public class InfraConfig {
 }
