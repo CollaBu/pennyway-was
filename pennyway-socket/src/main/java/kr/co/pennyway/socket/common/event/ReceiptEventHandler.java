@@ -29,7 +29,6 @@ public class ReceiptEventHandler {
     @Async
     public CompletableFuture<ApplicationListener<SubscribeEvent<ServerSideMessage>>> subscribeEventListener(final AbstractSubscribableChannel clientOutboundChannel) {
         return CompletableFuture.completedFuture(event -> {
-            log.info("subscribeEventListener: {}", event);
             Message<ServerSideMessage> message = event.getMessage();
             StompHeaderAccessor accessor = StompHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
 
@@ -44,7 +43,6 @@ public class ReceiptEventHandler {
     @EventListener
     public CompletableFuture<ApplicationListener<SessionSubscribeEvent>> sessionSubscribeEventListener(final AbstractSubscribableChannel clientOutboundChannel) {
         return CompletableFuture.completedFuture(event -> {
-            log.info("sessionSubscribeEventListener: {}", event);
             Message<byte[]> message = event.getMessage();
             StompHeaderAccessor accessor = StompHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
 
@@ -60,7 +58,6 @@ public class ReceiptEventHandler {
             accessor.setReceiptId(accessor.getReceipt());
 
             Message<byte[]> receiptMessage = MessageBuilder.createMessage(payload, accessor.getMessageHeaders());
-            log.info("receiptMessage: {}", receiptMessage);
 
             clientOutboundChannel.send(receiptMessage);
         }
