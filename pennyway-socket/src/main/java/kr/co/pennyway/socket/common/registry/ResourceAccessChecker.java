@@ -1,4 +1,4 @@
-package kr.co.pennyway.infra.common.registry;
+package kr.co.pennyway.socket.common.registry;
 
 import java.security.Principal;
 
