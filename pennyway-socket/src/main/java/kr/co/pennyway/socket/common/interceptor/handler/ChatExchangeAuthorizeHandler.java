@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
 @EnableConfigurationProperties({ChatExchangeProperties.class, MessageBrokerProperties.class})
 public class ChatExchangeAuthorizeHandler implements SubscribeCommandHandler {
     private static final String REQUEST_EXCHANGE_PREFIX = "/sub/";
-    private static final String CONVERTED_EXCHANGE_PREFIX = "/exchange";
+    private static final String CONVERTED_EXCHANGE_PREFIX = "/exchange/";
 
     private final ChatExchangeProperties chatExchangeProperties;
     private final MessageBrokerProperties messageBrokerProperties;
