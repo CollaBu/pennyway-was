@@ -32,7 +32,7 @@ public class AuthService {
             ServerSideMessage payload = ServerSideMessage.of("2000", "토큰 갱신 성공");
             message = MessageBuilder.createMessage(payload, accessor.getMessageHeaders());
         } catch (JwtErrorException e) {
-            log.info("refresh failed: {}", e.getErrorCode().getExplainError());
+            log.warn("refresh failed: {}", e.getErrorCode().getExplainError());
 
             ServerSideMessage payload = ServerSideMessage.of(e.causedBy().getCode(), e.getErrorCode().getExplainError());
             message = MessageBuilder.createMessage(payload, accessor.getMessageHeaders());

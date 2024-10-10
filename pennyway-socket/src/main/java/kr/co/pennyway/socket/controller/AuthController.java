@@ -23,8 +23,6 @@ public class AuthController {
     @MessageMapping("auth.refresh")
     @PreAuthorize("#principal instanceof T(kr.co.pennyway.socket.common.security.authenticate.UserPrincipal)")
     public void refreshPrincipal(@Header("Authorization") String authorization, Principal principal, StompHeaderAccessor accessor) {
-        log.info("refreshPrincipal AccessToken: {}", authorization);
-
         if (authorization == null || !authorization.startsWith("Bearer ")) {
             throw new JwtErrorException(JwtErrorCode.EMPTY_ACCESS_TOKEN);
         }

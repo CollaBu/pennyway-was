@@ -42,7 +42,6 @@ public class ReceiptEventHandler {
             accessor.setReceiptId(accessor.getReceipt());
 
             Message<byte[]> receiptMessage = MessageBuilder.createMessage(payload, accessor.getMessageHeaders());
-            log.info("receiptMessage: {}", receiptMessage);
 
             clientOutboundChannel.send(receiptMessage);
         }
