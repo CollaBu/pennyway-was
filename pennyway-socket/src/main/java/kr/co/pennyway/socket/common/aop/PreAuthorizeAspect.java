@@ -38,10 +38,8 @@ public class PreAuthorizeAspect {
         PreAuthorize preAuthorize = method.getAnnotation(PreAuthorize.class);
 
         Principal principal = extractPrincipal(joinPoint.getArgs());
-        log.info("principal: {}", principal);
 
         boolean isAuthorized = PreAuthorizeSpELParser.evaluate(preAuthorize.value(), method, joinPoint.getArgs(), applicationContext);
-        log.info("isAuthorized: {}", isAuthorized);
 
         if (!isAuthorized) {
             handleUnauthorized(principal, preAuthorize);

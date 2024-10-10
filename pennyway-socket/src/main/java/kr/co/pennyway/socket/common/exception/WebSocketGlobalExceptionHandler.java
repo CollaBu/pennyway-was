@@ -23,7 +23,7 @@ public class WebSocketGlobalExceptionHandler {
     @MessageExceptionHandler(GlobalErrorException.class)
     public void handleGlobalErrorException(Principal principal, GlobalErrorException ex) {
         ServerSideMessage serverSideMessage = ServerSideMessage.of(ex.causedBy().getCode(), ex.getBaseErrorCode().getExplainError());
-        log.error("handleGlobalErrorException: {}", serverSideMessage);
+        log.warn("handleGlobalErrorException: {}", serverSideMessage);
 
         template.convertAndSendToUser(principal.getName(), ERROR_DESTINATION, serverSideMessage);
     }
