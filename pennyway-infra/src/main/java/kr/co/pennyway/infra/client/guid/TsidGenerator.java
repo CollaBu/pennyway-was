@@ -1,12 +1,10 @@
 package kr.co.pennyway.infra.client.guid;
 
 import com.github.f4b6a3.tsid.TsidCreator;
-import org.springframework.stereotype.Component;
 
 /**
  * Time-Sorted ID 생성 클래스
  */
-@Component
 public class TsidGenerator implements IdGenerator<Long> {
 
     /**
