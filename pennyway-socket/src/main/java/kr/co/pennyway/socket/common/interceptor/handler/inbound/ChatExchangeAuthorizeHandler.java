@@ -1,4 +1,4 @@
-package kr.co.pennyway.socket.common.interceptor.handler;
+package kr.co.pennyway.socket.common.interceptor.handler.inbound;
 
 import kr.co.pennyway.infra.common.properties.ChatExchangeProperties;
 import kr.co.pennyway.socket.common.exception.InterceptorErrorCode;

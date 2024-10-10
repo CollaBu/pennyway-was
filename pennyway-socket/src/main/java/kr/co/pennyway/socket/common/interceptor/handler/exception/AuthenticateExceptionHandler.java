@@ -1,4 +1,4 @@
-package kr.co.pennyway.socket.common.interceptor.handler;
+package kr.co.pennyway.socket.common.interceptor.handler.exception;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.pennyway.infra.common.exception.JwtErrorException;

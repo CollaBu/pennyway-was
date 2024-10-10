@@ -1,4 +1,4 @@
-package kr.co.pennyway.socket.common.interceptor.handler;
+package kr.co.pennyway.socket.common.interceptor.handler.inbound;
 
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.service.UserService;
