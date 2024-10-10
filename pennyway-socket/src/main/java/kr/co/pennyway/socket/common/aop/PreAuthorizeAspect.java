@@ -65,10 +65,7 @@ public class PreAuthorizeAspect {
     }
 
     /**
-     * 인증/인가 실패 시 처리합니다.
-     *
-     * @param principal
-     * @param preAuthorize
+     * 인증/인가 실패 시 수행할 동작을 정의합니다.
      */
     private void handleUnauthorized(Principal principal, PreAuthorize preAuthorize) {
         if (preAuthorize.value().contains(PreAuthorizeSpELParser.SpELFunction.IS_AUTHENTICATED.getName())) {
