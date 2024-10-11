@@ -4,6 +4,9 @@ jar { enabled = true }
 dependencies {
     implementation project(':pennyway-common')
 
+    /* Jackson DataType */
+    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.18.0'
+
     /* jwt */
     api group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.12.5'
     runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.12.5'
@@ -33,11 +36,8 @@ dependencies {
     /* firebase */
     implementation 'com.google.firebase:firebase-admin:9.2.0'
 
-    /* Web Socket */
-    implementation 'org.springframework.boot:spring-boot-starter-websocket'
-
     /* RabbitMQ */
-    implementation 'org.springframework.boot:spring-boot-starter-amqp'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-amqp', version: '3.3.4'
 
     /* TSID Generator */
     implementation 'com.github.f4b6a3:tsid-creator:5.2.6'

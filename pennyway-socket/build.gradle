@@ -18,8 +18,8 @@ dependencies {
     implementation project(':pennyway-infra')
 
     /* Web Socket */
-    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-websocket', version: '3.3.4'
 
     /* Reactor Netty */
-    implementation "org.springframework.boot:spring-boot-starter-reactor-netty"
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-reactor-netty', version: '3.3.4'
 }
