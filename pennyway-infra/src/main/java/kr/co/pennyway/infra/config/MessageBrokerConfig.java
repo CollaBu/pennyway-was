@@ -10,21 +10,25 @@ import kr.co.pennyway.infra.common.importer.PennywayInfraConfig;
 import kr.co.pennyway.infra.common.properties.ChatExchangeProperties;
 import kr.co.pennyway.infra.common.properties.RabbitMqProperties;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.core.TopicExchange;
 import org.springframework.amqp.rabbit.annotation.EnableRabbit;
+import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitMessagingTemplate;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
+import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 
+@Slf4j
 @EnableRabbit
 @RequiredArgsConstructor
 @EnableConfigurationProperties({ChatExchangeProperties.class, RabbitMqProperties.class})
@@ -75,6 +79,19 @@ public class MessageBrokerConfig implements PennywayInfraConfig {
         factory.setPort(rabbitMqProperties.getPort());
         factory.setVirtualHost(rabbitMqProperties.getVirtualHost());
 
+        return factory;
+    }
+
+    @Bean
+    ApplicationRunner connectionFactoryRunner(ConnectionFactory cf) {
+        return args -> cf.createConnection().close();
+    }
+
+    @Bean
+    public SimpleRabbitListenerContainerFactory simpleRabbitListenerContainerFactory(ConnectionFactory connectionFactory, MessageConverter messageConverter) {
+        SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
+        factory.setConnectionFactory(connectionFactory);
+        factory.setMessageConverter(messageConverter);
         return factory;
     }
 
