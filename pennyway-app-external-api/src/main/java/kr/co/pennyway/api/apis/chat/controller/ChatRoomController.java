@@ -2,6 +2,7 @@ package kr.co.pennyway.api.apis.chat.controller;
 
 import kr.co.pennyway.api.apis.chat.dto.ChatRoomReq;
 import kr.co.pennyway.api.apis.chat.usecase.ChatRoomUseCase;
+import kr.co.pennyway.api.common.response.SuccessResponse;
 import kr.co.pennyway.api.common.security.authentication.SecurityUserDetails;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,11 +19,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping("/v2/chat-rooms")
 public class ChatRoomController {
+    private static final String CHAT_ROOM = "chatRoom";
     private ChatRoomUseCase chatRoomUseCase;
 
     @PostMapping("")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> postChatRoom(@RequestBody ChatRoomReq.Create request, @AuthenticationPrincipal SecurityUserDetails user) {
-        return ResponseEntity.ok(chatRoomUseCase.createChatRoom(request, user.getUserId()));
+        return ResponseEntity.ok(SuccessResponse.from(CHAT_ROOM, chatRoomUseCase.createChatRoom(request, user.getUserId())));
     }
 }
