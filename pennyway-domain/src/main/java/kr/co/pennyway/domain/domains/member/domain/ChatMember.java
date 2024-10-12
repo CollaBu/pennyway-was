@@ -1,8 +1,10 @@
 package kr.co.pennyway.domain.domains.member.domain;
 
 import jakarta.persistence.*;
+import kr.co.pennyway.domain.common.converter.ChatMemberRoleConverter;
 import kr.co.pennyway.domain.common.model.DateAuditable;
 import kr.co.pennyway.domain.domains.chatroom.domain.ChatRoom;
+import kr.co.pennyway.domain.domains.member.type.ChatMemberRole;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -31,6 +33,9 @@ public class ChatMember extends DateAuditable {
 
     private String name;
 
+    @Convert(converter = ChatMemberRoleConverter.class)
+    private ChatMemberRole role;
+
     @ColumnDefault("false")
     private boolean banned;
     @ColumnDefault("true")
@@ -48,21 +53,23 @@ public class ChatMember extends DateAuditable {
     private ChatRoom chatRoom;
 
     @Builder
-    public ChatMember(String name, User user, ChatRoom chatRoom) {
-        validate(name, user, chatRoom);
+    public ChatMember(String name, User user, ChatRoom chatRoom, ChatMemberRole role) {
+        validate(name, user, chatRoom, role);
 
         this.name = name;
         this.user = user;
         this.chatRoom = chatRoom;
+        this.role = role;
     }
 
-    private void validate(String name, User user, ChatRoom chatRoom) {
+    private void validate(String name, User user, ChatRoom chatRoom, ChatMemberRole role) {
         if (!StringUtils.hasText(name)) {
             throw new IllegalArgumentException("name은 null이거나 빈 문자열이 될 수 없습니다.");
         }
 
         Objects.requireNonNull(user, "user는 null이 될 수 없습니다.");
         Objects.requireNonNull(chatRoom, "chatRoom은 null이 될 수 없습니다.");
+        Objects.requireNonNull(role, "role은 null이 될 수 없습니다.");
     }
 
     @Override
