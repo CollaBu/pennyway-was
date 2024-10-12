@@ -19,12 +19,19 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping("/v2/chat-rooms")
 public class ChatRoomController {
+    private static final String CHAT_ROOM_ID = "chatRoomId";
     private static final String CHAT_ROOM = "chatRoom";
     private final ChatRoomUseCase chatRoomUseCase;
 
+    @PostMapping("/pend")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> postChatRoom(@RequestBody ChatRoomReq.Pend request, @AuthenticationPrincipal SecurityUserDetails user) {
+        return ResponseEntity.ok(SuccessResponse.from(CHAT_ROOM_ID, chatRoomUseCase.pendChatRoom(request, user.getUserId())));
+    }
+
     @PostMapping("")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> postChatRoom(@RequestBody ChatRoomReq.Create request, @AuthenticationPrincipal SecurityUserDetails user) {
+    public ResponseEntity<?> createChatRoom(@RequestBody ChatRoomReq.Create request, @AuthenticationPrincipal SecurityUserDetails user) {
         return ResponseEntity.ok(SuccessResponse.from(CHAT_ROOM, chatRoomUseCase.createChatRoom(request, user.getUserId())));
     }
 }
