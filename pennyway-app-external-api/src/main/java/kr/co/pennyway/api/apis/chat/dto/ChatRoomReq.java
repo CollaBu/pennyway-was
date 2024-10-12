@@ -21,12 +21,12 @@ public final class ChatRoomReq {
             @Size(min = 6, max = 6)
             Integer password
     ) {
-        public static ChatRoom toEntity(Create request) {
+        public ChatRoom toEntity() {
             return ChatRoom.builder()
-                    .title(request.title())
-                    .description(request.description())
-                    .backgroundImageUrl(request.backgroundImageUrl())
-                    .password(request.password())
+                    .title(title)
+                    .description(description)
+                    .backgroundImageUrl(backgroundImageUrl)
+                    .password(password)
                     .build();
         }
     }
