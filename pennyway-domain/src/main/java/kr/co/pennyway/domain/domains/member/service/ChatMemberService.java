@@ -14,8 +14,8 @@ public class ChatMemberService {
     private final ChatMemberRepository chatMemberRepository;
 
     @Transactional
-    public void create(ChatMember chatMember) {
-        chatMemberRepository.save(chatMember);
+    public ChatMember create(ChatMember chatMember) {
+        return chatMemberRepository.save(chatMember);
     }
 
     @Transactional(readOnly = true)
