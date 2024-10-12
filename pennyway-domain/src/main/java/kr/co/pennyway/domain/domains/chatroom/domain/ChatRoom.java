@@ -1,6 +1,8 @@
 package kr.co.pennyway.domain.domains.chatroom.domain;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import kr.co.pennyway.domain.common.model.DateAuditable;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -13,6 +15,7 @@ import org.hibernate.annotations.SQLRestriction;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Entity
 @Getter
@@ -23,7 +26,6 @@ import java.time.LocalDateTime;
 @SQLDelete(sql = "UPDATE chat_room SET deleted_at = NOW() WHERE id = ?")
 public class ChatRoom extends DateAuditable {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String title;
@@ -35,9 +37,10 @@ public class ChatRoom extends DateAuditable {
     private LocalDateTime deletedAt;
 
     @Builder
-    public ChatRoom(String title, String description, String backgroundImageUrl, Integer password) {
-        validate(title, description, password);
+    public ChatRoom(Long id, String title, String description, String backgroundImageUrl, Integer password) {
+        validate(id, title, description, password);
 
+        this.id = id;
         this.title = title;
         this.description = description;
         this.backgroundImageUrl = backgroundImageUrl;
@@ -51,6 +54,12 @@ public class ChatRoom extends DateAuditable {
         this.description = description;
         this.backgroundImageUrl = backgroundImageUrl;
         this.password = password;
+    }
+
+    private void validate(Long id, String title, String description, Integer password) {
+        Objects.requireNonNull(id, "채팅방 ID는 null일 수 없습니다.");
+
+        validate(title, description, password);
     }
 
     private void validate(String title, String description, Integer password) {

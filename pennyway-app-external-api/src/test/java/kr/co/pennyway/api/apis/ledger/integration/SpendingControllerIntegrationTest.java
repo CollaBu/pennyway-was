@@ -58,7 +58,7 @@ public class SpendingControllerIntegrationTest extends ExternalApiDBTestConfig {
     @Order(1)
     @Nested
     @DisplayName("지출 내역 추가하기")
-    class CreateSpending {
+    class PendSpending {
         @Test
         @DisplayName("request의 categoryId가 -1인 경우, spendingCustomCategory가 null인 Spending을 생성한다.")
         @Transactional
