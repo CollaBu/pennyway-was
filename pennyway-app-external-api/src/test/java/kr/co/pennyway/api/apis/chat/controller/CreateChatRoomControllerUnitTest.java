@@ -50,7 +50,7 @@ public class CreateChatRoomControllerUnitTest {
     @WithSecurityMockUser
     void createChatRoomSuccess() throws Exception {
         // given
-        ChatRoom fixture = ChatRoomFixture.DEFAULT_CHAT_ROOM.toEntity();
+        ChatRoom fixture = ChatRoomFixture.PRIVATE_CHAT_ROOM.toEntity();
         ChatRoomReq.Create request = new ChatRoomReq.Create(fixture.getTitle(), fixture.getDescription(), fixture.getBackgroundImageUrl(), fixture.getPassword());
 
         given(chatRoomUseCase.createChatRoom(request, 1L)).willReturn(ChatRoomRes.Detail.from(fixture, 1));
