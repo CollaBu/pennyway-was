@@ -13,8 +13,8 @@ import java.util.Optional;
 public class PendedChatRoomService {
     private final PendedChatRoomRepository pendedChatRoomRepository;
 
-    public void create(PendedChatRoom pendedChatRoom) {
-        pendedChatRoomRepository.save(pendedChatRoom);
+    public PendedChatRoom create(PendedChatRoom pendedChatRoom) {
+        return pendedChatRoomRepository.save(pendedChatRoom);
     }
 
     public Optional<PendedChatRoom> readByUserId(Long userId) {

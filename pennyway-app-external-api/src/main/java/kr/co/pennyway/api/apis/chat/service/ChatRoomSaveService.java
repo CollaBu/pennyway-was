@@ -40,7 +40,9 @@ public class ChatRoomSaveService {
     @Transactional
     public Long pendChatRoom(ChatRoomReq.Pend request, Long userId) {
         Long chatRoomId = idGenerator.generate();
-        pendedChatRoomService.create(request.toEntity(chatRoomId, userId));
+        log.info("Chat room ID: {}", chatRoomId);
+        PendedChatRoom info = pendedChatRoomService.create(request.toEntity(chatRoomId, userId));
+        log.info("Pended chat room: {}", info);
 
         return chatRoomId;
     }

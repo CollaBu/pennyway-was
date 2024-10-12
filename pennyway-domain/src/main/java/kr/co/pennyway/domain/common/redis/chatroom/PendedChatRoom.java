@@ -27,8 +27,8 @@ public class PendedChatRoom {
         this.password = password;
     }
 
-    public static PendedChatRoom of(Long id, Long userId, String title, String description, Integer password) {
-        return new PendedChatRoom(id, userId, title, description, password);
+    public static PendedChatRoom of(Long chatRoomId, Long userId, String title, String description, Integer password) {
+        return new PendedChatRoom(chatRoomId, userId, title, description, password);
     }
 
     private void validate(Long id, Long userId, String title, String description, Integer password) {
@@ -50,6 +50,7 @@ public class PendedChatRoom {
 
     public ChatRoom toChatRoom(String backgroundImageUrl) {
         return ChatRoom.builder()
+                .id(chatRoomId)
                 .title(title)
                 .description(description)
                 .backgroundImageUrl(backgroundImageUrl)
