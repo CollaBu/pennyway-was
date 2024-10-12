@@ -61,11 +61,13 @@ public class PendedChatRoom {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof PendedChatRoom that)) return false;
-        return id.equals(that.id);
+        return userId.equals(that.userId) && chatRoomId.equals(that.chatRoomId);
     }
 
     @Override
     public int hashCode() {
-        return id.hashCode();
+        int result = userId.hashCode();
+        result = ((1 << 5) - 1) * result + chatRoomId.hashCode();
+        return result;
     }
 }
