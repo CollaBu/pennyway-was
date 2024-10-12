@@ -62,6 +62,15 @@ public class ChatMember extends DateAuditable {
         this.role = role;
     }
 
+    public static ChatMember of(String name, User user, ChatRoom chatRoom, ChatMemberRole role) {
+        return ChatMember.builder()
+                .name(name)
+                .user(user)
+                .chatRoom(chatRoom)
+                .role(role)
+                .build();
+    }
+
     private void validate(String name, User user, ChatRoom chatRoom, ChatMemberRole role) {
         if (!StringUtils.hasText(name)) {
             throw new IllegalArgumentException("name은 null이거나 빈 문자열이 될 수 없습니다.");
