@@ -1,6 +1,7 @@
 package kr.co.pennyway.api.apis.chat.service;
 
 import kr.co.pennyway.api.apis.chat.dto.ChatRoomReq;
+import kr.co.pennyway.api.common.storage.AwsS3Adapter;
 import kr.co.pennyway.domain.common.redis.chatroom.PendedChatRoom;
 import kr.co.pennyway.domain.common.redis.chatroom.PendedChatRoomErrorCode;
 import kr.co.pennyway.domain.common.redis.chatroom.PendedChatRoomErrorException;
@@ -14,6 +15,7 @@ import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorCode;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorException;
 import kr.co.pennyway.domain.domains.user.service.UserService;
+import kr.co.pennyway.infra.client.aws.s3.ObjectKeyType;
 import kr.co.pennyway.infra.client.guid.IdGenerator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +31,7 @@ public class ChatRoomSaveService {
     private final ChatMemberService chatMemberService;
     private final PendedChatRoomService pendedChatRoomService;
 
+    private final AwsS3Adapter awsS3Adapter;
     private final IdGenerator<Long> idGenerator;
 
     /**
@@ -58,7 +61,12 @@ public class ChatRoomSaveService {
         PendedChatRoom pendedChatRoom = pendedChatRoomService.readByUserId(userId)
                 .orElseThrow(() -> new PendedChatRoomErrorException(PendedChatRoomErrorCode.NOT_FOUND));
 
-        ChatRoom chatRoom = chatRoomService.create(pendedChatRoom.toChatRoom(request.backgroundImageUrl()));
+        String originImageUrl = null;
+        if (request.backgroundImageUrl() != null) {
+            originImageUrl = awsS3Adapter.saveImage(request.backgroundImageUrl(), ObjectKeyType.CHAT_PROFILE);
+        }
+
+        ChatRoom chatRoom = chatRoomService.create(pendedChatRoom.toChatRoom(originImageUrl));
 
         User user = userService.readUser(userId).orElseThrow(() -> new UserErrorException(UserErrorCode.NOT_FOUND));
         ChatMember member = ChatMember.of(user.getName(), user, chatRoom, ChatMemberRole.ADMIN);
