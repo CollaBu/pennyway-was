@@ -26,7 +26,7 @@ import java.util.Map;
 
 @Slf4j
 @ExternalApiIntegrationTest
-public class ChatRoomCreateIntegrationTest extends ExternalApiDBTestConfig {
+public class ChatRoomPendIntegrationTest extends ExternalApiDBTestConfig {
     @Autowired
     private TestRestTemplate restTemplate;
 
@@ -45,12 +45,13 @@ public class ChatRoomCreateIntegrationTest extends ExternalApiDBTestConfig {
         // given
         User user = userService.createUser(UserFixture.GENERAL_USER.toUser());
         ChatRoom room = ChatRoomFixture.PRIVATE_CHAT_ROOM.toEntity();
-        ChatRoomReq.Create request = new ChatRoomReq.Create(room.getTitle(), room.getDescription(), room.getBackgroundImageUrl(), room.getPassword());
+        ChatRoomReq.Pend request = new ChatRoomReq.Pend(room.getTitle(), room.getDescription(), room.getPassword());
+        ChatRoomReq.Create request2 = new ChatRoomReq.Create(room.getBackgroundImageUrl());
 
         // when
-        ResponseEntity<SuccessResponse<Map<String, ChatRoomRes.Detail>>> response = successRequest(user, request);
-        ChatRoomRes.Detail detail = response.getBody().getData().get("chatRoom");
-        log.debug("detail: {}", detail);
+        ResponseEntity<SuccessResponse<Map<String, Long>>> response = postPending(user, request);
+        ResponseEntity<SuccessResponse<Map<String, ChatRoomRes.Detail>>> response2 = postCreating(user, request2);
+        ChatRoomRes.Detail detail = response2.getBody().getData().get("chatRoom");
 
         // then
         Assertions.assertEquals(HttpStatus.OK, response.getStatusCode(), "201 Created 응답을 받아야 합니다.");
@@ -59,14 +60,32 @@ public class ChatRoomCreateIntegrationTest extends ExternalApiDBTestConfig {
         Assertions.assertTrue(detail.isPrivate(), "생성된 채팅방은 비공개여야 합니다.");
     }
 
-    private ResponseEntity<SuccessResponse<Map<String, ChatRoomRes.Detail>>> successRequest(User user, ChatRoomReq.Create request) {
+    private ResponseEntity<SuccessResponse<Map<String, Long>>> postPending(User user, ChatRoomReq.Pend request) {
+        return restTemplate.exchange(
+                "http://localhost:" + port + "/v2/chat-rooms/pend",
+                HttpMethod.POST,
+                createHttpEntity(user, request),
+                new ParameterizedTypeReference<>() {
+                }
+        );
+    }
+
+    private ResponseEntity<SuccessResponse<Map<String, ChatRoomRes.Detail>>> postCreating(User user, ChatRoomReq.Create request) {
         return restTemplate.exchange(
                 "http://localhost:" + port + "/v2/chat-rooms",
                 HttpMethod.POST,
                 createHttpEntity(user, request),
-                new ParameterizedTypeReference<SuccessResponse<Map<String, ChatRoomRes.Detail>>>() {
+                new ParameterizedTypeReference<>() {
                 }
         );
+    }
+
+    private HttpEntity<?> createHttpEntity(User user, ChatRoomReq.Pend request) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + accessTokenProvider.generateToken(AccessTokenClaim.of(user.getId(), user.getRole().name())));
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        return new HttpEntity<>(request, headers);
     }
 
     private HttpEntity<?> createHttpEntity(User user, ChatRoomReq.Create request) {
