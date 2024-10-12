@@ -1,6 +1,7 @@
 package kr.co.pennyway.api.apis.chat.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import kr.co.pennyway.api.apis.chat.dto.ChatRoomRequest;
 import kr.co.pennyway.api.config.supporter.WithSecurityMockUser;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -48,7 +49,7 @@ public class CreateChatRoomControllerUnitTest {
         String description = "테스트 채팅방입니다.";
         String backgroundImageUrl = "https://test.com";
         Integer password = 123456;
-        ChatRoomRequest.Create request = new ChatRoomFixture.Create(title, description, backgroundImageUrl, password);
+        ChatRoomRequest.Create request = new ChatRoomRequest.Create(title, description, backgroundImageUrl, password);
 
         // when
         ResultActions result = performPostChatRoom(request);
