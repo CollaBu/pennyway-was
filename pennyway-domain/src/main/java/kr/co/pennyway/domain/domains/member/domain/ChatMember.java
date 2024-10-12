@@ -30,7 +30,6 @@ public class ChatMember extends DateAuditable {
     private Long id;
 
     private String name;
-    private String profileImageUrl;
 
     @ColumnDefault("false")
     private boolean banned;
@@ -49,11 +48,10 @@ public class ChatMember extends DateAuditable {
     private ChatRoom chatRoom;
 
     @Builder
-    public ChatMember(String name, String profileImageUrl, User user, ChatRoom chatRoom) {
+    public ChatMember(String name, User user, ChatRoom chatRoom) {
         validate(name, user, chatRoom);
 
         this.name = name;
-        this.profileImageUrl = profileImageUrl;
         this.user = user;
         this.chatRoom = chatRoom;
     }
@@ -72,7 +70,6 @@ public class ChatMember extends DateAuditable {
         return "ChatMember{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
-                ", profileImageUrl='" + profileImageUrl + '\'' +
                 ", banned=" + banned +
                 ", notifyEnabled=" + notifyEnabled +
                 ", deletedAt=" + deletedAt +
