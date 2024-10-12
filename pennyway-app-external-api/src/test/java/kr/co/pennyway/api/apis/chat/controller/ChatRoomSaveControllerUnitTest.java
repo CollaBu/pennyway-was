@@ -27,7 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(controllers = ChatRoomController.class)
 @ActiveProfiles("test")
-public class CreateChatRoomControllerUnitTest {
+public class ChatRoomSaveControllerUnitTest {
     @Autowired
     private MockMvc mockMvc;
 
@@ -46,12 +46,30 @@ public class CreateChatRoomControllerUnitTest {
     }
 
     @Test
-    @DisplayName("채팅방 생성 성공")
+    @DisplayName("채팅방 캐싱 성공")
     @WithSecurityMockUser
     void createChatRoomSuccess() throws Exception {
         // given
         ChatRoom fixture = ChatRoomFixture.PRIVATE_CHAT_ROOM.toEntity();
-        ChatRoomReq.Create request = new ChatRoomReq.Create(fixture.getTitle(), fixture.getDescription(), fixture.getBackgroundImageUrl(), fixture.getPassword());
+        ChatRoomReq.Pend request = new ChatRoomReq.Pend(fixture.getTitle(), fixture.getDescription(), fixture.getPassword());
+
+        given(chatRoomUseCase.pendChatRoom(request, 1L)).willReturn(1L);
+
+        // when
+        ResultActions result = performPostChatRoomPending(request);
+
+        // then
+        result.andDo(print())
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("채팅방 생성 성공")
+    @WithSecurityMockUser
+    void createChatRoomSuccess2() throws Exception {
+        // given
+        ChatRoom fixture = ChatRoomFixture.PRIVATE_CHAT_ROOM.toEntity();
+        ChatRoomReq.Create request = new ChatRoomReq.Create(fixture.getBackgroundImageUrl());
 
         given(chatRoomUseCase.createChatRoom(request, 1L)).willReturn(ChatRoomRes.Detail.from(fixture, 1));
 
@@ -61,6 +79,12 @@ public class CreateChatRoomControllerUnitTest {
         // then
         result.andDo(print())
                 .andExpect(status().isOk());
+    }
+
+    private ResultActions performPostChatRoomPending(ChatRoomReq.Pend request) throws Exception {
+        return mockMvc.perform(MockMvcRequestBuilders.post("/v2/chat-rooms/pend")
+                .contentType("application/json")
+                .content(objectMapper.writeValueAsString(request)));
     }
 
     private ResultActions performPostChatRoom(ChatRoomReq.Create request) throws Exception {
