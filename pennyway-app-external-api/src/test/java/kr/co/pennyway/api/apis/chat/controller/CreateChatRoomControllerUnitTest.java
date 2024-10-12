@@ -1,7 +1,8 @@
 package kr.co.pennyway.api.apis.chat.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kr.co.pennyway.api.apis.chat.dto.ChatRoomRequest;
+import kr.co.pennyway.api.apis.chat.dto.ChatRoomReq;
+import kr.co.pennyway.api.apis.chat.usecase.ChatRoomUseCase;
 import kr.co.pennyway.api.config.supporter.WithSecurityMockUser;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -49,7 +50,7 @@ public class CreateChatRoomControllerUnitTest {
         String description = "테스트 채팅방입니다.";
         String backgroundImageUrl = "https://test.com";
         Integer password = 123456;
-        ChatRoomRequest.Create request = new ChatRoomRequest.Create(title, description, backgroundImageUrl, password);
+        ChatRoomReq.Create request = new ChatRoomReq.Create(title, description, backgroundImageUrl, password);
 
         // when
         ResultActions result = performPostChatRoom(request);
@@ -59,7 +60,7 @@ public class CreateChatRoomControllerUnitTest {
                 .andExpect(status().isOk());
     }
 
-    private ResultActions performPostChatRoom(ChatRoomRequest.Create request) throws Exception {
+    private ResultActions performPostChatRoom(ChatRoomReq.Create request) throws Exception {
         return mockMvc.perform(MockMvcRequestBuilders.post("/v2/chat-rooms")
                 .contentType("application/json")
                 .content(objectMapper.writeValueAsString(request)));

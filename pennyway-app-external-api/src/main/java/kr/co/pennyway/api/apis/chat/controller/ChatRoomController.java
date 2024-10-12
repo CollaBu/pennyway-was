@@ -1,6 +1,7 @@
 package kr.co.pennyway.api.apis.chat.controller;
 
-import kr.co.pennyway.api.apis.chat.dto.ChatRoomRequest;
+import kr.co.pennyway.api.apis.chat.dto.ChatRoomReq;
+import kr.co.pennyway.api.apis.chat.usecase.ChatRoomUseCase;
 import kr.co.pennyway.api.common.security.authentication.SecurityUserDetails;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +22,7 @@ public class ChatRoomController {
 
     @PostMapping("")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> postChatRoom(@RequestBody ChatRoomRequest.Create request, @AuthenticationPrincipal SecurityUserDetails user) {
+    public ResponseEntity<?> postChatRoom(@RequestBody ChatRoomReq.Create request, @AuthenticationPrincipal SecurityUserDetails user) {
         return ResponseEntity.ok(chatRoomUseCase.createChatRoom(request, user.getUserId()));
     }
 }
