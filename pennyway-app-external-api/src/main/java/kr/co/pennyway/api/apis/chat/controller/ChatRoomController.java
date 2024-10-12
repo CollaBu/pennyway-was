@@ -1,5 +1,6 @@
 package kr.co.pennyway.api.apis.chat.controller;
 
+import kr.co.pennyway.api.apis.chat.api.ChatRoomApi;
 import kr.co.pennyway.api.apis.chat.dto.ChatRoomReq;
 import kr.co.pennyway.api.apis.chat.usecase.ChatRoomUseCase;
 import kr.co.pennyway.api.common.response.SuccessResponse;
@@ -18,17 +19,19 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/v2/chat-rooms")
-public class ChatRoomController {
+public class ChatRoomController implements ChatRoomApi {
     private static final String CHAT_ROOM_ID = "chatRoomId";
     private static final String CHAT_ROOM = "chatRoom";
     private final ChatRoomUseCase chatRoomUseCase;
 
+    @Override
     @PostMapping("/pend")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> postChatRoom(@RequestBody ChatRoomReq.Pend request, @AuthenticationPrincipal SecurityUserDetails user) {
         return ResponseEntity.ok(SuccessResponse.from(CHAT_ROOM_ID, chatRoomUseCase.pendChatRoom(request, user.getUserId())));
     }
 
+    @Override
     @PostMapping("")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> createChatRoom(@RequestBody ChatRoomReq.Create request, @AuthenticationPrincipal SecurityUserDetails user) {
