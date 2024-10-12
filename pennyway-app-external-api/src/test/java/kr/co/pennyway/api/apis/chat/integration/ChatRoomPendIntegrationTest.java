@@ -4,6 +4,7 @@ import kr.co.pennyway.api.apis.chat.dto.ChatRoomReq;
 import kr.co.pennyway.api.apis.chat.dto.ChatRoomRes;
 import kr.co.pennyway.api.common.response.SuccessResponse;
 import kr.co.pennyway.api.common.security.jwt.access.AccessTokenClaim;
+import kr.co.pennyway.api.common.storage.AwsS3Adapter;
 import kr.co.pennyway.api.config.ExternalApiDBTestConfig;
 import kr.co.pennyway.api.config.ExternalApiIntegrationTest;
 import kr.co.pennyway.api.config.fixture.ChatRoomFixture;
@@ -11,18 +12,23 @@ import kr.co.pennyway.api.config.fixture.UserFixture;
 import kr.co.pennyway.domain.domains.chatroom.domain.ChatRoom;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.service.UserService;
+import kr.co.pennyway.infra.client.aws.s3.ObjectKeyType;
 import kr.co.pennyway.infra.common.jwt.JwtProvider;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 
 import java.util.Map;
+
+import static org.mockito.BDDMockito.given;
+
 
 @Slf4j
 @ExternalApiIntegrationTest
@@ -36,6 +42,9 @@ public class ChatRoomPendIntegrationTest extends ExternalApiDBTestConfig {
     @Autowired
     private JwtProvider accessTokenProvider;
 
+    @MockBean
+    private AwsS3Adapter awsS3Adapter;
+
     @LocalServerPort
     private int port;
 
@@ -47,6 +56,7 @@ public class ChatRoomPendIntegrationTest extends ExternalApiDBTestConfig {
         ChatRoom room = ChatRoomFixture.PRIVATE_CHAT_ROOM.toEntity();
         ChatRoomReq.Pend request = new ChatRoomReq.Pend(room.getTitle(), room.getDescription(), room.getPassword());
         ChatRoomReq.Create request2 = new ChatRoomReq.Create(room.getBackgroundImageUrl());
+        given(awsS3Adapter.saveImage(room.getBackgroundImageUrl(), ObjectKeyType.CHAT_PROFILE)).willReturn("chatroom/1");
 
         // when
         ResponseEntity<SuccessResponse<Map<String, Long>>> response = postPending(user, request);
