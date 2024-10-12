@@ -33,7 +33,7 @@ public class ChatRoomSaveService {
 
     /**
      * 채팅방 생성 정보를 캐싱한다.
-     * 해당 요청은 {@link #createChatRoom(ChatRoomReq.Pend, Long)}를 통해 채팅방을 확정할 수 있다.
+     * 해당 요청은 {@link #createChatRoom(ChatRoomReq.Create, Long)}를 통해 채팅방을 확정할 수 있다.
      *
      * @return 캐싱된 채팅방의 ID
      */
@@ -49,18 +49,12 @@ public class ChatRoomSaveService {
      * 캐싱된 채팅방을 확정하고 채팅방을 생성한다.
      * 채팅방을 생성한 사용자는 채팅방의 관리자로 설정된다.
      *
-     * @throws PendedChatRoomErrorException: <br>
-     *                                       - {@link PendedChatRoomErrorCode#NOT_FOUND} - 캐싱된 채팅방이 존재하지 않을 경우 <br>
-     *                                       - {@link PendedChatRoomErrorCode#INVALID_CREATOR} - 채팅방 정보를 생성한 사용자가 아닐 경우
+     * @throws PendedChatRoomErrorException: {@link PendedChatRoomErrorCode#NOT_FOUND} - 캐싱된 채팅방이 존재하지 않을 경우
      */
     @Transactional
     public ChatRoom createChatRoom(ChatRoomReq.Create request, Long userId) {
         PendedChatRoom pendedChatRoom = pendedChatRoomService.readByUserId(userId)
                 .orElseThrow(() -> new PendedChatRoomErrorException(PendedChatRoomErrorCode.NOT_FOUND));
-
-        if (!pendedChatRoom.getUserId().equals(userId)) {
-            throw new PendedChatRoomErrorException(PendedChatRoomErrorCode.INVALID_CREATOR);
-        }
 
         ChatRoom chatRoom = chatRoomService.create(pendedChatRoom.toChatRoom(request.backgroundImageUrl()));
 

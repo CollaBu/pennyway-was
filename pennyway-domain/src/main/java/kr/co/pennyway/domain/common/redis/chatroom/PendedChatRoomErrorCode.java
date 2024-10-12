@@ -8,9 +8,6 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public enum PendedChatRoomErrorCode implements BaseErrorCode {
-    // 403 FORBIDDEN
-    INVALID_CREATOR(StatusCode.FORBIDDEN, ReasonCode.ACCESS_TO_THE_REQUESTED_RESOURCE_IS_FORBIDDEN, "채팅방 정보를 생성한 사용자가 아닙니다."),
-
     // 404 NOT_FOUND
     NOT_FOUND(StatusCode.NOT_FOUND, ReasonCode.REQUESTED_RESOURCE_NOT_FOUND, "채팅방 정보를 찾을 수 없습니다."),
     ;
