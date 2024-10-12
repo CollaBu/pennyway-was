@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/v2/chat-rooms")
 public class ChatRoomController {
     private static final String CHAT_ROOM = "chatRoom";
-    private ChatRoomUseCase chatRoomUseCase;
+    private final ChatRoomUseCase chatRoomUseCase;
 
     @PostMapping("")
     @PreAuthorize("isAuthenticated()")
