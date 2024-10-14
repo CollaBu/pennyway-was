@@ -1,6 +1,7 @@
 package kr.co.pennyway.api.apis.chat.api;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.media.SchemaProperty;
@@ -28,4 +29,8 @@ public interface ChatRoomApi {
             @ApiExceptionExplanation(value = PendedChatRoomErrorCode.class, constant = "NOT_FOUND", name = "채팅방 정보 탐색 실패", description = "사용자가 생성한 채팅방 정보가 존재하지 않는 경우 발생하며, 이 경우 채팅방 생성 요청은 재시도 없이 실패 처리해야 한다.")
     })
     ResponseEntity<?> createChatRoom(@RequestBody ChatRoomReq.Create request, @AuthenticationPrincipal SecurityUserDetails user);
+
+    @Operation(summary = "가입한 채팅방 목록 조회", method = "GET", description = "사용자가 가입한 채팅방 목록을 조회하며, 정렬 순서는 보장하지 않는다. 최근 활성화된 채팅방의 순서를 지정할 방법에 대해 추가 개선이 필요한 API이므로, 추후 기능이 일부 수정될 수도 있다.")
+    @ApiResponse(responseCode = "200", description = "가입한 채팅방 목록 조회 성공", content = @Content(schemaProperties = @SchemaProperty(name = "chatRooms", array = @ArraySchema(schema = @Schema(implementation = ChatRoomRes.Detail.class)))))
+    ResponseEntity<?> getChatRooms(@AuthenticationPrincipal SecurityUserDetails user);
 }
