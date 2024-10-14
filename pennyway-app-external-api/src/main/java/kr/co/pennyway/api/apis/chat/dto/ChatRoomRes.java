@@ -29,12 +29,22 @@ public final class ChatRoomRes {
             @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
             LocalDateTime createdAt
     ) {
+        public Detail(Long id, String title, String description, String backgroundImageUrl, boolean isPrivate, int participantCount, LocalDateTime createdAt) {
+            this.id = id;
+            this.title = title;
+            this.description = Objects.toString(description, "");
+            this.backgroundImageUrl = Objects.toString(backgroundImageUrl, "");
+            this.isPrivate = isPrivate;
+            this.participantCount = participantCount;
+            this.createdAt = createdAt;
+        }
+
         public static Detail from(ChatRoom chatRoom, int participantCount) {
             return new Detail(
                     chatRoom.getId(),
                     chatRoom.getTitle(),
-                    Objects.toString(chatRoom.getDescription(), ""),
-                    Objects.toString(chatRoom.getBackgroundImageUrl(), ""),
+                    chatRoom.getDescription(),
+                    chatRoom.getBackgroundImageUrl(),
                     chatRoom.getPassword() != null,
                     participantCount,
                     chatRoom.getCreatedAt()
