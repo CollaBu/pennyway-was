@@ -10,10 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
@@ -22,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ChatRoomController implements ChatRoomApi {
     private static final String CHAT_ROOM_ID = "chatRoomId";
     private static final String CHAT_ROOM = "chatRoom";
+    private static final String CHAT_ROOMS = "chatRooms";
     private final ChatRoomUseCase chatRoomUseCase;
 
     @Override
@@ -36,5 +34,12 @@ public class ChatRoomController implements ChatRoomApi {
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> createChatRoom(@RequestBody ChatRoomReq.Create request, @AuthenticationPrincipal SecurityUserDetails user) {
         return ResponseEntity.ok(SuccessResponse.from(CHAT_ROOM, chatRoomUseCase.createChatRoom(request, user.getUserId())));
+    }
+
+    @Override
+    @GetMapping("")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> getChatRooms(@AuthenticationPrincipal SecurityUserDetails user) {
+        return ResponseEntity.ok(SuccessResponse.from(CHAT_ROOMS, chatRoomUseCase.getChatRooms(user.getUserId())));
     }
 }
