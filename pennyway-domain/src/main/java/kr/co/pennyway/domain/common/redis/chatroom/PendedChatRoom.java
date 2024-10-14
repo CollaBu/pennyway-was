@@ -9,7 +9,7 @@ import org.springframework.util.StringUtils;
 import java.util.Objects;
 
 @Getter
-@RedisHash(value = "pendedChatRoom", timeToLive = 5)
+@RedisHash(value = "pendedChatRoom", timeToLive = 5 * 60)
 public class PendedChatRoom {
     @Id
     private final Long userId;
