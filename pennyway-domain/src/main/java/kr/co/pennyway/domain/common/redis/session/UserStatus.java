@@ -1,4 +1,4 @@
-package kr.co.pennyway.domain.common.redis.status;
+package kr.co.pennyway.domain.common.redis.session;
 
 import kr.co.pennyway.domain.common.converter.LegacyCommonType;
 import lombok.RequiredArgsConstructor;
