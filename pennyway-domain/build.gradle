@@ -4,6 +4,9 @@ jar { enabled = true }
 dependencies {
     implementation project(':pennyway-common')
 
+    /* Jackson DataType */
+    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.18.0'
+
     /* MySQL */
     implementation group: 'com.mysql', name: 'mysql-connector-j', version: '8.3.0'
 
