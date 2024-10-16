@@ -5,13 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.pennyway.domain.common.annotation.DomainRedisTemplate;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.script.RedisScript;
-import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.stereotype.Repository;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -31,159 +26,79 @@ public class UserSessionRepositoryImpl implements UserSessionRepository {
 
     @Override
     public void save(Long userId, String hashKey, UserSession value) {
-        String key = createKey(userId);
-
-        String luaScript =
-                "redis.call('HSET', KEYS[1], ARGV[1], ARGV[2]) " +
-                        "return redis.call('HEXPIRE', KEYS[1], ARGV[3], 'FIELDS', '1', ARGV[1])";
-
-        RedisScript<List> script = RedisScript.of(luaScript, List.class);
-
-        try {
-            List<Object> result = redisTemplate.execute(script,
-                    List.of(key),
-                    hashKey,
-                    serialize(value),
-                    ttlSeconds
-            );
-
-            log.info("User session saved for user {} with hash key {}. Result: {}", userId, hashKey, result);
-        } catch (Exception e) {
-            log.error("Error saving user session for user {} with hash key {}", userId, hashKey, e);
-            throw new RuntimeException("Failed to save user session", e);
-        }
+        executeScript(SessionLuaScripts.SAVE, userId, hashKey, serialize(value), ttlSeconds);
     }
 
     @Override
     public Optional<UserSession> findUserSession(Long userId, String hashKey) throws JsonProcessingException {
-        String luaScript =
-                "return redis.call('HGET', KEYS[1], ARGV[1])";
+        Object result = executeScript(SessionLuaScripts.FIND, userId, hashKey);
 
-        RedisScript<Object> script = RedisScript.of(luaScript, Object.class);
-
-        try {
-            Object result = redisTemplate.execute(script,
-                    List.of(createKey(userId)),
-                    hashKey
-            );
-
-            log.info("User session found for user {} with hash key {}: {}", userId, hashKey, result);
-
-            UserSession session = deserializeFromBase64((String) result);
-            log.debug("User session found for user {} with hash key {}: {}", userId, hashKey, session);
-
-            return Optional.ofNullable(session);
-        } catch (Exception e) {
-            log.error("Error finding user session for user {} with hash key {}", userId, hashKey, e);
-            return Optional.empty();
-        }
+        return Optional.ofNullable(deserialize(result));
     }
 
     @Override
     public Map<String, UserSession> findAllUserSessions(Long userId) throws JsonProcessingException {
-        String luaScript =
-                "return redis.call('HGETALL', KEYS[1])";
+        List<Object> result = executeScript(SessionLuaScripts.FIND_ALL, userId);
 
-        RedisScript<List> script = RedisScript.of(luaScript, List.class);
-
-        try {
-            List<Object> result = redisTemplate.execute(script,
-                    List.of(createKey(userId))
-            );
-
-            Map<String, UserSession> sessions = new ConcurrentHashMap<>();
-            for (int i = 0; i < result.size(); i += 2) {
-                String key = result.get(i).toString();
-                UserSession value = deserializeFromBase64((String) result.get(i + 1));
-                log.debug("User session found for user {} with hash key {}: {}", userId, key, value);
-                sessions.put(key, value);
-            }
-
-            return sessions;
-        } catch (Exception e) {
-            log.error("Error finding all user sessions for user {}", userId, e);
-            return new ConcurrentHashMap<>();
-        }
+        return deserializeMap(result);
     }
 
     @Override
     public Long getSessionTtl(Long userId, String hashKey) {
-        String luaScript =
-                "return redis.call('HTTL', KEYS[1], 'FIELDS', '1', ARGV[1])";
-
-        RedisScript<Long> script = RedisScript.of(luaScript, Long.class);
-
-        try {
-            Long result = redisTemplate.execute(script,
-                    List.of(createKey(userId)),
-                    hashKey
-            );
-
-            return result != null ? result : -1L;
-        } catch (Exception e) {
-            log.error("Error getting session TTL for user {} with hash key {}", userId, hashKey, e);
-            return -1L;
-        }
+        return executeScript(SessionLuaScripts.GET_TTL, userId, hashKey);
     }
 
     @Override
     public void resetSessionTtl(Long userId, String hashKey) {
-        String luaScript =
-                "return redis.call('HEXPIRE', KEYS[1], ARGV[1], 'FIELDS', '1', ARGV[2])";
-
-        RedisScript<Long> script = RedisScript.of(luaScript, Long.class);
-
-        try {
-            Long result = redisTemplate.execute(script,
-                    List.of(createKey(userId)),
-                    ttlSeconds,
-                    hashKey
-            );
-
-            log.debug("Reset session TTL for user {} with hash key {}. Result: {}", userId, hashKey, result);
-        } catch (Exception e) {
-            log.error("Error resetting session TTL for user {} with hash key {}", userId, hashKey, e);
-            throw new RuntimeException("Failed to reset session TTL", e);
-        }
+        executeScript(SessionLuaScripts.RESET_TTL, userId, hashKey, ttlSeconds);
     }
 
     @Override
     public void delete(Long userId, String hashKey) {
-        String luaScript =
-                "return redis.call('HDEL', KEYS[1], ARGV[1])";
-
-        RedisScript<Long> script = RedisScript.of(luaScript, Long.class);
-
-        try {
-            Long result = redisTemplate.execute(script,
-                    List.of(createKey(userId)),
-                    hashKey
-            );
-
-            log.debug("Deleted session for user {} with hash key {}. Result: {}", userId, hashKey, result);
-        } catch (Exception e) {
-            log.error("Error deleting session for user {} with hash key {}", userId, hashKey, e);
-            throw new RuntimeException("Failed to delete session", e);
-        }
-    }
-
-    private byte[] serialize(UserSession value) {
-        try {
-            RedisSerializer<UserSession> valueSerializer = (RedisSerializer<UserSession>) redisTemplate.getValueSerializer();
-            return valueSerializer.serialize(value);
-        } catch (Exception e) {
-            log.error("Error serializing UserSession", e);
-            throw new RuntimeException("Failed to serialize UserSession", e);
-        }
-    }
-
-    private UserSession deserializeFromBase64(String base64String) throws IOException {
-        byte[] decodedBytes = Base64.getDecoder().decode(base64String);
-        String jsonString = new String(decodedBytes, StandardCharsets.UTF_8);
-        return objectMapper.readValue(jsonString, UserSession.class);
+        executeScript(SessionLuaScripts.DELETE, userId, hashKey);
     }
 
     private String createKey(Long userId) {
         return "user:" + userId;
+    }
+
+    private <T> T executeScript(SessionLuaScripts script, Long userId, Object... args) {
+        try {
+            return redisTemplate.execute(
+                    script.getScript(),
+                    List.of(createKey(userId)),
+                    args
+            );
+        } catch (Exception e) {
+            log.error("Error executing Redis script: {}", script.name(), e);
+            throw new RuntimeException("Failed to execute Redis operation", e);
+        }
+    }
+
+    private String serialize(UserSession value) {
+        try {
+            return objectMapper.writeValueAsString(value);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Failed to serialize UserSession", e);
+        }
+    }
+
+    private UserSession deserialize(Object value) {
+        if (value == null) return null;
+        try {
+            return objectMapper.readValue((String) value, UserSession.class);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Failed to deserialize UserSession", e);
+        }
+    }
+
+    private Map<String, UserSession> deserializeMap(List<Object> entries) {
+        Map<String, UserSession> result = new ConcurrentHashMap<>();
+        for (int i = 0; i < entries.size(); i += 2) {
+            String key = (String) entries.get(i);
+            UserSession value = deserialize(entries.get(i + 1));
+            result.put(key, value);
+        }
+        return result;
     }
 }
