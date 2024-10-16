@@ -8,7 +8,7 @@ import org.testcontainers.utility.DockerImageName;
 
 @DisplayName("Container Redis 설정")
 public abstract class ContainerRedisTestConfig {
-    private static final String REDIS_CONTAINER_NAME = "redis:7.2.4-alpine";
+    private static final String REDIS_CONTAINER_NAME = "redis:7.4";
     private static final GenericContainer<?> REDIS_CONTAINER;
 
     static {

@@ -1,5 +1,8 @@
 package kr.co.pennyway.domain.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import kr.co.pennyway.domain.common.annotation.DomainRedisCacheManager;
 import kr.co.pennyway.domain.common.annotation.DomainRedisConnectionFactory;
 import kr.co.pennyway.domain.common.annotation.DomainRedisTemplate;
@@ -31,6 +34,7 @@ public class RedisConfig {
     private final int port;
     private final String password;
 
+
     public RedisConfig(
             @Value("${spring.data.redis.host}") String host,
             @Value("${spring.data.redis.port}") int port,
@@ -53,13 +57,13 @@ public class RedisConfig {
     @Bean
     @Primary
     @DomainRedisTemplate
-    public RedisTemplate<String, ?> redisTemplate() {
+    public RedisTemplate<String, ?> redisTemplate(ObjectMapper redisObjectMapper) {
         RedisTemplate<String, ?> template = new RedisTemplate<>();
 
         template.setConnectionFactory(redisConnectionFactory());
 
         template.setKeySerializer(new StringRedisSerializer());
-        template.setValueSerializer(new GenericJackson2JsonRedisSerializer());
+        template.setValueSerializer(new GenericJackson2JsonRedisSerializer(redisObjectMapper));
         return template;
     }
 
@@ -79,5 +83,14 @@ public class RedisConfig {
         return RedisCacheManager.RedisCacheManagerBuilder.fromConnectionFactory(cf)
                 .cacheDefaults(redisCacheConfiguration)
                 .build();
+    }
+
+    @Bean
+    public ObjectMapper redisObjectMapper() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, true);
+        objectMapper.registerModule(new JavaTimeModule());
+
+        return objectMapper;
     }
 }
