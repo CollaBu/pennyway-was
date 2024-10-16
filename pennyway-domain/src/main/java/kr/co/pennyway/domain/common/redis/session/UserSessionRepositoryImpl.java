@@ -79,6 +79,7 @@ public class UserSessionRepositoryImpl implements UserSessionRepository {
         try {
             return objectMapper.writeValueAsString(value);
         } catch (JsonProcessingException e) {
+            log.error("Error serializing UserSession", e);
             throw new RuntimeException("Failed to serialize UserSession", e);
         }
     }
@@ -88,6 +89,7 @@ public class UserSessionRepositoryImpl implements UserSessionRepository {
         try {
             return objectMapper.readValue((String) value, UserSession.class);
         } catch (JsonProcessingException e) {
+            log.error("Error deserializing UserSession", e);
             throw new RuntimeException("Failed to deserialize UserSession", e);
         }
     }
