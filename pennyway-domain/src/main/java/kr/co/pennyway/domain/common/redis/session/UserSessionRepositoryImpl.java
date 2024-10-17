@@ -30,14 +30,14 @@ public class UserSessionRepositoryImpl implements UserSessionRepository {
     }
 
     @Override
-    public Optional<UserSession> findUserSession(Long userId, String hashKey) throws JsonProcessingException {
+    public Optional<UserSession> findUserSession(Long userId, String hashKey) {
         Object result = executeScript(SessionLuaScripts.FIND, userId, hashKey);
 
         return Optional.ofNullable(deserialize(result));
     }
 
     @Override
-    public Map<String, UserSession> findAllUserSessions(Long userId) throws JsonProcessingException {
+    public Map<String, UserSession> findAllUserSessions(Long userId) {
         List<Object> result = executeScript(SessionLuaScripts.FIND_ALL, userId);
 
         return deserializeMap(result);
