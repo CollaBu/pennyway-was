@@ -20,14 +20,13 @@ import kr.co.pennyway.socket.common.security.jwt.AccessTokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.Message;
-import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Component;
-import org.springframework.util.MultiValueMap;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Slf4j
 @Component
@@ -50,8 +49,10 @@ public class ConnectAuthenticateHandler implements ConnectCommandHandler {
         Long userId = JwtClaimsParserUtil.getClaimsValue(claims, AccessTokenClaimKeys.USER_ID.getValue(), Long::parseLong);
         LocalDateTime expiresDate = accessTokenProvider.getExpiryDate(accessToken);
 
+        existsHeader(accessor);
+
         authenticateUser(accessor, userId, expiresDate);
-        activateUserSession(userId, accessor.getMessageHeaders());
+        activateUserSession(accessor, userId);
     }
 
     private String extractAccessToken(StompHeaderAccessor accessor) {
@@ -65,27 +66,36 @@ public class ConnectAuthenticateHandler implements ConnectCommandHandler {
         return authorization.substring(7);
     }
 
+    private void existsHeader(StompHeaderAccessor accessor) {
+        List<String> headerNames = List.of(
+                StompNativeHeaderFields.DEVICE_ID.getValue(),
+                StompNativeHeaderFields.DEVICE_NAME.getValue()
+        );
+
+        for (String headerName : headerNames) {
+            if (!accessor.containsNativeHeader(headerName)) {
+                log.warn("[인증 핸들러] 헤더에 {}가 없습니다.", headerName);
+                throw new InterceptorErrorException(InterceptorErrorCode.INAVLID_HEADER);
+            }
+        }
+    }
+
     private void authenticateUser(StompHeaderAccessor accessor, Long userId, LocalDateTime expiresDate) {
+        String deviceId = accessor.getFirstNativeHeader(StompNativeHeaderFields.DEVICE_ID.getValue());
+        String deviceName = accessor.getFirstNativeHeader(StompNativeHeaderFields.DEVICE_NAME.getValue());
+
         User user = userService.readUser(userId)
                 .orElseThrow(() -> new JwtErrorException(JwtErrorCode.MALFORMED_TOKEN));
-        Principal principal = UserPrincipal.from(user, expiresDate);
+        Principal principal = UserPrincipal.of(user, expiresDate, deviceId, deviceName);
 
         log.info("[인증 핸들러] 사용자 인증 완료: {}", principal);
 
         accessor.setUser(principal);
     }
 
-    private void activateUserSession(Long userId, MessageHeaders headers) {
-        MultiValueMap<String, String> nativeHeaders = headers.get(StompHeaderAccessor.NATIVE_HEADERS, MultiValueMap.class);
-        String deviceId, deviceName;
-
-        if (nativeHeaders.containsKey(StompNativeHeaderFields.DEVICE_ID.getValue()) && nativeHeaders.containsKey(StompNativeHeaderFields.DEVICE_NAME.getValue())) {
-            deviceId = nativeHeaders.getFirst(StompNativeHeaderFields.DEVICE_ID.getValue());
-            deviceName = nativeHeaders.getFirst(StompNativeHeaderFields.DEVICE_NAME.getValue());
-            log.debug("[인증 핸들러] 연결 기기 정보 deviceId: {}, deviceName: {}", deviceId, deviceName);
-        } else {
-            throw new InterceptorErrorException(InterceptorErrorCode.INAVLID_HEADER);
-        }
+    private void activateUserSession(StompHeaderAccessor accessor, Long userId) {
+        String deviceId = accessor.getFirstNativeHeader(StompNativeHeaderFields.DEVICE_ID.getValue());
+        String deviceName = accessor.getFirstNativeHeader(StompNativeHeaderFields.DEVICE_NAME.getValue());
 
         if (userSessionService.isExists(userId, deviceId)) {
             log.info("[인증 핸들러] 사용자 세션을 업데이트합니다. userId: {}, deviceId: {}", userId, deviceId);
