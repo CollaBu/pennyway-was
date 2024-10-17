@@ -95,6 +95,27 @@ public class UserSessionCustomRepositoryTest extends ContainerRedisTestConfig {
     }
 
     @Test
+    void existsTest() {
+        // Given
+        Long userId = 1L;
+        String hashKey = "testDevice";
+        UserSession session = UserSession.of(hashKey);
+        userSessionRepository.save(userId, hashKey, session);
+
+        // When
+        boolean exists = userSessionRepository.exists(userId, hashKey);
+
+        // Then
+        assertTrue(exists);
+
+        // When
+        boolean notExists = userSessionRepository.exists(userId, "nonExistentDevice");
+
+        // Then
+        assertFalse(notExists);
+    }
+
+    @Test
     @DisplayName("사용자 세션 삭제 테스트")
     void deleteUserSessionTest() throws JsonProcessingException {
         // given
@@ -110,7 +131,7 @@ public class UserSessionCustomRepositoryTest extends ContainerRedisTestConfig {
 
     @Test
     @DisplayName("사용자 세션 상태 업데이트 테스트 (채팅방으로 이동)")
-    void updateUserSessionStatusTest() throws JsonProcessingException {
+    void updateUserSessionStatusTest() {
         // given
         userSessionRepository.save(userId, deviceId, userSession);
 
