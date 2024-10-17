@@ -1,6 +1,8 @@
 package kr.co.pennyway.socket.common.dto;
 
 import kr.co.pennyway.domain.common.redis.session.UserStatus;
+import kr.co.pennyway.socket.common.exception.MessageErrorCode;
+import kr.co.pennyway.socket.common.exception.MessageErrorException;
 
 import java.util.Objects;
 
@@ -9,10 +11,12 @@ public record StatusMessage(
         Long chatRoomId
 ) {
     public StatusMessage {
-        Objects.requireNonNull(status, "status must not be null");
+        if (Objects.isNull(status)) {
+            throw new MessageErrorException(MessageErrorCode.MALFORMED_MESSAGE_BODY);
+        }
 
-        if (status.equals(UserStatus.ACTIVE_CHAT_ROOM)) {
-            Objects.requireNonNull(chatRoomId, "chatRoomId must not be null");
+        if (status.equals(UserStatus.ACTIVE_CHAT_ROOM) && Objects.isNull(chatRoomId)) {
+            throw new MessageErrorException(MessageErrorCode.MALFORMED_MESSAGE_BODY);
         }
     }
 
