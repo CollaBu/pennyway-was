@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 
 @Slf4j
@@ -48,11 +47,7 @@ public class UserSessionService {
      * @throws IllegalArgumentException chatRoomId가 null 혹은 0을 포함한 음수일 때 발생합니다. 사용자 세션 정보를 찾을 수 없을 때도 발생합니다.
      */
     public UserSession updateUserStatus(Long userId, String deviceId, Long chatRoomId) {
-        if (Objects.isNull(chatRoomId) || chatRoomId <= 0) {
-            throw new IllegalArgumentException("채팅방 ID는 null 혹은 0을 포함한 음수를 허용하지 않습니다.");
-        }
-
-        return updateUserStatus(userId, deviceId, chatRoomId, UserStatus.ACTIVE_APP);
+        return updateUserStatus(userId, deviceId, chatRoomId, UserStatus.ACTIVE_CHAT_ROOM);
     }
 
     private UserSession updateUserStatus(Long userId, String deviceId, Long chatRoomId, UserStatus status) {
@@ -70,6 +65,12 @@ public class UserSessionService {
     }
 
     public void resetSessionTtl(Long userId, String deviceId) {
+        UserSession userSession = userSessionRepository.findUserSession(userId, deviceId)
+                .orElseThrow(() -> new IllegalArgumentException("사용자 세션을 찾을 수 없습니다."));
+
+        userSession.updateLastActiveAt();
+        userSessionRepository.save(userId, deviceId, userSession);
+
         userSessionRepository.resetSessionTtl(userId, deviceId);
     }
 

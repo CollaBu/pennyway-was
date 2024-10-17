@@ -75,12 +75,22 @@ public class UserSession implements Serializable {
     }
 
     public void updateStatus(UserStatus status) {
+        validate(deviceName, status, lastActiveAt);
+
         this.status = status;
+        updateLastActiveAt();
     }
 
     public void updateStatus(UserStatus status, Long currentChatRoomId) {
+        validate(deviceName, status, lastActiveAt);
+
+        if (status.equals(UserStatus.ACTIVE_CHAT_ROOM) && (currentChatRoomId == null || currentChatRoomId <= 0)) {
+            throw new IllegalArgumentException("채팅방 ID는 null 혹은 0을 포함한 음수를 허용하지 않습니다.");
+        }
+
         this.status = status;
         this.currentChatRoomId = currentChatRoomId;
+        updateLastActiveAt();
     }
 
     /**
