@@ -51,8 +51,8 @@ public class ConnectAuthenticateHandler implements ConnectCommandHandler {
 
         existsHeader(accessor);
 
-        authenticateUser(accessor, userId, expiresDate);
-        activateUserSession(accessor, userId);
+        UserPrincipal principal = (UserPrincipal) authenticateUser(accessor, userId, expiresDate);
+        activateUserSession(principal);
     }
 
     private String extractAccessToken(StompHeaderAccessor accessor) {
@@ -80,7 +80,7 @@ public class ConnectAuthenticateHandler implements ConnectCommandHandler {
         }
     }
 
-    private void authenticateUser(StompHeaderAccessor accessor, Long userId, LocalDateTime expiresDate) {
+    private Principal authenticateUser(StompHeaderAccessor accessor, Long userId, LocalDateTime expiresDate) {
         String deviceId = accessor.getFirstNativeHeader(StompNativeHeaderFields.DEVICE_ID.getValue());
         String deviceName = accessor.getFirstNativeHeader(StompNativeHeaderFields.DEVICE_NAME.getValue());
 
@@ -91,18 +91,17 @@ public class ConnectAuthenticateHandler implements ConnectCommandHandler {
         log.info("[인증 핸들러] 사용자 인증 완료: {}", principal);
 
         accessor.setUser(principal);
+
+        return principal;
     }
 
-    private void activateUserSession(StompHeaderAccessor accessor, Long userId) {
-        String deviceId = accessor.getFirstNativeHeader(StompNativeHeaderFields.DEVICE_ID.getValue());
-        String deviceName = accessor.getFirstNativeHeader(StompNativeHeaderFields.DEVICE_NAME.getValue());
-
-        if (userSessionService.isExists(userId, deviceId)) {
-            log.info("[인증 핸들러] 사용자 세션을 업데이트합니다. userId: {}, deviceId: {}", userId, deviceId);
-            userSessionService.updateUserStatus(userId, deviceId, UserStatus.ACTIVE_APP);
+    private void activateUserSession(UserPrincipal principal) {
+        if (userSessionService.isExists(principal.getUserId(), principal.getDeviceId())) {
+            log.info("[인증 핸들러] 사용자 세션을 업데이트합니다. userId: {}, deviceId: {}", principal.getUserId(), principal.getDeviceId());
+            userSessionService.updateUserStatus(principal.getUserId(), principal.getDeviceName(), UserStatus.ACTIVE_APP);
         } else {
-            log.info("[인증 핸들러] 사용자 세션을 생성합니다. userId: {}, deviceId: {}", userId, deviceId);
-            userSessionService.create(userId, deviceId, UserSession.of(deviceId, deviceName));
+            log.info("[인증 핸들러] 사용자 세션을 생성합니다. userId: {}, deviceId: {}", principal.getUserId(), principal.getDeviceId());
+            userSessionService.create(principal.getUserId(), principal.getDeviceId(), UserSession.of(principal.getDeviceId(), principal.getDeviceName()));
         }
     }
 }
