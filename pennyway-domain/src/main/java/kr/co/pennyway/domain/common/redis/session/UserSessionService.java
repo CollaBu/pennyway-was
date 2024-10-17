@@ -56,6 +56,7 @@ public class UserSessionService {
 
         userSession.updateStatus(status, chatRoomId);
         userSessionRepository.save(userId, deviceId, userSession);
+        userSessionRepository.resetSessionTtl(userId, deviceId);
 
         return userSession;
     }
@@ -70,7 +71,6 @@ public class UserSessionService {
 
         userSession.updateLastActiveAt();
         userSessionRepository.save(userId, deviceId, userSession);
-
         userSessionRepository.resetSessionTtl(userId, deviceId);
     }
 
