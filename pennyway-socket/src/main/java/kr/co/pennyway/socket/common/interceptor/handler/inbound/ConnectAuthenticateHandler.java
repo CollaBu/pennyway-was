@@ -2,6 +2,7 @@ package kr.co.pennyway.socket.common.interceptor.handler.inbound;
 
 import kr.co.pennyway.domain.common.redis.session.UserSession;
 import kr.co.pennyway.domain.common.redis.session.UserSessionService;
+import kr.co.pennyway.domain.common.redis.session.UserStatus;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.service.UserService;
 import kr.co.pennyway.infra.common.exception.JwtErrorCode;
@@ -82,6 +83,12 @@ public class ConnectAuthenticateHandler implements ConnectCommandHandler {
             throw new InterceptorErrorException(InterceptorErrorCode.INAVLID_HEADER);
         }
 
-        userSessionService.create(userId, deviceId, UserSession.of(deviceName));
+        if (userSessionService.isExists(userId, deviceId)) {
+            log.info("[인증 핸들러] 사용자 세션을 업데이트합니다. userId: {}, deviceId: {}", userId, deviceId);
+            userSessionService.updateUserStatus(userId, deviceId, UserStatus.ACTIVE_APP);
+        } else {
+            log.info("[인증 핸들러] 사용자 세션을 생성합니다. userId: {}, deviceId: {}", userId, deviceId);
+            userSessionService.create(userId, deviceId, UserSession.of(deviceName));
+        }
     }
 }
