@@ -49,6 +49,11 @@ public class UserSessionRepositoryImpl implements UserSessionRepository {
     }
 
     @Override
+    public boolean exists(Long userId, String hashKey) {
+        return executeScript(SessionLuaScripts.EXISTS, userId, hashKey);
+    }
+
+    @Override
     public void resetSessionTtl(Long userId, String hashKey) {
         executeScript(SessionLuaScripts.RESET_TTL, userId, hashKey, ttlSeconds);
     }

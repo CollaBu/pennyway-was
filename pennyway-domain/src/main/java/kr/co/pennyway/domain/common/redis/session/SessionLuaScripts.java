@@ -24,6 +24,10 @@ public enum SessionLuaScripts {
             "return redis.call('HTTL', KEYS[1], 'FIELDS', '1', ARGV[1])",
             Long.class
     ),
+    EXISTS(
+            "return redis.call('HEXISTS', KEYS[1], ARGV[1])",
+            Boolean.class
+    ),
     RESET_TTL(
             "return redis.call('HEXPIRE', KEYS[1], ARGV[2], 'FIELDS', '1', ARGV[1])",
             Long.class

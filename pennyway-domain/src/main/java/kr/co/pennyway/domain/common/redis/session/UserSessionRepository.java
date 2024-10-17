@@ -12,6 +12,8 @@ public interface UserSessionRepository {
 
     Long getSessionTtl(Long userId, String hashKey);
 
+    boolean exists(Long userId, String hashKey);
+
     void resetSessionTtl(Long userId, String hashKey);
 
     void delete(Long userId, String hashKey);
