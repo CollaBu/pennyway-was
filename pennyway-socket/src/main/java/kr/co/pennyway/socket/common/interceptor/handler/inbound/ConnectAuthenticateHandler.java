@@ -102,7 +102,7 @@ public class ConnectAuthenticateHandler implements ConnectCommandHandler {
             userSessionService.updateUserStatus(userId, deviceId, UserStatus.ACTIVE_APP);
         } else {
             log.info("[인증 핸들러] 사용자 세션을 생성합니다. userId: {}, deviceId: {}", userId, deviceId);
-            userSessionService.create(userId, deviceId, UserSession.of(deviceName));
+            userSessionService.create(userId, deviceId, UserSession.of(deviceId, deviceName));
         }
     }
 }
