@@ -37,13 +37,14 @@ public class UserSessionCustomRepositoryTest extends ContainerRedisTestConfig {
         userId = 1L;
         deviceId = "123456789";
         deviceName = "TestDevice";
-        userSession = UserSession.of(deviceName);
+        userSession = UserSession.of(deviceId, deviceName);
     }
 
     @Test
     @DisplayName("사용자 세션 저장 및 조회 테스트")
     void saveAndFindUserSessionTest() throws JsonProcessingException {
         // given
+        log.debug("userSession: {}", userSession);
         userSessionRepository.save(userId, deviceId, userSession);
 
         // when
@@ -62,7 +63,7 @@ public class UserSessionCustomRepositoryTest extends ContainerRedisTestConfig {
         // given
         String deviceId2 = "987654321";
         String deviceName2 = "TestDevice2";
-        UserSession userSession2 = UserSession.of(deviceName2);
+        UserSession userSession2 = UserSession.of(deviceId2, deviceName2);
         userSessionRepository.save(userId, deviceId, userSession);
         userSessionRepository.save(userId, deviceId2, userSession2);
 
