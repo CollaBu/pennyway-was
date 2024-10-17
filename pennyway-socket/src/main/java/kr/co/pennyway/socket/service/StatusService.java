@@ -32,6 +32,6 @@ public class StatusService {
         ServerSideMessage payload = ServerSideMessage.of("2000", "OK");
         Message<ServerSideMessage> response = MessageBuilder.createMessage(payload, accessor.getMessageHeaders());
 
-        publisher.publishEvent(ReceiptEvent.of(response));
+        publisher.publishEvent(ReceiptEvent.of(response)); // @FIXME: Refresh Event와 달리 Receipt가 성공적으로 처리되지 않음.
     }
 }
