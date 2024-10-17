@@ -22,6 +22,7 @@ import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Component;
+import org.springframework.util.MultiValueMap;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
@@ -48,7 +49,6 @@ public class ConnectAuthenticateHandler implements ConnectCommandHandler {
         LocalDateTime expiresDate = accessTokenProvider.getExpiryDate(accessToken);
 
         authenticateUser(accessor, userId, expiresDate);
-
         activateUserSession(userId, accessor.getMessageHeaders());
     }
 
@@ -74,14 +74,17 @@ public class ConnectAuthenticateHandler implements ConnectCommandHandler {
     }
 
     private void activateUserSession(Long userId, MessageHeaders headers) {
+        MultiValueMap<String, String> nativeHeaders = headers.get(StompHeaderAccessor.NATIVE_HEADERS, MultiValueMap.class);
         String deviceId, deviceName;
 
-        if (headers.containsKey("device-id") && headers.containsKey("device-name")) {
-            deviceId = (String) headers.get("device-id");
-            deviceName = (String) headers.get("device-name");
+        if (nativeHeaders.containsKey("device-id") && nativeHeaders.containsKey("device-name")) {
+            deviceId = nativeHeaders.getFirst("device-id");
+            deviceName = nativeHeaders.getFirst("device-name");
         } else {
             throw new InterceptorErrorException(InterceptorErrorCode.INAVLID_HEADER);
         }
+
+        log.info("[인증 핸들러] 사용자 세션을 확인합니다. userId: {}, deviceId: {}", userId, deviceId);
 
         if (userSessionService.isExists(userId, deviceId)) {
             log.info("[인증 핸들러] 사용자 세션을 업데이트합니다. userId: {}, deviceId: {}", userId, deviceId);
