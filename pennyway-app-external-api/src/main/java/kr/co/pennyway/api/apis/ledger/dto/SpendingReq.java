@@ -1,6 +1,7 @@
 package kr.co.pennyway.api.apis.ledger.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -70,6 +71,7 @@ public record SpendingReq(
     }
 
     @Schema(hidden = true)
+    @JsonIgnore
     public boolean isCustomCategory() {
         return !categoryId.equals(-1L);
     }

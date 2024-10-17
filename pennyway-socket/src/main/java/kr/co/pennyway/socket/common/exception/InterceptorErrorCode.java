@@ -9,6 +9,7 @@ import org.springframework.messaging.simp.stomp.StompCommand;
 public enum InterceptorErrorCode implements BaseErrorCode {
     // 400
     INVALID_DESTINATION(StatusCode.BAD_REQUEST, ReasonCode.INVALID_REQUEST, "유효하지 않은 목적지입니다", StompCommand.SEND, StompCommand.SUBSCRIBE, StompCommand.UNSUBSCRIBE),
+    INAVLID_HEADER(StatusCode.BAD_REQUEST, ReasonCode.INVALID_REQUEST_SYNTAX, "유효하지 않은 헤더입니다", StompCommand.CONNECT),
 
     // 403
     UNAUTHORIZED_TO_SUBSCRIBE(StatusCode.FORBIDDEN, ReasonCode.ACCESS_TO_THE_REQUESTED_RESOURCE_IS_FORBIDDEN, "해당 주제에 대한 구독 권한이 없습니다", StompCommand.SUBSCRIBE, StompCommand.UNSUBSCRIBE),

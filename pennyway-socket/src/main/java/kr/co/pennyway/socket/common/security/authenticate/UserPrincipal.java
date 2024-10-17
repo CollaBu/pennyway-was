@@ -16,18 +16,22 @@ public class UserPrincipal implements Principal {
     private Role role;
     private boolean isChatNotify;
     private LocalDateTime expiresAt;
+    private String deviceId;
+    private String deviceName;
 
     @Builder
-    private UserPrincipal(Long userId, String name, String username, Role role, boolean isChatNotify, LocalDateTime expiresAt) {
+    private UserPrincipal(Long userId, String name, String username, Role role, boolean isChatNotify, LocalDateTime expiresAt, String deviceId, String deviceName) {
         this.userId = userId;
         this.name = name;
         this.username = username;
         this.role = role;
         this.isChatNotify = isChatNotify;
         this.expiresAt = expiresAt;
+        this.deviceId = deviceId;
+        this.deviceName = deviceName;
     }
 
-    public static UserPrincipal from(User user, LocalDateTime expiresAt) {
+    public static UserPrincipal of(User user, LocalDateTime expiresAt, String deviceId, String deviceName) {
         return UserPrincipal.builder()
                 .userId(user.getId())
                 .name(user.getName())
@@ -35,6 +39,8 @@ public class UserPrincipal implements Principal {
                 .role(user.getRole())
                 .isChatNotify(user.getNotifySetting().isChatNotify())
                 .expiresAt(expiresAt)
+                .deviceId(deviceId)
+                .deviceName(deviceName)
                 .build();
     }
 
@@ -83,7 +89,9 @@ public class UserPrincipal implements Principal {
                 ", username='" + username + '\'' +
                 ", role=" + role + '\'' +
                 ", isChatNotify=" + isChatNotify + '\'' +
-                ", expiresAt=" + expiresAt +
+                ", expiresAt=" + expiresAt + '\'' +
+                ", deviceId='" + deviceId + '\'' +
+                ", deviceName='" + deviceName + '\'' +
                 '}';
     }
 }

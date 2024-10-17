@@ -11,7 +11,7 @@ import org.testcontainers.utility.DockerImageName;
 @Testcontainers
 @ActiveProfiles("test")
 public abstract class ExternalApiDBTestConfig {
-    private static final String REDIS_CONTAINER_IMAGE = "redis:7.2.4-alpine";
+    private static final String REDIS_CONTAINER_IMAGE = "redis:7.4";
     private static final String MYSQL_CONTAINER_IMAGE = "mysql:8.0.26";
 
     private static final RedisContainer REDIS_CONTAINER;
