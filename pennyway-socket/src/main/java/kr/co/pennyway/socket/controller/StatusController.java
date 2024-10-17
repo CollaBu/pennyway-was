@@ -7,6 +7,7 @@ import kr.co.pennyway.socket.service.StatusService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Controller;
 
 @Slf4j
@@ -17,7 +18,7 @@ public class StatusController {
 
     @MessageMapping("status.me")
     @PreAuthorize("#isAuthenticated(#principal)")
-    public void updateStatus(UserPrincipal principal, StatusMessage message) {
-        statusService.updateStatus(principal.getUserId(), principal.getDeviceId(), message);
+    public void updateStatus(UserPrincipal principal, StatusMessage message, StompHeaderAccessor accessor) {
+        statusService.updateStatus(principal.getUserId(), principal.getDeviceId(), message, accessor);
     }
 }
