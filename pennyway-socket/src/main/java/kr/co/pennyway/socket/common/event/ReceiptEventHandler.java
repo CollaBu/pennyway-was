@@ -25,7 +25,7 @@ public class ReceiptEventHandler {
 
     @Bean
     @Async
-    public CompletableFuture<ApplicationListener<RefreshEvent<ServerSideMessage>>> principalRefreshEventListener(final AbstractSubscribableChannel clientOutboundChannel) {
+    public CompletableFuture<ApplicationListener<ReceiptEvent<ServerSideMessage>>> principalRefreshEventListener(final AbstractSubscribableChannel clientOutboundChannel) {
         return CompletableFuture.completedFuture(event -> {
             Message<ServerSideMessage> message = event.getMessage();
             StompHeaderAccessor accessor = StompHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);

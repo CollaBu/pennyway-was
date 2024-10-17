@@ -2,7 +2,7 @@ package kr.co.pennyway.socket.service;
 
 import kr.co.pennyway.infra.common.exception.JwtErrorException;
 import kr.co.pennyway.socket.common.dto.ServerSideMessage;
-import kr.co.pennyway.socket.common.event.RefreshEvent;
+import kr.co.pennyway.socket.common.event.ReceiptEvent;
 import kr.co.pennyway.socket.common.security.authenticate.UserPrincipal;
 import kr.co.pennyway.socket.common.security.jwt.AccessTokenProvider;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +38,6 @@ public class AuthService {
             message = MessageBuilder.createMessage(payload, accessor.getMessageHeaders());
         }
 
-        eventPublisher.publishEvent(RefreshEvent.of(message));
+        eventPublisher.publishEvent(ReceiptEvent.of(message));
     }
 }
