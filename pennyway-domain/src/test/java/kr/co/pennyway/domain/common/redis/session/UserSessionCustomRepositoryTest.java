@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import kr.co.pennyway.domain.config.ContainerRedisTestConfig;
 import kr.co.pennyway.domain.config.RedisConfig;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -95,15 +96,13 @@ public class UserSessionCustomRepositoryTest extends ContainerRedisTestConfig {
     }
 
     @Test
+    @DisplayName("사용자 세션 존재 여부 조회 테스트")
     void existsTest() {
         // Given
-        Long userId = 1L;
-        String hashKey = "testDevice";
-        UserSession session = UserSession.of(hashKey);
-        userSessionRepository.save(userId, hashKey, session);
+        userSessionRepository.save(userId, deviceId, userSession);
 
         // When
-        boolean exists = userSessionRepository.exists(userId, hashKey);
+        boolean exists = userSessionRepository.exists(userId, deviceId);
 
         // Then
         assertTrue(exists);
@@ -163,5 +162,10 @@ public class UserSessionCustomRepositoryTest extends ContainerRedisTestConfig {
         // then
         UserSession foundSession = userSessionRepository.findUserSession(userId, deviceId).get();
         assertTrue(foundSession.getLastActiveAt().isAfter(initialLastActiveAt));
+    }
+
+    @AfterEach
+    void tearDown() {
+        userSessionRepository.delete(userId, deviceId);
     }
 }
