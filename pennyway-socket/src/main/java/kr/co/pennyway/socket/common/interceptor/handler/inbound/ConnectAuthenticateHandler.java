@@ -97,11 +97,13 @@ public class ConnectAuthenticateHandler implements ConnectCommandHandler {
 
     private void activateUserSession(UserPrincipal principal) {
         if (userSessionService.isExists(principal.getUserId(), principal.getDeviceId())) {
-            log.info("[인증 핸들러] 사용자 세션을 업데이트합니다. userId: {}, deviceId: {}", principal.getUserId(), principal.getDeviceId());
-            userSessionService.updateUserStatus(principal.getUserId(), principal.getDeviceName(), UserStatus.ACTIVE_APP);
+            log.info("[인증 핸들러] 사용자 세션을 갱신합니다. userId: {}, deviceId: {}", principal.getUserId(), principal.getDeviceId());
+            userSessionService.updateUserStatus(principal.getUserId(), principal.getDeviceId(), UserStatus.ACTIVE_APP);
+            log.info("[인증 핸들러] 사용자 세션을 갱신했습니다. userId: {}, deviceId: {}", principal.getUserId(), principal.getDeviceId());
         } else {
             log.info("[인증 핸들러] 사용자 세션을 생성합니다. userId: {}, deviceId: {}", principal.getUserId(), principal.getDeviceId());
             userSessionService.create(principal.getUserId(), principal.getDeviceId(), UserSession.of(principal.getDeviceId(), principal.getDeviceName()));
+            log.info("[인증 핸들러] 사용자 세션을 생성했습니다. userId: {}, deviceId: {}", principal.getUserId(), principal.getDeviceId());
         }
     }
 }
