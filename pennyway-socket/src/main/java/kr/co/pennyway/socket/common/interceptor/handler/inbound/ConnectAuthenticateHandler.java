@@ -7,8 +7,10 @@ import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.service.UserService;
 import kr.co.pennyway.infra.common.exception.JwtErrorCode;
 import kr.co.pennyway.infra.common.exception.JwtErrorException;
+import kr.co.pennyway.infra.common.jwt.AuthConstants;
 import kr.co.pennyway.infra.common.jwt.JwtClaims;
 import kr.co.pennyway.infra.common.util.JwtClaimsParserUtil;
+import kr.co.pennyway.socket.common.contants.StompNativeHeaderFields;
 import kr.co.pennyway.socket.common.exception.InterceptorErrorCode;
 import kr.co.pennyway.socket.common.exception.InterceptorErrorException;
 import kr.co.pennyway.socket.common.interceptor.marker.ConnectCommandHandler;
@@ -53,9 +55,9 @@ public class ConnectAuthenticateHandler implements ConnectCommandHandler {
     }
 
     private String extractAccessToken(StompHeaderAccessor accessor) {
-        String authorization = accessor.getFirstNativeHeader("Authorization");
+        String authorization = accessor.getFirstNativeHeader(AuthConstants.AUTHORIZATION.getValue());
 
-        if ((authorization == null || !authorization.startsWith("Bearer "))) {
+        if ((authorization == null || !authorization.startsWith(AuthConstants.TOKEN_TYPE.getValue()))) {
             log.warn("[인증 핸들러] 헤더에 Authorization이 없거나 Bearer 토큰이 아닙니다.");
             throw new JwtErrorException(JwtErrorCode.EMPTY_ACCESS_TOKEN);
         }
@@ -77,14 +79,13 @@ public class ConnectAuthenticateHandler implements ConnectCommandHandler {
         MultiValueMap<String, String> nativeHeaders = headers.get(StompHeaderAccessor.NATIVE_HEADERS, MultiValueMap.class);
         String deviceId, deviceName;
 
-        if (nativeHeaders.containsKey("device-id") && nativeHeaders.containsKey("device-name")) {
-            deviceId = nativeHeaders.getFirst("device-id");
-            deviceName = nativeHeaders.getFirst("device-name");
+        if (nativeHeaders.containsKey(StompNativeHeaderFields.DEVICE_ID.getValue()) && nativeHeaders.containsKey(StompNativeHeaderFields.DEVICE_NAME.getValue())) {
+            deviceId = nativeHeaders.getFirst(StompNativeHeaderFields.DEVICE_ID.getValue());
+            deviceName = nativeHeaders.getFirst(StompNativeHeaderFields.DEVICE_NAME.getValue());
+            log.debug("[인증 핸들러] 연결 기기 정보 deviceId: {}, deviceName: {}", deviceId, deviceName);
         } else {
             throw new InterceptorErrorException(InterceptorErrorCode.INAVLID_HEADER);
         }
-
-        log.info("[인증 핸들러] 사용자 세션을 확인합니다. userId: {}, deviceId: {}", userId, deviceId);
 
         if (userSessionService.isExists(userId, deviceId)) {
             log.info("[인증 핸들러] 사용자 세션을 업데이트합니다. userId: {}, deviceId: {}", userId, deviceId);
