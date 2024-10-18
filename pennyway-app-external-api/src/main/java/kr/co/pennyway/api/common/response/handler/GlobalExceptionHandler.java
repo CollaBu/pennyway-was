@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import kr.co.pennyway.api.common.exception.CustomValidationException;
 import kr.co.pennyway.api.common.response.ErrorResponse;
 import kr.co.pennyway.api.common.swagger.CustomJsonView;
 import kr.co.pennyway.common.exception.CausedBy;
@@ -169,6 +170,21 @@ public class GlobalExceptionHandler {
     @JsonView(CustomJsonView.Hidden.class)
     protected ErrorResponse handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
         log.warn("handleMethodArgumentNotValidException: {}", e.getMessage());
+        BindingResult bindingResult = e.getBindingResult();
+
+        return ErrorResponse.failure(bindingResult, ReasonCode.REQUIRED_PARAMETERS_MISSING_IN_REQUEST_BODY);
+    }
+
+    /**
+     * API 호출 시 객체 혹은 파라미터 데이터 값이 유효하지 않은 경우
+     *
+     * @see CustomValidationException
+     */
+    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+    @ExceptionHandler(CustomValidationException.class)
+    @JsonView(CustomJsonView.Hidden.class)
+    protected ErrorResponse handleCustomValidationException(CustomValidationException e) {
+        log.warn("handleCustomValidationException: {}", e.getMessage());
         BindingResult bindingResult = e.getBindingResult();
 
         return ErrorResponse.failure(bindingResult, ReasonCode.REQUIRED_PARAMETERS_MISSING_IN_REQUEST_BODY);

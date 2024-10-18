@@ -63,6 +63,11 @@ public class ExternalApiLogAspect {
     @AfterReturning(pointcut = "cut()", returning = "returnObject")
     public void afterResponse(JoinPoint joinPoint, Object returnObject) {
         ResponseEntity<?> responseEntity = (ResponseEntity<?>) returnObject;
+
+        if (responseEntity == null) {
+            return;
+        }
+
         HttpHeaders headers = responseEntity.getHeaders();
 
         log.info("================================= Response =================================");
