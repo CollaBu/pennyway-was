@@ -1,4 +1,4 @@
-package kr.co.pennyway.api.apis.storage.service;
+package kr.co.pennyway.api.apis.storage.adapter;
 
 import kr.co.pennyway.infra.client.aws.s3.AwsS3Provider;
 import lombok.RequiredArgsConstructor;
@@ -10,10 +10,10 @@ import java.net.URI;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class StorageService {
+public class PresignedUrlGenerateAdapter {
     private final AwsS3Provider awsS3Provider;
 
-    public URI getPresignedUrl(String type, String ext, String userId, String chatroomId) {
+    public URI execute(String type, String ext, String userId, String chatroomId) {
         return awsS3Provider.generatedPresignedUrl(type, ext, userId, chatroomId);
     }
 }
