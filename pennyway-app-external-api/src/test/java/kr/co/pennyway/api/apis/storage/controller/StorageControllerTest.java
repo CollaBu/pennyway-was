@@ -107,10 +107,54 @@ class StorageControllerTest {
 
     @Test
     @WithSecurityMockUser
-    @DisplayName("올바른 파라미터로 요청 시 200 응답을 반환한다.")
-    void getPresignedUrlWithValidParameters() throws Exception {
+    @DisplayName("올바른 Profile 파라미터로 요청 시 200 응답을 반환한다.")
+    void getPresignedUrlWithValidProfileParameters() throws Exception {
         // when
         ResultActions resultActions = getPresignedUrlRequest(ObjectKeyType.PROFILE, "jpg", null, null, null);
+
+        // then
+        resultActions.andExpect(status().isOk());
+    }
+
+    @Test
+    @WithSecurityMockUser
+    @DisplayName("올바른 Chat 파라미터로 요청 시 200 응답을 반환한다.")
+    void getPresignedUrlWithValidChatParameters() throws Exception {
+        // when
+        ResultActions resultActions = getPresignedUrlRequest(ObjectKeyType.CHAT, "jpg", 1L, 1L, null);
+
+        // then
+        resultActions.andExpect(status().isOk());
+    }
+
+    @Test
+    @WithSecurityMockUser
+    @DisplayName("올바른 ChatroomProfile 파라미터로 요청 시 200 응답을 반환한다.")
+    void getPresignedUrlWithValidChatroomProfileParameters() throws Exception {
+        // when
+        ResultActions resultActions = getPresignedUrlRequest(ObjectKeyType.CHATROOM_PROFILE, "jpg", 1L, null, null);
+
+        // then
+        resultActions.andExpect(status().isOk());
+    }
+
+    @Test
+    @WithSecurityMockUser
+    @DisplayName("올바른 ChatProfile 파라미터로 요청 시 200 응답을 반환한다.")
+    void getPresignedUrlWithValidChatProfileParameters() throws Exception {
+        // when
+        ResultActions resultActions = getPresignedUrlRequest(ObjectKeyType.CHAT_PROFILE, "jpg", 1L, null, null);
+
+        // then
+        resultActions.andExpect(status().isOk());
+    }
+
+    @Test
+    @WithSecurityMockUser
+    @DisplayName("올바른 Feed 파라미터로 요청 시 200 응답을 반환한다.")
+    void getPresignedUrlWithValidFeedParameters() throws Exception {
+        // when
+        ResultActions resultActions = getPresignedUrlRequest(ObjectKeyType.FEED, "jpg", null, null, 1L);
 
         // then
         resultActions.andExpect(status().isOk());
