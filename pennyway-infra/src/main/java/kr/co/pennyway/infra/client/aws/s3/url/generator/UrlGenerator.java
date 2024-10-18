@@ -1,16 +1,26 @@
 package kr.co.pennyway.infra.client.aws.s3.url.generator;
 
-import java.util.Map;
+import kr.co.pennyway.infra.client.aws.s3.ObjectKeyTemplate;
+import kr.co.pennyway.infra.client.aws.s3.url.properties.PresignedUrlProperty;
 
-public interface UrlGenerator {
+public final class UrlGenerator {
     /**
-     * type에 해당하는 ObjectKeyTemplate을 적용하여 ObjectKey(S3에 저장하기 위한 정적 파일의 경로 및 이름)를 생성한다.
+     * S3에 임시 업로드할 파일의 URL을 생성한다.
      *
-     * @param type
-     * @param ext
-     * @param userId
-     * @param chatroomId
-     * @return ObjectKey
+     * @param property {@link PresignedUrlProperty}: Presigned URL 생성을 위한 Property
+     * @return Presigned URL
      */
-    Map<String, String> generate(String type, String ext, String userId, String chatroomId);
+    public static String createDeleteUrl(PresignedUrlProperty property) {
+        return ObjectKeyTemplate.apply(property.type().getDeleteTemplate(), property.variables());
+    }
+
+    /**
+     * 임시 경로에서 실제 경로로 파일을 이동시키기 위한 URL을 생성한다.
+     *
+     * @param property {@link PresignedUrlProperty}: Presigned URL 생성을 위한 Property
+     * @return Presigned URL
+     */
+    public static String createOriginUrl(PresignedUrlProperty property) {
+        return ObjectKeyTemplate.apply(property.type().getOriginTemplate(), property.variables());
+    }
 }
