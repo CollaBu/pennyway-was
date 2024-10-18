@@ -1,10 +1,23 @@
 package kr.co.pennyway.infra.client.aws.s3.url.generator;
 
+import kr.co.pennyway.infra.client.aws.s3.ObjectKeyType;
 import kr.co.pennyway.infra.client.aws.s3.url.properties.PresignedUrlProperty;
 
-import java.util.Map;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public final class UrlGenerator {
+    private static final EnumMap<ObjectKeyType, Pattern> DELETE_PATTERNS = new EnumMap<>(ObjectKeyType.class);
+    private static final EnumMap<ObjectKeyType, List<String>> VARIABLE_NAMES = new EnumMap<>(ObjectKeyType.class);
+
+    static {
+        for (ObjectKeyType type : ObjectKeyType.values()) {
+            DELETE_PATTERNS.put(type, createRegexPattern(type.getDeleteTemplate()));
+            VARIABLE_NAMES.put(type, extractVariableNames(type.getDeleteTemplate()));
+        }
+    }
+
     /**
      * S3에 임시 업로드할 파일의 URL을 생성한다.
      *
@@ -18,11 +31,13 @@ public final class UrlGenerator {
     /**
      * 임시 경로에서 실제 경로로 파일을 이동시키기 위한 URL을 생성한다.
      *
-     * @param property {@link PresignedUrlProperty}: Presigned URL 생성을 위한 Property
+     * @param type      {@link ObjectKeyType}
+     * @param deleteUrl 임시 경로의 URL
      * @return Presigned URL
      */
-    public static String createOriginUrl(PresignedUrlProperty property) {
-        return applyTemplate(property.type().getOriginTemplate(), property.variables());
+    public static String convertDeleteToOriginUrl(ObjectKeyType type, String deleteUrl) {
+        Map<String, String> variables = extractVariables(type, deleteUrl);
+        return applyTemplate(type.getOriginTemplate(), variables);
     }
 
     private static String applyTemplate(String template, Map<String, String> variables) {
@@ -31,5 +46,38 @@ public final class UrlGenerator {
             result = result.replace("{" + entry.getKey() + "}", entry.getValue());
         }
         return result;
+    }
+
+    private static Map<String, String> extractVariables(ObjectKeyType type, String url) {
+        Map<String, String> variables = new HashMap<>();
+        Matcher matcher = DELETE_PATTERNS.get(type).matcher(url);
+
+        if (matcher.matches()) {
+            List<String> variableNames = VARIABLE_NAMES.get(type);
+            for (int i = 0; i < variableNames.size(); i++) {
+                variables.put(variableNames.get(i), matcher.group(i + 1));
+            }
+        } else {
+            throw new IllegalArgumentException("URL이 패턴과 일치하지 않습니다. URL: " + url);
+        }
+
+        return variables;
+    }
+
+    private static Pattern createRegexPattern(String template) {
+        String regex = template.replaceAll("\\{[^}]+\\}", "([^/]+)")
+                .replace("/", "\\/")
+                .replace(".", "\\.");
+        return Pattern.compile(regex);
+    }
+
+    private static List<String> extractVariableNames(String template) {
+        List<String> variableNames = new ArrayList<>();
+        Pattern variablePattern = Pattern.compile("\\{([^}]+)\\}");
+        Matcher matcher = variablePattern.matcher(template);
+        while (matcher.find()) {
+            variableNames.add(matcher.group(1));
+        }
+        return variableNames;
     }
 }
