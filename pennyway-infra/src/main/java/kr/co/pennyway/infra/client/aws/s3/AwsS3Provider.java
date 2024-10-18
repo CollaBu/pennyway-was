@@ -1,5 +1,7 @@
 package kr.co.pennyway.infra.client.aws.s3;
 
+import kr.co.pennyway.infra.client.aws.s3.url.generator.UrlGenerator;
+import kr.co.pennyway.infra.client.aws.s3.url.generator.UrlGeneratorFactory;
 import kr.co.pennyway.infra.common.exception.StorageErrorCode;
 import kr.co.pennyway.infra.common.exception.StorageException;
 import kr.co.pennyway.infra.config.AwsS3Config;
