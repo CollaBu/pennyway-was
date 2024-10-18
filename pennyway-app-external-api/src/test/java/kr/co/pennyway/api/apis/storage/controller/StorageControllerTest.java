@@ -40,7 +40,7 @@ class StorageControllerTest {
 
     @Test
     @WithSecurityMockUser
-    @DisplayName("jpg, png, jpeg 이외의 확장자로 요청 시 400 응답을 반환한다.")
+    @DisplayName("jpg, png, jpeg 이외의 확장자로 요청 시 422 응답을 반환한다.")
     void getPresignedUrlWithInvalidExt() throws Exception {
         // when
         ResultActions resultActions = getPresignedUrlRequest(ObjectKeyType.PROFILE, "gif", null, null, null);
@@ -48,12 +48,12 @@ class StorageControllerTest {
         // then
         resultActions
                 .andDo(print())
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isUnprocessableEntity());
     }
 
     @Test
     @WithSecurityMockUser
-    @DisplayName("유효하지 않은 Type으로 요청 시 400 응답을 반환한다.")
+    @DisplayName("유효하지 않은 Type으로 요청 시 422 응답을 반환한다.")
     void getPresignedUrlWithInvalidType() throws Exception {
         // when
         ResultActions resultActions = mockMvc.perform(get("/v1/storage/presigned-url")
@@ -63,12 +63,12 @@ class StorageControllerTest {
         // then
         resultActions
                 .andDo(print())
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isUnprocessableEntity());
     }
 
     @Test
     @WithSecurityMockUser
-    @DisplayName("Type이 CHAT이고, ChatroomId가 NULL일 때 400 응답을 반환한다.")
+    @DisplayName("Type이 CHAT이고, ChatroomId가 NULL일 때 422 응답을 반환한다.")
     void getPresignedUrlWithNullChatroomIdForChat() throws Exception {
         // when
         ResultActions resultActions = getPresignedUrlRequest(ObjectKeyType.CHAT, "jpg", null, null, null);
@@ -76,12 +76,12 @@ class StorageControllerTest {
         // then
         resultActions
                 .andDo(print())
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isUnprocessableEntity());
     }
 
     @Test
     @WithSecurityMockUser
-    @DisplayName("Type이 CHATROOM_PROFILE이고, ChatroomId가 NULL일 때 400 응답을 반환한다.")
+    @DisplayName("Type이 CHATROOM_PROFILE이고, ChatroomId가 NULL일 때 422 응답을 반환한다.")
     void getPresignedUrlWithNullChatroomIdForChatroomProfile() throws Exception {
         // when
         ResultActions resultActions = getPresignedUrlRequest(ObjectKeyType.CHATROOM_PROFILE, "jpg", null, null, null);
@@ -89,12 +89,12 @@ class StorageControllerTest {
         // then
         resultActions
                 .andDo(print())
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isUnprocessableEntity());
     }
 
     @Test
     @WithSecurityMockUser
-    @DisplayName("Type이 FEED이고, FeedId가 NULL일 때 400 응답을 반환한다.")
+    @DisplayName("Type이 FEED이고, FeedId가 NULL일 때 422 응답을 반환한다.")
     void getPresignedUrlWithNullFeedIdForFeed() throws Exception {
         // when
         ResultActions resultActions = getPresignedUrlRequest(ObjectKeyType.FEED, "jpg", null, null, null);
@@ -102,7 +102,7 @@ class StorageControllerTest {
         // then
         resultActions
                 .andDo(print())
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isUnprocessableEntity());
     }
 
     @Test
