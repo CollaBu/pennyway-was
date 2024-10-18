@@ -14,6 +14,7 @@ import kr.co.pennyway.api.apis.storage.dto.PresignedUrlDto;
 import kr.co.pennyway.api.common.security.authentication.SecurityUserDetails;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 
 @Tag(name = "[S3 이미지 저장을 위한 Presigned URL 발급 API]")
@@ -46,5 +47,5 @@ public interface StorageApi {
                             """)
             })),
     })
-    ResponseEntity<?> getPresignedUrl(@Validated PresignedUrlDto.Req req, @AuthenticationPrincipal SecurityUserDetails user);
+    ResponseEntity<?> getPresignedUrl(@Validated PresignedUrlDto.Req req, BindingResult bindingResult, @AuthenticationPrincipal SecurityUserDetails user);
 }
