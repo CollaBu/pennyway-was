@@ -1,7 +1,8 @@
 package kr.co.pennyway.infra.client.aws.s3.url.generator;
 
-import kr.co.pennyway.infra.client.aws.s3.ObjectKeyTemplate;
 import kr.co.pennyway.infra.client.aws.s3.url.properties.PresignedUrlProperty;
+
+import java.util.Map;
 
 public final class UrlGenerator {
     /**
@@ -11,7 +12,7 @@ public final class UrlGenerator {
      * @return Presigned URL
      */
     public static String createDeleteUrl(PresignedUrlProperty property) {
-        return ObjectKeyTemplate.apply(property.type().getDeleteTemplate(), property.variables());
+        return applyTemplate(property.type().getDeleteTemplate(), property.variables());
     }
 
     /**
@@ -21,6 +22,14 @@ public final class UrlGenerator {
      * @return Presigned URL
      */
     public static String createOriginUrl(PresignedUrlProperty property) {
-        return ObjectKeyTemplate.apply(property.type().getOriginTemplate(), property.variables());
+        return applyTemplate(property.type().getOriginTemplate(), property.variables());
+    }
+
+    private static String applyTemplate(String template, Map<String, String> variables) {
+        String result = template;
+        for (Map.Entry<String, String> entry : variables.entrySet()) {
+            result = result.replace("{" + entry.getKey() + "}", entry.getValue());
+        }
+        return result;
     }
 }
