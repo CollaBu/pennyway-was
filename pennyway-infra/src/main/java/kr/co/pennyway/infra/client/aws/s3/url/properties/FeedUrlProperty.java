@@ -16,7 +16,7 @@ public record FeedUrlProperty(
         Objects.requireNonNull(imageId, "이미지 아이디는 필수입니다.");
         Objects.requireNonNull(timestamp, "타임스탬프는 필수입니다.");
         Objects.requireNonNull(ext, "확장자는 필수입니다.");
-        Objects.requireNonNull(type, "타입은 필수입니다.");
+        assert type == ObjectKeyType.FEED : "타입은 피드이어야 합니다.";
         Objects.requireNonNull(feedId, "피드 아이디는 필수입니다.");
     }
 
