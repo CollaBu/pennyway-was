@@ -3,6 +3,7 @@ package kr.co.pennyway.api.apis.storage.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import kr.co.pennyway.infra.client.aws.s3.ObjectKeyType;
 
 import java.net.URI;
@@ -16,15 +17,19 @@ public class PresignedUrlDto {
             ObjectKeyType type,
             @Schema(description = "파일 확장자", example = "jpg/png/jpeg")
             @NotBlank(message = "파일 확장자는 필수입니다.")
+            @Pattern(regexp = "^(jpg|png|jpeg)$", message = "파일 확장자는 jpg, png, jpeg 중 하나여야 합니다.")
             String ext,
-            @Schema(description = "채팅방 ID", example = "12345678-1234-5678-1234-567812345678")
-            String chatroomId,
-            @Schema(description = "채팅 ID", example = "12345678-1234-5678-1234-567812345678")
-            String chatId,
-            @Schema(description = "피드 ID", example = "12345678-1234-5678-1234-567812345678")
-            String feedId
+            @Schema(description = "채팅방 ID", example = "123456789")
+            Long chatroomId,
+            @Schema(description = "채팅 ID", example = "123456789")
+            Long chatId,
+            @Schema(description = "피드 ID", example = "123456789")
+            Long feedId
     ) {
         public Req {
+            Objects.requireNonNull(type, "이미지 종류는 필수입니다.");
+            Objects.requireNonNull(ext, "파일 확장자는 필수입니다.");
+
             if (ObjectKeyType.CHATROOM_PROFILE.equals(type) && Objects.isNull(chatroomId)) {
                 throw new IllegalArgumentException("채팅방 이미지를 위해 채팅방 ID는 필수입니다.");
             }
