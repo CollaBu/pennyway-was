@@ -16,12 +16,7 @@ public class PresignedUrlGenerateAdapter {
     private final AwsS3Provider awsS3Provider;
 
     public URI execute(Long userId, PresignedUrlDto.Req request) {
-        PresignedUrlPropertyFactory factory = PresignedUrlPropertyFactory.create(request.ext(), request.type())
-                .userId(userId)
-                .chatroomId(request.chatroomId())
-                .chatId(request.chatId())
-                .feedId(request.feedId())
-                .build();
+        PresignedUrlPropertyFactory factory = PresignedUrlPropertyFactory.createInstance(request.ext(), request.type(), userId, request.chatroomId());
 
         return awsS3Provider.generatedPresignedUrl(factory);
     }

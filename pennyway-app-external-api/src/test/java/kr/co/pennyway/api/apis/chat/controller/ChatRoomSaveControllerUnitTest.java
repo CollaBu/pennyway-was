@@ -46,17 +46,16 @@ public class ChatRoomSaveControllerUnitTest {
     }
 
     @Test
-    @DisplayName("채팅방 캐싱 성공")
+    @DisplayName("모두 올바른 값을 입력하면 채팅방 생성 요청에 성공한다.")
     @WithSecurityMockUser
     void createChatRoomSuccess() throws Exception {
         // given
         ChatRoom fixture = ChatRoomFixture.PRIVATE_CHAT_ROOM.toEntity();
-        ChatRoomReq.Pend request = new ChatRoomReq.Pend(fixture.getTitle(), fixture.getDescription(), fixture.getPassword());
-
-        given(chatRoomUseCase.pendChatRoom(request, 1L)).willReturn(1L);
+        ChatRoomReq.Create request = ChatRoomFixture.PRIVATE_CHAT_ROOM.toCreateRequest();
+        given(chatRoomUseCase.createChatRoom(request, 1L)).willReturn(ChatRoomRes.Detail.from(fixture, 1));
 
         // when
-        ResultActions result = performPostChatRoomPending(request);
+        ResultActions result = performPostChatRoom(request);
 
         // then
         result.andDo(print())
@@ -64,12 +63,12 @@ public class ChatRoomSaveControllerUnitTest {
     }
 
     @Test
-    @DisplayName("채팅방 생성 성공")
+    @DisplayName("채팅 이미지가 null이어도 채팅방 생성 요청에 성공한다.")
     @WithSecurityMockUser
-    void createChatRoomSuccess2() throws Exception {
+    void createChatRoomSuccessWithNullBackgroundImageUrl() throws Exception {
         // given
-        ChatRoom fixture = ChatRoomFixture.PRIVATE_CHAT_ROOM.toEntity();
-        ChatRoomReq.Create request = new ChatRoomReq.Create(fixture.getBackgroundImageUrl());
+        ChatRoom fixture = ChatRoomFixture.PUBLIC_CHAT_ROOM.toEntity();
+        ChatRoomReq.Create request = ChatRoomFixture.PUBLIC_CHAT_ROOM.toCreateRequest();
 
         given(chatRoomUseCase.createChatRoom(request, 1L)).willReturn(ChatRoomRes.Detail.from(fixture, 1));
 
@@ -81,10 +80,19 @@ public class ChatRoomSaveControllerUnitTest {
                 .andExpect(status().isOk());
     }
 
-    private ResultActions performPostChatRoomPending(ChatRoomReq.Pend request) throws Exception {
-        return mockMvc.perform(MockMvcRequestBuilders.post("/v2/chat-rooms/pend")
-                .contentType("application/json")
-                .content(objectMapper.writeValueAsString(request)));
+    @Test
+    @DisplayName("delete/로 시작하지 않는 null이 아닌 채팅 이미지 URL이 입력되면 채팅방 생성 요청에 실패한다. (422 Unprocessable Entity)")
+    @WithSecurityMockUser
+    void createChatRoomFailWithInvalidBackgroundImageUrl() throws Exception {
+        // given
+        ChatRoomReq.Create request = new ChatRoomReq.Create("페니웨이", "짱짱", "1234", "invalid");
+
+        // when
+        ResultActions result = performPostChatRoom(request);
+
+        // then
+        result.andDo(print())
+                .andExpect(status().isUnprocessableEntity());
     }
 
     private ResultActions performPostChatRoom(ChatRoomReq.Create request) throws Exception {

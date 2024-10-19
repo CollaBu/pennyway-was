@@ -15,9 +15,7 @@ public class PresignedUrlDto {
             @NotBlank(message = "파일 확장자는 필수입니다.")
             @Pattern(regexp = "^(jpg|png|jpeg)$", message = "파일 확장자는 jpg, png, jpeg 중 하나여야 합니다.")
             String ext,
-            Long chatroomId,
-            Long chatId,
-            Long feedId
+            Long chatroomId
     ) {
     }
 

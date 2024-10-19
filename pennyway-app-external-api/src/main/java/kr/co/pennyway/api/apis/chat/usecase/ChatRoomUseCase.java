@@ -18,10 +18,6 @@ public class ChatRoomUseCase {
     private final ChatRoomSaveService chatRoomSaveService;
     private final ChatRoomSearchService chatRoomSearchService;
 
-    public Long pendChatRoom(ChatRoomReq.Pend request, Long userId) {
-        return chatRoomSaveService.pendChatRoom(request, userId);
-    }
-
     public ChatRoomRes.Detail createChatRoom(ChatRoomReq.Create request, Long userId) {
         ChatRoom chatRoom = chatRoomSaveService.createChatRoom(request, userId);
 

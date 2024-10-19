@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
@@ -17,22 +18,14 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RequestMapping("/v2/chat-rooms")
 public class ChatRoomController implements ChatRoomApi {
-    private static final String CHAT_ROOM_ID = "chatRoomId";
     private static final String CHAT_ROOM = "chatRoom";
     private static final String CHAT_ROOMS = "chatRooms";
     private final ChatRoomUseCase chatRoomUseCase;
 
     @Override
-    @PostMapping("/pend")
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> postChatRoom(@RequestBody ChatRoomReq.Pend request, @AuthenticationPrincipal SecurityUserDetails user) {
-        return ResponseEntity.ok(SuccessResponse.from(CHAT_ROOM_ID, chatRoomUseCase.pendChatRoom(request, user.getUserId())));
-    }
-
-    @Override
     @PostMapping("")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> createChatRoom(@RequestBody ChatRoomReq.Create request, @AuthenticationPrincipal SecurityUserDetails user) {
+    public ResponseEntity<?> createChatRoom(@Validated @RequestBody ChatRoomReq.Create request, @AuthenticationPrincipal SecurityUserDetails user) {
         return ResponseEntity.ok(SuccessResponse.from(CHAT_ROOM, chatRoomUseCase.createChatRoom(request, user.getUserId())));
     }
 

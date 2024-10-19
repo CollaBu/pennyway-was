@@ -12,7 +12,7 @@ import kr.co.pennyway.domain.domains.device.domain.DeviceToken;
 import kr.co.pennyway.domain.domains.oauth.domain.Oauth;
 import kr.co.pennyway.domain.domains.user.domain.NotifySetting;
 import kr.co.pennyway.domain.domains.user.domain.User;
-import kr.co.pennyway.infra.client.aws.s3.ObjectKeyType;
+import kr.co.pennyway.infra.client.aws.s3.ActualIdProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
@@ -69,7 +69,7 @@ public class UserAccountUseCase {
     }
 
     public String updateProfileImage(Long userId, UserProfileUpdateDto.ProfileImageReq request) {
-        String originImageUrl = awsS3Adapter.saveImage(request.profileImageUrl(), ObjectKeyType.PROFILE);
+        String originImageUrl = awsS3Adapter.saveImage(request.profileImageUrl(), ActualIdProvider.createInstanceOfProfile());
         String oldImageUrl = userProfileUpdateService.updateProfileImage(userId, originImageUrl);
 
         if (oldImageUrl != null) {

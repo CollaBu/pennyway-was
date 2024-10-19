@@ -36,8 +36,6 @@ public interface StorageApi {
                     @ExampleObject(value = "jpeg", name = "jpeg")
             }),
             @Parameter(name = "chatroomId", description = "채팅방 ID", in = ParameterIn.QUERY, example = "123456789"),
-            @Parameter(name = "chatId", description = "채팅 ID", in = ParameterIn.QUERY, example = "123456789"),
-            @Parameter(name = "feedId", description = "피드 ID", in = ParameterIn.QUERY, example = "123456789"),
             @Parameter(name = "request", hidden = true)
     })
     @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = PresignedUrlDto.Res.class)))
