@@ -28,7 +28,7 @@ public final class ChatRoomReq {
                     .id(chatRoomId)
                     .title(title)
                     .description(description)
-                    .password(Integer.valueOf(password))
+                    .password(password != null ? Integer.valueOf(password) : null)
                     .backgroundImageUrl(originImageUrl)
                     .build();
         }
