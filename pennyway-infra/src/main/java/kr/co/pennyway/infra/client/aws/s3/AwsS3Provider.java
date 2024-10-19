@@ -83,11 +83,11 @@ public class AwsS3Provider {
     /**
      * S3에 저장된 파일을 복사한다.
      *
-     * @param type      : ObjectKeyType (PROFILE, FEED, CHATROOM_PROFILE, CHAT, CHAT_PROFILE)
-     * @param sourceKey : 복사할 파일의 키
+     * @param type      {@link ActualIdProvider} : 실제 ID를 제공하는 클래스
+     * @param sourceKey String : 복사할 파일의 키
      * @return 복사된 파일의 키
      */
-    public String copyObject(ObjectKeyType type, String sourceKey) {
+    public String copyObject(ActualIdProvider type, String sourceKey) {
         String originKey = UrlGenerator.convertDeleteToOriginUrl(type, sourceKey);
 
         try {

@@ -1,5 +1,6 @@
 package kr.co.pennyway.infra.client.aws.s3.url.generator;
 
+import kr.co.pennyway.infra.client.aws.s3.ActualIdProvider;
 import kr.co.pennyway.infra.client.aws.s3.ObjectKeyType;
 import kr.co.pennyway.infra.client.aws.s3.url.properties.PresignedUrlProperty;
 
@@ -31,13 +32,21 @@ public final class UrlGenerator {
     /**
      * 임시 경로에서 실제 경로로 파일을 이동시키기 위한 URL을 생성한다.
      *
-     * @param type      {@link ObjectKeyType}
+     * @param type      {@link ActualIdProvider}
      * @param deleteUrl 임시 경로의 URL
      * @return Presigned URL
      */
-    public static String convertDeleteToOriginUrl(ObjectKeyType type, String deleteUrl) {
-        Map<String, String> variables = extractVariables(type, deleteUrl);
-        return applyTemplate(type.getOriginTemplate(), variables);
+    public static String convertDeleteToOriginUrl(ActualIdProvider type, String deleteUrl) {
+        Map<String, String> variables = extractVariables(type.getType(), deleteUrl);
+
+        for (String requiredParam : type.getType().getRequiredParams()) {
+            if (!type.getActualIds().containsKey(requiredParam)) {
+                throw new IllegalArgumentException("Missing required parameter: " + requiredParam);
+            }
+            variables.put(requiredParam, type.getActualIds().get(requiredParam));
+        }
+
+        return applyTemplate(type.getType().getOriginTemplate(), variables);
     }
 
     private static String applyTemplate(String template, Map<String, String> variables) {
