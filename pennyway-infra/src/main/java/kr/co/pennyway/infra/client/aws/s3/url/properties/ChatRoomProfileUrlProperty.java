@@ -1,29 +1,22 @@
 package kr.co.pennyway.infra.client.aws.s3.url.properties;
 
+import kr.co.pennyway.common.util.UUIDUtil;
 import kr.co.pennyway.infra.client.aws.s3.ObjectKeyType;
 
 import java.util.Map;
-import java.util.Objects;
 
-public record ChatRoomProfileUrlProperty(
-        String imageId,
-        String timestamp,
-        String ext,
-        ObjectKeyType type,
-        Long chatroomId
-) implements PresignedUrlProperty {
-    public ChatRoomProfileUrlProperty {
-        Objects.requireNonNull(imageId, "이미지 아이디는 필수입니다.");
-        Objects.requireNonNull(timestamp, "타임스탬프는 필수입니다.");
-        Objects.requireNonNull(ext, "확장자는 필수입니다.");
-        assert type == ObjectKeyType.CHATROOM_PROFILE : "타입은 채팅방 프로필이어야 합니다.";
-        Objects.requireNonNull(chatroomId, "채팅방 아이디는 필수입니다.");
+public class ChatRoomProfileUrlProperty extends BaseUrlProperty {
+    private final String chatroomId;
+
+    public ChatRoomProfileUrlProperty(String ext) {
+        super(ext, ObjectKeyType.CHATROOM_PROFILE);
+        this.chatroomId = UUIDUtil.generateUUID();
     }
 
     @Override
     public Map<String, String> variables() {
         return Map.of(
-                "chatroom_id", chatroomId.toString(),
+                "chatroom_id", chatroomId,
                 "uuid", imageId,
                 "timestamp", timestamp,
                 "ext", ext
