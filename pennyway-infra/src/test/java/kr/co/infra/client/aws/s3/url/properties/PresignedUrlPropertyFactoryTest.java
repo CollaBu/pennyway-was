@@ -2,13 +2,14 @@ package kr.co.infra.client.aws.s3.url.properties;
 
 import kr.co.pennyway.infra.client.aws.s3.ObjectKeyType;
 import kr.co.pennyway.infra.client.aws.s3.url.properties.ChatUrlProperty;
+import kr.co.pennyway.infra.client.aws.s3.url.properties.FeedUrlProperty;
 import kr.co.pennyway.infra.client.aws.s3.url.properties.PresignedUrlProperty;
 import kr.co.pennyway.infra.client.aws.s3.url.properties.PresignedUrlPropertyFactory;
-import kr.co.pennyway.infra.client.aws.s3.url.properties.ProfileUrlProperty;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Map;
 
@@ -32,52 +33,42 @@ public class PresignedUrlPropertyFactoryTest {
     @Test
     @DisplayName("피드 타입에 대해 PresignedUrlProperty를 생성한다.")
     void createPropertyProfile() {
-        PresignedUrlPropertyFactory factory = PresignedUrlPropertyFactory.create("jpg", ObjectKeyType.PROFILE)
-                .userId(1L)
-                .build();
+        PresignedUrlPropertyFactory factory = PresignedUrlPropertyFactory.createInstance("jpg", ObjectKeyType.FEED, 1L, null);
 
         PresignedUrlProperty property = factory.getProperty();
-        assertTrue(property instanceof ProfileUrlProperty);
-        assertEquals(1L, ((ProfileUrlProperty) property).userId());
+        assertTrue(property instanceof FeedUrlProperty);
+        assertNotNull(ReflectionTestUtils.getField(property, "feedId"));
     }
 
     @Test
-    @DisplayName("피드 타입에 대해 PresignedUrlProperty를 생성한다.")
+    @DisplayName("채팅 타입에 대해 PresignedUrlProperty를 생성한다.")
     void createPropertyChat() {
-        PresignedUrlPropertyFactory factory = PresignedUrlPropertyFactory.create("png", ObjectKeyType.CHAT)
-                .chatroomId(100L)
-                .chatId(200L)
-                .build();
+        PresignedUrlPropertyFactory factory = PresignedUrlPropertyFactory.createInstance("png", ObjectKeyType.CHAT, 1L, 100L);
 
         PresignedUrlProperty property = factory.getProperty();
         assertTrue(property instanceof ChatUrlProperty);
-        assertEquals(100L, ((ChatUrlProperty) property).chatroomId());
-        assertEquals(200L, ((ChatUrlProperty) property).chatId());
+        assertEquals(100L, ReflectionTestUtils.getField(property, "chatroomId"));
+        assertNotNull(ReflectionTestUtils.getField(property, "chatId"));
     }
 
     @Test
-    @DisplayName("피드 타입에 대해 PresignedUrlProperty를 생성한다.")
+    @DisplayName("잘못된 확장자로 생성 시 예외를 던진다.")
     void createPropertyInvalidExtension() {
         assertThrows(IllegalArgumentException.class, () ->
-                PresignedUrlPropertyFactory.create("gif", ObjectKeyType.PROFILE)
-                        .userId(1L)
-                        .build());
+                PresignedUrlPropertyFactory.createInstance("gif", ObjectKeyType.PROFILE, 1L, null));
     }
 
     @Test
     @DisplayName("필수 파라미터가 누락된 경우 예외를 던진다.")
     void createPropertyMissingRequiredParameter() {
-        assertThrows(IllegalArgumentException.class, () ->
-                PresignedUrlPropertyFactory.create("jpg", ObjectKeyType.PROFILE)
-                        .build());
+        assertThrows(NullPointerException.class, () ->
+                PresignedUrlPropertyFactory.createInstance("jpg", ObjectKeyType.PROFILE, null, null));
     }
 
     @Test
     @DisplayName("PresignedUrlProperty는 자신의 변수들을 반환할 수 있다.")
     void createPropertyVariables() {
-        PresignedUrlPropertyFactory factory = PresignedUrlPropertyFactory.create("jpg", ObjectKeyType.PROFILE)
-                .userId(1L)
-                .build();
+        PresignedUrlPropertyFactory factory = PresignedUrlPropertyFactory.createInstance("jpg", ObjectKeyType.PROFILE, 1L, null);
 
         PresignedUrlProperty property = factory.getProperty();
         Map<String, String> variables = property.variables();
@@ -90,14 +81,12 @@ public class PresignedUrlPropertyFactoryTest {
     }
 
     private PresignedUrlPropertyFactory createValidFactory(ObjectKeyType type) {
-        PresignedUrlPropertyFactory.Builder builder = PresignedUrlPropertyFactory.create("jpg", type);
-        switch (type) {
-            case PROFILE -> builder.userId(1L);
-            case FEED -> builder.feedId(100L);
-            case CHATROOM_PROFILE -> builder.chatroomId(200L);
-            case CHAT -> builder.chatroomId(300L).chatId(400L);
-            case CHAT_PROFILE -> builder.userId(500L).chatroomId(600L);
-        }
-        return builder.build();
+        return switch (type) {
+            case PROFILE -> PresignedUrlPropertyFactory.createInstance("jpg", type, 1L, null);
+            case FEED -> PresignedUrlPropertyFactory.createInstance("jpg", type, null, null);
+            case CHATROOM_PROFILE -> PresignedUrlPropertyFactory.createInstance("jpg", type, null, null);
+            case CHAT -> PresignedUrlPropertyFactory.createInstance("jpg", type, null, 100L);
+            case CHAT_PROFILE -> PresignedUrlPropertyFactory.createInstance("jpg", type, 1L, 100L);
+        };
     }
 }
