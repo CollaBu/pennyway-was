@@ -43,7 +43,7 @@ class StorageControllerTest {
     @DisplayName("jpg, png, jpeg 이외의 확장자로 요청 시 422 응답을 반환한다.")
     void getPresignedUrlWithInvalidExt() throws Exception {
         // when
-        ResultActions resultActions = getPresignedUrlRequest(ObjectKeyType.PROFILE, "gif", null, null, null);
+        ResultActions resultActions = getPresignedUrlRequest(ObjectKeyType.PROFILE, "gif", null);
 
         // then
         resultActions
@@ -71,33 +71,7 @@ class StorageControllerTest {
     @DisplayName("Type이 CHAT이고, ChatroomId가 NULL일 때 422 응답을 반환한다.")
     void getPresignedUrlWithNullChatroomIdForChat() throws Exception {
         // when
-        ResultActions resultActions = getPresignedUrlRequest(ObjectKeyType.CHAT, "jpg", null, null, null);
-
-        // then
-        resultActions
-                .andDo(print())
-                .andExpect(status().isUnprocessableEntity());
-    }
-
-    @Test
-    @WithSecurityMockUser
-    @DisplayName("Type이 CHATROOM_PROFILE이고, ChatroomId가 NULL일 때 422 응답을 반환한다.")
-    void getPresignedUrlWithNullChatroomIdForChatroomProfile() throws Exception {
-        // when
-        ResultActions resultActions = getPresignedUrlRequest(ObjectKeyType.CHATROOM_PROFILE, "jpg", null, null, null);
-
-        // then
-        resultActions
-                .andDo(print())
-                .andExpect(status().isUnprocessableEntity());
-    }
-
-    @Test
-    @WithSecurityMockUser
-    @DisplayName("Type이 FEED이고, FeedId가 NULL일 때 422 응답을 반환한다.")
-    void getPresignedUrlWithNullFeedIdForFeed() throws Exception {
-        // when
-        ResultActions resultActions = getPresignedUrlRequest(ObjectKeyType.FEED, "jpg", null, null, null);
+        ResultActions resultActions = getPresignedUrlRequest(ObjectKeyType.CHAT, "jpg", null);
 
         // then
         resultActions
@@ -110,7 +84,7 @@ class StorageControllerTest {
     @DisplayName("올바른 Profile 파라미터로 요청 시 200 응답을 반환한다.")
     void getPresignedUrlWithValidProfileParameters() throws Exception {
         // when
-        ResultActions resultActions = getPresignedUrlRequest(ObjectKeyType.PROFILE, "jpg", null, null, null);
+        ResultActions resultActions = getPresignedUrlRequest(ObjectKeyType.PROFILE, "jpg", null);
 
         // then
         resultActions.andExpect(status().isOk());
@@ -121,7 +95,7 @@ class StorageControllerTest {
     @DisplayName("올바른 Chat 파라미터로 요청 시 200 응답을 반환한다.")
     void getPresignedUrlWithValidChatParameters() throws Exception {
         // when
-        ResultActions resultActions = getPresignedUrlRequest(ObjectKeyType.CHAT, "jpg", 1L, 1L, null);
+        ResultActions resultActions = getPresignedUrlRequest(ObjectKeyType.CHAT, "jpg", 1L);
 
         // then
         resultActions.andExpect(status().isOk());
@@ -132,7 +106,7 @@ class StorageControllerTest {
     @DisplayName("올바른 ChatroomProfile 파라미터로 요청 시 200 응답을 반환한다.")
     void getPresignedUrlWithValidChatroomProfileParameters() throws Exception {
         // when
-        ResultActions resultActions = getPresignedUrlRequest(ObjectKeyType.CHATROOM_PROFILE, "jpg", 1L, null, null);
+        ResultActions resultActions = getPresignedUrlRequest(ObjectKeyType.CHATROOM_PROFILE, "jpg", null);
 
         // then
         resultActions.andExpect(status().isOk());
@@ -143,7 +117,7 @@ class StorageControllerTest {
     @DisplayName("올바른 ChatProfile 파라미터로 요청 시 200 응답을 반환한다.")
     void getPresignedUrlWithValidChatProfileParameters() throws Exception {
         // when
-        ResultActions resultActions = getPresignedUrlRequest(ObjectKeyType.CHAT_PROFILE, "jpg", 1L, null, null);
+        ResultActions resultActions = getPresignedUrlRequest(ObjectKeyType.CHAT_PROFILE, "jpg", 1L);
 
         // then
         resultActions.andExpect(status().isOk());
@@ -154,18 +128,16 @@ class StorageControllerTest {
     @DisplayName("올바른 Feed 파라미터로 요청 시 200 응답을 반환한다.")
     void getPresignedUrlWithValidFeedParameters() throws Exception {
         // when
-        ResultActions resultActions = getPresignedUrlRequest(ObjectKeyType.FEED, "jpg", null, null, 1L);
+        ResultActions resultActions = getPresignedUrlRequest(ObjectKeyType.FEED, "jpg", null);
 
         // then
         resultActions.andExpect(status().isOk());
     }
 
-    private ResultActions getPresignedUrlRequest(ObjectKeyType type, String ext, Long chatroomId, Long chatId, Long feedId) throws Exception {
+    private ResultActions getPresignedUrlRequest(ObjectKeyType type, String ext, Long chatroomId) throws Exception {
         return mockMvc.perform(get("/v1/storage/presigned-url")
                 .param("type", type.name())
                 .param("ext", ext)
-                .param("chatroomId", chatroomId != null ? chatroomId.toString() : null)
-                .param("chatId", chatId != null ? chatId.toString() : null)
-                .param("feedId", feedId != null ? feedId.toString() : null));
+                .param("chatroomId", chatroomId != null ? chatroomId.toString() : null));
     }
 }
