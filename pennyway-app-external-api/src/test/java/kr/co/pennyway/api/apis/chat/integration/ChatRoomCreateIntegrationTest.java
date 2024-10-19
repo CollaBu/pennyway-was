@@ -12,7 +12,7 @@ import kr.co.pennyway.api.config.fixture.UserFixture;
 import kr.co.pennyway.domain.domains.chatroom.domain.ChatRoom;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.service.UserService;
-import kr.co.pennyway.infra.client.aws.s3.ObjectKeyType;
+import kr.co.pennyway.infra.client.aws.s3.ActualIdProvider;
 import kr.co.pennyway.infra.common.jwt.JwtProvider;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
@@ -56,7 +56,7 @@ public class ChatRoomPendIntegrationTest extends ExternalApiDBTestConfig {
         ChatRoom room = ChatRoomFixture.PRIVATE_CHAT_ROOM.toEntity();
         ChatRoomReq.Pend request = new ChatRoomReq.Pend(room.getTitle(), room.getDescription(), room.getPassword());
         ChatRoomReq.Create request2 = new ChatRoomReq.Create(room.getBackgroundImageUrl());
-        given(awsS3Adapter.saveImage(room.getBackgroundImageUrl(), ObjectKeyType.CHAT_PROFILE)).willReturn("chatroom/1");
+        given(awsS3Adapter.saveImage(room.getBackgroundImageUrl(), ActualIdProvider.createInstanceOfChatProfile())).willReturn("chatroom/1");
 
         // when
         ResponseEntity<SuccessResponse<Map<String, Long>>> response = postPending(user, request);
