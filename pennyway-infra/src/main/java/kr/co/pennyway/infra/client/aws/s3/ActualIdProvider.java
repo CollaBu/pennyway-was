@@ -45,7 +45,7 @@ public final class ActualIdProvider {
     }
 
     /**
-     * 채팅방 이미지 URL을 생성하기 위한 ActualIdProvider 인스턴스를 생성합니다.
+     * 채팅 이미지 URL을 생성하기 위한 ActualIdProvider 인스턴스를 생성합니다.
      *
      * @param chatId 실제 채팅 ID
      */
@@ -56,7 +56,7 @@ public final class ActualIdProvider {
     }
 
     /**
-     * 채팅 프로필 이미지 URL을 생성하기 위한 ActualIdProvider 인스턴스를 생성합니다.
+     * 채팅방 사용자 프로필 이미지 URL을 생성하기 위한 ActualIdProvider 인스턴스를 생성합니다.
      */
     public static ActualIdProvider createInstanceOfChatProfile() {
         return createEmptyInstance(ObjectKeyType.CHAT_PROFILE);
