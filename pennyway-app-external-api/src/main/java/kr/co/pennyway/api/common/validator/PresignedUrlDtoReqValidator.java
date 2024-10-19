@@ -20,23 +20,12 @@ public class PresignedUrlDtoReqValidator implements Validator {
     @Override
     public void validate(@NonNull Object target, @NonNull Errors errors) {
         PresignedUrlDto.Req req = (PresignedUrlDto.Req) target;
-
-        if (ObjectKeyType.CHATROOM_PROFILE.equals(req.type()) && req.chatroomId() == null) {
-            errors.rejectValue("chatroomId", "MISSING_CHATROOM_PARAMETER", "채팅방 이미지를 위해 채팅방 ID는 필수입니다.");
-        }
+        
         if (ObjectKeyType.CHAT_PROFILE.equals(req.type()) && req.chatroomId() == null) {
             errors.rejectValue("chatroomId", "MISSING_CHAT_PROFILE_PARAMETER", "채팅 프로필 이미지를 위해 채팅방 ID는 필수입니다.");
         }
-        if (ObjectKeyType.CHAT.equals(req.type())) {
-            if (req.chatroomId() == null) {
-                errors.rejectValue("chatroomId", "MISSING_CHAT_PARAMETER", "채팅 이미지를 위해 채팅방 ID는 필수입니다.");
-            }
-            if (req.chatId() == null) {
-                errors.rejectValue("chatId", "MISSING_CHAT_PARAMETER", "채팅 이미지를 위해 채팅 ID는 필수입니다.");
-            }
-        }
-        if (ObjectKeyType.FEED.equals(req.type()) && req.feedId() == null) {
-            errors.rejectValue("feedId", "MISSING_FEED_PARAMETER", "피드 이미지를 위해 피드 ID는 필수입니다.");
+        if (ObjectKeyType.CHAT.equals(req.type()) && req.chatroomId() == null) {
+            errors.rejectValue("chatroomId", "MISSING_CHAT_PARAMETER", "채팅 이미지를 위해 채팅방 ID는 필수입니다.");
         }
     }
 }
