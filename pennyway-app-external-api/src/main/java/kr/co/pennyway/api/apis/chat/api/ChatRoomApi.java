@@ -22,5 +22,5 @@ public interface ChatRoomApi {
 
     @Operation(summary = "가입한 채팅방 목록 조회", method = "GET", description = "사용자가 가입한 채팅방 목록을 조회하며, 정렬 순서는 보장하지 않는다. 최근 활성화된 채팅방의 순서를 지정할 방법에 대해 추가 개선이 필요한 API이므로, 추후 기능이 일부 수정될 수도 있다.")
     @ApiResponse(responseCode = "200", description = "가입한 채팅방 목록 조회 성공", content = @Content(schemaProperties = @SchemaProperty(name = "chatRooms", array = @ArraySchema(schema = @Schema(implementation = ChatRoomRes.Detail.class)))))
-    ResponseEntity<?> getChatRooms(@AuthenticationPrincipal SecurityUserDetails user);
+    ResponseEntity<?> getMyChatRooms(@AuthenticationPrincipal SecurityUserDetails user);
 }
