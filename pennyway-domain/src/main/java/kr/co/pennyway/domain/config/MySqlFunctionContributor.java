@@ -7,7 +7,7 @@ import org.hibernate.type.StandardBasicTypes;
 import org.hibernate.type.spi.TypeConfiguration;
 
 public class MySqlFunctionContributor implements FunctionContributor {
-    private static final String TWO_COLUMN_NATURAL_FUNCTION_NAME = "two_column_natural";
+    public static final String TWO_COLUMN_NATURAL_FUNCTION_NAME = "two_column_natural";
     private static final String TWO_COLUMN_NATURAL_PATTERN = "match(?1, ?2) against(?3 in natural language mode)";
 
     @Override
