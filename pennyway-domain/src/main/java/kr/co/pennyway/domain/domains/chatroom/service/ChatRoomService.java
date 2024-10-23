@@ -29,7 +29,7 @@ public class ChatRoomService {
     }
 
     @Transactional(readOnly = true)
-    public Slice<ChatRoomDetail> readChatRooms(String target, Pageable pageable) {
-        return chatRoomRepository.findChatRooms(target, pageable);
+    public Slice<ChatRoomDetail> readChatRooms(Long userId, String target, Pageable pageable) {
+        return chatRoomRepository.findChatRooms(userId, target, pageable);
     }
 }
