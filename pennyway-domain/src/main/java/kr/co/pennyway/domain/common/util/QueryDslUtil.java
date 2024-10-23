@@ -102,7 +102,7 @@ public class QueryDslUtil {
             return null;
         }
 
-        return Expressions.numberTemplate(Double.class, "function('" + TWO_COLUMN_NATURAL_FUNCTION_NAME + "', {0}, {1}, {2})", c1, c2, target).goe(0.0);
+        return Expressions.booleanTemplate(TWO_COLUMN_NATURAL_FUNCTION_NAME, c1, c2, target);
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
