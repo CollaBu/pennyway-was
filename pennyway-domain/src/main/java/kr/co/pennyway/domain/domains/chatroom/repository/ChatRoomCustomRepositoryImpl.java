@@ -117,13 +117,13 @@ public class ChatRoomCustomRepositoryImpl implements ChatRoomCustomRepository {
         log.info("memberCountQuery Type: {}", memberCountQuery.getType());
 
         // MATCH AGAINST 표현식
-        BooleanExpression matchExpr = Expressions.numberTemplate(
-                Double.class,
+        BooleanExpression matchExpr = Expressions.booleanTemplate(
                 "MATCH({0}, {1}) AGAINST({2} IN NATURAL LANGUAGE MODE)",
                 Expressions.stringPath(chatRoomPath, "title"),
                 Expressions.stringPath(chatRoomPath, "description"),
                 target
-        ).goe(0.0);
+        );
+
         log.info("matchExpr: {}", matchExpr);
 
         // 메인 쿼리
