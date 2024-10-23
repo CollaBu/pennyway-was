@@ -24,7 +24,7 @@ public class ChatRoomUseCase {
     public ChatRoomRes.Detail createChatRoom(ChatRoomReq.Create request, Long userId) {
         ChatRoom chatRoom = chatRoomSaveService.createChatRoom(request, userId);
 
-        return ChatRoomMapper.toChatRoomResDetail(chatRoom, 1);
+        return ChatRoomMapper.toChatRoomResDetail(chatRoom, true, 1);
     }
 
     public List<ChatRoomRes.Detail> getChatRooms(Long userId) {

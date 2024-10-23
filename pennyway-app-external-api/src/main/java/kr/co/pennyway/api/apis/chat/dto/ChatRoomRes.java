@@ -22,6 +22,8 @@ public final class ChatRoomRes {
             String backgroundImageUrl,
             @Schema(description = "채팅방 비공개 여부")
             boolean isPrivate,
+            @Schema(description = "어드민 여부. 채팅방의 관리자라면 true, 아니라면 false")
+            boolean isAdmin,
             @Schema(description = "채팅방 참여자 수")
             int participantCount,
             @Schema(description = "채팅방 개설일")
@@ -29,23 +31,25 @@ public final class ChatRoomRes {
             @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
             LocalDateTime createdAt
     ) {
-        public Detail(Long id, String title, String description, String backgroundImageUrl, boolean isPrivate, int participantCount, LocalDateTime createdAt) {
+        public Detail(Long id, String title, String description, String backgroundImageUrl, boolean isPrivate, boolean isAdmin, int participantCount, LocalDateTime createdAt) {
             this.id = id;
             this.title = title;
             this.description = Objects.toString(description, "");
             this.backgroundImageUrl = Objects.toString(backgroundImageUrl, "");
             this.isPrivate = isPrivate;
+            this.isAdmin = isAdmin;
             this.participantCount = participantCount;
             this.createdAt = createdAt;
         }
 
-        public static Detail from(ChatRoom chatRoom, int participantCount) {
+        public static Detail from(ChatRoom chatRoom, boolean isAdmin, int participantCount) {
             return new Detail(
                     chatRoom.getId(),
                     chatRoom.getTitle(),
                     chatRoom.getDescription(),
                     chatRoom.getBackgroundImageUrl(),
                     chatRoom.getPassword() != null,
+                    isAdmin,
                     participantCount,
                     chatRoom.getCreatedAt()
             );

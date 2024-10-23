@@ -13,9 +13,7 @@ import java.util.List;
 
 @Mapper
 public final class ChatRoomMapper {
-    public static ChatRoomRes.Detail toChatRoomResDetail(ChatRoom chatRoom, int participantCount) {
-        return ChatRoomRes.Detail.from(chatRoom, participantCount);
-    }
+
 
     public static SliceResponseTemplate<ChatRoomRes.Detail> toChatRoomResDetails(Slice<ChatRoomDetail> details, Pageable pageable) {
         List<ChatRoomRes.Detail> contents = toChatRoomResDetails(details.getContent());
@@ -34,6 +32,7 @@ public final class ChatRoomMapper {
                             detail.description(),
                             detail.backgroundImageUrl(),
                             detail.password() != null,
+                            detail.isAdmin(),
                             detail.participantCount(),
                             detail.createdAt()
                     )
@@ -41,5 +40,9 @@ public final class ChatRoomMapper {
         }
 
         return responses;
+    }
+
+    public static ChatRoomRes.Detail toChatRoomResDetail(ChatRoom chatRoom, boolean isAdmin, int participantCount) {
+        return ChatRoomRes.Detail.from(chatRoom, isAdmin, participantCount);
     }
 }
