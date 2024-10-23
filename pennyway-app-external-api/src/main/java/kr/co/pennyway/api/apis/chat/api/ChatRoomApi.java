@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.co.pennyway.api.apis.chat.dto.ChatRoomReq;
 import kr.co.pennyway.api.apis.chat.dto.ChatRoomRes;
+import kr.co.pennyway.api.common.response.SliceResponseTemplate;
 import kr.co.pennyway.api.common.security.authentication.SecurityUserDetails;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -25,6 +26,7 @@ public interface ChatRoomApi {
     @ApiResponse(responseCode = "200", description = "가입한 채팅방 목록 조회 성공", content = @Content(schemaProperties = @SchemaProperty(name = "chatRooms", array = @ArraySchema(schema = @Schema(implementation = ChatRoomRes.Detail.class)))))
     ResponseEntity<?> getMyChatRooms(@AuthenticationPrincipal SecurityUserDetails user);
 
-    @Operation(summary = "채팅방 검색", method = "GET", description = "사용자가 가입한 채팅방 중 검색어에 일치하는 채팅방 목록을 조회한다. 검색 결과는 무한 스크롤 응답으로 반환되며, 정렬 순서는 정확도가 높은 순으로 반환된다.")
+    @Operation(summary = "채팅방 검색", method = "GET", description = "사용자가 가입한 채팅방 중 검색어에 일치하는 채팅방 목록을 조회한다. 검색 결과는 무한 스크롤 응답으로 반환되며, 정렬 순서는 정확도가 높은 순으로 반환된다. content 필드는 List<ChatRoomRes.Detail> 타입으로, '가입한 채팅방 목록 조회' API 응답과 동일하다.")
+    @ApiResponse(responseCode = "200", description = "채팅방 검색 성공", content = @Content(schemaProperties = @SchemaProperty(name = "chatRooms", schema = @Schema(implementation = SliceResponseTemplate.class))))
     ResponseEntity<?> searchChatRooms(@Validated ChatRoomReq.SearchQuery query, @AuthenticationPrincipal SecurityUserDetails user);
 }
