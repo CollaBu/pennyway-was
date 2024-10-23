@@ -98,10 +98,17 @@ public class ChatRoomCustomRepositoryImpl implements ChatRoomCustomRepository {
                 .select(chatRoomIdPath)
                 .from(chatMemberPath)
                 .where(
-                        userIdPath.ne(userId),
-                        deletedAtPath.isNull()
-                )
-                .groupBy(chatRoomIdPath);
+                        deletedAtPath.isNull(),
+                        chatRoomIdPath.notIn(
+                                JPAExpressions
+                                        .select(chatRoomIdPath)
+                                        .from(chatMemberPath)
+                                        .where(
+                                                userIdPath.eq(userId),
+                                                deletedAtPath.isNull()
+                                        )
+                        )
+                );
         log.info("eligibleRoomsQuery: {}", eligibleRoomsQuery);
 
         // 멤버 수 계산 서브쿼리
