@@ -1,9 +1,9 @@
 package kr.co.pennyway.domain.domains.user.repository;
 
-import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import kr.co.pennyway.domain.config.ContainerMySqlTestConfig;
 import kr.co.pennyway.domain.config.JpaConfig;
+import kr.co.pennyway.domain.config.TestJpaConfig;
 import kr.co.pennyway.domain.domains.user.domain.NotifySetting;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.service.UserService;
@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +25,7 @@ import static org.springframework.test.util.AssertionErrors.*;
 @DataJpaTest(properties = "spring.jpa.hibernate.ddl-auto=create")
 @ContextConfiguration(classes = {JpaConfig.class, UserService.class})
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@Import(TestJpaConfig.class)
 @ActiveProfiles("test")
 public class UserSoftDeleteTest extends ContainerMySqlTestConfig {
     @Autowired
@@ -32,9 +33,6 @@ public class UserSoftDeleteTest extends ContainerMySqlTestConfig {
 
     @Autowired
     private EntityManager em;
-
-    @MockBean
-    private JPAQueryFactory jpaQueryFactory;
 
     private User user;
 

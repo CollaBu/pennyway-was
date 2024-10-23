@@ -1,9 +1,9 @@
 package kr.co.pennyway.api.apis.users.usecase;
 
-import com.querydsl.jpa.impl.JPAQueryFactory;
 import kr.co.pennyway.api.apis.users.helper.PasswordEncoderHelper;
 import kr.co.pennyway.api.apis.users.service.PasswordUpdateService;
 import kr.co.pennyway.api.config.ExternalApiDBTestConfig;
+import kr.co.pennyway.api.config.TestJpaConfig;
 import kr.co.pennyway.api.config.fixture.UserFixture;
 import kr.co.pennyway.domain.config.JpaConfig;
 import kr.co.pennyway.domain.domains.user.domain.User;
@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,6 +34,7 @@ import static org.springframework.test.util.AssertionErrors.assertEquals;
 @DataJpaTest(properties = "spring.jpa.hibernate.ddl-auto=create")
 @ContextConfiguration(classes = {JpaConfig.class, PasswordUpdateService.class, UserService.class})
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@Import(TestJpaConfig.class)
 public class PasswordUpdateServiceTest extends ExternalApiDBTestConfig {
     @Autowired
     private UserService userService;
@@ -42,9 +44,6 @@ public class PasswordUpdateServiceTest extends ExternalApiDBTestConfig {
 
     @MockBean
     private PasswordEncoderHelper passwordEncoderHelper;
-
-    @MockBean
-    private JPAQueryFactory queryFactory;
 
     @Nested
     @DisplayName("사용자 비밀번호 검증 테스트")
