@@ -1,9 +1,12 @@
 package kr.co.pennyway.api.apis.chat.mapper;
 
 import kr.co.pennyway.api.apis.chat.dto.ChatRoomRes;
+import kr.co.pennyway.api.common.response.SliceResponseTemplate;
 import kr.co.pennyway.common.annotation.Mapper;
 import kr.co.pennyway.domain.domains.chatroom.domain.ChatRoom;
 import kr.co.pennyway.domain.domains.chatroom.dto.ChatRoomDetail;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +15,12 @@ import java.util.List;
 public final class ChatRoomMapper {
     public static ChatRoomRes.Detail toChatRoomResDetail(ChatRoom chatRoom, int participantCount) {
         return ChatRoomRes.Detail.from(chatRoom, participantCount);
+    }
+
+    public static SliceResponseTemplate<ChatRoomRes.Detail> toChatRoomResDetails(Slice<ChatRoomDetail> details, Pageable pageable) {
+        List<ChatRoomRes.Detail> contents = toChatRoomResDetails(details.getContent());
+
+        return SliceResponseTemplate.of(contents, pageable, contents.size(), details.hasNext());
     }
 
     public static List<ChatRoomRes.Detail> toChatRoomResDetails(List<ChatRoomDetail> details) {
