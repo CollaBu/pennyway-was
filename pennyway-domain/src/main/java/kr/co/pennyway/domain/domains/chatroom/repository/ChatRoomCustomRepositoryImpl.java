@@ -2,6 +2,8 @@ package kr.co.pennyway.domain.domains.chatroom.repository;
 
 import com.querydsl.core.types.ConstructorExpression;
 import com.querydsl.core.types.Projections;
+import com.querydsl.jpa.JPQLQuery;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import kr.co.pennyway.domain.common.util.QueryDslUtil;
 import kr.co.pennyway.domain.common.util.SliceUtil;
@@ -25,8 +27,17 @@ public class ChatRoomCustomRepositoryImpl implements ChatRoomCustomRepository {
 
     @Override
     public List<ChatRoomDetail> findChatRoomsByUserId(Long userId) {
+        JPAQuery<Integer> memberCountExpr = queryFactory
+                .select(chatMember.count().intValue())
+                .from(chatMember)
+                .where(
+                        chatMember.chatRoom.id.eq(chatRoom.id),
+                        chatMember.deletedAt.isNull()
+                )
+                .groupBy(chatMember.chatRoom.id);
+
         return queryFactory
-                .select(createChatRoomDetailConstructorExpression())
+                .select(createChatRoomDetailConstructorExpression(memberCountExpr))
                 .from(chatRoom)
                 .where(
                         chatRoom.id.in(
@@ -39,11 +50,40 @@ public class ChatRoomCustomRepositoryImpl implements ChatRoomCustomRepository {
     }
 
     @Override
-    public Slice<ChatRoomDetail> findChatRooms(String target, Pageable pageable) {
+    public Slice<ChatRoomDetail> findChatRooms(Long userId, String target, Pageable pageable) {
+        // 멤버 수를 계산하는 서브쿼리
+        JPAQuery<Integer> memberCountExpr = queryFactory
+                .select(chatMember.count().intValue())
+                .from(chatMember)
+                .where(
+                        chatMember.chatRoom.id.eq(chatRoom.id),
+                        chatMember.deletedAt.isNull()
+                )
+                .groupBy(chatMember.chatRoom.id);
+
+        // 사용자가 가입하지 않은 채팅방을 찾는 서브쿼리
+        JPQLQuery<Long> eligibleRoomsQuery = queryFactory
+                .select(chatMember.chatRoom.id)
+                .from(chatMember)
+                .where(
+                        chatMember.user.id.ne(userId),
+                        chatMember.deletedAt.isNull()
+                )
+                .groupBy(chatMember.chatRoom.id);
+
+        // 채팅방 목록 조회
         List<ChatRoomDetail> results = queryFactory
-                .select(createChatRoomDetailConstructorExpression())
+                .select(createChatRoomDetailConstructorExpression(memberCountExpr))
                 .from(chatRoom)
-                .where(QueryDslUtil.matchAgainstTwoElemNaturalMode(chatRoom.title, chatRoom.description, target))
+                .where(
+                        chatRoom.id.in(eligibleRoomsQuery),
+                        QueryDslUtil.matchAgainstTwoElemNaturalMode(
+                                chatRoom.title,
+                                chatRoom.description,
+                                target
+                        ),
+                        chatRoom.deletedAt.isNull()
+                )
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize() + 1)
                 .fetch();
@@ -51,7 +91,13 @@ public class ChatRoomCustomRepositoryImpl implements ChatRoomCustomRepository {
         return SliceUtil.toSlice(results, pageable);
     }
 
-    private ConstructorExpression<ChatRoomDetail> createChatRoomDetailConstructorExpression() {
+    /**
+     * {@link ChatRoomDetail} 생성자 표현식을 생성한다.
+     *
+     * @param countExpr JPAQuery<Integer> 타입의 멤버 수를 계산하는 서브쿼리
+     * @return 생성된 ChatRoomDetail 생성자 표현식
+     */
+    private ConstructorExpression<ChatRoomDetail> createChatRoomDetailConstructorExpression(JPAQuery<Integer> countExpr) {
         return Projections.constructor(
                 ChatRoomDetail.class,
                 chatRoom.id,
@@ -60,9 +106,7 @@ public class ChatRoomCustomRepositoryImpl implements ChatRoomCustomRepository {
                 chatRoom.backgroundImageUrl,
                 chatRoom.password,
                 chatRoom.createdAt,
-                queryFactory.select(chatMember.count().intValue())
-                        .from(chatMember)
-                        .where(chatMember.chatRoom.id.eq(chatRoom.id))
+                countExpr
         );
     }
 }
