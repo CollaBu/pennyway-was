@@ -27,6 +27,6 @@ public class ChatRoomUseCase {
     public List<ChatRoomRes.Detail> getChatRooms(Long userId) {
         List<ChatRoomDetail> chatRooms = chatRoomSearchService.readChatRooms(userId);
 
-        return ChatRoomMapper.toChatRoomResDetailList(chatRooms);
+        return ChatRoomMapper.toChatRoomResDetails(chatRooms);
     }
 }

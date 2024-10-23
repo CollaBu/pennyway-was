@@ -14,7 +14,7 @@ public final class ChatRoomMapper {
         return ChatRoomRes.Detail.from(chatRoom, participantCount);
     }
 
-    public static List<ChatRoomRes.Detail> toChatRoomResDetailList(List<ChatRoomDetail> details) {
+    public static List<ChatRoomRes.Detail> toChatRoomResDetails(List<ChatRoomDetail> details) {
         List<ChatRoomRes.Detail> responses = new ArrayList<>();
 
         for (ChatRoomDetail detail : details) {
