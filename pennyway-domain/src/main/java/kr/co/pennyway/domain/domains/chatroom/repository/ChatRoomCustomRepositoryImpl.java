@@ -47,25 +47,67 @@ public class ChatRoomCustomRepositoryImpl implements ChatRoomCustomRepository {
     @Override
     @Transactional(readOnly = true)
     public List<ChatRoomDetail> findChatRoomsByUserId(Long userId) {
-        JPAQuery<Integer> memberCountExpr = queryFactory
-                .select(chatMember.count().intValue())
-                .from(chatMember)
-                .where(
-                        chatMember.chatRoom.id.eq(chatRoom.id),
-                        chatMember.deletedAt.isNull()
-                )
-                .groupBy(chatMember.chatRoom.id);
+        JPASQLQuery<Tuple> jpaSqlQuery = new JPASQLQuery<>(entityManager, sqlTemplates);
 
-        return queryFactory
-                .select(createChatRoomDetailConstructorExpression(memberCountExpr))
-                .from(chatRoom)
+        // 별칭 정의
+        final StringPath MY_ROOMS = stringPath("my_rooms");
+        final StringPath ROOM_STATS = stringPath("room_stats");
+        final String CHAT_ROOM_ID = "chat_room_id";
+        final String MEMBER_COUNT = "member_count";
+        final String IS_ADMIN = "is_admin";
+
+        // EntityPath 정의
+        EntityPath<ChatMember> chatMemberPath = new EntityPathBase<>(ChatMember.class, "chat_member");
+        EntityPath<ChatRoom> chatRoomPath = new EntityPathBase<>(ChatRoom.class, "chat_room");
+
+        // 사용자가 가입한 방 필터링 서브쿼리
+        JPQLQuery<Long> myRoomsQuery = JPAExpressions
+                .select(Expressions.numberPath(Long.class, chatMemberPath, CHAT_ROOM_ID))
+                .from(chatMemberPath)
                 .where(
-                        chatRoom.id.in(
-                                queryFactory.select(chatMember.chatRoom.id)
-                                        .from(chatMember)
-                                        .where(chatMember.user.id.eq(userId))
-                        )
+                        Expressions.numberPath(Long.class, chatMemberPath, "user_id").eq(userId),
+                        Expressions.dateTimePath(LocalDateTime.class, chatMemberPath, "deleted_at").isNull()
+                );
+
+        // 멤버 수와 어드민 여부를 계산하는 서브쿼리
+        JPQLQuery<Tuple> roomStatsQuery = JPAExpressions
+                .select(
+                        Expressions.numberPath(Long.class, chatMemberPath, CHAT_ROOM_ID),
+                        Expressions.numberTemplate(Long.class, "COUNT(*)", chatMemberPath).as(MEMBER_COUNT),
+                        Expressions.booleanTemplate(
+                                "MAX(CASE WHEN user_id = {0} AND role = '0' THEN true ELSE false END)",
+                                userId
+                        ).as(IS_ADMIN)
                 )
+                .from(chatMemberPath)
+                .where(Expressions.dateTimePath(LocalDateTime.class, chatMemberPath, "deleted_at").isNull())
+                .groupBy(Expressions.numberPath(Long.class, chatMemberPath, CHAT_ROOM_ID));
+
+        // 메인 쿼리
+        return jpaSqlQuery
+                .select(Projections.constructor(
+                        ChatRoomDetail.class,
+                        Expressions.numberPath(Long.class, chatRoomPath, "id"),
+                        Expressions.stringPath(chatRoomPath, "title"),
+                        Expressions.stringPath(chatRoomPath, "description"),
+                        Expressions.stringPath(chatRoomPath, "background_image_url"),
+                        Expressions.numberPath(Integer.class, chatRoomPath, "password"),
+                        Expressions.dateTemplate(
+                                LocalDateTime.class,
+                                "DATE_FORMAT({0}, '%Y-%m-%d %H:%i:%s')",
+                                "createdAt"
+                        ),
+                        Expressions.booleanPath(ROOM_STATS, IS_ADMIN),
+                        Expressions.numberPath(Integer.class, ROOM_STATS, MEMBER_COUNT)
+                ))
+                .from(chatRoomPath)
+                .innerJoin(myRoomsQuery, MY_ROOMS)
+                .on(Expressions.numberPath(Long.class, chatRoomPath, "id")
+                        .eq(Expressions.numberPath(Long.class, MY_ROOMS, CHAT_ROOM_ID)))
+                .leftJoin(roomStatsQuery, ROOM_STATS)
+                .on(Expressions.numberPath(Long.class, chatRoomPath, "id")
+                        .eq(Expressions.numberPath(Long.class, ROOM_STATS, CHAT_ROOM_ID)))
+                .where(Expressions.dateTimePath(LocalDateTime.class, chatRoomPath, "deleted_at").isNull())
                 .fetch();
     }
 
@@ -142,11 +184,12 @@ public class ChatRoomCustomRepositoryImpl implements ChatRoomCustomRepository {
                         Expressions.stringPath(chatRoomPath, "description"),
                         Expressions.stringPath(chatRoomPath, "background_image_url"),
                         Expressions.numberPath(Integer.class, chatRoomPath, "password"),
-                        Expressions.dateTemplate(     // 이 부분만 수정
+                        Expressions.dateTemplate(
                                 LocalDateTime.class,
                                 "DATE_FORMAT({0}, '%Y-%m-%d %H:%i:%s')",
                                 "createdAt"
                         ),
+                        Expressions.constant(false),
                         Expressions.numberPath(Integer.class, CM_COUNT, MEMBER_COUNT)
                 ))
                 .from(chatRoomPath)
