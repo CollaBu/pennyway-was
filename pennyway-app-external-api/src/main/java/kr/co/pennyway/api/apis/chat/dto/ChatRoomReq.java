@@ -42,8 +42,13 @@ public final class ChatRoomReq {
             String target,
             @Schema(description = "페이지 번호. 0부터 시작한다.", example = "0")
             int page,
-            @Schema(description = "페이지 크기. 한 페이지 당 반환되는 채팅방 개수이다.", example = "10")
-            int size
+            @Schema(description = "페이지 크기. 한 페이지 당 반환되는 채팅방 개수이다. 기본값으로 10개씩 반환한다.", example = "10")
+            Integer size
     ) {
+        public SearchQuery {
+            if (size == null) {
+                size = 10;
+            }
+        }
     }
 }
