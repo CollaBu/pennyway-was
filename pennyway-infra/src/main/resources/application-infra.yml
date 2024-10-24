@@ -34,6 +34,7 @@ spring:
     username: ${RABBITMQ_USERNAME:guest}
     password: ${RABBITMQ_PASSWORD:guest}
     virtual-host: ${RABBITMQ_VIRTUAL_HOST:/}
+    requested-heartbeat: ${RABBITMQ_REQUESTED_HEARTBEAT:20}
 
 app:
   question-address: ${ADMIN_ADDRESS:team.collabu@gmail.com}

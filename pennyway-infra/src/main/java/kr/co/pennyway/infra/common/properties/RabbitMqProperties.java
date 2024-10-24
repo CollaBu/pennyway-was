@@ -13,6 +13,7 @@ public class RabbitMqProperties {
     private final String username;
     private final String password;
     private final String virtualHost;
+    private final int requestedHeartbeat;
 
     @Override
     public String toString() {
@@ -22,6 +23,7 @@ public class RabbitMqProperties {
                 ", username='" + username + '\'' +
                 ", password='" + password + '\'' +
                 ", virtualHost='" + virtualHost + '\'' +
+                ", requestedHeartbeat=" + requestedHeartbeat +
                 '}';
     }
 }
