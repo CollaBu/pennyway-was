@@ -1,6 +1,8 @@
 package kr.co.pennyway.api.apis.chat.api;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -27,6 +29,12 @@ public interface ChatRoomApi {
     ResponseEntity<?> getMyChatRooms(@AuthenticationPrincipal SecurityUserDetails user);
 
     @Operation(summary = "채팅방 검색", method = "GET", description = "사용자가 가입한 채팅방 중 검색어에 일치하는 채팅방 목록을 조회한다. 검색 결과는 무한 스크롤 응답으로 반환되며, 정렬 순서는 정확도가 높은 순으로 반환된다. contents 필드는 List<ChatRoomRes.Detail> 타입으로, '가입한 채팅방 목록 조회' API 응답과 동일하다.")
+    @Parameters({
+            @Parameter(name = "target", description = "검색 대상. 채팅방 제목 혹은 설명을 검색한다. 최소한 2자 이상의 문자열이어야 한다.", example = "페니웨이", required = true),
+            @Parameter(name = "page", description = "페이지 번호. 0부터 시작한다.", example = "0", required = true),
+            @Parameter(name = "size", description = "페이지 크기. 한 페이지 당 반환되는 채팅방 개수이다. 기본값으로 10개씩 반환한다."),
+            @Parameter(name = "query", hidden = true)
+    })
     @ApiResponse(responseCode = "200", description = "채팅방 검색 성공", content = @Content(schemaProperties = @SchemaProperty(name = "chatRooms", schema = @Schema(implementation = SliceResponseTemplate.class))))
     ResponseEntity<?> searchChatRooms(@Validated ChatRoomReq.SearchQuery query, @AuthenticationPrincipal SecurityUserDetails user);
 }
