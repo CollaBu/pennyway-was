@@ -43,6 +43,6 @@ public class ChatRoomController implements ChatRoomApi {
     public ResponseEntity<?> searchChatRooms(@Validated ChatRoomReq.SearchQuery query, @AuthenticationPrincipal SecurityUserDetails user) {
         Pageable pageable = Pageable.ofSize(query.size()).withPage(query.page());
 
-        return ResponseEntity.ok(SuccessResponse.from(CHAT_ROOMS, chatRoomUseCase.searchChatRooms(user.getUserId(), query.target(), pageable)));
+        return ResponseEntity.ok(SuccessResponse.from(CHAT_ROOM, chatRoomUseCase.searchChatRooms(user.getUserId(), query.target(), pageable)));
     }
 }
