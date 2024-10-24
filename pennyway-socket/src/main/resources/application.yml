@@ -23,8 +23,8 @@ message-broker:
     client-password: ${MESSAGE_BROKER_CLIENT_PASSWORD:guest}
     user-prefix: ${MESSAGE_BROKER_USER_PREFIX:/usr}
     publish-exchange: ${MESSAGE_BROKER_PUBLISH_EXCHANGE:/topic}
-    heartbeat-send-interval: ${MESSAGE_BROKER_HEARTBEAT_SEND_INTERVAL:10000}
-    heartbeat-receive-interval: ${MESSAGE_BROKER_HEARTBEAT_RECEIVE_INTERVAL:10000}
+    heartbeat-send-interval: ${MESSAGE_BROKER_HEARTBEAT_SEND_INTERVAL:20000}
+    heartbeat-receive-interval: ${MESSAGE_BROKER_HEARTBEAT_RECEIVE_INTERVAL:20000}
 
 jwt:
   secret-key:
