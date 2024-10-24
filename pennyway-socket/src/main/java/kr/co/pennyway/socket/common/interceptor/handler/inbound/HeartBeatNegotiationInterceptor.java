@@ -24,26 +24,31 @@ public class HeartBeatNegotiationInterceptor implements ConnectCommandHandler {
     public void handle(Message<?> message, StompHeaderAccessor accessor) {
         String heartbeat = accessor.getFirstNativeHeader(HEART_BEAT_HEADER);
 
+        long clientToServer = SERVER_HEARTBEAT_RECEIVE;
+        long serverToClient = SERVER_HEARTBEAT_SEND;
+
+        if (heartbeat == null || heartbeat.equals("0,0")) {
+            log.debug("Client attempted connection without heart-beat. Enforcing server's heart-beat policy: {},{}",
+                    SERVER_HEARTBEAT_SEND, SERVER_HEARTBEAT_RECEIVE);
+        }
+
         if (heartbeat != null) {
             String[] parts = heartbeat.split(",");
-            
+
             if (parts.length == 2) {
                 long cx = Long.parseLong(parts[0]);
                 long cy = Long.parseLong(parts[1]);
 
-                long clientToServer = (cx != 0 && SERVER_HEARTBEAT_RECEIVE != 0)
-                        ? Math.max(cx, SERVER_HEARTBEAT_RECEIVE) : 0;
-                long serverToClient = (SERVER_HEARTBEAT_SEND != 0 && cy != 0)
-                        ? Math.max(SERVER_HEARTBEAT_SEND, cy) : 0;
+                clientToServer = (cx != 0) ? Math.max(cx, SERVER_HEARTBEAT_RECEIVE) : SERVER_HEARTBEAT_RECEIVE;
+                serverToClient = (cy != 0) ? Math.max(SERVER_HEARTBEAT_SEND, cy) : SERVER_HEARTBEAT_SEND;
 
                 log.info("Heart-beat negotiation - Client wants: {}, Server wants: {}",
                         heartbeat, SERVER_HEARTBEAT_SEND + "," + SERVER_HEARTBEAT_RECEIVE);
                 log.info("Negotiated heart-beat - Client to Server: {}, Server to Client: {}",
                         clientToServer, serverToClient);
-
-                accessor.setNativeHeader(HEART_BEAT_HEADER,
-                        clientToServer + "," + serverToClient);
             }
         }
+
+        accessor.setNativeHeader(HEART_BEAT_HEADER, clientToServer + "," + serverToClient);
     }
 }
