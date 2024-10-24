@@ -1,8 +1,8 @@
 package kr.co.pennyway.domain.domains.oauth.repository;
 
-import com.querydsl.jpa.impl.JPAQueryFactory;
 import kr.co.pennyway.domain.config.ContainerMySqlTestConfig;
 import kr.co.pennyway.domain.config.JpaConfig;
+import kr.co.pennyway.domain.config.TestJpaConfig;
 import kr.co.pennyway.domain.domains.oauth.domain.Oauth;
 import kr.co.pennyway.domain.domains.oauth.type.Provider;
 import kr.co.pennyway.domain.domains.user.domain.NotifySetting;
@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 @DataJpaTest(properties = {"spring.jpa.hibernate.ddl-auto=create"})
 @ContextConfiguration(classes = JpaConfig.class)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@Import(TestJpaConfig.class)
 @ActiveProfiles("test")
 public class OauthRepositoryTest extends ContainerMySqlTestConfig {
     @Autowired
@@ -34,9 +35,6 @@ public class OauthRepositoryTest extends ContainerMySqlTestConfig {
 
     @Autowired
     private OauthRepository oauthRepository;
-
-    @MockBean
-    private JPAQueryFactory jpaQueryFactory;
 
     private User user;
 

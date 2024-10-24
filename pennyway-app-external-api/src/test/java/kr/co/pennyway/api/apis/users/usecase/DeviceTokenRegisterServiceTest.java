@@ -1,9 +1,9 @@
 package kr.co.pennyway.api.apis.users.usecase;
 
-import com.querydsl.jpa.impl.JPAQueryFactory;
 import kr.co.pennyway.api.apis.users.dto.DeviceTokenDto;
 import kr.co.pennyway.api.apis.users.service.DeviceTokenRegisterService;
 import kr.co.pennyway.api.config.ExternalApiDBTestConfig;
+import kr.co.pennyway.api.config.TestJpaConfig;
 import kr.co.pennyway.api.config.fixture.DeviceTokenFixture;
 import kr.co.pennyway.api.config.fixture.UserFixture;
 import kr.co.pennyway.domain.config.JpaConfig;
@@ -19,7 +19,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +29,7 @@ import static org.springframework.test.util.AssertionErrors.*;
 @DataJpaTest(properties = "spring.jpa.hibernate.ddl-auto=create")
 @ContextConfiguration(classes = {JpaConfig.class, DeviceTokenRegisterService.class, UserService.class, DeviceTokenService.class})
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@Import(TestJpaConfig.class)
 public class DeviceTokenRegisterServiceTest extends ExternalApiDBTestConfig {
     @Autowired
     private UserService userService;
@@ -38,9 +39,6 @@ public class DeviceTokenRegisterServiceTest extends ExternalApiDBTestConfig {
 
     @Autowired
     private DeviceTokenRegisterService deviceTokenRegisterService;
-
-    @MockBean
-    private JPAQueryFactory queryFactory;
 
     private User requestUser;
 

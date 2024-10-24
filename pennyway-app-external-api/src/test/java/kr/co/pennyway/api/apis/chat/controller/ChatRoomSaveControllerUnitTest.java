@@ -52,7 +52,7 @@ public class ChatRoomSaveControllerUnitTest {
         // given
         ChatRoom fixture = ChatRoomFixture.PRIVATE_CHAT_ROOM.toEntity();
         ChatRoomReq.Create request = ChatRoomFixture.PRIVATE_CHAT_ROOM.toCreateRequest();
-        given(chatRoomUseCase.createChatRoom(request, 1L)).willReturn(ChatRoomRes.Detail.from(fixture, 1));
+        given(chatRoomUseCase.createChatRoom(request, 1L)).willReturn(ChatRoomRes.Detail.from(fixture, true, 1));
 
         // when
         ResultActions result = performPostChatRoom(request);
@@ -70,7 +70,7 @@ public class ChatRoomSaveControllerUnitTest {
         ChatRoom fixture = ChatRoomFixture.PUBLIC_CHAT_ROOM.toEntity();
         ChatRoomReq.Create request = ChatRoomFixture.PUBLIC_CHAT_ROOM.toCreateRequest();
 
-        given(chatRoomUseCase.createChatRoom(request, 1L)).willReturn(ChatRoomRes.Detail.from(fixture, 1));
+        given(chatRoomUseCase.createChatRoom(request, 1L)).willReturn(ChatRoomRes.Detail.from(fixture, true, 1));
 
         // when
         ResultActions result = performPostChatRoom(request);

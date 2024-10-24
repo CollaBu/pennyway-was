@@ -7,6 +7,7 @@ import kr.co.pennyway.api.common.response.SuccessResponse;
 import kr.co.pennyway.api.common.security.authentication.SecurityUserDetails;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -30,9 +31,18 @@ public class ChatRoomController implements ChatRoomApi {
     }
 
     @Override
+    @GetMapping("/me")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> getMyChatRooms(@AuthenticationPrincipal SecurityUserDetails user) {
+        return ResponseEntity.ok(SuccessResponse.from(CHAT_ROOMS, chatRoomUseCase.getChatRooms(user.getUserId())));
+    }
+
+    @Override
     @GetMapping("")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> getChatRooms(@AuthenticationPrincipal SecurityUserDetails user) {
-        return ResponseEntity.ok(SuccessResponse.from(CHAT_ROOMS, chatRoomUseCase.getChatRooms(user.getUserId())));
+    public ResponseEntity<?> searchChatRooms(@Validated ChatRoomReq.SearchQuery query, @AuthenticationPrincipal SecurityUserDetails user) {
+        Pageable pageable = Pageable.ofSize(query.size()).withPage(query.page());
+
+        return ResponseEntity.ok(SuccessResponse.from(CHAT_ROOMS, chatRoomUseCase.searchChatRooms(user.getUserId(), query.target(), pageable)));
     }
 }

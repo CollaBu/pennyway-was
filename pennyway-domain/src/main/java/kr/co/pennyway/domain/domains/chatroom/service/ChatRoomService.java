@@ -6,6 +6,8 @@ import kr.co.pennyway.domain.domains.chatroom.dto.ChatRoomDetail;
 import kr.co.pennyway.domain.domains.chatroom.repository.ChatRoomRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -21,8 +23,13 @@ public class ChatRoomService {
         return chatRoomRepository.save(chatRoom);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<ChatRoomDetail> readChatRoomsByUserId(Long userId) {
         return chatRoomRepository.findChatRoomsByUserId(userId);
+    }
+
+    @Transactional(readOnly = true)
+    public Slice<ChatRoomDetail> readChatRooms(Long userId, String target, Pageable pageable) {
+        return chatRoomRepository.findChatRooms(userId, target, pageable);
     }
 }

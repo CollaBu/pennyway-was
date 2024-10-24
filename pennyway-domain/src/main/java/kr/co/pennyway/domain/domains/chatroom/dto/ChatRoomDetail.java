@@ -9,6 +9,7 @@ public record ChatRoomDetail(
         String backgroundImageUrl,
         Integer password,
         LocalDateTime createdAt,
+        boolean isAdmin,
         int participantCount
 ) {
 }

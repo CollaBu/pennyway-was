@@ -2,6 +2,7 @@ package kr.co.pennyway.api.apis.chat.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import kr.co.pennyway.domain.domains.chatroom.domain.ChatRoom;
@@ -32,5 +33,17 @@ public final class ChatRoomReq {
                     .backgroundImageUrl(originImageUrl)
                     .build();
         }
+    }
+
+    public record SearchQuery(
+            @Schema(description = "검색 대상. 채팅방 제목 혹은 설명을 검색한다. 최소한 2자 이상의 문자열이어야 한다.", example = "페니웨이")
+            @NotNull(message = "검색 대상은 NULL이 될 수 없습니다.")
+            @Size(min = 2)
+            String target,
+            @Schema(description = "페이지 번호. 0부터 시작한다.", example = "0")
+            int page,
+            @Schema(description = "페이지 크기. 한 페이지 당 반환되는 채팅방 개수이다.", example = "10")
+            int size
+    ) {
     }
 }

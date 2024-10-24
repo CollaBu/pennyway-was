@@ -1,14 +1,20 @@
 package kr.co.pennyway.domain.common.util;
 
 import com.querydsl.core.types.*;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.NumberExpression;
+import com.querydsl.core.types.dsl.StringPath;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+
+import static kr.co.pennyway.domain.config.MySqlFunctionContributor.TWO_COLUMN_NATURAL_FUNCTION_NAME;
 
 /**
  * QueryDsl의 편의 기능을 제공하는 유틸리티 클래스
@@ -81,6 +87,22 @@ public class QueryDslUtil {
         } else {
             return createOrderSpecifier(orderBy, Expressions.stringPath(order.getProperty()), queryDslNullHandling);
         }
+    }
+
+    /**
+     * MySQL의 match_against 함수를 사용하여 한 컬럼을 비교하는 메서드
+     *
+     * @param c1     {@link StringPath} : 비교할 첫 번째 컬럼
+     * @param c2     {@link StringPath} : 비교할 두 번째 컬럼
+     * @param target {@link String} : 비교할 대상
+     * @return {@link NumberExpression} : match_against 함수를 사용하여 비교한 결과 측정치가 0 이상이면 true, 0 미만이면 false
+     */
+    public static BooleanExpression matchAgainstTwoElemNaturalMode(final StringPath c1, final StringPath c2, final String target) {
+        if (!StringUtils.hasText(target)) {
+            return null;
+        }
+
+        return Expressions.booleanTemplate(TWO_COLUMN_NATURAL_FUNCTION_NAME, c1, c2, target);
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
