@@ -16,6 +16,8 @@ public class MessageBrokerProperties {
     private final String clientPassword;
     private final String userPrefix;
     private final String publishExchange;
+    private final int heartbeatSendInterval;
+    private final int heartbeatReceiveInterval;
 
     @Override
     public String toString() {
@@ -28,6 +30,8 @@ public class MessageBrokerProperties {
                 ", clientPassword='" + clientPassword + '\'' +
                 ", userPrefix='" + userPrefix + '\'' +
                 ", publishExchange='" + publishExchange + '\'' +
+                ", heartbeatSendInterval=" + heartbeatSendInterval +
+                ", heartbeatReceiveInterval=" + heartbeatReceiveInterval +
                 '}';
     }
 }
