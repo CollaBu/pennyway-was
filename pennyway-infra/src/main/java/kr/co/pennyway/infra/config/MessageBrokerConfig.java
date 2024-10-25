@@ -78,6 +78,7 @@ public class MessageBrokerConfig implements PennywayInfraConfig {
         factory.setPassword(rabbitMqProperties.getPassword());
         factory.setPort(rabbitMqProperties.getPort());
         factory.setVirtualHost(rabbitMqProperties.getVirtualHost());
+        factory.setRequestedHeartBeat(rabbitMqProperties.getRequestedHeartbeat());
 
         return factory;
     }

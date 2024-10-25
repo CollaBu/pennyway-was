@@ -53,7 +53,9 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
                 .setClientLogin(messageBrokerProperties.getClientId())
                 .setClientPasscode(messageBrokerProperties.getClientPassword())
                 .setRelayHost(messageBrokerProperties.getHost())
-                .setRelayPort(messageBrokerProperties.getPort());
+                .setRelayPort(messageBrokerProperties.getPort())
+                .setSystemHeartbeatSendInterval(messageBrokerProperties.getHeartbeatSendInterval())
+                .setSystemHeartbeatReceiveInterval(messageBrokerProperties.getHeartbeatReceiveInterval());
 
         config.setUserDestinationPrefix(messageBrokerProperties.getUserPrefix());
         config.setPathMatcher(new AntPathMatcher("."));
