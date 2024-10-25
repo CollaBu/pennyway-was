@@ -42,12 +42,13 @@ public class HeartBeatNegotiationInterceptor implements ConnectCommandHandler {
                 clientToServer = (cx != 0) ? Math.max(cx, SERVER_HEARTBEAT_RECEIVE) : SERVER_HEARTBEAT_RECEIVE;
                 serverToClient = (cy != 0) ? Math.max(SERVER_HEARTBEAT_SEND, cy) : SERVER_HEARTBEAT_SEND;
 
-                log.info("Heart-beat negotiation - Client wants: {}, Server wants: {}",
+                log.debug("Heart-beat negotiation - Client wants: {}, Server wants: {}",
                         heartbeat, SERVER_HEARTBEAT_SEND + "," + SERVER_HEARTBEAT_RECEIVE);
-                log.info("Negotiated heart-beat - Client to Server: {}, Server to Client: {}",
-                        clientToServer, serverToClient);
             }
         }
+
+        log.info("Negotiated heart-beat - Client to Server: {}, Server to Client: {}",
+                clientToServer, serverToClient);
 
         accessor.setNativeHeader(HEART_BEAT_HEADER, clientToServer + "," + serverToClient);
     }
