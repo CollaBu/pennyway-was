@@ -79,6 +79,24 @@ public class ChatMember extends DateAuditable {
         Objects.requireNonNull(role, "role은 null이 될 수 없습니다.");
     }
 
+    /**
+     * 사용자 데이터가 삭제되었는지 확인한다.
+     *
+     * @return 삭제된 데이터가 아니면 true, 삭제된 데이터이면 false
+     */
+    public boolean isActive() {
+        return deletedAt == null;
+    }
+
+    /**
+     * 사용자 추방된 이력이 있는 지 확인한다.
+     *
+     * @return 추방된 이력이 있으면 true, 없으면 false
+     */
+    public boolean isBannedMember() {
+        return deletedAt != null && banned;
+    }
+
     @Override
     public String toString() {
         return "ChatMember{" +
