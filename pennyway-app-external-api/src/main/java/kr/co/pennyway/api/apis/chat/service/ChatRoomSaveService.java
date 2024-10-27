@@ -4,9 +4,7 @@ import kr.co.pennyway.api.apis.chat.dto.ChatRoomReq;
 import kr.co.pennyway.api.common.storage.AwsS3Adapter;
 import kr.co.pennyway.domain.domains.chatroom.domain.ChatRoom;
 import kr.co.pennyway.domain.domains.chatroom.service.ChatRoomService;
-import kr.co.pennyway.domain.domains.member.domain.ChatMember;
 import kr.co.pennyway.domain.domains.member.service.ChatMemberService;
-import kr.co.pennyway.domain.domains.member.type.ChatMemberRole;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorCode;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorException;
@@ -40,9 +38,7 @@ public class ChatRoomSaveService {
         ChatRoom chatRoom = chatRoomService.create(request.toEntity(chatRoomId, originImageUrl));
 
         User user = userService.readUser(userId).orElseThrow(() -> new UserErrorException(UserErrorCode.NOT_FOUND));
-        ChatMember member = ChatMember.of(user.getName(), user, chatRoom, ChatMemberRole.ADMIN);
-
-        chatMemberService.create(member);
+        chatMemberService.createAdmin(user.getName(), user, chatRoom);
 
         return chatRoom;
     }
