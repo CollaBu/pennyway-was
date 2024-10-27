@@ -97,6 +97,11 @@ public class ChatMember extends DateAuditable {
         return deletedAt != null && banned;
     }
 
+    public void ban() {
+        this.banned = true;
+        this.deletedAt = LocalDateTime.now();
+    }
+
     @Override
     public String toString() {
         return "ChatMember{" +
