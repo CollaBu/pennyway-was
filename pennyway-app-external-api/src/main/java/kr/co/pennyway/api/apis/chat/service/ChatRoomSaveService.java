@@ -38,7 +38,7 @@ public class ChatRoomSaveService {
         ChatRoom chatRoom = chatRoomService.create(request.toEntity(chatRoomId, originImageUrl));
 
         User user = userService.readUser(userId).orElseThrow(() -> new UserErrorException(UserErrorCode.NOT_FOUND));
-        chatMemberService.createAdmin(user.getName(), user, chatRoom);
+        chatMemberService.createAdmin(user, chatRoom);
 
         return chatRoom;
     }

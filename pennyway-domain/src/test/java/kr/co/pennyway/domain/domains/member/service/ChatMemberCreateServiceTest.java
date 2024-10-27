@@ -48,11 +48,11 @@ public class ChatMemberCreateServiceTest {
     @DisplayName("이미 가입한 회원은 가입에 실패한다.")
     void createMemberWhenAlreadyExist() {
         // given
-        ChatMember chatMember = ChatMember.of(user.getName(), user, chatRoom, ChatMemberRole.MEMBER);
+        ChatMember chatMember = ChatMember.of(user, chatRoom, ChatMemberRole.MEMBER);
         given(chatMemberRepository.findByChat_Room_IdAndUser_Id(chatRoom.getId(), user.getId())).willReturn(Set.of(chatMember));
 
         // when
-        ChatMemberErrorException exception = assertThrows(ChatMemberErrorException.class, () -> chatMemberService.createMember(user.getName(), user, chatRoom));
+        ChatMemberErrorException exception = assertThrows(ChatMemberErrorException.class, () -> chatMemberService.createMember(user, chatRoom));
 
         // then
         assertEquals(ChatMemberErrorCode.ALREADY_JOINED, exception.getBaseErrorCode(), "에러 코드는 ALREADY_JOINED 여야 한다.");
@@ -62,12 +62,12 @@ public class ChatMemberCreateServiceTest {
     @DisplayName("추방 당한 이력이 있는 회원은 가입에 실패한다.")
     void createMemberWhenBanned() {
         // given
-        ChatMember chatMember = ChatMember.of(user.getName(), user, chatRoom, ChatMemberRole.MEMBER);
+        ChatMember chatMember = ChatMember.of(user, chatRoom, ChatMemberRole.MEMBER);
         chatMember.ban();
         given(chatMemberRepository.findByChat_Room_IdAndUser_Id(chatRoom.getId(), user.getId())).willReturn(Set.of(chatMember));
 
         // when
-        ChatMemberErrorException exception = assertThrows(ChatMemberErrorException.class, () -> chatMemberService.createMember(user.getName(), user, chatRoom));
+        ChatMemberErrorException exception = assertThrows(ChatMemberErrorException.class, () -> chatMemberService.createMember(user, chatRoom));
 
         // then
         assertEquals(ChatMemberErrorCode.BANNED, exception.getBaseErrorCode(), "에러 코드는 BANNED 여야 한다.");
@@ -80,11 +80,11 @@ public class ChatMemberCreateServiceTest {
         // given
         given(chatMemberRepository.findByChat_Room_IdAndUser_Id(chatRoom.getId(), user.getId())).willReturn(Set.of());
 
-        ChatMember chatMember = ChatMember.of(user.getName(), user, chatRoom, ChatMemberRole.MEMBER);
+        ChatMember chatMember = ChatMember.of(user, chatRoom, ChatMemberRole.MEMBER);
         given(chatMemberRepository.save(any(ChatMember.class))).willReturn(chatMember);
 
         // when
-        ChatMember result = chatMemberService.createMember(user.getName(), user, chatRoom);
+        ChatMember result = chatMemberService.createMember(user, chatRoom);
 
         // then
         Assertions.assertNotNull(result);
@@ -94,14 +94,14 @@ public class ChatMemberCreateServiceTest {
     @DisplayName("탈퇴한 이력이 있지만, 사유가 추방이 아니라면 가입에 성공한다.")
     void createMemberWhenWithdrawn() {
         // given
-        ChatMember original = ChatMember.of(user.getName(), user, chatRoom, ChatMemberRole.MEMBER);
+        ChatMember original = ChatMember.of(user, chatRoom, ChatMemberRole.MEMBER);
         ReflectionTestUtils.setField(original, "deletedAt", LocalDateTime.now());
 
-        ChatMember chatMember = ChatMember.of(user.getName(), user, chatRoom, ChatMemberRole.MEMBER);
+        ChatMember chatMember = ChatMember.of(user, chatRoom, ChatMemberRole.MEMBER);
         given(chatMemberRepository.save(any(ChatMember.class))).willReturn(chatMember);
 
         // when
-        ChatMember result = chatMemberService.createMember(user.getName(), user, chatRoom);
+        ChatMember result = chatMemberService.createMember(user, chatRoom);
 
         // then
         Assertions.assertNotNull(result);

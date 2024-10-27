@@ -21,14 +21,14 @@ public class ChatMemberService {
     private final ChatMemberRepository chatMemberRepository;
 
     @Transactional
-    public ChatMember createAdmin(String nickname, User user, ChatRoom chatRoom) {
-        ChatMember chatMember = ChatMember.of(nickname, user, chatRoom, ChatMemberRole.ADMIN);
+    public ChatMember createAdmin(User user, ChatRoom chatRoom) {
+        ChatMember chatMember = ChatMember.of(user, chatRoom, ChatMemberRole.ADMIN);
 
         return chatMemberRepository.save(chatMember);
     }
 
     @Transactional
-    public ChatMember createMember(String nickname, User user, ChatRoom chatRoom) {
+    public ChatMember createMember(User user, ChatRoom chatRoom) {
         Set<ChatMember> chatMembers = chatMemberRepository.findByChat_Room_IdAndUser_Id(chatRoom.getId(), user.getId());
 
         if (chatMembers.stream().anyMatch(ChatMember::isActive)) {
@@ -41,7 +41,7 @@ public class ChatMemberService {
             throw new ChatMemberErrorException(ChatMemberErrorCode.BANNED);
         }
 
-        ChatMember chatMember = ChatMember.of(nickname, user, chatRoom, ChatMemberRole.MEMBER);
+        ChatMember chatMember = ChatMember.of(user, chatRoom, ChatMemberRole.MEMBER);
 
         return chatMemberRepository.save(chatMember);
     }

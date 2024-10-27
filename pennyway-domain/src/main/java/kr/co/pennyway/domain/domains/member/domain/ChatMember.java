@@ -51,7 +51,7 @@ public class ChatMember extends DateAuditable {
     private ChatRoom chatRoom;
 
     @Builder
-    public ChatMember(String name, User user, ChatRoom chatRoom, ChatMemberRole role) {
+    protected ChatMember(String name, User user, ChatRoom chatRoom, ChatMemberRole role) {
         validate(name, user, chatRoom, role);
 
         this.name = name;
@@ -60,9 +60,9 @@ public class ChatMember extends DateAuditable {
         this.role = role;
     }
 
-    public static ChatMember of(String name, User user, ChatRoom chatRoom, ChatMemberRole role) {
+    public static ChatMember of(User user, ChatRoom chatRoom, ChatMemberRole role) {
         return ChatMember.builder()
-                .name(name)
+                .name(user.getName())
                 .user(user)
                 .chatRoom(chatRoom)
                 .role(role)
