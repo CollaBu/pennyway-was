@@ -8,6 +8,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import kr.co.pennyway.infra.client.broker.MessageBrokerAdapter;
 import kr.co.pennyway.infra.common.importer.PennywayInfraConfig;
 import kr.co.pennyway.infra.common.properties.ChatExchangeProperties;
+import kr.co.pennyway.infra.common.properties.ChatJoinEventExchangeProperties;
 import kr.co.pennyway.infra.common.properties.RabbitMqProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,10 +32,16 @@ import org.springframework.context.annotation.Primary;
 @Slf4j
 @EnableRabbit
 @RequiredArgsConstructor
-@EnableConfigurationProperties({ChatExchangeProperties.class, RabbitMqProperties.class})
+@EnableConfigurationProperties({ChatExchangeProperties.class, ChatJoinEventExchangeProperties.class, RabbitMqProperties.class})
 public class MessageBrokerConfig implements PennywayInfraConfig {
     private final RabbitMqProperties rabbitMqProperties;
     private final ChatExchangeProperties chatExchangeProperties;
+    private final ChatJoinEventExchangeProperties chatJoinEventExchangeProperties;
+
+    @Bean
+    public TopicExchange chatExchange() {
+        return new TopicExchange(chatExchangeProperties.getExchange());
+    }
 
     @Bean
     public Queue chatQueue() {
@@ -42,8 +49,8 @@ public class MessageBrokerConfig implements PennywayInfraConfig {
     }
 
     @Bean
-    public TopicExchange chatExchange() {
-        return new TopicExchange(chatExchangeProperties.getExchange());
+    public Queue chatJoinEventQueue(ChatJoinEventExchangeProperties chatJoinEventExchangeProperties) {
+        return new Queue(chatJoinEventExchangeProperties.getQueue(), true);
     }
 
     @Bean
@@ -52,6 +59,14 @@ public class MessageBrokerConfig implements PennywayInfraConfig {
                 .bind(chatQueue)
                 .to(chatExchange)
                 .with(chatExchangeProperties.getRoutingKey());
+    }
+
+    @Bean
+    public Binding chatJoinEventBinding(Queue chatJoinEventQueue, TopicExchange chatExchange) {
+        return BindingBuilder
+                .bind(chatJoinEventQueue)
+                .to(chatExchange)
+                .with(chatJoinEventExchangeProperties.getRoutingKey());
     }
 
     @Bean
