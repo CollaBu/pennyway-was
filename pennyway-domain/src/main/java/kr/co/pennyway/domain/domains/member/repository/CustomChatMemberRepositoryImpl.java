@@ -18,7 +18,8 @@ public class CustomChatMemberRepositoryImpl implements CustomChatMemberRepositor
         return queryFactory.select(ConstantImpl.create(1))
                 .from(chatMember)
                 .where(chatMember.chatRoom.id.eq(chatRoomId)
-                        .and(chatMember.user.id.eq(userId)))
+                        .and(chatMember.user.id.eq(userId))
+                        .and(chatMember.deletedAt.isNull()))
                 .fetchFirst() != null;
     }
 }

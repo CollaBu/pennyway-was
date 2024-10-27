@@ -13,7 +13,6 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.SQLRestriction;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
@@ -24,7 +23,6 @@ import java.util.Objects;
 @Table(name = "chat_member")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @DynamicInsert
-@SQLRestriction("deleted_at IS NULL")
 @SQLDelete(sql = "UPDATE chat_member SET deleted_at = NOW() WHERE id = ?")
 public class ChatMember extends DateAuditable {
     @Id
