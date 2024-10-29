@@ -11,6 +11,7 @@ import org.springframework.data.domain.Slice;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @DomainService
@@ -21,6 +22,11 @@ public class ChatRoomService {
     @Transactional
     public ChatRoom create(ChatRoom chatRoom) {
         return chatRoomRepository.save(chatRoom);
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<ChatRoom> readChatRoom(Long chatRoomId) {
+        return chatRoomRepository.findById(chatRoomId);
     }
 
     @Transactional(readOnly = true)
