@@ -14,6 +14,7 @@ import kr.co.pennyway.domain.domains.user.service.UserService;
 import kr.co.pennyway.infra.common.event.ChatRoomJoinEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
@@ -29,11 +30,21 @@ public class ChatMemberJoinService {
 
     private final ApplicationEventPublisher eventPublisher;
 
+    /**
+     * 사용자가 채팅방에 참여하는 도메인 비즈니스 로직을 처리한다.
+     * 채팅방 가입 가능 여부 확인을 위해 현재 가입한 회원 수를 조회하는데, 이 때 분산 락을 걸어 동시성 문제를 해결한다.
+     *
+     * @param userId     Long : 가입하려는 사용자의 ID
+     * @param chatRoomId Long : 가입하려는 채팅방의 ID
+     * @param password   Integer : 비공개 채팅방의 경우 비밀번호 정보를 입력받으며, 채팅방에 비밀번호가 없을 경우 null
+     * @return Pair<ChatRoom, Integer> - 채팅방 정보와 현재 가입한 회원 수
+     */
     @DistributedLock(key = "chatRoom.join.#chatRoomId")
-    public void execute(Long userId, Long chatRoomId, Integer password) {
+    public Pair<ChatRoom, Integer> execute(Long userId, Long chatRoomId, Integer password) {
         ChatRoom chatRoom = chatRoomService.readChatRoom(chatRoomId).orElseThrow(() -> new ChatRoomErrorException(ChatRoomErrorCode.NOT_FOUND_CHAT_ROOM));
 
-        if (isFullRoom(chatRoomId)) {
+        Long currentMemberCount = chatMemberService.countActiveMembers(chatRoomId);
+        if (isFullRoom(currentMemberCount)) {
             throw new ChatRoomErrorException(ChatRoomErrorCode.FULL_CHAT_ROOM);
         }
 
@@ -45,9 +56,11 @@ public class ChatMemberJoinService {
         ChatMember member = chatMemberService.createMember(user, chatRoom);
 
         eventPublisher.publishEvent(ChatRoomJoinEvent.of(chatRoomId, member.getName()));
+
+        return Pair.of(chatRoom, currentMemberCount.intValue());
     }
 
-    private boolean isFullRoom(Long chatRoomId) {
-        return chatMemberService.countActiveMembers(chatRoomId) >= MAX_MEMBER_COUNT;
+    private boolean isFullRoom(Long currentMemberCount) {
+        return currentMemberCount >= MAX_MEMBER_COUNT;
     }
 }
