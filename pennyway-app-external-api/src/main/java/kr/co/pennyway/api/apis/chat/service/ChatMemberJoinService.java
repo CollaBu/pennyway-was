@@ -45,10 +45,12 @@ public class ChatMemberJoinService {
 
         Long currentMemberCount = chatMemberService.countActiveMembers(chatRoomId);
         if (isFullRoom(currentMemberCount)) {
+            log.warn("채팅방이 가득 찼습니다. chatRoomId: {}", chatRoomId);
             throw new ChatRoomErrorException(ChatRoomErrorCode.FULL_CHAT_ROOM);
         }
 
         if (chatRoom.isPrivateRoom() && !chatRoom.matchPassword(password)) {
+            log.warn("채팅방 비밀번호가 일치하지 않습니다. chatRoomId: {}", chatRoomId);
             throw new ChatRoomErrorException(ChatRoomErrorCode.INVALID_PASSWORD);
         }
 
