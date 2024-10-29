@@ -10,6 +10,9 @@ public final class ChatMemberReq {
         @Pattern(regexp = "^[0-9]{6}$", message = "채팅방 비밀번호는 6자리 정수여야 합니다.")
         private String password;
 
+        protected Join() {
+        }
+
         public Join(String password) {
             this.password = password;
         }
