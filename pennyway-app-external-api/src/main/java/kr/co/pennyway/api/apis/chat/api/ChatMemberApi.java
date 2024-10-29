@@ -1,6 +1,9 @@
 package kr.co.pennyway.api.apis.chat.api;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.media.SchemaProperty;
@@ -22,6 +25,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 @Tag(name = "[채팅방 멤버 API]")
 public interface ChatMemberApi {
     @Operation(summary = "채팅방 멤버 가입", method = "POST", description = "채팅방에 멤버로 가입한다.")
+    @Parameters({
+            @Parameter(name = "chatRoomId", description = "채팅방 ID", required = true, in = ParameterIn.PATH),
+            @Parameter(name = "payload", description = "채팅방 멤버 가입 요청 DTO", required = true, in = ParameterIn.DEFAULT, schema = @Schema(implementation = ChatMemberReq.Join.class))
+    })
     @ApiResponse(responseCode = "200", description = "채팅방 멤버 가입 성공", content = @Content(schemaProperties = @SchemaProperty(name = "chatRoom", schema = @Schema(implementation = ChatRoomRes.Detail.class))))
     @ApiResponseExplanations(errors = {
             @ApiExceptionExplanation(value = ChatRoomErrorCode.class, constant = "INVALID_PASSWORD", summary = "비밀번호가 일치하지 않음", description = "비밀번호가 일치하지 않아 채팅방 멤버 가입에 실패했습니다."),

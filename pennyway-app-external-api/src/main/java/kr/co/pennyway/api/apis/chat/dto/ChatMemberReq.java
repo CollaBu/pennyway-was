@@ -10,8 +10,14 @@ public final class ChatMemberReq {
         @Pattern(regexp = "^[0-9]{6}$", message = "채팅방 비밀번호는 6자리 정수여야 합니다.")
         private String password;
 
+        // 메서드 표현 일관성을 유지하고, password를 Integer로 변환하여 반환하는 getter
         public Integer password() {
             return password != null ? Integer.valueOf(password) : null;
+        }
+
+        // Swagger UI에서 표현하기 위한 getter
+        public String getPassword() {
+            return password;
         }
     }
 }
