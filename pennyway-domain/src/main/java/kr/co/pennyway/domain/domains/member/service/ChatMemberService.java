@@ -29,7 +29,7 @@ public class ChatMemberService {
 
     @Transactional
     public ChatMember createMember(User user, ChatRoom chatRoom) {
-        Set<ChatMember> chatMembers = chatMemberRepository.findByChat_Room_IdAndUser_Id(chatRoom.getId(), user.getId());
+        Set<ChatMember> chatMembers = chatMemberRepository.findByChatRoom_IdAndUser_Id(chatRoom.getId(), user.getId());
 
         if (chatMembers.stream().anyMatch(ChatMember::isActive)) {
             log.warn("사용자는 이미 채팅방에 가입되어 있습니다. chatRoomId: {}, userId: {}", chatRoom.getId(), user.getId());

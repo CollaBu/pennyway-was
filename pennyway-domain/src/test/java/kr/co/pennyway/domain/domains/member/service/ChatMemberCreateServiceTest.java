@@ -49,7 +49,7 @@ public class ChatMemberCreateServiceTest {
     void createMemberWhenAlreadyExist() {
         // given
         ChatMember chatMember = ChatMember.of(user, chatRoom, ChatMemberRole.MEMBER);
-        given(chatMemberRepository.findByChat_Room_IdAndUser_Id(chatRoom.getId(), user.getId())).willReturn(Set.of(chatMember));
+        given(chatMemberRepository.findByChatRoom_IdAndUser_Id(chatRoom.getId(), user.getId())).willReturn(Set.of(chatMember));
 
         // when
         ChatMemberErrorException exception = assertThrows(ChatMemberErrorException.class, () -> chatMemberService.createMember(user, chatRoom));
@@ -64,7 +64,7 @@ public class ChatMemberCreateServiceTest {
         // given
         ChatMember chatMember = ChatMember.of(user, chatRoom, ChatMemberRole.MEMBER);
         chatMember.ban();
-        given(chatMemberRepository.findByChat_Room_IdAndUser_Id(chatRoom.getId(), user.getId())).willReturn(Set.of(chatMember));
+        given(chatMemberRepository.findByChatRoom_IdAndUser_Id(chatRoom.getId(), user.getId())).willReturn(Set.of(chatMember));
 
         // when
         ChatMemberErrorException exception = assertThrows(ChatMemberErrorException.class, () -> chatMemberService.createMember(user, chatRoom));
@@ -78,7 +78,7 @@ public class ChatMemberCreateServiceTest {
     void createMemberWhenNotExist() {
 
         // given
-        given(chatMemberRepository.findByChat_Room_IdAndUser_Id(chatRoom.getId(), user.getId())).willReturn(Set.of());
+        given(chatMemberRepository.findByChatRoom_IdAndUser_Id(chatRoom.getId(), user.getId())).willReturn(Set.of());
 
         ChatMember chatMember = ChatMember.of(user, chatRoom, ChatMemberRole.MEMBER);
         given(chatMemberRepository.save(any(ChatMember.class))).willReturn(chatMember);
