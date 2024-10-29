@@ -12,6 +12,8 @@ pennyway:
     chat:
       endpoint: ${SOCKET_CHAT_ENDPOINT:/ws}
       allowed-origin-patterns: ${ALLOWED_ORIGIN_PATTERNS:*}
+  rabbitmq:
+    validate-connection: true
 
 message-broker:
   external:

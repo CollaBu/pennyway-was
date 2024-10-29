@@ -13,7 +13,6 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.SQLRestriction;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
@@ -24,7 +23,6 @@ import java.util.Objects;
 @Table(name = "chat_member")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @DynamicInsert
-@SQLRestriction("deleted_at IS NULL")
 @SQLDelete(sql = "UPDATE chat_member SET deleted_at = NOW() WHERE id = ?")
 public class ChatMember extends DateAuditable {
     @Id
@@ -53,7 +51,7 @@ public class ChatMember extends DateAuditable {
     private ChatRoom chatRoom;
 
     @Builder
-    public ChatMember(String name, User user, ChatRoom chatRoom, ChatMemberRole role) {
+    protected ChatMember(String name, User user, ChatRoom chatRoom, ChatMemberRole role) {
         validate(name, user, chatRoom, role);
 
         this.name = name;
@@ -62,9 +60,9 @@ public class ChatMember extends DateAuditable {
         this.role = role;
     }
 
-    public static ChatMember of(String name, User user, ChatRoom chatRoom, ChatMemberRole role) {
+    public static ChatMember of(User user, ChatRoom chatRoom, ChatMemberRole role) {
         return ChatMember.builder()
-                .name(name)
+                .name(user.getName())
                 .user(user)
                 .chatRoom(chatRoom)
                 .role(role)
@@ -79,6 +77,29 @@ public class ChatMember extends DateAuditable {
         Objects.requireNonNull(user, "user는 null이 될 수 없습니다.");
         Objects.requireNonNull(chatRoom, "chatRoom은 null이 될 수 없습니다.");
         Objects.requireNonNull(role, "role은 null이 될 수 없습니다.");
+    }
+
+    /**
+     * 사용자 데이터가 삭제되었는지 확인한다.
+     *
+     * @return 삭제된 데이터가 아니면 true, 삭제된 데이터이면 false
+     */
+    public boolean isActive() {
+        return deletedAt == null;
+    }
+
+    /**
+     * 사용자 추방된 이력이 있는 지 확인한다.
+     *
+     * @return 추방된 이력이 있으면 true, 없으면 false
+     */
+    public boolean isBannedMember() {
+        return deletedAt != null && banned;
+    }
+
+    public void ban() {
+        this.banned = true;
+        this.deletedAt = LocalDateTime.now();
     }
 
     @Override

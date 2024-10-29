@@ -76,6 +76,14 @@ public class ChatRoom extends DateAuditable {
         }
     }
 
+    public boolean isPrivateRoom() {
+        return password != null;
+    }
+
+    public boolean matchPassword(Integer password) {
+        return this.password.equals(password);
+    }
+
     @Override
     public String toString() {
         return "ChatRoom{" +

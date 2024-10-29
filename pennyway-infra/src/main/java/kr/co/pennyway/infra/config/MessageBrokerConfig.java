@@ -6,8 +6,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import kr.co.pennyway.infra.client.broker.MessageBrokerAdapter;
+import kr.co.pennyway.infra.common.event.ChatRoomJoinEventHandler;
 import kr.co.pennyway.infra.common.importer.PennywayInfraConfig;
 import kr.co.pennyway.infra.common.properties.ChatExchangeProperties;
+import kr.co.pennyway.infra.common.properties.ChatJoinEventExchangeProperties;
 import kr.co.pennyway.infra.common.properties.RabbitMqProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,12 +20,14 @@ import org.springframework.amqp.core.TopicExchange;
 import org.springframework.amqp.rabbit.annotation.EnableRabbit;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
+import org.springframework.amqp.rabbit.connection.Connection;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitMessagingTemplate;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
@@ -31,10 +35,16 @@ import org.springframework.context.annotation.Primary;
 @Slf4j
 @EnableRabbit
 @RequiredArgsConstructor
-@EnableConfigurationProperties({ChatExchangeProperties.class, RabbitMqProperties.class})
+@EnableConfigurationProperties({ChatExchangeProperties.class, ChatJoinEventExchangeProperties.class, RabbitMqProperties.class})
 public class MessageBrokerConfig implements PennywayInfraConfig {
     private final RabbitMqProperties rabbitMqProperties;
     private final ChatExchangeProperties chatExchangeProperties;
+    private final ChatJoinEventExchangeProperties chatJoinEventExchangeProperties;
+
+    @Bean
+    public TopicExchange chatExchange() {
+        return new TopicExchange(chatExchangeProperties.getExchange());
+    }
 
     @Bean
     public Queue chatQueue() {
@@ -42,8 +52,8 @@ public class MessageBrokerConfig implements PennywayInfraConfig {
     }
 
     @Bean
-    public TopicExchange chatExchange() {
-        return new TopicExchange(chatExchangeProperties.getExchange());
+    public Queue chatJoinEventQueue(ChatJoinEventExchangeProperties chatJoinEventExchangeProperties) {
+        return new Queue(chatJoinEventExchangeProperties.getQueue(), true);
     }
 
     @Bean
@@ -52,6 +62,14 @@ public class MessageBrokerConfig implements PennywayInfraConfig {
                 .bind(chatQueue)
                 .to(chatExchange)
                 .with(chatExchangeProperties.getRoutingKey());
+    }
+
+    @Bean
+    public Binding chatJoinEventBinding(Queue chatJoinEventQueue, TopicExchange chatExchange) {
+        return BindingBuilder
+                .bind(chatJoinEventQueue)
+                .to(chatExchange)
+                .with(chatJoinEventExchangeProperties.getRoutingKey());
     }
 
     @Bean
@@ -83,9 +101,16 @@ public class MessageBrokerConfig implements PennywayInfraConfig {
         return factory;
     }
 
-    @Bean
+    @ConditionalOnProperty(prefix = "pennyway.rabbitmq", name = "validate-connection", havingValue = "true", matchIfMissing = false)
     ApplicationRunner connectionFactoryRunner(ConnectionFactory cf) {
-        return args -> cf.createConnection().close();
+        return args -> {
+            try (Connection conn = cf.createConnection()) {
+                log.info("RabbitMQ connection validated");
+            } catch (Exception e) {
+                log.error("Failed to validate RabbitMQ connection", e);
+                throw e;
+            }
+        };
     }
 
     @Bean
@@ -111,5 +136,10 @@ public class MessageBrokerConfig implements PennywayInfraConfig {
     @Bean
     public MessageBrokerAdapter messageBrokerAdapter(RabbitMessagingTemplate rabbitMessagingTemplate) {
         return new MessageBrokerAdapter(rabbitMessagingTemplate);
+    }
+
+    @Bean
+    public ChatRoomJoinEventHandler chatRoomJoinEventHandler(MessageBrokerAdapter messageBrokerAdapter, ChatExchangeProperties chatExchangeProperties, ChatJoinEventExchangeProperties chatJoinEventExchangeProperties) {
+        return new ChatRoomJoinEventHandler(messageBrokerAdapter, chatExchangeProperties, chatJoinEventExchangeProperties);
     }
 }

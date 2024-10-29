@@ -1,6 +1,5 @@
-package kr.co.pennyway.api.config.fixture;
+package kr.co.pennyway.common.fixture;
 
-import kr.co.pennyway.api.apis.chat.dto.ChatRoomReq;
 import kr.co.pennyway.domain.domains.chatroom.domain.ChatRoom;
 
 public enum ChatRoomFixture {
@@ -19,17 +18,13 @@ public enum ChatRoomFixture {
         this.password = password;
     }
 
-    public ChatRoom toEntity(Long id) {
+    public ChatRoom toEntity() {
         return ChatRoom.builder()
-                .id(id)
+                .id(1L)
                 .title(title)
                 .description(description)
                 .backgroundImageUrl(backgroundImageUrl)
                 .password(password != null ? Integer.valueOf(password) : null)
                 .build();
-    }
-
-    public ChatRoomReq.Create toCreateRequest() {
-        return new ChatRoomReq.Create(title, description, password, backgroundImageUrl);
     }
 }
