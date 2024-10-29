@@ -11,6 +11,9 @@ public enum ChatRoomErrorCode implements BaseErrorCode {
     /* 400 Bad Request */
     INVALID_PASSWORD(StatusCode.BAD_REQUEST, ReasonCode.INVALID_REQUEST, "비밀번호가 일치하지 않습니다."),
 
+    /* 404 Not Found */
+    NOT_FOUND_CHAT_ROOM(StatusCode.NOT_FOUND, ReasonCode.REQUESTED_RESOURCE_NOT_FOUND, "채팅방을 찾을 수 없습니다."),
+
     /* 409 Conflict */
     FULL_CHAT_ROOM(StatusCode.CONFLICT, ReasonCode.REQUESTED_RESPONSE_FORMAT_NOT_SUPPORTED, "채팅방 인원이 가득 찼습니다."),
     ;
