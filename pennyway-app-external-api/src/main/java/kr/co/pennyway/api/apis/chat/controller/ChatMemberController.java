@@ -1,5 +1,6 @@
 package kr.co.pennyway.api.apis.chat.controller;
 
+import kr.co.pennyway.api.apis.chat.api.ChatMemberApi;
 import kr.co.pennyway.api.apis.chat.dto.ChatMemberReq;
 import kr.co.pennyway.api.apis.chat.dto.ChatRoomRes;
 import kr.co.pennyway.api.apis.chat.usecase.ChatMemberUseCase;
@@ -17,10 +18,11 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/v2/chat-rooms/{chatRoomId}/chat-members")
-public class ChatMemberController {
+public class ChatMemberController implements ChatMemberApi {
     private static final String CHAT_ROOM = "chatRoom";
     private final ChatMemberUseCase chatMemberUseCase;
 
+    @Override
     @PostMapping("")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> joinChatRoom(
