@@ -19,12 +19,14 @@ import org.springframework.amqp.core.TopicExchange;
 import org.springframework.amqp.rabbit.annotation.EnableRabbit;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
+import org.springframework.amqp.rabbit.connection.Connection;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitMessagingTemplate;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
@@ -98,9 +100,16 @@ public class MessageBrokerConfig implements PennywayInfraConfig {
         return factory;
     }
 
-    @Bean
+    @ConditionalOnProperty(prefix = "pennyway.rabbitmq", name = "validate-connection", havingValue = "true", matchIfMissing = false)
     ApplicationRunner connectionFactoryRunner(ConnectionFactory cf) {
-        return args -> cf.createConnection().close();
+        return args -> {
+            try (Connection conn = cf.createConnection()) {
+                log.info("RabbitMQ connection validated");
+            } catch (Exception e) {
+                log.error("Failed to validate RabbitMQ connection", e);
+                throw e;
+            }
+        };
     }
 
     @Bean

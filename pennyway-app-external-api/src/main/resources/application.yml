@@ -13,6 +13,10 @@ jwt:
     access-token: ${JWT_ACCESS_EXPIRATION_TIME:1800000} # 30m (30 * 60 * 1000)
     refresh-token: ${JWT_REFRESH_EXPIRATION_TIME:604800000} # 7d (7 * 24 * 60 * 60 * 1000)
 
+pennyway:
+  rabbitmq:
+    validate-connection: true
+
 ---
 spring:
   config:
