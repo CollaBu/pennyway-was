@@ -5,11 +5,13 @@ import kr.co.pennyway.domain.domains.chatroom.domain.ChatRoom;
 import kr.co.pennyway.domain.domains.chatroom.exception.ChatRoomErrorCode;
 import kr.co.pennyway.domain.domains.chatroom.exception.ChatRoomErrorException;
 import kr.co.pennyway.domain.domains.chatroom.service.ChatRoomService;
+import kr.co.pennyway.domain.domains.member.domain.ChatMember;
 import kr.co.pennyway.domain.domains.member.service.ChatMemberService;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorCode;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorException;
 import kr.co.pennyway.domain.domains.user.service.UserService;
+import kr.co.pennyway.infra.common.event.ChatRoomJoinEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -40,8 +42,9 @@ public class ChatMemberJoinService {
         }
 
         User user = userService.readUser(userId).orElseThrow(() -> new UserErrorException(UserErrorCode.NOT_FOUND));
+        ChatMember member = chatMemberService.createMember(user, chatRoom);
 
-        chatMemberService.createMember(user, chatRoom);
+        eventPublisher.publishEvent(ChatRoomJoinEvent.of(chatRoomId, member.getName()));
     }
 
     private boolean isFullRoom(Long chatRoomId) {
