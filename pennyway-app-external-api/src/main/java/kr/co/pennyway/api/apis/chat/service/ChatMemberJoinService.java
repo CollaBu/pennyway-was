@@ -57,7 +57,7 @@ public class ChatMemberJoinService {
 
         eventPublisher.publishEvent(ChatRoomJoinEvent.of(chatRoomId, member.getName()));
 
-        return Pair.of(chatRoom, currentMemberCount.intValue());
+        return Pair.of(chatRoom, currentMemberCount.intValue() + 1);
     }
 
     private boolean isFullRoom(Long currentMemberCount) {
