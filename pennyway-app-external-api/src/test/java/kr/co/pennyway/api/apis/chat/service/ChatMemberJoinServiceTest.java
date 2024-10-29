@@ -1,6 +1,5 @@
-package kr.co.pennyway.api.apis.chat.usecase;
+package kr.co.pennyway.api.apis.chat.service;
 
-import kr.co.pennyway.api.apis.chat.service.ChatMemberJoinService;
 import kr.co.pennyway.api.config.fixture.ChatMemberFixture;
 import kr.co.pennyway.api.config.fixture.ChatRoomFixture;
 import kr.co.pennyway.api.config.fixture.UserFixture;
