@@ -54,4 +54,9 @@ public class ChatMemberService {
     public boolean isExists(Long chatRoomId, Long userId) {
         return chatMemberRepository.existsByChatRoomIdAndUserId(chatRoomId, userId);
     }
+
+    @Transactional(readOnly = true)
+    public long countActiveMembers(Long chatRoomId) {
+        return chatMemberRepository.countByChatRoomIdAndActive(chatRoomId);
+    }
 }
