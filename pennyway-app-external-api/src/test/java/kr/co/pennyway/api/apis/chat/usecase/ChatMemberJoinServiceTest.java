@@ -210,11 +210,11 @@ public class ChatMemberJoinServiceTest {
     }
 
     private ChatRoom createPublicRoom() {
-        return ChatRoomFixture.PUBLIC_CHAT_ROOM.toEntity();
+        return ChatRoomFixture.PUBLIC_CHAT_ROOM.toEntity(1L);
     }
 
     private ChatRoom createPrivateRoom() {
-        return ChatRoomFixture.PRIVATE_CHAT_ROOM.toEntity();
+        return ChatRoomFixture.PRIVATE_CHAT_ROOM.toEntity(1L);
     }
 
     private User createUser() {

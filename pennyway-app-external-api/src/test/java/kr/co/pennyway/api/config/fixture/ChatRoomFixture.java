@@ -19,9 +19,9 @@ public enum ChatRoomFixture {
         this.password = password;
     }
 
-    public ChatRoom toEntity() {
+    public ChatRoom toEntity(Long id) {
         return ChatRoom.builder()
-                .id(1L)
+                .id(id)
                 .title(title)
                 .description(description)
                 .backgroundImageUrl(backgroundImageUrl)

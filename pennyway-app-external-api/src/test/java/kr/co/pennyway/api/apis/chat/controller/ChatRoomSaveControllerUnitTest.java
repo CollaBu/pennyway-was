@@ -50,7 +50,7 @@ public class ChatRoomSaveControllerUnitTest {
     @WithSecurityMockUser
     void createChatRoomSuccess() throws Exception {
         // given
-        ChatRoom fixture = ChatRoomFixture.PRIVATE_CHAT_ROOM.toEntity();
+        ChatRoom fixture = ChatRoomFixture.PRIVATE_CHAT_ROOM.toEntity(1L);
         ChatRoomReq.Create request = ChatRoomFixture.PRIVATE_CHAT_ROOM.toCreateRequest();
         given(chatRoomUseCase.createChatRoom(request, 1L)).willReturn(ChatRoomRes.Detail.from(fixture, true, 1));
 
@@ -67,7 +67,7 @@ public class ChatRoomSaveControllerUnitTest {
     @WithSecurityMockUser
     void createChatRoomSuccessWithNullBackgroundImageUrl() throws Exception {
         // given
-        ChatRoom fixture = ChatRoomFixture.PUBLIC_CHAT_ROOM.toEntity();
+        ChatRoom fixture = ChatRoomFixture.PUBLIC_CHAT_ROOM.toEntity(1L);
         ChatRoomReq.Create request = ChatRoomFixture.PUBLIC_CHAT_ROOM.toCreateRequest();
 
         given(chatRoomUseCase.createChatRoom(request, 1L)).willReturn(ChatRoomRes.Detail.from(fixture, true, 1));
