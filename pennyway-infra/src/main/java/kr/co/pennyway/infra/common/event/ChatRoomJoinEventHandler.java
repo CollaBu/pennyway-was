@@ -22,7 +22,7 @@ public class ChatRoomJoinEventHandler {
     private final ChatJoinEventExchangeProperties chatJoinEventExchangeProperties;
 
     @Async
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
     public void handle(ChatRoomJoinEvent event) {
         log.debug("handle: {}", event);
 
