@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import kr.co.pennyway.infra.client.broker.MessageBrokerAdapter;
+import kr.co.pennyway.infra.common.event.ChatRoomJoinEventHandler;
 import kr.co.pennyway.infra.common.importer.PennywayInfraConfig;
 import kr.co.pennyway.infra.common.properties.ChatExchangeProperties;
 import kr.co.pennyway.infra.common.properties.ChatJoinEventExchangeProperties;
@@ -135,5 +136,10 @@ public class MessageBrokerConfig implements PennywayInfraConfig {
     @Bean
     public MessageBrokerAdapter messageBrokerAdapter(RabbitMessagingTemplate rabbitMessagingTemplate) {
         return new MessageBrokerAdapter(rabbitMessagingTemplate);
+    }
+
+    @Bean
+    public ChatRoomJoinEventHandler chatRoomJoinEventHandler(MessageBrokerAdapter messageBrokerAdapter, ChatExchangeProperties chatExchangeProperties, ChatJoinEventExchangeProperties chatJoinEventExchangeProperties) {
+        return new ChatRoomJoinEventHandler(messageBrokerAdapter, chatExchangeProperties, chatJoinEventExchangeProperties);
     }
 }

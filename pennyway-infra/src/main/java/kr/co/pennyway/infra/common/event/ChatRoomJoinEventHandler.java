@@ -5,16 +5,17 @@ import kr.co.pennyway.infra.common.properties.ChatExchangeProperties;
 import kr.co.pennyway.infra.common.properties.ChatJoinEventExchangeProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.messaging.Message;
+import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
+import java.util.Map;
+
 @Slf4j
 @RequiredArgsConstructor
-@EnableConfigurationProperties({ChatExchangeProperties.class, ChatJoinEventExchangeProperties.class})
 public class ChatRoomJoinEventHandler {
     private final MessageBrokerAdapter messageBrokerAdapter;
     private final ChatExchangeProperties chatExchangeProperties;
@@ -25,7 +26,7 @@ public class ChatRoomJoinEventHandler {
     public void handle(ChatRoomJoinEvent event) {
         log.debug("handle: {}", event);
 
-        Message<?> message = MessageBuilder.createMessage(event, null);
+        Message<?> message = MessageBuilder.createMessage(event, new MessageHeaders(Map.of()));
 
         messageBrokerAdapter.send(
                 chatExchangeProperties.getExchange(),
