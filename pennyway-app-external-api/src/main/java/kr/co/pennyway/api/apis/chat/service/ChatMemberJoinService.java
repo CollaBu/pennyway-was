@@ -39,7 +39,7 @@ public class ChatMemberJoinService {
      * @param password   Integer : 비공개 채팅방의 경우 비밀번호 정보를 입력받으며, 채팅방에 비밀번호가 없을 경우 null
      * @return Pair<ChatRoom, Integer> - 채팅방 정보와 현재 가입한 회원 수
      */
-    @DistributedLock(key = "chatRoom.join.#chatRoomId")
+    @DistributedLock(key = "'chat-room-join-' + #chatRoomId")
     public Pair<ChatRoom, Integer> execute(Long userId, Long chatRoomId, Integer password) {
         ChatRoom chatRoom = chatRoomService.readChatRoom(chatRoomId).orElseThrow(() -> new ChatRoomErrorException(ChatRoomErrorCode.NOT_FOUND_CHAT_ROOM));
 
