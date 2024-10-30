@@ -22,4 +22,7 @@ dependencies {
 
     /* Reactor Netty */
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-reactor-netty', version: '3.3.4'
+
+    /* RabbitMQ (for listener) */
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-amqp', version: '3.3.4'
 }
