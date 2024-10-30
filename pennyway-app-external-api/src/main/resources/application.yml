@@ -58,3 +58,7 @@ spring:
   config:
     activate:
       on-profile: test
+
+pennyway:
+  rabbitmq:
+    validate-connection: false
