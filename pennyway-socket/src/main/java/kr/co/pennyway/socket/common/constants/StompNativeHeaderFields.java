@@ -1,4 +1,4 @@
-package kr.co.pennyway.socket.common.contants;
+package kr.co.pennyway.socket.common.constants;
 
 public enum StompNativeHeaderFields {
     DEVICE_ID("device-id"),

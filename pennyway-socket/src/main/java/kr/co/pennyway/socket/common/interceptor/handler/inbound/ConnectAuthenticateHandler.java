@@ -10,7 +10,7 @@ import kr.co.pennyway.infra.common.exception.JwtErrorException;
 import kr.co.pennyway.infra.common.jwt.AuthConstants;
 import kr.co.pennyway.infra.common.jwt.JwtClaims;
 import kr.co.pennyway.infra.common.util.JwtClaimsParserUtil;
-import kr.co.pennyway.socket.common.contants.StompNativeHeaderFields;
+import kr.co.pennyway.socket.common.constants.StompNativeHeaderFields;
 import kr.co.pennyway.socket.common.exception.InterceptorErrorCode;
 import kr.co.pennyway.socket.common.exception.InterceptorErrorException;
 import kr.co.pennyway.socket.common.interceptor.marker.ConnectCommandHandler;
