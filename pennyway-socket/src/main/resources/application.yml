@@ -14,6 +14,7 @@ pennyway:
       allowed-origin-patterns: ${ALLOWED_ORIGIN_PATTERNS:*}
   rabbitmq:
     validate-connection: true
+    chat-join-event-listener: true
 
 message-broker:
   external:

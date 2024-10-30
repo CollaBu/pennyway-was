@@ -101,6 +101,7 @@ public class MessageBrokerConfig implements PennywayInfraConfig {
         return factory;
     }
 
+    @Bean
     @ConditionalOnProperty(prefix = "pennyway.rabbitmq", name = "validate-connection", havingValue = "true", matchIfMissing = false)
     ApplicationRunner connectionFactoryRunner(ConnectionFactory cf) {
         return args -> {
@@ -114,10 +115,18 @@ public class MessageBrokerConfig implements PennywayInfraConfig {
     }
 
     @Bean
+    @ConditionalOnProperty(prefix = "pennyway.rabbitmq", name = "chat-join-event-listener", havingValue = "true", matchIfMissing = false)
     public SimpleRabbitListenerContainerFactory simpleRabbitListenerContainerFactory(ConnectionFactory connectionFactory, MessageConverter messageConverter) {
         SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
         factory.setConnectionFactory(connectionFactory);
         factory.setMessageConverter(messageConverter);
+
+        factory.setConcurrentConsumers(2);
+        factory.setMaxConcurrentConsumers(10);
+
+        factory.setErrorHandler(t -> log.error("An error occurred in the listener", t));
+        factory.setAutoStartup(true);
+
         return factory;
     }
 
