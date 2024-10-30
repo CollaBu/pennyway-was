@@ -1,6 +1,7 @@
 package kr.co.pennyway.domain.common.redis.message.domain;
 
 import jakarta.persistence.Convert;
+import jakarta.persistence.Id;
 import kr.co.pennyway.domain.common.converter.MessageCategoryTypeConverter;
 import kr.co.pennyway.domain.common.converter.MessageContentTypeConverter;
 import kr.co.pennyway.domain.common.redis.message.type.MessageCategoryType;
@@ -8,7 +9,7 @@ import kr.co.pennyway.domain.common.redis.message.type.MessageContentType;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
+import org.springframework.data.redis.core.RedisHash;
 
 import java.time.LocalDateTime;
 
@@ -17,6 +18,7 @@ import java.time.LocalDateTime;
  * Redis에 저장되는 채팅 메시지의 기본 단위입니다.
  */
 @Getter
+@RedisHash
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ChatMessage {
     /**
