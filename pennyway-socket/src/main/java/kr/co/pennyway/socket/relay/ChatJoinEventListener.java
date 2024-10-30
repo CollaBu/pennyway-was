@@ -19,8 +19,6 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 @EnableConfigurationProperties({ChatExchangeProperties.class})
 public class ChatJoinEventListener {
-    private static final String JOIN_MESSAGE_SUFFIX = "님이 입장하셨습니다.";
-
     private final ChatMessageSendService chatMessageSendService;
 
     @RabbitListener(
