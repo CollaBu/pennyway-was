@@ -6,7 +6,7 @@ import kr.co.pennyway.domain.common.redis.message.service.ChatMessageService;
 import kr.co.pennyway.infra.client.broker.MessageBrokerAdapter;
 import kr.co.pennyway.infra.client.guid.IdGenerator;
 import kr.co.pennyway.infra.common.properties.ChatExchangeProperties;
-import kr.co.pennyway.socket.dto.SendMessageCommand;
+import kr.co.pennyway.socket.command.SendMessageCommand;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
