@@ -1,9 +1,9 @@
 package kr.co.pennyway.socket.relay;
 
-import kr.co.pennyway.domain.common.redis.message.type.MessageCategoryType;
-import kr.co.pennyway.domain.common.redis.message.type.MessageContentType;
 import kr.co.pennyway.infra.common.event.ChatRoomJoinEvent;
 import kr.co.pennyway.infra.common.properties.ChatExchangeProperties;
+import kr.co.pennyway.socket.common.constants.SystemMessageTemplate;
+import kr.co.pennyway.socket.dto.SendMessageCommand;
 import kr.co.pennyway.socket.service.ChatMessageSendService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,11 +35,7 @@ public class ChatJoinEventListener {
         log.debug("handleJoinEvent: {}", event);
 
         chatMessageSendService.execute(
-                event.chatRoomId(),
-                event.userName() + JOIN_MESSAGE_SUFFIX,
-                MessageContentType.TEXT,
-                MessageCategoryType.SYSTEM,
-                0L // 시스템 메시지
+                SendMessageCommand.createSystemMessage(event.chatRoomId(), SystemMessageTemplate.JOIN_MESSAGE_FORMAT.convertToMessage(event.userName()))
         );
     }
 }

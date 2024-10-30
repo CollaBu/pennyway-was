@@ -3,11 +3,10 @@ package kr.co.pennyway.socket.service;
 import kr.co.pennyway.domain.common.redis.message.domain.ChatMessage;
 import kr.co.pennyway.domain.common.redis.message.domain.ChatMessageBuilder;
 import kr.co.pennyway.domain.common.redis.message.service.ChatMessageService;
-import kr.co.pennyway.domain.common.redis.message.type.MessageCategoryType;
-import kr.co.pennyway.domain.common.redis.message.type.MessageContentType;
 import kr.co.pennyway.infra.client.broker.MessageBrokerAdapter;
 import kr.co.pennyway.infra.client.guid.IdGenerator;
 import kr.co.pennyway.infra.common.properties.ChatExchangeProperties;
+import kr.co.pennyway.socket.dto.SendMessageCommand;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -27,27 +26,23 @@ public class ChatMessageSendService {
     /**
      * 채팅 메시지를 전송한다.
      *
-     * @param chatRoomId   long : 채팅방 ID
-     * @param content      String : 메시지 내용
-     * @param contentType  {@link MessageContentType} : 메시지 타입
-     * @param categoryType {@link MessageCategoryType} : 메시지 카테고리
-     * @param senderId     long : 발신자 ID
+     * @param command SendMessageCommand : 채팅 메시지 전송을 위한 Command
      */
-    public void execute(final long chatRoomId, final String content, MessageContentType contentType, MessageCategoryType categoryType, final long senderId) {
+    public void execute(SendMessageCommand command) {
         ChatMessage message = ChatMessageBuilder.builder()
-                .chatRoomId(chatRoomId)
+                .chatRoomId(command.chatRoomId())
                 .chatId(idGenerator.generate())
-                .content(content)
-                .contentType(contentType)
-                .categoryType(categoryType)
-                .sender(senderId)
+                .content(command.content())
+                .contentType(command.contentType())
+                .categoryType(command.categoryType())
+                .sender(command.senderId())
                 .build();
 
         chatMessageService.save(message);
 
         messageBrokerAdapter.convertAndSend(
                 chatExchangeProperties.getExchange(),
-                "chat.room." + chatRoomId,
+                "chat.room." + command.chatRoomId(),
                 message
         );
     }
