@@ -1,7 +1,7 @@
 package kr.co.pennyway.domain.common.converter;
 
 import jakarta.persistence.Converter;
-import kr.co.pennyway.domain.common.redis.message.domain.MessageContentType;
+import kr.co.pennyway.domain.common.redis.message.type.MessageContentType;
 
 @Converter
 public class MessageContentTypeConverter extends AbstractLegacyEnumAttributeConverter<MessageContentType> {

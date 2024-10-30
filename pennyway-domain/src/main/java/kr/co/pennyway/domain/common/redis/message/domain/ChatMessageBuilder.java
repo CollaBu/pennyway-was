@@ -1,5 +1,7 @@
 package kr.co.pennyway.domain.common.redis.message.domain;
 
+import kr.co.pennyway.domain.common.redis.message.type.MessageCategoryType;
+import kr.co.pennyway.domain.common.redis.message.type.MessageContentType;
 import org.springframework.lang.NonNull;
 
 import java.util.Objects;

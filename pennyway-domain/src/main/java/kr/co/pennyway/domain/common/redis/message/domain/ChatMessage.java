@@ -3,6 +3,8 @@ package kr.co.pennyway.domain.common.redis.message.domain;
 import jakarta.persistence.Convert;
 import kr.co.pennyway.domain.common.converter.MessageCategoryTypeConverter;
 import kr.co.pennyway.domain.common.converter.MessageContentTypeConverter;
+import kr.co.pennyway.domain.common.redis.message.type.MessageCategoryType;
+import kr.co.pennyway.domain.common.redis.message.type.MessageContentType;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
