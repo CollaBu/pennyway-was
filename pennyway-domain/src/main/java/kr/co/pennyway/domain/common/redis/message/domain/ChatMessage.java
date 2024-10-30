@@ -46,11 +46,11 @@ public class ChatMessage {
     }
 
     public Long getChatRoomId() {
-        return Long.parseLong(id.split(":")[1]);
+        return Long.parseLong(id.split(":")[0]);
     }
 
     public Long getChatId() {
-        return Long.parseLong(id.split(":")[3]);
+        return Long.parseLong(id.split(":")[2]);
     }
 
     @Override
