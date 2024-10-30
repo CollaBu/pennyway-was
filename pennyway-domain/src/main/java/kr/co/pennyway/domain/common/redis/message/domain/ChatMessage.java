@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
  * Redis에 저장되는 채팅 메시지의 기본 단위입니다.
  */
 @Getter
-@RedisHash
+@RedisHash(value = "chatroom")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ChatMessage {
     /**
@@ -36,7 +36,7 @@ public class ChatMessage {
     private Long sender;
 
     protected ChatMessage(ChatMessageBuilder builder) {
-        this.id = "chatroom:" + builder.getChatRoomId() + ":message:" + builder.getChatId();
+        this.id = builder.getChatRoomId() + ":message:" + builder.getChatId();
         this.content = builder.getContent();
         this.contentType = builder.getContentType();
         this.categoryType = builder.getCategoryType();
