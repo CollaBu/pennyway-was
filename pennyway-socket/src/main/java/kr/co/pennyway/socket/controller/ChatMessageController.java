@@ -20,7 +20,7 @@ public class ChatMessageController {
 
     @MessageMapping("chat.message.{chatRoomId}")
     @PreAuthorize("#isAuthenticated(#principal) and @chatRoomAccessChecker.hasPermission(#chatRoomId, #principal)")
-    public void sendMessage(@DestinationVariable Long chatRoomId, @Validated ChatMessageDto payload, UserPrincipal principal) {
+    public void sendMessage(@DestinationVariable Long chatRoomId, @Validated ChatMessageDto.Request payload, UserPrincipal principal) {
         chatMessageSendService.execute(SendMessageCommand.createUserMessage(chatRoomId, payload.content(), payload.contentType(), principal.getUserId()));
     }
 }
