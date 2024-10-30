@@ -1,4 +1,4 @@
-package kr.co.pennyway.socket.dto;
+package kr.co.pennyway.socket.command;
 
 import kr.co.pennyway.domain.common.redis.message.type.MessageCategoryType;
 import kr.co.pennyway.domain.common.redis.message.type.MessageContentType;
