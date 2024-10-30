@@ -7,6 +7,7 @@ import kr.co.pennyway.infra.client.broker.MessageBrokerAdapter;
 import kr.co.pennyway.infra.client.guid.IdGenerator;
 import kr.co.pennyway.infra.common.properties.ChatExchangeProperties;
 import kr.co.pennyway.socket.command.SendMessageCommand;
+import kr.co.pennyway.socket.dto.ChatMessageDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -37,13 +38,13 @@ public class ChatMessageSendService {
                 .categoryType(command.categoryType())
                 .sender(command.senderId())
                 .build();
-
-        chatMessageService.save(message);
+        
+        ChatMessageDto.Response response = ChatMessageDto.Response.from(chatMessageService.save(message));
 
         messageBrokerAdapter.convertAndSend(
                 chatExchangeProperties.getExchange(),
                 "chat.room." + command.chatRoomId(),
-                message
+                response
         );
     }
 }
