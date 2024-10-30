@@ -27,7 +27,7 @@ public class ChatJoinEventListener {
             containerFactory = "simpleRabbitListenerContainerFactory",
             bindings = @QueueBinding(
                     value = @Queue("${pennyway.rabbitmq.chat-join-event.queue}"),
-                    exchange = @Exchange(value = "${pennyway.rabbitmq.chat.exchange}"),
+                    exchange = @Exchange(value = "${pennyway.rabbitmq.chat.exchange}", type = "topic"),
                     key = "${pennyway.rabbitmq.chat-join-event.routing-key}"
             )
     )
