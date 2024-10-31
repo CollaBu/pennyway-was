@@ -1,4 +1,4 @@
-package kr.co.pennyway.socket.dto;
+package kr.co.pennyway.socket.command;
 
 import kr.co.pennyway.domain.common.redis.message.type.MessageCategoryType;
 import kr.co.pennyway.domain.common.redis.message.type.MessageContentType;
@@ -8,11 +8,11 @@ import kr.co.pennyway.socket.common.constants.SystemMessageConstants;
  * 채팅 메시지 전송을 위한 Command 클래스
  */
 public record SendMessageCommand(
-        long chatRoomId, // 채팅방 아이디는 음수일 수 없다.
-        String content, // 메시지 내용은 5000자를 초과할 수 없다.
-        MessageContentType contentType, // 메시지 타입은 NULL일 수 없다.
-        MessageCategoryType categoryType, // 메시지 카테고리는 NULL일 수 없다.
-        long senderId // 발신자 아이디는 음수일 수 없다.
+        long chatRoomId,
+        String content,
+        MessageContentType contentType,
+        MessageCategoryType categoryType,
+        long senderId
 ) {
     public SendMessageCommand {
         if (chatRoomId <= 0) {

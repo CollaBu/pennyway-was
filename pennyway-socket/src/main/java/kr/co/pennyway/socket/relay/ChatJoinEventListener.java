@@ -2,8 +2,8 @@ package kr.co.pennyway.socket.relay;
 
 import kr.co.pennyway.infra.common.event.ChatRoomJoinEvent;
 import kr.co.pennyway.infra.common.properties.ChatExchangeProperties;
+import kr.co.pennyway.socket.command.SendMessageCommand;
 import kr.co.pennyway.socket.common.constants.SystemMessageTemplate;
-import kr.co.pennyway.socket.dto.SendMessageCommand;
 import kr.co.pennyway.socket.service.ChatMessageSendService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,15 +19,13 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 @EnableConfigurationProperties({ChatExchangeProperties.class})
 public class ChatJoinEventListener {
-    private static final String JOIN_MESSAGE_SUFFIX = "님이 입장하셨습니다.";
-
     private final ChatMessageSendService chatMessageSendService;
 
     @RabbitListener(
             containerFactory = "simpleRabbitListenerContainerFactory",
             bindings = @QueueBinding(
                     value = @Queue("${pennyway.rabbitmq.chat-join-event.queue}"),
-                    exchange = @Exchange(value = "${pennyway.rabbitmq.chat.exchange}"),
+                    exchange = @Exchange(value = "${pennyway.rabbitmq.chat.exchange}", type = "topic"),
                     key = "${pennyway.rabbitmq.chat-join-event.routing-key}"
             )
     )
