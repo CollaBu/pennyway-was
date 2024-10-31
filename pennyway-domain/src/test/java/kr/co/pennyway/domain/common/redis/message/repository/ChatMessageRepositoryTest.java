@@ -56,7 +56,7 @@ public class ChatMessageRepositoryTest extends ContainerRedisTestConfig {
         log.info("Saved message: {}", savedMessage);
         assertAll(
                 () -> assertNotNull(savedMessage, "저장된 메시지는 null이 아니어야 합니다"),
-                () -> assertTrue(savedMessage.getId().matches("chatroom:\\d+:message:\\d+"), "ID는 'chatroom:{roomId}:message:{messageId}' 형태여야 합니다"),
+                () -> assertTrue(savedMessage.getId().matches("\\d+:message:\\d+"), "ID는 'chatroom:{roomId}:message:{messageId}' 형태여야 합니다 ('chatroom:'은 hash key로 제외)"),
                 () -> assertEquals(chatMessage.getId(), savedMessage.getId(), "저장 전후의 ID가 동일해야 합니다")
         );
     }
