@@ -47,7 +47,7 @@ public class ChatMemberService {
     }
 
     @Transactional
-    public Set<Long> findChatRoomIdsByUserId(Long userId) {
+    public Set<Long> readChatRoomIdsByUserId(Long userId) {
         return chatMemberRepository.findChatRoomIdsByUserId(userId);
     }
 
