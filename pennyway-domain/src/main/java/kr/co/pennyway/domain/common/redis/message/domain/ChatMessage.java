@@ -1,7 +1,6 @@
 package kr.co.pennyway.domain.common.redis.message.domain;
 
 import jakarta.persistence.Convert;
-import jakarta.persistence.Id;
 import kr.co.pennyway.domain.common.converter.MessageCategoryTypeConverter;
 import kr.co.pennyway.domain.common.converter.MessageContentTypeConverter;
 import kr.co.pennyway.domain.common.redis.message.type.MessageCategoryType;
@@ -9,6 +8,7 @@ import kr.co.pennyway.domain.common.redis.message.type.MessageContentType;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.redis.core.RedisHash;
 
 import java.time.LocalDateTime;
 
@@ -17,13 +17,11 @@ import java.time.LocalDateTime;
  * Redis에 저장되는 채팅 메시지의 기본 단위입니다.
  */
 @Getter
+@RedisHash(value = "chatroom")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ChatMessage {
-    /**
-     * 채팅 메시지 ID는 "chatroom:{roomId}:message:{messageId}" 형태로 생성한다.
-     */
-    @Id
-    private String id;
+    private Long chatRoomId;
+    private Long chatId;
     private String content;
     @Convert(converter = MessageContentTypeConverter.class)
     private MessageContentType contentType;
@@ -34,7 +32,8 @@ public class ChatMessage {
     private Long sender;
 
     protected ChatMessage(ChatMessageBuilder builder) {
-        this.id = createId(builder.getChatRoomId(), builder.getChatId());
+        this.chatRoomId = builder.getChatRoomId();
+        this.chatId = builder.getChatId();
         this.content = builder.getContent();
         this.contentType = builder.getContentType();
         this.categoryType = builder.getCategoryType();
@@ -43,28 +42,18 @@ public class ChatMessage {
         this.sender = builder.getSender();
     }
 
-    public Long getChatRoomId() {
-        return Long.parseLong(id.split(":")[0]);
-    }
-
-    public Long getChatId() {
-        return Long.parseLong(id.split(":")[2]);
-    }
-
-    private String createId(long chatRoomId, long chatId) {
-        return "chatroom:" + chatRoomId + ":message:" + chatId;
-    }
 
     @Override
     public String toString() {
         return "ChatMessage{" +
-                "id='" + id + '\'' +
+                "chatRoomId='" + chatRoomId + '\'' +
+                ", chatId='" + chatId + '\'' +
                 ", content='" + content + '\'' +
-                ", contentType=" + contentType +
-                ", categoryType=" + categoryType +
-                ", createdAt=" + createdAt +
-                ", deletedAt=" + deletedAt +
-                ", sender=" + sender +
+                ", contentType='" + contentType + '\'' +
+                ", categoryType='" + categoryType + '\'' +
+                ", createdAt='" + createdAt + '\'' +
+                ", deletedAt='" + deletedAt + '\'' +
+                ", sender='" + sender + '\'' +
                 '}';
     }
 }
