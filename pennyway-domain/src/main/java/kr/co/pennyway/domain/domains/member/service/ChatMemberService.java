@@ -46,6 +46,11 @@ public class ChatMemberService {
         return chatMemberRepository.save(chatMember);
     }
 
+    @Transactional
+    public Set<Long> readChatRoomIdsByUserId(Long userId) {
+        return chatMemberRepository.findChatRoomIdsByUserId(userId);
+    }
+
     /**
      * 채팅방에 해당 유저가 존재하는지 확인한다.
      * 이 때, 삭제된 사용자 데이터는 조회하지 않는다.

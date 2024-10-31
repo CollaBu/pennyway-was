@@ -14,4 +14,8 @@ public interface ChatMemberRepository extends ExtendedRepository<ChatMember, Lon
     @Transactional(readOnly = true)
     @Query("SELECT COUNT(*) FROM ChatMember cm WHERE cm.chatRoom.id = :chatRoomId AND cm.deletedAt IS NULL")
     long countByChatRoomIdAndActive(Long chatRoomId);
+
+    @Transactional(readOnly = true)
+    @Query("SELECT cm.chatRoom.id FROM ChatMember cm WHERE cm.user.id = :userId AND cm.deletedAt IS NULL")
+    Set<Long> findChatRoomIdsByUserId(Long userId);
 }

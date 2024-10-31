@@ -8,6 +8,7 @@ import kr.co.pennyway.domain.domains.chatroom.domain.ChatRoom;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
+import java.util.Set;
 
 public final class ChatRoomRes {
     @Schema(description = "채팅방 상세 정보")
@@ -54,5 +55,12 @@ public final class ChatRoomRes {
                     chatRoom.getCreatedAt()
             );
         }
+    }
+
+    @Schema(description = "채팅방 요약 정보")
+    public record Summary(
+            @Schema(description = "채팅방 ID 목록. 빈 목록일 경우 빈 배열이 반환된다. 각 요소는 long 타입이다.")
+            Set<Long> chatRoomIds
+    ) {
     }
 }

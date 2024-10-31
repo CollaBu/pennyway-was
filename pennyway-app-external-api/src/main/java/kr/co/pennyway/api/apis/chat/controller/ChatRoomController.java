@@ -33,7 +33,11 @@ public class ChatRoomController implements ChatRoomApi {
     @Override
     @GetMapping("/me")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> getMyChatRooms(@AuthenticationPrincipal SecurityUserDetails user) {
+    public ResponseEntity<?> getMyChatRooms(@RequestParam(name = "summary", required = false, defaultValue = "false") boolean isSummary, @AuthenticationPrincipal SecurityUserDetails user) {
+        if (isSummary) {
+            return ResponseEntity.ok(SuccessResponse.from(CHAT_ROOM, chatRoomUseCase.readJoinedChatRoomIds(user.getUserId())));
+        }
+
         return ResponseEntity.ok(SuccessResponse.from(CHAT_ROOMS, chatRoomUseCase.getChatRooms(user.getUserId())));
     }
 
