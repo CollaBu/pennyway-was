@@ -30,9 +30,9 @@ import static org.junit.jupiter.api.Assertions.*;
 @Slf4j
 @ContextConfiguration(classes = {RedisConfig.class})
 @DataRedisTest(properties = "spring.config.location=classpath:application-domain.yml")
-@Import({ChatMessageRepository.class})
+@Import({ChatMessageRepositoryImpl.class})
 @ActiveProfiles("test")
-public class ChatMessageRepositoryTest extends ContainerRedisTestConfig {
+public class ChatMessageRepositoryImplTest extends ContainerRedisTestConfig {
     @Autowired
     private RedisTemplate<String, String> redisTemplate;
 
@@ -40,13 +40,13 @@ public class ChatMessageRepositoryTest extends ContainerRedisTestConfig {
     private ObjectMapper objectMapper;
 
     //    @Autowired
-    private ChatMessageRepository chatMessageRepository;
+    private ChatMessageRepositoryImpl chatMessageRepositoryImpl;
 
     private ChatMessage chatMessage;
 
     @BeforeEach
     void setUp() {
-        chatMessageRepository = new ChatMessageRepository(redisTemplate, objectMapper);
+        chatMessageRepositoryImpl = new ChatMessageRepositoryImpl(redisTemplate, objectMapper);
         chatMessage = ChatMessageBuilder.builder()
                 .chatRoomId(1L)
                 .chatId(1L)
@@ -61,10 +61,10 @@ public class ChatMessageRepositoryTest extends ContainerRedisTestConfig {
     @DisplayName("Happy Path: 채팅 메시지 저장에 성공한다")
     void successSaveChatMessage() {
         // when
-        chatMessageRepository.save(chatMessage);
+        chatMessageRepositoryImpl.save(chatMessage);
 
         // then
-        List<ChatMessage> messages = chatMessageRepository.findRecentMessages(1L, 1);
+        List<ChatMessage> messages = chatMessageRepositoryImpl.findRecentMessages(1L, 1);
         assertFalse(messages.isEmpty(), "저장된 메시지는 조회할 수 있어야 합니다");
     }
 
@@ -75,7 +75,7 @@ public class ChatMessageRepositoryTest extends ContainerRedisTestConfig {
         saveMessagesInOrder(1L, 5);
 
         // when
-        List<ChatMessage> messages = chatMessageRepository.findRecentMessages(1L, 3);
+        List<ChatMessage> messages = chatMessageRepositoryImpl.findRecentMessages(1L, 3);
 
         // then
         assertAll(
@@ -93,7 +93,7 @@ public class ChatMessageRepositoryTest extends ContainerRedisTestConfig {
         saveMessagesInOrder(1L, 10);
 
         // when
-        Slice<ChatMessage> messageSlice = chatMessageRepository.findMessagesBefore(1L, 8L, 2);
+        Slice<ChatMessage> messageSlice = chatMessageRepositoryImpl.findMessagesBefore(1L, 8L, 2);
 
         // then
         assertAll(
@@ -108,10 +108,10 @@ public class ChatMessageRepositoryTest extends ContainerRedisTestConfig {
     @DisplayName("Enum 타입들이 올바르게 저장 및 조회된다")
     void successSaveAndFindEnumTypes() {
         // given
-        chatMessageRepository.save(chatMessage);
+        chatMessageRepositoryImpl.save(chatMessage);
 
         // when
-        List<ChatMessage> messages = chatMessageRepository.findRecentMessages(1L, 1);
+        List<ChatMessage> messages = chatMessageRepositoryImpl.findRecentMessages(1L, 1);
         ChatMessage foundMessage = messages.get(0);
 
         // then
@@ -130,7 +130,7 @@ public class ChatMessageRepositoryTest extends ContainerRedisTestConfig {
         saveMessagesInOrder(1L, 5);
 
         // when
-        Long unreadCount = chatMessageRepository.countUnreadMessages(1L, 3L);
+        Long unreadCount = chatMessageRepositoryImpl.countUnreadMessages(1L, 3L);
 
         // then
         assertEquals(2L, unreadCount, "마지막으로 읽은 메시지(ID: 3) 이후의 메시지 개수(4, 5)가 반환되어야 합니다");
@@ -162,7 +162,7 @@ public class ChatMessageRepositoryTest extends ContainerRedisTestConfig {
         saveMessagesInOrder(1L, 5);
 
         // when
-        Slice<ChatMessage> messageSlice = chatMessageRepository.findMessagesBefore(1L, Long.MAX_VALUE, 2);
+        Slice<ChatMessage> messageSlice = chatMessageRepositoryImpl.findMessagesBefore(1L, Long.MAX_VALUE, 2);
 
         // then
         assertAll(
@@ -180,7 +180,7 @@ public class ChatMessageRepositoryTest extends ContainerRedisTestConfig {
         saveMessagesInOrder(1L, 5);
 
         // when
-        Slice<ChatMessage> messageSlice = chatMessageRepository.findMessagesBefore(1L, 2L, 2);
+        Slice<ChatMessage> messageSlice = chatMessageRepositoryImpl.findMessagesBefore(1L, 2L, 2);
 
         // then
         assertAll(
@@ -198,8 +198,8 @@ public class ChatMessageRepositoryTest extends ContainerRedisTestConfig {
         saveMessagesInOrder(2L, 3);  // room 2
 
         // when
-        List<ChatMessage> room1Messages = chatMessageRepository.findRecentMessages(1L, 5);
-        List<ChatMessage> room2Messages = chatMessageRepository.findRecentMessages(2L, 5);
+        List<ChatMessage> room1Messages = chatMessageRepositoryImpl.findRecentMessages(1L, 5);
+        List<ChatMessage> room2Messages = chatMessageRepositoryImpl.findRecentMessages(2L, 5);
 
         // then
         assertAll(
@@ -214,7 +214,7 @@ public class ChatMessageRepositoryTest extends ContainerRedisTestConfig {
     @DisplayName("존재하지 않는 채팅방 조회 시 빈 목록을 반환한다")
     void returnEmptyForNonExistingRoom() {
         // when
-        List<ChatMessage> messages = chatMessageRepository.findRecentMessages(999L, 10);
+        List<ChatMessage> messages = chatMessageRepositoryImpl.findRecentMessages(999L, 10);
 
         // then
         assertTrue(messages.isEmpty());
@@ -224,7 +224,7 @@ public class ChatMessageRepositoryTest extends ContainerRedisTestConfig {
     @DisplayName("존재하지 않는 메시지 ID로 페이징 조회 시 빈 Slice를 반환한다")
     void returnEmptySliceForNonExistingMessage() {
         // when
-        Slice<ChatMessage> messageSlice = chatMessageRepository.findMessagesBefore(1L, 999L, 10);
+        Slice<ChatMessage> messageSlice = chatMessageRepositoryImpl.findMessagesBefore(1L, 999L, 10);
 
         // then
         assertAll(
@@ -240,7 +240,7 @@ public class ChatMessageRepositoryTest extends ContainerRedisTestConfig {
         saveMessagesInOrder(1L, 3);
 
         // when
-        List<ChatMessage> messages = chatMessageRepository.findRecentMessages(1L, 10);
+        List<ChatMessage> messages = chatMessageRepositoryImpl.findRecentMessages(1L, 10);
 
         // then
         assertEquals(3, messages.size());
@@ -262,12 +262,12 @@ public class ChatMessageRepositoryTest extends ContainerRedisTestConfig {
                     .sender(1L)
                     .build();
             ReflectionTestUtils.setField(message, "createdAt", now);
-            
-            chatMessageRepository.save(message);
+
+            chatMessageRepositoryImpl.save(message);
         }
 
         // when
-        List<ChatMessage> messages = chatMessageRepository.findRecentMessages(1L, 3);
+        List<ChatMessage> messages = chatMessageRepositoryImpl.findRecentMessages(1L, 3);
 
         // then
         assertAll(
@@ -288,7 +288,7 @@ public class ChatMessageRepositoryTest extends ContainerRedisTestConfig {
                     .categoryType(MessageCategoryType.NORMAL)
                     .sender(1L)
                     .build();
-            chatMessageRepository.save(message);
+            chatMessageRepositoryImpl.save(message);
         }
     }
 
