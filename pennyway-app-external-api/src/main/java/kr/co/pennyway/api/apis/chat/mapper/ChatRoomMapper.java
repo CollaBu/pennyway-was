@@ -1,10 +1,14 @@
 package kr.co.pennyway.api.apis.chat.mapper;
 
+import kr.co.pennyway.api.apis.chat.dto.ChatMemberRes;
+import kr.co.pennyway.api.apis.chat.dto.ChatRes;
 import kr.co.pennyway.api.apis.chat.dto.ChatRoomRes;
 import kr.co.pennyway.api.common.response.SliceResponseTemplate;
 import kr.co.pennyway.common.annotation.Mapper;
+import kr.co.pennyway.domain.common.redis.message.domain.ChatMessage;
 import kr.co.pennyway.domain.domains.chatroom.domain.ChatRoom;
 import kr.co.pennyway.domain.domains.chatroom.dto.ChatRoomDetail;
+import kr.co.pennyway.domain.domains.member.domain.ChatMember;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 
@@ -44,5 +48,22 @@ public final class ChatRoomMapper {
 
     public static ChatRoomRes.Detail toChatRoomResDetail(ChatRoom chatRoom, boolean isAdmin, int participantCount) {
         return ChatRoomRes.Detail.from(chatRoom, isAdmin, participantCount);
+    }
+
+    public static ChatRoomRes.RoomWithParticipants toChatRoomResRoomWithParticipants(ChatMember myInfo, List<ChatMember> recentParticipants, List<Long> otherMemberIds, List<ChatMessage> chatMessages) {
+        List<ChatMemberRes.Detail> recentParticipantsRes = recentParticipants.stream()
+                .map(participant -> ChatMemberRes.Detail.from(participant, false))
+                .toList();
+
+        List<ChatRes.Detail> chatMessagesRes = chatMessages.stream()
+                .map(ChatRes.Detail::from)
+                .toList();
+
+        return ChatRoomRes.RoomWithParticipants.builder()
+                .myInfo(ChatMemberRes.Detail.from(myInfo, true))
+                .recentParticipants(recentParticipantsRes)
+                .otherParticipantIds(otherMemberIds)
+                .recentMessages(chatMessagesRes)
+                .build();
     }
 }

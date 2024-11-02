@@ -5,8 +5,10 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import kr.co.pennyway.domain.domains.chatroom.domain.ChatRoom;
+import lombok.Builder;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -62,5 +64,20 @@ public final class ChatRoomRes {
             @Schema(description = "채팅방 ID 목록. 빈 목록일 경우 빈 배열이 반환된다. 각 요소는 long 타입이다.")
             Set<Long> chatRoomIds
     ) {
+    }
+
+    @Schema(description = "채팅방 참여자 정보 (방의 참여자 + 최근 메시지)")
+    @Builder
+    public record RoomWithParticipants(
+            @Schema(description = "채팅방에서 내 정보")
+            ChatMemberRes.Detail myInfo,
+            @Schema(description = "최근에 채팅 메시지를 보낸 참여자의 상세 정보 목록")
+            List<ChatMemberRes.Detail> recentParticipants,
+            @Schema(description = "채팅방에서 내 정보와 최근 활동자를 제외한 참여자 ID 목록")
+            List<Long> otherParticipantIds,
+            @Schema(description = "최근 채팅 이력. 메시지는 최신순으로 정렬되어 반환.")
+            List<ChatRes.Detail> recentMessages
+    ) {
+
     }
 }

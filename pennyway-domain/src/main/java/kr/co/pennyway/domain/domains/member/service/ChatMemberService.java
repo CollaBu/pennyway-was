@@ -12,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Slf4j
@@ -46,7 +48,22 @@ public class ChatMemberService {
         return chatMemberRepository.save(chatMember);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
+    public Optional<ChatMember> readChatMember(Long userId, Long chatRoomId) {
+        return chatMemberRepository.findActiveChatMember(chatRoomId, userId).stream().findFirst();
+    }
+
+    @Transactional(readOnly = true)
+    public List<ChatMember> readChatMembersByMemberIdIn(Long chatRoomId, Set<Long> memberIds) {
+        return chatMemberRepository.findByChatRoom_IdAndUser_IdIn(chatRoomId, memberIds);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Long> readChatMemberIdsByMemberIdNotIn(Long chatRoomId, Set<Long> memberIds) {
+        return chatMemberRepository.findByChatRoom_IdAndUser_IdNotIn(chatRoomId, memberIds);
+    }
+
+    @Transactional(readOnly = true)
     public Set<Long> readChatRoomIdsByUserId(Long userId) {
         return chatMemberRepository.findChatRoomIdsByUserId(userId);
     }
