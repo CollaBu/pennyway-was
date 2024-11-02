@@ -86,4 +86,3 @@ spring:
 logging:
   level:
     org.springframework.jdbc: debug
-    io.lettuce.core: DEBUG
