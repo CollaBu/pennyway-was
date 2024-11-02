@@ -19,7 +19,9 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.util.ReflectionTestUtils;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
@@ -70,18 +72,7 @@ public class ChatMessageRepositoryTest extends ContainerRedisTestConfig {
     @DisplayName("최근 메시지를 지정한 개수만큼 조회한다")
     void successFindRecentMessages() {
         // given
-        int messageCount = 5;
-        for (long i = 1; i <= messageCount; i++) {
-            ChatMessage message = ChatMessageBuilder.builder()
-                    .chatRoomId(1L)
-                    .chatId(i)
-                    .content("Message " + i)
-                    .contentType(MessageContentType.TEXT)
-                    .categoryType(MessageCategoryType.NORMAL)
-                    .sender(1L)
-                    .build();
-            chatMessageRepository.save(message);
-        }
+        saveMessagesInOrder(1L, 5);
 
         // when
         List<ChatMessage> messages = chatMessageRepository.findRecentMessages(1L, 3);
@@ -99,18 +90,7 @@ public class ChatMessageRepositoryTest extends ContainerRedisTestConfig {
     @DisplayName("특정 메시지 이전의 메시지들을 페이징하여 조회한다")
     void successFindMessagesAfter() {
         // given
-        int messageCount = 10;
-        for (long i = 1; i <= messageCount; i++) {
-            ChatMessage message = ChatMessageBuilder.builder()
-                    .chatRoomId(1L)
-                    .chatId(i)
-                    .content("Message " + i)
-                    .contentType(MessageContentType.TEXT)
-                    .categoryType(MessageCategoryType.NORMAL)
-                    .sender(1L)
-                    .build();
-            chatMessageRepository.save(message);
-        }
+        saveMessagesInOrder(1L, 10);
 
         // when
         Slice<ChatMessage> messageSlice = chatMessageRepository.findMessagesBefore(1L, 8L, 2);
@@ -147,17 +127,7 @@ public class ChatMessageRepositoryTest extends ContainerRedisTestConfig {
     @DisplayName("안 읽은 메시지 개수를 정확히 계산한다")
     void successCountUnreadMessages() {
         // given
-        for (long i = 1; i <= 5; i++) {
-            ChatMessage message = ChatMessageBuilder.builder()
-                    .chatRoomId(1L)
-                    .chatId(i)
-                    .content("Message " + i)
-                    .contentType(MessageContentType.TEXT)
-                    .categoryType(MessageCategoryType.NORMAL)
-                    .sender(1L)
-                    .build();
-            chatMessageRepository.save(message);
-        }
+        saveMessagesInOrder(1L, 5);
 
         // when
         Long unreadCount = chatMessageRepository.countUnreadMessages(1L, 3L);
@@ -183,6 +153,143 @@ public class ChatMessageRepositoryTest extends ContainerRedisTestConfig {
                         .sender(1L)
                         .build(),
                 "메시지 내용이 5000자를 초과하면 예외가 발생해야 합니다");
+    }
+
+    @Test
+    @DisplayName("BVA: 첫 페이지(가장 최근 메시지)부터 정상적으로 조회된다")
+    void successFindFirstPage() {
+        // given
+        saveMessagesInOrder(1L, 5);
+
+        // when
+        Slice<ChatMessage> messageSlice = chatMessageRepository.findMessagesBefore(1L, Long.MAX_VALUE, 2);
+
+        // then
+        assertAll(
+                () -> assertEquals(2, messageSlice.getContent().size()),
+                () -> assertEquals("Message 5", messageSlice.getContent().get(0).getContent()),
+                () -> assertEquals("Message 4", messageSlice.getContent().get(1).getContent()),
+                () -> assertTrue(messageSlice.hasNext())
+        );
+    }
+
+    @Test
+    @DisplayName("BVA: 마지막 페이지(가장 오래된 메시지)까지 정상적으로 조회된다")
+    void successFindLastPage() {
+        // given
+        saveMessagesInOrder(1L, 5);
+
+        // when
+        Slice<ChatMessage> messageSlice = chatMessageRepository.findMessagesBefore(1L, 2L, 2);
+
+        // then
+        assertAll(
+                () -> assertEquals(1, messageSlice.getContent().size()),
+                () -> assertEquals("Message 1", messageSlice.getContent().get(0).getContent()),
+                () -> assertFalse(messageSlice.hasNext())
+        );
+    }
+
+    @Test
+    @DisplayName("여러 채팅방의 메시지가 서로 영향을 주지 않는다")
+    void successMultipleRoomMessages() {
+        // given
+        saveMessagesInOrder(1L, 3);  // room 1
+        saveMessagesInOrder(2L, 3);  // room 2
+
+        // when
+        List<ChatMessage> room1Messages = chatMessageRepository.findRecentMessages(1L, 5);
+        List<ChatMessage> room2Messages = chatMessageRepository.findRecentMessages(2L, 5);
+
+        // then
+        assertAll(
+                () -> assertEquals(3, room1Messages.size()),
+                () -> assertEquals(3, room2Messages.size()),
+                () -> assertTrue(room1Messages.stream().allMatch(msg -> msg.getChatRoomId().equals(1L))),
+                () -> assertTrue(room2Messages.stream().allMatch(msg -> msg.getChatRoomId().equals(2L)))
+        );
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 채팅방 조회 시 빈 목록을 반환한다")
+    void returnEmptyForNonExistingRoom() {
+        // when
+        List<ChatMessage> messages = chatMessageRepository.findRecentMessages(999L, 10);
+
+        // then
+        assertTrue(messages.isEmpty());
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 메시지 ID로 페이징 조회 시 빈 Slice를 반환한다")
+    void returnEmptySliceForNonExistingMessage() {
+        // when
+        Slice<ChatMessage> messageSlice = chatMessageRepository.findMessagesBefore(1L, 999L, 10);
+
+        // then
+        assertAll(
+                () -> assertTrue(messageSlice.getContent().isEmpty()),
+                () -> assertFalse(messageSlice.hasNext())
+        );
+    }
+
+    @Test
+    @DisplayName("요청한 크기가 전체 메시지 수보다 큰 경우에도 정상 동작한다")
+    void successWithLargePageSize() {
+        // given
+        saveMessagesInOrder(1L, 3);
+
+        // when
+        List<ChatMessage> messages = chatMessageRepository.findRecentMessages(1L, 10);
+
+        // then
+        assertEquals(3, messages.size());
+    }
+
+    @Test
+    @DisplayName("동일한 시간에 생성된 메시지도 TSID 순서대로 정렬된다")
+    void successSortingWithSameTimestamp() {
+        // given
+        int messageCount = 3;
+        LocalDateTime now = LocalDateTime.now();
+        for (long i = 1; i <= messageCount; i++) {
+            ChatMessage message = ChatMessageBuilder.builder()
+                    .chatRoomId(1L)
+                    .chatId(i)
+                    .content("Message " + i)
+                    .contentType(MessageContentType.TEXT)
+                    .categoryType(MessageCategoryType.NORMAL)
+                    .sender(1L)
+                    .build();
+            ReflectionTestUtils.setField(message, "createdAt", now);
+            
+            chatMessageRepository.save(message);
+        }
+
+        // when
+        List<ChatMessage> messages = chatMessageRepository.findRecentMessages(1L, 3);
+
+        // then
+        assertAll(
+                () -> assertEquals(3, messages.size()),
+                () -> assertEquals("Message 3", messages.get(0).getContent()),
+                () -> assertEquals("Message 2", messages.get(1).getContent()),
+                () -> assertEquals("Message 1", messages.get(2).getContent())
+        );
+    }
+
+    private void saveMessagesInOrder(Long roomId, int messageCount) {
+        for (long i = 1; i <= messageCount; i++) {
+            ChatMessage message = ChatMessageBuilder.builder()
+                    .chatRoomId(roomId)
+                    .chatId(i)
+                    .content("Message " + i)
+                    .contentType(MessageContentType.TEXT)
+                    .categoryType(MessageCategoryType.NORMAL)
+                    .sender(1L)
+                    .build();
+            chatMessageRepository.save(message);
+        }
     }
 
     @AfterEach
