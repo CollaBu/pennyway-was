@@ -6,6 +6,7 @@ import kr.co.pennyway.api.apis.chat.mapper.ChatRoomMapper;
 import kr.co.pennyway.api.apis.chat.service.ChatMemberSearchService;
 import kr.co.pennyway.api.apis.chat.service.ChatRoomSaveService;
 import kr.co.pennyway.api.apis.chat.service.ChatRoomSearchService;
+import kr.co.pennyway.api.apis.chat.service.ChatRoomWithParticipantsSearchService;
 import kr.co.pennyway.api.common.response.SliceResponseTemplate;
 import kr.co.pennyway.common.annotation.UseCase;
 import kr.co.pennyway.domain.domains.chatroom.domain.ChatRoom;
@@ -22,6 +23,7 @@ import java.util.Set;
 public class ChatRoomUseCase {
     private final ChatRoomSaveService chatRoomSaveService;
     private final ChatRoomSearchService chatRoomSearchService;
+    private final ChatRoomWithParticipantsSearchService chatRoomWithParticipantsSearchService;
 
     private final ChatMemberSearchService chatMemberSearchService;
 
@@ -35,6 +37,10 @@ public class ChatRoomUseCase {
         List<ChatRoomDetail> chatRooms = chatRoomSearchService.readChatRooms(userId);
 
         return ChatRoomMapper.toChatRoomResDetails(chatRooms);
+    }
+
+    public ChatRoomRes.RoomWithParticipants getChatRoomWithParticipants(Long userId, Long chatRoomId) {
+        return chatRoomWithParticipantsSearchService.execute(userId, chatRoomId);
     }
 
     public ChatRoomRes.Summary readJoinedChatRoomIds(Long userId) {
