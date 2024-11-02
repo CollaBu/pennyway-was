@@ -12,7 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 public class ChatMessageService {
     private final ChatMessageRepositoryImpl chatMessageRepositoryImpl;
 
-    public ChatMessage save(ChatMessage chatMessage) {
+    public ChatMessage create(ChatMessage chatMessage) {
         return chatMessageRepositoryImpl.save(chatMessage);
     }
 }

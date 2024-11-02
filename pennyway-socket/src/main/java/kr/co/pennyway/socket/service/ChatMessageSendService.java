@@ -38,8 +38,8 @@ public class ChatMessageSendService {
                 .categoryType(command.categoryType())
                 .sender(command.senderId())
                 .build();
-        message = chatMessageService.save(message);
-        
+        message = chatMessageService.create(message);
+
         ChatMessageDto.Response response = ChatMessageDto.Response.from(message);
 
         messageBrokerAdapter.convertAndSend(
