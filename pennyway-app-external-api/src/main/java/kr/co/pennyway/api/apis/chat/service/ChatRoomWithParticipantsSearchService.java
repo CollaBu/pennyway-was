@@ -21,19 +21,18 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class ChatRoomWithParticipantsSearchService {
+    private static final int MESSAGE_LIMIT = 15;
+
     private final ChatMemberService chatMemberService;
     private final ChatMessageService chatMessageService;
 
     @Transactional(readOnly = true)
     public ChatRoomRes.RoomWithParticipants execute(Long userId, Long chatRoomId) {
-        // (1) myInfo: 내 정보 조회 - MySQL
         ChatMember myInfo = chatMemberService.readChatMember(userId, chatRoomId)
                 .orElseThrow(() -> new ChatMemberErrorException(ChatMemberErrorCode.NOT_FOUND));
 
-        // (2) recentChats: 최근 채팅 조회 - Redis (key: `chatroom:{chatroom_id}:message:{message_id}`)
-        List<ChatMessage> chatMessages = chatMessageService.readRecentMessages(chatRoomId, 15);
+        List<ChatMessage> chatMessages = chatMessageService.readRecentMessages(chatRoomId, MESSAGE_LIMIT);
 
-        // (3) recentParticipantIds: 최근 채팅 참여자 정보 상세 조회 - MySQL
         Set<Long> recentParticipantIds = chatMessages.stream()
                 .map(ChatMessage::getSender)
                 .filter(sender -> !sender.equals(userId))
@@ -41,7 +40,6 @@ public class ChatRoomWithParticipantsSearchService {
 
         List<ChatMember> recentParticipants = chatMemberService.readChatMembersByMemberIdIn(chatRoomId, recentParticipantIds);
 
-        // (4) otherMemberIds: 나머지 멤버 ID 조회 - MySQL
         recentParticipantIds.add(userId);
         List<Long> otherMemberIds = chatMemberService.readChatMemberIdsByMemberIdNotIn(chatRoomId, recentParticipantIds);
 
