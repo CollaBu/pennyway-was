@@ -29,8 +29,8 @@ public class ChatMemberUseCase {
         return ChatRoomMapper.toChatRoomResDetail(chatRoom.getLeft(), false, chatRoom.getRight());
     }
 
-    public List<ChatMemberRes.Detail> readChatMembers(Long chatRoomId, Set<Long> memberIds) {
-        List<ChatMember> chatMembers = chatMemberSearchService.readChatMembers(chatRoomId, memberIds);
+    public List<ChatMemberRes.Detail> readChatMembers(Long chatRoomId, Set<Long> chatMemberIds) {
+        List<ChatMember> chatMembers = chatMemberSearchService.readChatMembers(chatRoomId, chatMemberIds);
 
         return ChatMemberMapper.toChatMemberResDetail(chatMembers);
     }

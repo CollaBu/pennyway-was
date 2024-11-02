@@ -19,7 +19,7 @@ public class ChatMemberSearchService {
         return chatMemberService.readChatRoomIdsByUserId(userId);
     }
 
-    public List<ChatMember> readChatMembers(Long chatRoomId, Set<Long> memberIds) {
-        return chatMemberService.readChatMembersByMemberIdIn(chatRoomId, memberIds);
+    public List<ChatMember> readChatMembers(Long chatRoomId, Set<Long> chatMemberIds) {
+        return chatMemberService.readChatMembersByIdIn(chatRoomId, chatMemberIds);
     }
 }

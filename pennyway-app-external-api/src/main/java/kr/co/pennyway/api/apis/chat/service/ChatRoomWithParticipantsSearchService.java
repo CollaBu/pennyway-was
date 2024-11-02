@@ -38,10 +38,10 @@ public class ChatRoomWithParticipantsSearchService {
                 .filter(sender -> !sender.equals(userId))
                 .collect(Collectors.toSet());
 
-        List<ChatMember> recentParticipants = chatMemberService.readChatMembersByMemberIdIn(chatRoomId, recentParticipantIds);
+        List<ChatMember> recentParticipants = chatMemberService.readChatMembersByUserIdIn(chatRoomId, recentParticipantIds);
 
         recentParticipantIds.add(userId);
-        List<Long> otherMemberIds = chatMemberService.readChatMemberIdsByMemberIdNotIn(chatRoomId, recentParticipantIds);
+        List<Long> otherMemberIds = chatMemberService.readChatMemberIdsByUserIdNotIn(chatRoomId, recentParticipantIds);
 
         return ChatRoomMapper.toChatRoomResRoomWithParticipants(myInfo, recentParticipants, otherMemberIds, chatMessages);
     }

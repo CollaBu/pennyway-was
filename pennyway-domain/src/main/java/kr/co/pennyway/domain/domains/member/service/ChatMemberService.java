@@ -54,13 +54,18 @@ public class ChatMemberService {
     }
 
     @Transactional(readOnly = true)
-    public List<ChatMember> readChatMembersByMemberIdIn(Long chatRoomId, Set<Long> memberIds) {
-        return chatMemberRepository.findByChatRoom_IdAndUser_IdIn(chatRoomId, memberIds);
+    public List<ChatMember> readChatMembersByIdIn(Long chatRoomId, Set<Long> chatMemberIds) {
+        return chatMemberRepository.findByChatRoom_IdAndIdIn(chatRoomId, chatMemberIds);
     }
 
     @Transactional(readOnly = true)
-    public List<Long> readChatMemberIdsByMemberIdNotIn(Long chatRoomId, Set<Long> memberIds) {
-        return chatMemberRepository.findByChatRoom_IdAndUser_IdNotIn(chatRoomId, memberIds);
+    public List<ChatMember> readChatMembersByUserIdIn(Long chatRoomId, Set<Long> userIds) {
+        return chatMemberRepository.findByChatRoom_IdAndUser_IdIn(chatRoomId, userIds);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Long> readChatMemberIdsByUserIdNotIn(Long chatRoomId, Set<Long> userIds) {
+        return chatMemberRepository.findByChatRoom_IdAndUser_IdNotIn(chatRoomId, userIds);
     }
 
     @Transactional(readOnly = true)

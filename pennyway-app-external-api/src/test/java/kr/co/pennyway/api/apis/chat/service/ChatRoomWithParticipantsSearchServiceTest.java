@@ -64,8 +64,8 @@ public class ChatRoomWithParticipantsSearchServiceTest {
 
         given(chatMemberService.readChatMember(userId, chatRoom.getId())).willReturn(Optional.of(myInfo));
         given(chatMessageService.readRecentMessages(eq(chatRoom.getId()), anyInt())).willReturn(recentMessages);
-        given(chatMemberService.readChatMembersByMemberIdIn(eq(chatRoom.getId()), anySet())).willReturn(recentParticipants);
-        given(chatMemberService.readChatMemberIdsByMemberIdNotIn(eq(chatRoom.getId()), anySet())).willReturn(otherMemberIds);
+        given(chatMemberService.readChatMembersByUserIdIn(eq(chatRoom.getId()), anySet())).willReturn(recentParticipants);
+        given(chatMemberService.readChatMemberIdsByUserIdNotIn(eq(chatRoom.getId()), anySet())).willReturn(otherMemberIds);
 
         // when
         ChatRoomRes.RoomWithParticipants result = service.execute(userId, chatRoom.getId());
@@ -83,8 +83,8 @@ public class ChatRoomWithParticipantsSearchServiceTest {
         // verify
         verify(chatMemberService).readChatMember(userId, chatRoom.getId());
         verify(chatMessageService).readRecentMessages(eq(chatRoom.getId()), anyInt());
-        verify(chatMemberService).readChatMembersByMemberIdIn(eq(chatRoom.getId()), anySet());
-        verify(chatMemberService).readChatMemberIdsByMemberIdNotIn(eq(chatRoom.getId()), anySet());
+        verify(chatMemberService).readChatMembersByUserIdIn(eq(chatRoom.getId()), anySet());
+        verify(chatMemberService).readChatMemberIdsByUserIdNotIn(eq(chatRoom.getId()), anySet());
     }
 
     @Test

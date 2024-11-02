@@ -45,11 +45,11 @@ public class ChatMemberController implements ChatMemberApi {
     @Override
     @GetMapping("")
     @PreAuthorize("isAuthenticated() and @chatRoomManager.hasPermission(principal.userId, #chatRoomId)")
-    public ResponseEntity<?> readChatMembers(@PathVariable("chatRoomId") Long chatRoomId, @Validated @NotEmpty @RequestParam("ids") Set<Long> ids) {
-        if (ids.size() > 50) {
+    public ResponseEntity<?> readChatMembers(@PathVariable("chatRoomId") Long chatRoomId, @Validated @NotEmpty @RequestParam("chatMemberIds") Set<Long> chatMemberIds) {
+        if (chatMemberIds.size() > 50) {
             throw new ApiErrorException(ApiErrorCode.OVERFLOW_QUERY_PARAMETER);
         }
 
-        return ResponseEntity.ok(SuccessResponse.from(CHAT_MEMBERS, chatMemberUseCase.readChatMembers(chatRoomId, ids)));
+        return ResponseEntity.ok(SuccessResponse.from(CHAT_MEMBERS, chatMemberUseCase.readChatMembers(chatRoomId, chatMemberIds)));
     }
 }
