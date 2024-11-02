@@ -76,8 +76,8 @@ public class ChatMemberBatchGetIntegrationTest extends ExternalApiDBTestConfig {
     @DisplayName("채팅방 멤버 조회를 성공한다")
     void successReadChatMembers() {
         // given
-        List<User> members = createTestMembers(10);
-        List<Long> memberIds = members.stream().map(User::getId).toList();
+        List<ChatMember> members = createTestMembers(10);
+        List<Long> memberIds = members.stream().map(ChatMember::getId).toList();
 
         // when
         ResponseEntity<?> response = apiTestHelper.callApi(
@@ -98,12 +98,11 @@ public class ChatMemberBatchGetIntegrationTest extends ExternalApiDBTestConfig {
         assertEquals(memberIds.size(), payload.size());
     }
 
-    private List<User> createTestMembers(int count) {
-        List<User> createdMembers = new ArrayList<>();
+    private List<ChatMember> createTestMembers(int count) {
+        List<ChatMember> createdMembers = new ArrayList<>();
         for (int i = 0; i < count; i++) {
             User member = userService.createUser(UserFixture.GENERAL_USER.toUser());
-            chatMemberService.createMember(member, chatRoom);
-            createdMembers.add(member);
+            createdMembers.add(chatMemberService.createMember(member, chatRoom));
         }
         return createdMembers;
     }
