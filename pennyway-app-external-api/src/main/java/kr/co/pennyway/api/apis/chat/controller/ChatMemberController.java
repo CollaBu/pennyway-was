@@ -1,6 +1,6 @@
 package kr.co.pennyway.api.apis.chat.controller;
 
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotEmpty;
 import kr.co.pennyway.api.apis.chat.api.ChatMemberApi;
 import kr.co.pennyway.api.apis.chat.dto.ChatMemberReq;
 import kr.co.pennyway.api.apis.chat.dto.ChatRoomRes;
@@ -45,7 +45,7 @@ public class ChatMemberController implements ChatMemberApi {
     @Override
     @GetMapping("")
     @PreAuthorize("isAuthenticated() and @chatRoomManager.hasPermission(principal.userId, #chatRoomId)")
-    public ResponseEntity<?> readChatMembers(@PathVariable("chatRoomId") Long chatRoomId, @Validated @NotNull @RequestParam("ids") Set<Long> ids) {
+    public ResponseEntity<?> readChatMembers(@PathVariable("chatRoomId") Long chatRoomId, @Validated @NotEmpty @RequestParam("ids") Set<Long> ids) {
         if (ids.size() > 50) {
             throw new ApiErrorException(ApiErrorCode.OVERFLOW_QUERY_PARAMETER);
         }

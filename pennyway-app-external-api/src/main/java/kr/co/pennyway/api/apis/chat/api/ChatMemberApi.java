@@ -10,7 +10,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.media.SchemaProperty;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotEmpty;
 import kr.co.pennyway.api.apis.chat.dto.ChatMemberReq;
 import kr.co.pennyway.api.apis.chat.dto.ChatMemberRes;
 import kr.co.pennyway.api.apis.chat.dto.ChatRoomRes;
@@ -59,5 +59,5 @@ public interface ChatMemberApi {
             @ApiExceptionExplanation(value = ApiErrorCode.class, constant = "OVERFLOW_QUERY_PARAMETER", summary = "쿼리 파라미터 오버플로우", description = "쿼리 파라미터가 최대 개수를 초과하여 채팅방 멤버 조회에 실패했습니다.")
     })
     @ApiResponse(responseCode = "200", description = "채팅방 멤버 조회 성공", content = @Content(schemaProperties = @SchemaProperty(name = "chatMembers", array = @ArraySchema(schema = @Schema(implementation = ChatMemberRes.Detail.class)))))
-    ResponseEntity<?> readChatMembers(@PathVariable("chatRoomId") Long chatRoomId, @Validated @NotNull @RequestParam("ids") Set<Long> ids);
+    ResponseEntity<?> readChatMembers(@PathVariable("chatRoomId") Long chatRoomId, @Validated @NotEmpty @RequestParam("ids") Set<Long> ids);
 }
