@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Entity
 @Getter
@@ -20,6 +21,13 @@ public class ChatMessageStatus {
     private Long chatRoomId;
     private Long lastReadMessageId;
     private LocalDateTime updatedAt;
+
+    public ChatMessageStatus(Long userId, Long chatRoomId, Long lastReadMessageId) {
+        this.userId = Objects.requireNonNull(userId, "userId must not be null");
+        this.chatRoomId = Objects.requireNonNull(chatRoomId, "chatRoomId must not be null");
+        this.lastReadMessageId = Objects.requireNonNull(lastReadMessageId, "lastReadMessageId must not be null");
+        this.updatedAt = LocalDateTime.now();
+    }
 
     @PrePersist
     @PreUpdate
