@@ -32,9 +32,11 @@ public final class ChatRoomRes {
             @Schema(description = "채팅방 개설일")
             @JsonSerialize(using = LocalDateTimeSerializer.class)
             @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-            LocalDateTime createdAt
+            LocalDateTime createdAt,
+            @Schema(description = "읽지 않은 메시지 수. 100 이상의 값을 가지면, 100으로 표시된다.")
+            long unreadMessageCount
     ) {
-        public Detail(Long id, String title, String description, String backgroundImageUrl, boolean isPrivate, boolean isAdmin, int participantCount, LocalDateTime createdAt) {
+        public Detail(Long id, String title, String description, String backgroundImageUrl, boolean isPrivate, boolean isAdmin, int participantCount, LocalDateTime createdAt, long unreadMessageCount) {
             this.id = id;
             this.title = title;
             this.description = Objects.toString(description, "");
@@ -43,9 +45,10 @@ public final class ChatRoomRes {
             this.isAdmin = isAdmin;
             this.participantCount = participantCount;
             this.createdAt = createdAt;
+            this.unreadMessageCount = (unreadMessageCount > 100) ? 100 : unreadMessageCount;
         }
 
-        public static Detail from(ChatRoom chatRoom, boolean isAdmin, int participantCount) {
+        public static Detail of(ChatRoom chatRoom, boolean isAdmin, int participantCount, long unreadMessageCount) {
             return new Detail(
                     chatRoom.getId(),
                     chatRoom.getTitle(),
@@ -54,7 +57,8 @@ public final class ChatRoomRes {
                     chatRoom.getPassword() != null,
                     isAdmin,
                     participantCount,
-                    chatRoom.getCreatedAt()
+                    chatRoom.getCreatedAt(),
+                    unreadMessageCount
             );
         }
     }
