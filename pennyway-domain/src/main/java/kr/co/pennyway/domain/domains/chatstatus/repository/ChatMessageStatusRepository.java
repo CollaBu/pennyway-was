@@ -9,7 +9,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-public interface ChatMessageStatusRepository extends JpaRepository<ChatMessageStatus, Long>, ChatMessageStatusCacheRepository {
+public interface ChatMessageStatusRepository extends JpaRepository<ChatMessageStatus, Long>, ChatMessageStatusCacheCustomRepository {
     Optional<ChatMessageStatus> findByUserIdAndChatRoomId(Long userId, Long chatRoomId);
 
     @Query("SELECT c FROM ChatMessageStatus c WHERE c.userId = :userId AND c.chatRoomId IN :roomIds")

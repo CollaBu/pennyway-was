@@ -11,7 +11,7 @@ import java.util.Optional;
 @Slf4j
 @Repository
 @RequiredArgsConstructor
-public class ChatMessageStatusRedisRepository implements ChatMessageStatusCacheRepository {
+public class ChatMessageStatusCacheCustomRepositoryImpl implements ChatMessageStatusCacheCustomRepository {
     private static final String CACHE_KEY_PREFIX = "chat:last_read:";
     private static final Duration CACHE_TTL = Duration.ofHours(1);
 

@@ -2,7 +2,7 @@ package kr.co.pennyway.domain.domains.chatstatus.repository;
 
 import java.util.Optional;
 
-public interface ChatMessageStatusCacheRepository {
+public interface ChatMessageStatusCacheCustomRepository {
     /**
      * 캐시 데이터에서 마지막으로 읽은 메시지 ID를 조회합니다.
      */
