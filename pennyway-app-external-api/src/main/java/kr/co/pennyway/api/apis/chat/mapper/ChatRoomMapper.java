@@ -14,21 +14,36 @@ import org.springframework.data.domain.Slice;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public final class ChatRoomMapper {
-
-
     public static SliceResponseTemplate<ChatRoomRes.Detail> toChatRoomResDetails(Slice<ChatRoomDetail> details, Pageable pageable) {
-        List<ChatRoomRes.Detail> contents = toChatRoomResDetails(details.getContent());
+        List<ChatRoomRes.Detail> contents = new ArrayList<>();
+        for (ChatRoomDetail detail : details.getContent()) {
+            contents.add(
+                    new ChatRoomRes.Detail(
+                            detail.id(),
+                            detail.title(),
+                            detail.description(),
+                            detail.backgroundImageUrl(),
+                            detail.password() != null,
+                            detail.isAdmin(),
+                            detail.participantCount(),
+                            detail.createdAt(),
+                            0
+                    )
+            );
+        }
 
         return SliceResponseTemplate.of(contents, pageable, contents.size(), details.hasNext());
     }
 
-    public static List<ChatRoomRes.Detail> toChatRoomResDetails(List<ChatRoomDetail> details) {
+    public static List<ChatRoomRes.Detail> toChatRoomResDetails(Map<ChatRoomDetail, Long> details) {
         List<ChatRoomRes.Detail> responses = new ArrayList<>();
 
-        for (ChatRoomDetail detail : details) {
+        for (Map.Entry<ChatRoomDetail, Long> entry : details.entrySet()) {
+            ChatRoomDetail detail = entry.getKey();
             responses.add(
                     new ChatRoomRes.Detail(
                             detail.id(),
@@ -38,7 +53,8 @@ public final class ChatRoomMapper {
                             detail.password() != null,
                             detail.isAdmin(),
                             detail.participantCount(),
-                            detail.createdAt()
+                            detail.createdAt(),
+                            entry.getValue()
                     )
             );
         }
@@ -46,8 +62,8 @@ public final class ChatRoomMapper {
         return responses;
     }
 
-    public static ChatRoomRes.Detail toChatRoomResDetail(ChatRoom chatRoom, boolean isAdmin, int participantCount) {
-        return ChatRoomRes.Detail.from(chatRoom, isAdmin, participantCount);
+    public static ChatRoomRes.Detail toChatRoomResDetail(ChatRoom chatRoom, boolean isAdmin, int participantCount, long unreadMessageCount) {
+        return ChatRoomRes.Detail.of(chatRoom, isAdmin, participantCount, unreadMessageCount);
     }
 
     public static ChatRoomRes.RoomWithParticipants toChatRoomResRoomWithParticipants(ChatMember myInfo, List<ChatMember> recentParticipants, List<Long> otherMemberIds, List<ChatMessage> chatMessages) {
