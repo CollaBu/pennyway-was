@@ -17,7 +17,7 @@ public interface ChatMessageStatusRepository extends JpaRepository<ChatMessageSt
 
     @Modifying
     @Query(value = """
-            INSERT INTO chat_member_read (user_id, chat_room_id, last_read_message_id, updated_at)
+            INSERT INTO chat_message_status (user_id, chat_room_id, last_read_message_id, updated_at)
             VALUES (:userId, :roomId, :messageId, NOW())
             ON DUPLICATE KEY UPDATE
             last_read_message_id = GREATEST(last_read_message_id, :messageId),
