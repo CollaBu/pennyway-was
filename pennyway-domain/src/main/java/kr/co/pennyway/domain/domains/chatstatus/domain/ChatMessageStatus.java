@@ -10,7 +10,13 @@ import java.util.Objects;
 
 @Entity
 @Getter
-@Table(name = "chat_message_status")
+@Table(name = "chat_message_status",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        name = "uk_chat_message_status",
+                        columnNames = {"user_id", "chat_room_id"}
+                )
+        })
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ChatMessageStatus {
     @Id
