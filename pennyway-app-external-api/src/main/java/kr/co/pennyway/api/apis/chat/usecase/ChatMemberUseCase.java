@@ -11,7 +11,7 @@ import kr.co.pennyway.domain.domains.chatroom.domain.ChatRoom;
 import kr.co.pennyway.domain.domains.member.domain.ChatMember;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.Triple;
 
 import java.util.List;
 import java.util.Set;
@@ -24,9 +24,9 @@ public class ChatMemberUseCase {
     private final ChatMemberSearchService chatMemberSearchService;
 
     public ChatRoomRes.Detail joinChatRoom(Long userId, Long chatRoomId, Integer password) {
-        Pair<ChatRoom, Integer> chatRoom = chatMemberJoinService.execute(userId, chatRoomId, password);
+        Triple<ChatRoom, Integer, Long> chatRoom = chatMemberJoinService.execute(userId, chatRoomId, password);
 
-        return ChatRoomMapper.toChatRoomResDetail(chatRoom.getLeft(), false, chatRoom.getRight());
+        return ChatRoomMapper.toChatRoomResDetail(chatRoom.getLeft(), false, chatRoom.getMiddle(), chatRoom.getRight());
     }
 
     public List<ChatMemberRes.Detail> readChatMembers(Long chatRoomId, Set<Long> chatMemberIds) {
