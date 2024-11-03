@@ -23,5 +23,5 @@ public interface ChatMessageStatusRepository extends JpaRepository<ChatMessageSt
             last_read_message_id = GREATEST(last_read_message_id, :messageId),
             updated_at = NOW()
             """, nativeQuery = true)
-    void saveLastReadMessageId(Long userId, Long roomId, Long messageId);
+    void saveLastReadMessageIdInBulk(Long userId, Long roomId, Long messageId);
 }
