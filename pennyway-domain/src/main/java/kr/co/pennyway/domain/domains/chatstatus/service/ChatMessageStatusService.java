@@ -23,6 +23,8 @@ public class ChatMessageStatusService {
 
     /**
      * 마지막으로 읽은 메시지 ID를 조회합니다.
+     *
+     * @return 마지막으로 읽은 메시지 ID가 없을 경우 0을 반환합니다.
      */
     @Transactional(readOnly = true)
     public Long readLastReadMessageId(Long userId, Long chatRoomId) {
