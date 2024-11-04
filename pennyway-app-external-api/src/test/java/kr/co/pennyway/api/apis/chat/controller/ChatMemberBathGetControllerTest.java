@@ -53,7 +53,7 @@ public class ChatMemberBathGetControllerTest {
         // given
         Long chatRoomId = 1L;
         Set<Long> memberIds = Set.of(1L, 2L, 3L);
-        List<ChatMemberRes.Detail> expectedResponse = createMockMemberDetails();
+        List<ChatMemberRes.MemberDetail> expectedResponse = createMockMemberDetails();
 
         given(chatMemberUseCase.readChatMembers(chatRoomId, memberIds)).willReturn(expectedResponse);
 
@@ -116,11 +116,11 @@ public class ChatMemberBathGetControllerTest {
                 .andDo(print());
     }
 
-    private List<ChatMemberRes.Detail> createMockMemberDetails() {
+    private List<ChatMemberRes.MemberDetail> createMockMemberDetails() {
         return List.of(
-                new ChatMemberRes.Detail(1L, "User1", ChatMemberRole.MEMBER, null, LocalDateTime.now()),
-                new ChatMemberRes.Detail(2L, "User2", ChatMemberRole.MEMBER, null, LocalDateTime.now()),
-                new ChatMemberRes.Detail(3L, "User3", ChatMemberRole.MEMBER, null, LocalDateTime.now())
+                new ChatMemberRes.MemberDetail(1L, "User1", ChatMemberRole.MEMBER, null, LocalDateTime.now()),
+                new ChatMemberRes.MemberDetail(2L, "User2", ChatMemberRole.MEMBER, null, LocalDateTime.now()),
+                new ChatMemberRes.MemberDetail(3L, "User3", ChatMemberRole.MEMBER, null, LocalDateTime.now())
         );
     }
 }

@@ -60,6 +60,6 @@ public interface ChatMemberApi {
     @ApiResponseExplanations(errors = {
             @ApiExceptionExplanation(value = ApiErrorCode.class, constant = "OVERFLOW_QUERY_PARAMETER", summary = "쿼리 파라미터 오버플로우", description = "쿼리 파라미터가 최대 개수를 초과하여 채팅방 멤버 조회에 실패했습니다.")
     })
-    @ApiResponse(responseCode = "200", description = "채팅방 멤버 조회 성공", content = @Content(schemaProperties = @SchemaProperty(name = "chatMembers", array = @ArraySchema(schema = @Schema(implementation = ChatMemberRes.Detail.class)))))
+    @ApiResponse(responseCode = "200", description = "채팅방 멤버 조회 성공", content = @Content(schemaProperties = @SchemaProperty(name = "chatMembers", array = @ArraySchema(schema = @Schema(implementation = ChatMemberRes.MemberDetail.class)))))
     ResponseEntity<?> readChatMembers(@PathVariable("chatRoomId") Long chatRoomId, @Validated @NotEmpty @RequestParam("ids") Set<Long> ids);
 }

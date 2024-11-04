@@ -67,8 +67,8 @@ public final class ChatRoomMapper {
     }
 
     public static ChatRoomRes.RoomWithParticipants toChatRoomResRoomWithParticipants(ChatMember myInfo, List<ChatMember> recentParticipants, List<Long> otherMemberIds, List<ChatMessage> chatMessages) {
-        List<ChatMemberRes.Detail> recentParticipantsRes = recentParticipants.stream()
-                .map(participant -> ChatMemberRes.Detail.from(participant, false))
+        List<ChatMemberRes.MemberDetail> recentParticipantsRes = recentParticipants.stream()
+                .map(participant -> ChatMemberRes.MemberDetail.from(participant, false))
                 .toList();
 
         List<ChatRes.Detail> chatMessagesRes = chatMessages.stream()
@@ -76,7 +76,7 @@ public final class ChatRoomMapper {
                 .toList();
 
         return ChatRoomRes.RoomWithParticipants.builder()
-                .myInfo(ChatMemberRes.Detail.from(myInfo, true))
+                .myInfo(ChatMemberRes.MemberDetail.from(myInfo, true))
                 .recentParticipants(recentParticipantsRes)
                 .otherParticipantIds(otherMemberIds)
                 .recentMessages(chatMessagesRes)

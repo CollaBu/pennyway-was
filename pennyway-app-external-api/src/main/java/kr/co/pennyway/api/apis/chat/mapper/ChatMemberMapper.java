@@ -8,9 +8,9 @@ import java.util.List;
 
 @Mapper
 public final class ChatMemberMapper {
-    public static List<ChatMemberRes.Detail> toChatMemberResDetail(List<ChatMember> chatMembers) {
+    public static List<ChatMemberRes.MemberDetail> toChatMemberResDetail(List<ChatMember> chatMembers) {
         return chatMembers.stream()
-                .map(chatMember -> ChatMemberRes.Detail.from(chatMember, false))
+                .map(chatMember -> ChatMemberRes.MemberDetail.from(chatMember, false))
                 .toList();
     }
 }
