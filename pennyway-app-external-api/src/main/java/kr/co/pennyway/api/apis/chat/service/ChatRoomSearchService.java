@@ -11,8 +11,9 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -29,10 +30,16 @@ public class ChatRoomSearchService {
      */
     @Transactional(readOnly = true)
     public Map<ChatRoomDetail, Long> readChatRooms(Long userId) {
-        return chatRoomService.readChatRoomsByUserId(userId).stream()
-                .collect(Collectors.toMap(chatRoom -> chatRoom, chatRoom -> chatMessageStatusService.readLastReadMessageId(userId, chatRoom.id())))
-                .entrySet().stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, entry -> chatMessageService.countUnreadMessages(userId, entry.getValue())));
+        List<ChatRoomDetail> chatRooms = chatRoomService.readChatRoomsByUserId(userId);
+        Map<ChatRoomDetail, Long> result = new HashMap<>();
+
+        for (ChatRoomDetail chatRoom : chatRooms) {
+            Long lastReadMessageId = chatMessageStatusService.readLastReadMessageId(userId, chatRoom.id());
+            Long unreadCount = chatMessageService.countUnreadMessages(chatRoom.id(), lastReadMessageId);
+            result.put(chatRoom, unreadCount);
+        }
+
+        return result;
     }
 
     @Transactional(readOnly = true)

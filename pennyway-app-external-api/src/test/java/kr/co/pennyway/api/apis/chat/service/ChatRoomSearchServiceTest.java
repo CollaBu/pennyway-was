@@ -47,11 +47,11 @@ class ChatRoomSearchServiceTest {
 
         // room1: 마지막으로 읽은 메시지 ID 10, 읽지 않은 메시지 5개
         given(chatMessageStatusService.readLastReadMessageId(userId, 1L)).willReturn(10L);
-        given(chatMessageService.countUnreadMessages(userId, 10L)).willReturn(5L);
+        given(chatMessageService.countUnreadMessages(1L, 10L)).willReturn(5L);
 
         // room2: 마지막으로 읽은 메시지 ID 20, 읽지 않은 메시지 3개
         given(chatMessageStatusService.readLastReadMessageId(userId, 2L)).willReturn(20L);
-        given(chatMessageService.countUnreadMessages(userId, 20L)).willReturn(3L);
+        given(chatMessageService.countUnreadMessages(2L, 20L)).willReturn(3L);
 
         // when
         Map<ChatRoomDetail, Long> result = chatRoomSearchService.readChatRooms(userId);
