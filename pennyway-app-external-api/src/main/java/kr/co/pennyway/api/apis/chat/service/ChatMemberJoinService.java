@@ -1,5 +1,6 @@
 package kr.co.pennyway.api.apis.chat.service;
 
+import kr.co.pennyway.domain.common.redis.message.service.ChatMessageService;
 import kr.co.pennyway.domain.common.redisson.DistributedLock;
 import kr.co.pennyway.domain.domains.chatroom.domain.ChatRoom;
 import kr.co.pennyway.domain.domains.chatroom.exception.ChatRoomErrorCode;
@@ -14,7 +15,8 @@ import kr.co.pennyway.domain.domains.user.service.UserService;
 import kr.co.pennyway.infra.common.event.ChatRoomJoinEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.ImmutableTriple;
+import org.apache.commons.lang3.tuple.Triple;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +30,8 @@ public class ChatMemberJoinService {
     private final ChatRoomService chatRoomService;
     private final ChatMemberService chatMemberService;
 
+    private final ChatMessageService chatMessageService;
+
     private final ApplicationEventPublisher eventPublisher;
 
     /**
@@ -37,10 +41,10 @@ public class ChatMemberJoinService {
      * @param userId     Long : 가입하려는 사용자의 ID
      * @param chatRoomId Long : 가입하려는 채팅방의 ID
      * @param password   Integer : 비공개 채팅방의 경우 비밀번호 정보를 입력받으며, 채팅방에 비밀번호가 없을 경우 null
-     * @return Pair<ChatRoom, Integer> - 채팅방 정보와 현재 가입한 회원 수
+     * @return Triple<ChatRoom, Integer, Long> : 가입한 채팅방 정보, 현재 채팅방의 회원 수, 읽지 않은 메시지 수
      */
     @DistributedLock(key = "'chat-room-join-' + #chatRoomId")
-    public Pair<ChatRoom, Integer> execute(Long userId, Long chatRoomId, Integer password) {
+    public Triple<ChatRoom, Integer, Long> execute(Long userId, Long chatRoomId, Integer password) {
         ChatRoom chatRoom = chatRoomService.readChatRoom(chatRoomId).orElseThrow(() -> new ChatRoomErrorException(ChatRoomErrorCode.NOT_FOUND_CHAT_ROOM));
 
         Long currentMemberCount = chatMemberService.countActiveMembers(chatRoomId);
@@ -56,10 +60,11 @@ public class ChatMemberJoinService {
 
         User user = userService.readUser(userId).orElseThrow(() -> new UserErrorException(UserErrorCode.NOT_FOUND));
         ChatMember member = chatMemberService.createMember(user, chatRoom);
+        Long unreadMessageCount = chatMessageService.countUnreadMessages(chatRoomId, 0L);
 
         eventPublisher.publishEvent(ChatRoomJoinEvent.of(chatRoomId, member.getName()));
 
-        return Pair.of(chatRoom, currentMemberCount.intValue() + 1);
+        return ImmutableTriple.of(chatRoom, currentMemberCount.intValue() + 1, unreadMessageCount);
     }
 
     private boolean isFullRoom(Long currentMemberCount) {

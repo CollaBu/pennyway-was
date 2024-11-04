@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 
 public final class ChatRes {
     @Schema(description = "채팅 메시지 상세 정보")
-    public record Detail(
+    public record ChatDetail(
             @Schema(description = "채팅방 ID", type = "long")
             Long chatRoomId,
             @Schema(description = "채팅 ID", type = "long")
@@ -30,8 +30,8 @@ public final class ChatRes {
             @Schema(description = "채팅 보낸 사람 ID", type = "long")
             Long senderId
     ) {
-        public static Detail from(ChatMessage message) {
-            return new Detail(
+        public static ChatDetail from(ChatMessage message) {
+            return new ChatDetail(
                     message.getChatRoomId(),
                     message.getChatId(),
                     message.getContent(),

@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 
 public final class ChatMemberRes {
     @Schema(description = "채팅방 참여자 상세 정보")
-    public record Detail(
+    public record MemberDetail(
             @Schema(description = "채팅방 참여자 ID", type = "long")
             Long id,
             @Schema(description = "채팅방 참여자 이름")
@@ -27,8 +27,8 @@ public final class ChatMemberRes {
             @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
             LocalDateTime createdAt
     ) {
-        public static Detail from(ChatMember chatMember, boolean isContainNotifyEnabled) {
-            return new Detail(
+        public static MemberDetail from(ChatMember chatMember, boolean isContainNotifyEnabled) {
+            return new MemberDetail(
                     chatMember.getId(),
                     chatMember.getName(),
                     chatMember.getRole(),

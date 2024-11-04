@@ -41,7 +41,7 @@ public interface ChatRoomApi {
     @ApiResponse(responseCode = "200", description = "채팅방 검색 성공", content = @Content(schemaProperties = @SchemaProperty(name = "chatRooms", schema = @Schema(implementation = SliceResponseTemplate.class))))
     ResponseEntity<?> searchChatRooms(@Validated ChatRoomReq.SearchQuery query, @AuthenticationPrincipal SecurityUserDetails user);
 
-    @Operation(summary = "채팅방 조회", method = "GET", description = "사용자가 가입한 채팅방 중 특정 채팅방의 상세 정보를 조회한다. 채팅방의 상세 정보에는 채팅방의 참여자 목록과 최근 채팅 메시지 목록 등이 포함된다.")
+    @Operation(summary = "채팅방 상세 조회", method = "GET", description = "사용자가 가입한 채팅방 중 특정 채팅방의 상세 정보를 조회한다. 채팅방의 상세 정보에는 채팅방의 참여자 목록과 최근 채팅 메시지 목록 등이 포함된다.")
     @Parameter(name = "chatRoomId", description = "조회할 채팅방의 식별자", example = "1", required = true)
     @ApiResponse(responseCode = "200", description = "채팅방 조회 성공", content = @Content(schemaProperties = @SchemaProperty(name = "chatRoom", schema = @Schema(implementation = ChatRoomRes.RoomWithParticipants.class))))
     ResponseEntity<?> getChatRoom(@PathVariable("chatRoomId") Long chatRoomId, @AuthenticationPrincipal SecurityUserDetails user);

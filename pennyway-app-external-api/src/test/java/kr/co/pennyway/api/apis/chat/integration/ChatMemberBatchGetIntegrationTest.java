@@ -85,13 +85,13 @@ public class ChatMemberBatchGetIntegrationTest extends ExternalApiDBTestConfig {
                 HttpMethod.GET,
                 owner,
                 null,
-                new TypeReference<SuccessResponse<Map<String, List<ChatMemberRes.Detail>>>>() {
+                new TypeReference<SuccessResponse<Map<String, List<ChatMemberRes.MemberDetail>>>>() {
                 },
                 chatRoom.getId(),
                 String.join(",", memberIds.stream().map(String::valueOf).toList())
         );
-        SuccessResponse<Map<String, List<ChatMemberRes.Detail>>> body = (SuccessResponse<Map<String, List<ChatMemberRes.Detail>>>) response.getBody();
-        List<ChatMemberRes.Detail> payload = body.getData().get("chatMembers");
+        SuccessResponse<Map<String, List<ChatMemberRes.MemberDetail>>> body = (SuccessResponse<Map<String, List<ChatMemberRes.MemberDetail>>>) response.getBody();
+        List<ChatMemberRes.MemberDetail> payload = body.getData().get("chatMembers");
 
         // then
         assertEquals(HttpStatus.OK, response.getStatusCode());
