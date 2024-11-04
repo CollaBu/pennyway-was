@@ -80,7 +80,7 @@ public final class ChatRoomRes {
             @Schema(description = "채팅방에서 내 정보와 최근 활동자를 제외한 참여자 ID 목록")
             List<Long> otherParticipantIds,
             @Schema(description = "최근 채팅 이력. 메시지는 최신순으로 정렬되어 반환.")
-            List<ChatRes.Detail> recentMessages
+            List<ChatRes.ChatDetail> recentMessages
     ) {
 
     }

@@ -71,8 +71,8 @@ public final class ChatRoomMapper {
                 .map(participant -> ChatMemberRes.MemberDetail.from(participant, false))
                 .toList();
 
-        List<ChatRes.Detail> chatMessagesRes = chatMessages.stream()
-                .map(ChatRes.Detail::from)
+        List<ChatRes.ChatDetail> chatMessagesRes = chatMessages.stream()
+                .map(ChatRes.ChatDetail::from)
                 .toList();
 
         return ChatRoomRes.RoomWithParticipants.builder()
