@@ -3,6 +3,7 @@ package kr.co.pennyway.api.apis.chat.service;
 import kr.co.pennyway.api.config.fixture.ChatMemberFixture;
 import kr.co.pennyway.api.config.fixture.ChatRoomFixture;
 import kr.co.pennyway.api.config.fixture.UserFixture;
+import kr.co.pennyway.domain.common.redis.message.service.ChatMessageService;
 import kr.co.pennyway.domain.domains.chatroom.domain.ChatRoom;
 import kr.co.pennyway.domain.domains.chatroom.exception.ChatRoomErrorCode;
 import kr.co.pennyway.domain.domains.chatroom.exception.ChatRoomErrorException;
@@ -14,7 +15,7 @@ import kr.co.pennyway.domain.domains.user.exception.UserErrorException;
 import kr.co.pennyway.domain.domains.user.service.UserService;
 import kr.co.pennyway.infra.common.event.ChatRoomJoinEvent;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.Triple;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -44,13 +45,15 @@ public class ChatMemberJoinServiceTest {
     @Mock
     private ChatMemberService chatMemberService;
     @Mock
+    private ChatMessageService chatMessageService;
+    @Mock
     private ApplicationEventPublisher eventPublisher;
     private Long userId = 1L;
     private Long chatRoomId = 1L;
 
     @BeforeEach
     void setUp() {
-        chatMemberJoinService = new ChatMemberJoinService(userService, chatRoomService, chatMemberService, eventPublisher);
+        chatMemberJoinService = new ChatMemberJoinService(userService, chatRoomService, chatMemberService, chatMessageService, eventPublisher);
     }
 
     @Test
@@ -88,18 +91,25 @@ public class ChatMemberJoinServiceTest {
         // given
         ChatRoom expectedChatRoom = createPublicRoom();
         User expectedUser = createUser();
+        Long expectedUnreadCount = 10L;  // 추가
 
         given(chatRoomService.readChatRoom(chatRoomId)).willReturn(Optional.of(expectedChatRoom));
         given(chatMemberService.countActiveMembers(chatRoomId)).willReturn(AVAILABLE_CAPACITY);
 
         given(userService.readUser(userId)).willReturn(Optional.of(expectedUser));
         given(chatMemberService.createMember(expectedUser, expectedChatRoom)).willReturn(ChatMemberFixture.MEMBER.toEntity(expectedUser, expectedChatRoom));
+        given(chatMessageService.countUnreadMessages(chatRoomId, 0L)).willReturn(expectedUnreadCount);
 
         // when
-        chatMemberJoinService.execute(userId, chatRoomId, null);
+        Triple<ChatRoom, Integer, Long> result = chatMemberJoinService.execute(userId, chatRoomId, null);
 
         // then
-        verify(eventPublisher, times(1)).publishEvent(any(ChatRoomJoinEvent.class));
+        assertAll(
+                () -> assertEquals(expectedChatRoom, result.getLeft()),
+                () -> assertEquals(AVAILABLE_CAPACITY + 1, result.getMiddle().longValue()),
+                () -> assertEquals(expectedUnreadCount, result.getRight()),
+                () -> verify(eventPublisher, times(1)).publishEvent(any(ChatRoomJoinEvent.class))
+        );
     }
 
     @Test
@@ -110,20 +120,23 @@ public class ChatMemberJoinServiceTest {
         User expectedUser = createUser();
         ChatMember expectedMember = ChatMemberFixture.MEMBER.toEntity(expectedUser, expectedChatRoom);
         Integer validPassword = expectedChatRoom.getPassword();
+        Long expectedUnreadCount = 5L;
 
         given(chatRoomService.readChatRoom(chatRoomId)).willReturn(Optional.of(expectedChatRoom));
         given(chatMemberService.countActiveMembers(chatRoomId)).willReturn(AVAILABLE_CAPACITY);
 
         given(userService.readUser(userId)).willReturn(Optional.of(expectedUser));
         given(chatMemberService.createMember(expectedUser, expectedChatRoom)).willReturn(expectedMember);
+        given(chatMessageService.countUnreadMessages(chatRoomId, 0L)).willReturn(expectedUnreadCount);
 
         // when
-        Pair<ChatRoom, Integer> result = chatMemberJoinService.execute(userId, chatRoomId, validPassword);
+        Triple<ChatRoom, Integer, Long> result = chatMemberJoinService.execute(userId, chatRoomId, validPassword);
 
         // then
         assertAll(
                 () -> assertEquals(expectedChatRoom, result.getLeft()),
-                () -> assertEquals(FULL_ROOM_CAPACITY, result.getRight().longValue()),
+                () -> assertEquals(AVAILABLE_CAPACITY + 1, result.getMiddle().longValue()),
+                () -> assertEquals(expectedUnreadCount, result.getRight()),
                 () -> verify(eventPublisher, times(1)).publishEvent(any(ChatRoomJoinEvent.class))
         );
     }
@@ -164,7 +177,7 @@ public class ChatMemberJoinServiceTest {
     @DisplayName("채팅방 가입 시 정해진 순서대로 검증이 수행된다")
     void verifyValidationOrder() {
         // given
-        InOrder inOrder = inOrder(chatRoomService, chatMemberService, userService);
+        InOrder inOrder = inOrder(chatRoomService, chatMemberService, userService, chatMessageService);
 
         ChatRoom expectedChatRoom = createPrivateRoom();
         User expectedUser = createUser();
@@ -173,9 +186,9 @@ public class ChatMemberJoinServiceTest {
 
         given(chatRoomService.readChatRoom(chatRoomId)).willReturn(Optional.of(expectedChatRoom));
         given(chatMemberService.countActiveMembers(chatRoomId)).willReturn(AVAILABLE_CAPACITY);
-
         given(userService.readUser(userId)).willReturn(Optional.of(expectedUser));
         given(chatMemberService.createMember(expectedUser, expectedChatRoom)).willReturn(expectedMember);
+        given(chatMessageService.countUnreadMessages(chatRoomId, 0L)).willReturn(0L);
 
         // when
         chatMemberJoinService.execute(userId, chatRoomId, validPassword);
@@ -184,6 +197,7 @@ public class ChatMemberJoinServiceTest {
         inOrder.verify(chatRoomService).readChatRoom(chatRoomId);
         inOrder.verify(chatMemberService).countActiveMembers(chatRoomId);
         inOrder.verify(userService).readUser(userId);
+        inOrder.verify(chatMessageService).countUnreadMessages(chatRoomId, 0L);
     }
 
     @Test
