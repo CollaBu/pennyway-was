@@ -51,7 +51,7 @@ public class ChatRoomWithParticipantsSearchService {
         );
 
         // 내가 관리자가 아니거나, 최근 활동자에 관리자가 없다면 관리자 정보 조회
-        if (!myInfo.getRole().equals(ChatMemberRole.ADMIN) || recentParticipants.stream().noneMatch(participant -> participant.role().equals(ChatMemberRole.ADMIN))) {
+        if (!myInfo.getRole().equals(ChatMemberRole.ADMIN) && recentParticipants.stream().noneMatch(participant -> participant.role().equals(ChatMemberRole.ADMIN))) {
             ChatMemberResult.Detail admin = chatMemberService.readAdmin(chatRoomId)
                     .orElseThrow(() -> new ChatMemberErrorException(ChatMemberErrorCode.NOT_FOUND));
             recentParticipantIds.add(admin.userId());
