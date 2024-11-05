@@ -4,7 +4,6 @@ import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Predicate;
 import kr.co.pennyway.common.annotation.DomainService;
 import kr.co.pennyway.domain.domains.chatroom.domain.ChatRoom;
-import kr.co.pennyway.domain.domains.chatroom.repository.ChatRoomRepository;
 import kr.co.pennyway.domain.domains.member.domain.ChatMember;
 import kr.co.pennyway.domain.domains.member.domain.QChatMember;
 import kr.co.pennyway.domain.domains.member.dto.ChatMemberResult;
@@ -23,7 +22,6 @@ import java.util.*;
 @DomainService
 @RequiredArgsConstructor
 public class ChatMemberService {
-    private final ChatRoomRepository chatRoomRepository;
     private final ChatMemberRepository chatMemberRepository;
 
     private final QChatMember qChatMember = QChatMember.chatMember;
@@ -60,13 +58,25 @@ public class ChatMemberService {
     }
 
     @Transactional(readOnly = true)
-    public Optional<ChatMember> readAdmin(Long chatRoomId) {
-        return chatMemberRepository.findByChatRoom_IdAndRole(chatRoomId, ChatMemberRole.ADMIN);
+    public Optional<ChatMemberResult.Detail> readAdmin(Long chatRoomId) {
+        return chatMemberRepository.findAdminByChatRoomId(chatRoomId);
     }
 
     @Transactional(readOnly = true)
-    public List<ChatMember> readChatMembersByIdIn(Long chatRoomId, Set<Long> chatMemberIds) {
-        return chatMemberRepository.findByChatRoom_IdAndIdIn(chatRoomId, chatMemberIds);
+    public List<ChatMemberResult.Detail> readChatMembersByIdIn(Long chatRoomId, Set<Long> chatMemberIds) {
+        Predicate predicate = qChatMember.chatRoom.id.eq(chatRoomId)
+                .and(qChatMember.id.in(chatMemberIds))
+                .and(qChatMember.deletedAt.isNull());
+
+        Map<String, Expression<?>> bindings = new LinkedHashMap<>();
+        bindings.put("id", qChatMember.id);
+        bindings.put("name", qChatMember.name);
+        bindings.put("role", qChatMember.role);
+        bindings.put("notification", qChatMember.notifyEnabled);
+        bindings.put("userId", qChatMember.user.id);
+        bindings.put("createdAt", qChatMember.createdAt);
+
+        return chatMemberRepository.selectList(predicate, ChatMemberResult.Detail.class, bindings, null, null);
     }
 
     @Transactional(readOnly = true)
@@ -83,7 +93,7 @@ public class ChatMemberService {
         bindings.put("userId", qChatMember.user.id);
         bindings.put("createdAt", qChatMember.createdAt);
 
-        return chatRoomRepository.selectList(predicate, ChatMemberResult.Detail.class, bindings, null, null);
+        return chatMemberRepository.selectList(predicate, ChatMemberResult.Detail.class, bindings, null, null);
     }
 
     @Transactional(readOnly = true)
@@ -96,7 +106,7 @@ public class ChatMemberService {
         bindings.put("id", qChatMember.id);
         bindings.put("name", qChatMember.name);
 
-        return chatRoomRepository.selectList(predicate, ChatMemberResult.Summary.class, bindings, null, null);
+        return chatMemberRepository.selectList(predicate, ChatMemberResult.Summary.class, bindings, null, null);
     }
 
     @Transactional(readOnly = true)
