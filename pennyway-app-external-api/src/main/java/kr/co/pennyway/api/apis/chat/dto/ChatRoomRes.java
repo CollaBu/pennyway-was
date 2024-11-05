@@ -75,10 +75,10 @@ public final class ChatRoomRes {
     public record RoomWithParticipants(
             @Schema(description = "채팅방에서 내 정보")
             ChatMemberRes.MemberDetail myInfo,
-            @Schema(description = "최근에 채팅 메시지를 보낸 참여자의 상세 정보 목록")
+            @Schema(description = "최근에 채팅 메시지를 보낸 참여자의 상세 정보 목록. 내가 방장이 아니라면, 최근에 활동 내역이 없어도 방장 정보가 포함된다.")
             List<ChatMemberRes.MemberDetail> recentParticipants,
-            @Schema(description = "채팅방에서 내 정보와 최근 활동자를 제외한 참여자 ID 목록")
-            List<ChatMemberRes.MemberSummary> otherParticipantIds,
+            @Schema(description = "채팅방에서 내 정보와 최근 활동자를 제외한 참여자 ID, Name 목록")
+            List<ChatMemberRes.MemberSummary> otherParticipants,
             @Schema(description = "최근 채팅 이력. 메시지는 최신순으로 정렬되어 반환.")
             List<ChatRes.ChatDetail> recentMessages
     ) {
