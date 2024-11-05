@@ -8,7 +8,7 @@ import kr.co.pennyway.api.apis.chat.service.ChatMemberJoinService;
 import kr.co.pennyway.api.apis.chat.service.ChatMemberSearchService;
 import kr.co.pennyway.common.annotation.UseCase;
 import kr.co.pennyway.domain.domains.chatroom.domain.ChatRoom;
-import kr.co.pennyway.domain.domains.member.domain.ChatMember;
+import kr.co.pennyway.domain.domains.member.dto.ChatMemberResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Triple;
@@ -30,7 +30,7 @@ public class ChatMemberUseCase {
     }
 
     public List<ChatMemberRes.MemberDetail> readChatMembers(Long chatRoomId, Set<Long> chatMemberIds) {
-        List<ChatMember> chatMembers = chatMemberSearchService.readChatMembers(chatRoomId, chatMemberIds);
+        List<ChatMemberResult.Detail> chatMembers = chatMemberSearchService.readChatMembers(chatRoomId, chatMemberIds);
 
         return ChatMemberMapper.toChatMemberResDetail(chatMembers);
     }
