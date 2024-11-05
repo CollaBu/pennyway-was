@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
-import kr.co.pennyway.domain.domains.member.domain.ChatMember;
+import kr.co.pennyway.domain.domains.member.dto.ChatMemberResult;
 import kr.co.pennyway.domain.domains.member.type.ChatMemberRole;
 
 import java.time.LocalDateTime;
@@ -15,6 +15,8 @@ public final class ChatMemberRes {
     public record MemberDetail(
             @Schema(description = "채팅방 참여자 ID", type = "long")
             Long id,
+            @Schema(description = "채팅방 사용자의 애플리케이션 내 고유 식별자 (userId)")
+            Long userId,
             @Schema(description = "채팅방 참여자 이름")
             String name,
             @Schema(description = "채팅방 참여자 역할")
@@ -27,13 +29,29 @@ public final class ChatMemberRes {
             @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
             LocalDateTime createdAt
     ) {
-        public static MemberDetail from(ChatMember chatMember, boolean isContainNotifyEnabled) {
+        public static MemberDetail from(ChatMemberResult.Detail chatMember, boolean isContainNotifyEnabled) {
             return new MemberDetail(
-                    chatMember.getId(),
-                    chatMember.getName(),
-                    chatMember.getRole(),
-                    isContainNotifyEnabled ? chatMember.isNotifyEnabled() : null,
-                    chatMember.getCreatedAt()
+                    chatMember.id(),
+                    chatMember.userId(),
+                    chatMember.name(),
+                    chatMember.role(),
+                    isContainNotifyEnabled ? chatMember.notifyEnabled() : null,
+                    chatMember.createdAt()
+            );
+        }
+    }
+
+    @Schema(description = "채팅방 참여자 요약 정보")
+    public record MemberSummary(
+            @Schema(description = "채팅방 참여자 ID", type = "long")
+            Long id,
+            @Schema(description = "채팅방 참여자 이름")
+            String name
+    ) {
+        public static MemberSummary from(ChatMemberResult.Summary chatMember) {
+            return new MemberSummary(
+                    chatMember.id(),
+                    String.valueOf(chatMember.name())
             );
         }
     }

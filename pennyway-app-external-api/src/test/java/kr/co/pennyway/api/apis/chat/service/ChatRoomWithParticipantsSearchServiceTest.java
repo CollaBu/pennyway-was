@@ -11,6 +11,7 @@ import kr.co.pennyway.domain.common.redis.message.type.MessageCategoryType;
 import kr.co.pennyway.domain.common.redis.message.type.MessageContentType;
 import kr.co.pennyway.domain.domains.chatroom.domain.ChatRoom;
 import kr.co.pennyway.domain.domains.member.domain.ChatMember;
+import kr.co.pennyway.domain.domains.member.dto.ChatMemberResult;
 import kr.co.pennyway.domain.domains.member.exception.ChatMemberErrorCode;
 import kr.co.pennyway.domain.domains.member.exception.ChatMemberErrorException;
 import kr.co.pennyway.domain.domains.member.service.ChatMemberService;
@@ -26,14 +27,14 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.*;
 
 @Slf4j
 @ExtendWith(MockitoExtension.class)
@@ -54,18 +55,18 @@ public class ChatRoomWithParticipantsSearchServiceTest {
     }
 
     @Test
-    @DisplayName("채팅방 참여자 정보와 최근 메시지를 성공적으로 조회한다")
+    @DisplayName("관리자인 사용자가 채팅방 참여자 정보와 최근 메시지를 성공적으로 조회한다")
     public void successToRetrieveChatRoomWithParticipantsAndRecentMessages() {
         // given
         ChatMember myInfo = createChatMember(userId, UserFixture.GENERAL_USER.toUser(), chatRoom, ChatMemberRole.ADMIN);
         List<ChatMessage> recentMessages = createRecentMessages();
-        List<ChatMember> recentParticipants = createRecentParticipants();
-        List<Long> otherMemberIds = List.of(5L, 6L);
+        List<ChatMemberResult.Detail> recentParticipants = createRecentParticipantDetails();
+        List<ChatMemberResult.Summary> otherParticipants = createOtherParticipantSummaries();
 
         given(chatMemberService.readChatMember(userId, chatRoom.getId())).willReturn(Optional.of(myInfo));
         given(chatMessageService.readRecentMessages(eq(chatRoom.getId()), anyInt())).willReturn(recentMessages);
         given(chatMemberService.readChatMembersByUserIdIn(eq(chatRoom.getId()), anySet())).willReturn(recentParticipants);
-        given(chatMemberService.readChatMemberIdsByUserIdNotIn(eq(chatRoom.getId()), anySet())).willReturn(otherMemberIds);
+        given(chatMemberService.readChatMemberIdsByUserIdNotIn(eq(chatRoom.getId()), anySet())).willReturn(otherParticipants);
 
         // when
         ChatRoomRes.RoomWithParticipants result = service.execute(userId, chatRoom.getId());
@@ -76,7 +77,7 @@ public class ChatRoomWithParticipantsSearchServiceTest {
         assertAll(
                 () -> assertEquals(userId, result.myInfo().id()),
                 () -> assertEquals(2, result.recentParticipants().size()),
-                () -> assertEquals(2, result.otherParticipantIds().size()),
+                () -> assertEquals(2, result.otherParticipants().size()),
                 () -> assertEquals(3, result.recentMessages().size())
         );
 
@@ -85,6 +86,41 @@ public class ChatRoomWithParticipantsSearchServiceTest {
         verify(chatMessageService).readRecentMessages(eq(chatRoom.getId()), anyInt());
         verify(chatMemberService).readChatMembersByUserIdIn(eq(chatRoom.getId()), anySet());
         verify(chatMemberService).readChatMemberIdsByUserIdNotIn(eq(chatRoom.getId()), anySet());
+        verify(chatMemberService, never()).readAdmin(chatRoom.getId());
+    }
+
+    @Test
+    @DisplayName("일반 회원이 채팅방 참여자 정보와 최근 메시지를 조회하면 관리자 정보도 함께 조회된다")
+    public void memberSuccessToRetrieveChatRoomWithParticipantsIncludingAdmin() {
+        // given
+        ChatMember myInfo = createChatMember(userId, UserFixture.GENERAL_USER.toUser(), chatRoom, ChatMemberRole.MEMBER);
+        ChatMemberResult.Detail adminDetail = new ChatMemberResult.Detail(2L, "Admin", ChatMemberRole.ADMIN, true, 2L, LocalDateTime.now());
+        List<ChatMessage> recentMessages = createRecentMessages();
+        List<ChatMemberResult.Detail> recentParticipants = createRecentParticipantDetails();
+        List<ChatMemberResult.Summary> otherParticipants = createOtherParticipantSummaries();
+
+        given(chatMemberService.readChatMember(userId, chatRoom.getId())).willReturn(Optional.of(myInfo));
+        given(chatMessageService.readRecentMessages(eq(chatRoom.getId()), eq(15))).willReturn(recentMessages);
+        given(chatMemberService.readChatMembersByUserIdIn(eq(chatRoom.getId()), anySet())).willReturn(recentParticipants);
+        given(chatMemberService.readAdmin(chatRoom.getId())).willReturn(Optional.of(adminDetail));
+        given(chatMemberService.readChatMemberIdsByUserIdNotIn(eq(chatRoom.getId()), anySet())).willReturn(otherParticipants);
+
+        // when
+        ChatRoomRes.RoomWithParticipants result = service.execute(userId, chatRoom.getId());
+
+        // then
+        assertAll(
+                () -> assertEquals(userId, result.myInfo().id()),
+                () -> assertEquals(ChatMemberRole.MEMBER, result.myInfo().role()),
+                () -> assertEquals(3, result.recentParticipants().size()),  // 관리자 정보가 포함되어야 함
+                () -> assertTrue(result.recentParticipants().stream()
+                        .anyMatch(member -> member.role() == ChatMemberRole.ADMIN)),
+                () -> assertEquals(2, result.otherParticipants().size()),
+                () -> assertEquals(3, result.recentMessages().size())
+        );
+
+        // verify
+        verify(chatMemberService).readAdmin(chatRoom.getId());
     }
 
     @Test
@@ -104,10 +140,17 @@ public class ChatRoomWithParticipantsSearchServiceTest {
         verifyNoMoreInteractions(chatMemberService, chatMessageService);
     }
 
-    private List<ChatMember> createRecentParticipants() {
+    private List<ChatMemberResult.Detail> createRecentParticipantDetails() {
         return List.of(
-                createChatMember(2L, UserFixture.GENERAL_USER.toUser(), chatRoom, ChatMemberRole.MEMBER),
-                createChatMember(3L, UserFixture.GENERAL_USER.toUser(), chatRoom, ChatMemberRole.MEMBER)
+                new ChatMemberResult.Detail(2L, "User2", ChatMemberRole.MEMBER, true, 20L, LocalDateTime.now()),
+                new ChatMemberResult.Detail(3L, "User3", ChatMemberRole.MEMBER, true, 30L, LocalDateTime.now())
+        );
+    }
+
+    private List<ChatMemberResult.Summary> createOtherParticipantSummaries() {
+        return List.of(
+                new ChatMemberResult.Summary(5L, "User5"),
+                new ChatMemberResult.Summary(6L, "User6")
         );
     }
 

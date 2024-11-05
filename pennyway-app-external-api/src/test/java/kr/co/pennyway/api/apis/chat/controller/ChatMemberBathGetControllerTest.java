@@ -118,9 +118,9 @@ public class ChatMemberBathGetControllerTest {
 
     private List<ChatMemberRes.MemberDetail> createMockMemberDetails() {
         return List.of(
-                new ChatMemberRes.MemberDetail(1L, "User1", ChatMemberRole.MEMBER, null, LocalDateTime.now()),
-                new ChatMemberRes.MemberDetail(2L, "User2", ChatMemberRole.MEMBER, null, LocalDateTime.now()),
-                new ChatMemberRes.MemberDetail(3L, "User3", ChatMemberRole.MEMBER, null, LocalDateTime.now())
+                new ChatMemberRes.MemberDetail(1L, 2L, "User1", ChatMemberRole.MEMBER, null, LocalDateTime.now()),
+                new ChatMemberRes.MemberDetail(2L, 3L, "User2", ChatMemberRole.MEMBER, null, LocalDateTime.now()),
+                new ChatMemberRes.MemberDetail(3L, 4L, "User3", ChatMemberRole.MEMBER, null, LocalDateTime.now())
         );
     }
 }

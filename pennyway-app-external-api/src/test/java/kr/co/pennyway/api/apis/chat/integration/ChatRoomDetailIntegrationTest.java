@@ -130,7 +130,7 @@ public class ChatRoomDetailIntegrationTest extends ExternalApiDBTestConfig {
                     assertEquals(ownerMember.getRole(), ChatMemberRole.ADMIN, "나는 방장 권한이어야 한다");
                     assertEquals(expectedRecentParticipantCount, payload.recentParticipants().size(), "최근 참여자 개수가 일치해야 한다");
                     assertEquals(expectedMessageCount, payload.recentMessages().size(), "최근 메시지 개수가 일치해야 한다");
-                    assertTrue(payload.otherParticipantIds().isEmpty(), "다른 참여자가 없어야 한다");
+                    assertTrue(payload.otherParticipants().isEmpty(), "다른 참여자가 없어야 한다");
                 }
         );
     }
@@ -187,7 +187,7 @@ public class ChatRoomDetailIntegrationTest extends ExternalApiDBTestConfig {
         assertAll(
                 () -> assertNotNull(payload),
                 () -> assertEquals(payload.recentParticipants().size(), 2, "최근 참여자 개수가 일치해야 한다."),
-                () -> assertEquals(payload.otherParticipantIds().size(), expectedParticipantCount - 2, "다른 참여자 개수가 일치해야 한다.")
+                () -> assertEquals(payload.otherParticipants().size(), expectedParticipantCount - 2, "다른 참여자 개수가 일치해야 한다.")
         );
     }
 
