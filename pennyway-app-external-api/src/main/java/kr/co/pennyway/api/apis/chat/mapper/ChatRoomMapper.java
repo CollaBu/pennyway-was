@@ -81,7 +81,7 @@ public final class ChatRoomMapper {
         return ChatRoomRes.RoomWithParticipants.builder()
                 .myInfo(ChatMemberRes.MemberDetail.from(myInfo, true))
                 .recentParticipants(recentParticipantsRes)
-                .otherParticipantIds(otherParticipantsRes)
+                .otherParticipants(otherParticipantsRes)
                 .recentMessages(chatMessagesRes)
                 .build();
     }
