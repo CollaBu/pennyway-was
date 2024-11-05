@@ -17,7 +17,7 @@ public final class ChatMemberResult {
 
     public record Summary(
             Long id,
-            Long name
+            String name
     ) {
     }
 }
