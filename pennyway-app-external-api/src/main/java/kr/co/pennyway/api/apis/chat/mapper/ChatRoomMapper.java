@@ -8,7 +8,7 @@ import kr.co.pennyway.common.annotation.Mapper;
 import kr.co.pennyway.domain.common.redis.message.domain.ChatMessage;
 import kr.co.pennyway.domain.domains.chatroom.domain.ChatRoom;
 import kr.co.pennyway.domain.domains.chatroom.dto.ChatRoomDetail;
-import kr.co.pennyway.domain.domains.member.domain.ChatMember;
+import kr.co.pennyway.domain.domains.member.dto.ChatMemberResult;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 
@@ -66,9 +66,12 @@ public final class ChatRoomMapper {
         return ChatRoomRes.Detail.of(chatRoom, isAdmin, participantCount, unreadMessageCount);
     }
 
-    public static ChatRoomRes.RoomWithParticipants toChatRoomResRoomWithParticipants(ChatMember myInfo, List<ChatMember> recentParticipants, List<Long> otherMemberIds, List<ChatMessage> chatMessages) {
+    public static ChatRoomRes.RoomWithParticipants toChatRoomResRoomWithParticipants(ChatMemberResult.Detail myInfo, List<ChatMemberResult.Detail> recentParticipants, List<ChatMemberResult.Summary> otherParticipants, List<ChatMessage> chatMessages) {
         List<ChatMemberRes.MemberDetail> recentParticipantsRes = recentParticipants.stream()
                 .map(participant -> ChatMemberRes.MemberDetail.from(participant, false))
+                .toList();
+        List<ChatMemberRes.MemberSummary> otherParticipantsRes = otherParticipants.stream()
+                .map(ChatMemberRes.MemberSummary::from)
                 .toList();
 
         List<ChatRes.ChatDetail> chatMessagesRes = chatMessages.stream()
@@ -78,7 +81,7 @@ public final class ChatRoomMapper {
         return ChatRoomRes.RoomWithParticipants.builder()
                 .myInfo(ChatMemberRes.MemberDetail.from(myInfo, true))
                 .recentParticipants(recentParticipantsRes)
-                .otherParticipantIds(otherMemberIds)
+                .otherParticipantIds(otherParticipantsRes)
                 .recentMessages(chatMessagesRes)
                 .build();
     }
