@@ -1,6 +1,6 @@
 package kr.co.pennyway.api.apis.chat.service;
 
-import kr.co.pennyway.domain.domains.member.domain.ChatMember;
+import kr.co.pennyway.domain.domains.member.dto.ChatMemberResult;
 import kr.co.pennyway.domain.domains.member.service.ChatMemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +19,7 @@ public class ChatMemberSearchService {
         return chatMemberService.readChatRoomIdsByUserId(userId);
     }
 
-    public List<ChatMember> readChatMembers(Long chatRoomId, Set<Long> chatMemberIds) {
+    public List<ChatMemberResult.Detail> readChatMembers(Long chatRoomId, Set<Long> chatMemberIds) {
         return chatMemberService.readChatMembersByIdIn(chatRoomId, chatMemberIds);
     }
 }

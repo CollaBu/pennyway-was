@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -45,7 +46,9 @@ public class ChatRoomWithParticipantsSearchService {
                 .collect(Collectors.toSet());
 
         // 최근 메시지의 발신자 상세 정보 조회
-        List<ChatMemberResult.Detail> recentParticipants = chatMemberService.readChatMembersByUserIdIn(chatRoomId, recentParticipantIds);
+        List<ChatMemberResult.Detail> recentParticipants = new ArrayList<>(
+                chatMemberService.readChatMembersByUserIdIn(chatRoomId, recentParticipantIds)
+        );
 
         // 내가 관리자가 아닌 경우, 관리자 정보 조회
         if (!myInfo.getRole().equals(ChatMemberRole.ADMIN)) {
