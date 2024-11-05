@@ -60,6 +60,11 @@ public class ChatMemberService {
     }
 
     @Transactional(readOnly = true)
+    public Optional<ChatMember> readAdmin(Long chatRoomId) {
+        return chatMemberRepository.findByChatRoom_IdAndRole(chatRoomId, ChatMemberRole.ADMIN);
+    }
+
+    @Transactional(readOnly = true)
     public List<ChatMember> readChatMembersByIdIn(Long chatRoomId, Set<Long> chatMemberIds) {
         return chatMemberRepository.findByChatRoom_IdAndIdIn(chatRoomId, chatMemberIds);
     }
