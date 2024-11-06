@@ -27,7 +27,7 @@ public class ChatMessageController {
         chatMessageSendService.execute(SendMessageCommand.createUserMessage(chatRoomId, payload.content(), payload.contentType(), principal.getUserId()));
     }
 
-    @MessageMapping("chat.message.{chatRoomId}.read.{chatRoomId}")
+    @MessageMapping("chat.message.{chatRoomId}.read.{lastReadMessageId}")
     @PreAuthorize("#isAuthenticated(#principal) and @chatRoomAccessChecker.hasPermission(#chatRoomId, #principal)")
     public void readMessage(@DestinationVariable(value = "chatRoomId") @Validated @NotNull Long chatRoomId,
                             @DestinationVariable(value = "lastReadMessageId") @Validated @NotNull Long lastReadMessageId,
