@@ -16,8 +16,8 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class LastMessageIdReader implements ItemReader<KeyValue> {
+    private static final String PREFIX_PATTERN = "chat:last_read:*";
     private final RedisTemplate<String, String> redisTemplate;
-    private final String pattern;
     private Cursor<String> cursor;
     private boolean initialized = false;
 
@@ -25,7 +25,7 @@ public class LastMessageIdReader implements ItemReader<KeyValue> {
     @Override
     public KeyValue read() throws Exception, UnexpectedInputException, ParseException, NonTransientResourceException {
         if (!initialized) {
-            ScanOptions options = ScanOptions.scanOptions().match(pattern).count(100).build();
+            ScanOptions options = ScanOptions.scanOptions().match(PREFIX_PATTERN).count(1000).build();
             cursor = redisTemplate.scan(options);
             initialized = true;
         }
