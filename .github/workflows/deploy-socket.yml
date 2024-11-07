@@ -74,4 +74,4 @@ jobs:
             docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
             docker system prune -a -f
             docker pull pennyway/pennyway-socket
-            docker-compose up -d
+            docker-compose up -d socket
