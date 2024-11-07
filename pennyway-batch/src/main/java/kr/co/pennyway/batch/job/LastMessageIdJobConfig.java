@@ -14,17 +14,22 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.core.Cursor;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
 @RequiredArgsConstructor
 public class LastMessageIdJobConfig {
     private static final int CHUNK_SIZE = 1000;
-    
+    private static final String PREFIX_PATTERN = "chat:last_read:*";
+
     private final JobRepository jobRepository;
     private final LastMessageIdReader reader;
     private final LastMessageIdProcessor processor;
     private final LastMessageIdWriter writer;
+    private final RedisTemplate<String, String> redisTemplate;
 
     @Bean
     public Job lastMessageIdJob(PlatformTransactionManager transactionManager) {
@@ -47,5 +52,11 @@ public class LastMessageIdJobConfig {
                 .processor(processor)
                 .writer(writer)
                 .build();
+    }
+
+    @Bean
+    public Cursor<String> lastMessageIdCursor() {
+        ScanOptions options = ScanOptions.scanOptions().match(PREFIX_PATTERN).count(1000).build();
+        return redisTemplate.scan(options);
     }
 }

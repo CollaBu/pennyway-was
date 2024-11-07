@@ -9,28 +9,19 @@ import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class LastMessageIdReader implements ItemReader<KeyValue> {
-    private static final String PREFIX_PATTERN = "chat:last_read:*";
     private final RedisTemplate<String, String> redisTemplate;
-    private Cursor<String> cursor;
-    private boolean initialized = false;
-
+    private final Cursor<String> cursor;
 
     @Override
     public KeyValue read() throws Exception, UnexpectedInputException, ParseException, NonTransientResourceException {
-        if (!initialized) {
-            ScanOptions options = ScanOptions.scanOptions().match(PREFIX_PATTERN).count(1000).build();
-            cursor = redisTemplate.scan(options);
-            initialized = true;
-        }
-
-        if (cursor == null || !cursor.hasNext()) {
+        if (!cursor.hasNext()) {
+            log.debug("No more keys to read cursor: {}", cursor);
             return null;
         }
 
@@ -38,6 +29,7 @@ public class LastMessageIdReader implements ItemReader<KeyValue> {
         String value = redisTemplate.opsForValue().get(key);
 
         if (value == null) {
+            log.warn("Value not found for key: {}", key);
             return null;
         }
 
