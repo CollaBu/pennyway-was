@@ -46,4 +46,15 @@ public class ChatMessageStatus {
             this.lastReadMessageId = messageId;
         }
     }
+
+    @Override
+    public String toString() {
+        return "ChatMessageStatus{" +
+                "id=" + id +
+                ", userId=" + userId +
+                ", chatRoomId=" + chatRoomId +
+                ", lastReadMessageId=" + lastReadMessageId +
+                ", updatedAt=" + updatedAt +
+                '}';
+    }
 }
