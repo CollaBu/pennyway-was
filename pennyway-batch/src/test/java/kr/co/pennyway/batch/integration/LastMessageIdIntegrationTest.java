@@ -133,6 +133,64 @@ public class LastMessageIdIntegrationTest extends BatchDBTestConfig {
         assertEquals(0, chatMessageStatusRepository.count());
     }
 
+    @Test
+    @DisplayName("대량의 데이터도 정상적으로 처리되어야 한다")
+    void largeDataSetTest() throws Exception {
+        // given
+        int userCount = 100;
+        int roomCount = 50;
+        cleanupTestData();
+
+        // 대량의 테스트 데이터 생성
+        for (int i = 1; i <= userCount; i++) {
+            for (int j = 1; j <= roomCount; j++) {
+                redisTemplate.opsForValue().set(formatCacheKey((long) i, (long) j), String.valueOf(i * 1000 + j));
+            }
+        }
+
+        // when
+        long startTime = System.currentTimeMillis();
+        JobExecution jobExecution = jobLauncherTestUtils.launchJob(jobParameters);
+        long endTime = System.currentTimeMillis();
+
+        // then
+        assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
+        assertEquals(userCount * roomCount, chatMessageStatusRepository.count());
+        log.debug("처리 시간: {}ms", endTime - startTime);
+
+        // 샘플 데이터 검증
+        Optional<ChatMessageStatus> sampleStatus = chatMessageStatusRepository
+                .findByUserIdAndChatRoomId(50L, 25L);
+        assertTrue(sampleStatus.isPresent());
+        assertEquals(50000 + 25, sampleStatus.get().getLastReadMessageId());
+    }
+
+    @Test
+    @DisplayName("Job이 실패하더라도 이전 처리 데이터는 유지되어야 한다")
+    void jobFailureTest() throws Exception {
+        // given
+        redisTemplate.opsForValue().set(formatCacheKey(1L, 1L), "100");
+        redisTemplate.opsForValue().set(formatCacheKey(1L, 2L), "invalid_value"); // 실패 유발 데이터
+        redisTemplate.opsForValue().set(formatCacheKey(2L, 1L), "300");
+
+        // when
+        JobExecution jobExecution = jobLauncherTestUtils.launchJob(jobParameters);
+
+        // then
+        assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
+
+        // 정상 데이터는 저장되어 있어야 함
+        Optional<ChatMessageStatus> status1 = chatMessageStatusRepository
+                .findByUserIdAndChatRoomId(1L, 1L);
+        assertTrue(status1.isPresent());
+        assertEquals(100L, status1.get().getLastReadMessageId());
+
+        Optional<ChatMessageStatus> status2 = chatMessageStatusRepository
+                .findByUserIdAndChatRoomId(2L, 1L);
+        assertTrue(status2.isPresent());
+        assertEquals(300L, status2.get().getLastReadMessageId());
+    }
+
     private void setupTestData() {
         jobRepositoryTestUtils.removeJobExecutions();
         jobLauncherTestUtils.setJob(lastMessageIdJob);
