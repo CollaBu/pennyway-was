@@ -19,6 +19,8 @@ public class LastMessageIdWriter implements ItemWriter<ChatMessageStatus> {
 
     @Override
     public void write(Chunk<? extends ChatMessageStatus> chunk) throws Exception {
+        log.debug("Writing chunk size: {}", chunk.getItems().size());
+
         Map<Long, Map<Long, Long>> updates = chunk.getItems().stream()
                 .collect(
                         Collectors.groupingBy(
@@ -30,11 +32,13 @@ public class LastMessageIdWriter implements ItemWriter<ChatMessageStatus> {
                                 )
                         )
                 );
+        log.debug("Grouped updates: {}", updates);
 
         updates.forEach((userId, roomUpdates) ->
-                roomUpdates.forEach((roomId, messageId) ->
-                        repository.saveLastReadMessageIdInBulk(userId, roomId, messageId)
-                )
+                roomUpdates.forEach((roomId, messageId) -> {
+                    log.debug("Saving - userId: {}, roomId: {}, messageId: {}", userId, roomId, messageId);
+                    repository.saveLastReadMessageIdInBulk(userId, roomId, messageId);
+                })
         );
     }
 }

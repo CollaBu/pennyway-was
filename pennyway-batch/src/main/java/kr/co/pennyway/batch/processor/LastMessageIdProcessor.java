@@ -12,6 +12,8 @@ public class LastMessageIdProcessor implements ItemProcessor<KeyValue, ChatMessa
 
     @Override
     public ChatMessageStatus process(KeyValue item) throws Exception {
+        log.debug("Processing item - key: {}, value: {}", item.key(), item.value());
+
         String[] parts = item.key().split(":"); // key format: chat:last_read:{roomId}:{userId}
 
         if (parts.length != 4) {
@@ -22,6 +24,7 @@ public class LastMessageIdProcessor implements ItemProcessor<KeyValue, ChatMessa
         Long roomId = Long.parseLong(parts[2]);
         Long userId = Long.parseLong(parts[3]);
         Long messageId = Long.parseLong(item.value());
+        log.debug("Parsed roomId: {}, userId: {}, messageId: {}", roomId, userId, messageId);
 
         return new ChatMessageStatus(userId, roomId, messageId);
     }

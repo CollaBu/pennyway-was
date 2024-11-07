@@ -9,10 +9,8 @@ import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.stereotype.Component;
 
 @Slf4j
-@Component
 @RequiredArgsConstructor
 public class LastMessageIdReader implements ItemReader<KeyValue> {
     private final RedisTemplate<String, String> redisTemplate;
@@ -27,6 +25,7 @@ public class LastMessageIdReader implements ItemReader<KeyValue> {
 
         String key = cursor.next();
         String value = redisTemplate.opsForValue().get(key);
+        log.debug("Read key: {}, value: {}", key, value);
 
         if (value == null) {
             log.warn("Value not found for key: {}", key);
