@@ -14,18 +14,23 @@ public class LastMessageIdProcessor implements ItemProcessor<KeyValue, ChatMessa
     public ChatMessageStatus process(KeyValue item) throws Exception {
         log.debug("Processing item - key: {}, value: {}", item.key(), item.value());
 
-        String[] parts = item.key().split(":"); // key format: chat:last_read:{roomId}:{userId}
+        String[] parts = item.key().split(":");
 
         if (parts.length != 4) {
             log.error("Invalid key format: {}", item.key());
             return null;
         }
 
-        Long roomId = Long.parseLong(parts[2]);
-        Long userId = Long.parseLong(parts[3]);
-        Long messageId = Long.parseLong(item.value());
-        log.debug("Parsed roomId: {}, userId: {}, messageId: {}", roomId, userId, messageId);
+        try {
+            Long roomId = Long.parseLong(parts[2]);
+            Long userId = Long.parseLong(parts[3]);
+            Long messageId = Long.parseLong(item.value());
+            log.debug("Parsed roomId: {}, userId: {}, messageId: {}", roomId, userId, messageId);
 
-        return new ChatMessageStatus(userId, roomId, messageId);
+            return new ChatMessageStatus(userId, roomId, messageId);
+        } catch (NoSuchFieldError | NumberFormatException e) {
+            log.error("Failed to parse key: {}", item.key(), e);
+            return null;
+        }
     }
 }
