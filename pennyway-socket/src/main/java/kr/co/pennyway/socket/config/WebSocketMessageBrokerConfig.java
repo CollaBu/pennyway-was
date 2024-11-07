@@ -73,7 +73,7 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
             @Override
             public Message<?> preSend(@NonNull Message<?> message, @NonNull MessageChannel channel) {
                 StompHeaderAccessor accessor = StompHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
-                log.info("Outbound message: {}", accessor);
+                log.debug("Outbound message: {}", accessor);
                 return message;
             }
         });
