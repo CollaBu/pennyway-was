@@ -122,10 +122,7 @@ public class ChatPaginationGetIntegrationTest extends ExternalApiDBTestConfig {
     private ResponseEntity<?> performRequest(User user, Long chatRoomId, Long lastMessageId, int size) {
         RequestParameters parameters = RequestParameters.defaultGet(BASE_URL)
                 .user(user)
-                .queryParams(RequestParameters.createQueryParams(
-                        "lastMessageId", 1000L,
-                        "size", 30
-                ))
+                .queryParams(RequestParameters.createQueryParams("lastMessageId", lastMessageId, "size", size))
                 .uriVariables(new Object[]{chatRoomId})
                 .build();
 
