@@ -45,6 +45,7 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Slf4j
 @ExternalApiIntegrationTest
@@ -102,10 +103,8 @@ public class ChatPaginationGetIntegrationTest extends ExternalApiDBTestConfig {
         createChatMember(user, chatRoom, ChatMemberRole.ADMIN);
         List<ChatMessage> messages = setupTestMessages(chatRoom.getId(), user.getId(), 50);
 
-        log.info("saved messages: {}", chatMessageRepository.findRecentMessages(chatRoom.getId(), 50));
-
         // when
-        ResponseEntity<?> response = performRequest(user, chatRoom.getId(), messages.get(49).getChatId(), 30);
+        ResponseEntity<?> response = performRequest(user, chatRoom.getId(), messages.get(49).getChatId() + 100, 30); // 마지막 메시지를 포함하여 요청
 
         // then
         assertAll(
@@ -113,8 +112,85 @@ public class ChatPaginationGetIntegrationTest extends ExternalApiDBTestConfig {
                 () -> {
                     SliceResponseTemplate<ChatRes.ChatDetail> slice = extractChatDetail(response);
 
+                    assertEquals(messages.get(49).getChatId(), slice.contents().get(0).chatId());
                     assertThat(slice.contents()).hasSize(30);
                     assertThat(slice.hasNext()).isTrue();
+                }
+        );
+    }
+
+    @Test
+    @DisplayName("채팅방 멤버가 아닌 사용자는 메시지를 조회할 수 없다")
+    void readChatsWithoutPermissionTest() {
+        // given
+        User nonMember = createUser();
+        ChatRoom chatRoom = createChatRoom();
+
+        // when
+        ResponseEntity<?> response = performRequest(nonMember, chatRoom.getId(), 0L, 30);
+
+        // then
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 채팅방의 메시지는 조회할 수 없다")
+    void readChatsFromNonExistentRoomTest() {
+        // given
+        User user = createUser();
+        Long nonExistentRoomId = 9999L;
+
+        // when
+        ResponseEntity<?> response = performRequest(user, nonExistentRoomId, 0L, 30);
+
+        // then
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+    }
+
+    @Test
+    @DisplayName("마지막 페이지를 조회할 때 hasNext는 false여야 한다")
+    void readLastPageTest() {
+        // given
+        User user = createUser();
+        ChatRoom chatRoom = createChatRoom();
+        createChatMember(user, chatRoom, ChatMemberRole.ADMIN);
+        List<ChatMessage> messages = setupTestMessages(chatRoom.getId(), user.getId(), 10);
+        log.info("messages: {}", messages);
+
+        // when
+        ResponseEntity<?> response = performRequest(user, chatRoom.getId(), messages.get(0).getChatId(), 10);
+
+        // then
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
+                () -> {
+                    SliceResponseTemplate<ChatRes.ChatDetail> slice = extractChatDetail(response);
+
+                    assertThat(slice.contents()).hasSize(0);
+                    assertThat(slice.hasNext()).isFalse();
+                }
+        );
+    }
+
+    @Test
+    @DisplayName("메시지가 없는 채팅방을 조회하면 빈 리스트를 반환해야 한다")
+    void readEmptyChatsTest() {
+        // given
+        User user = createUser();
+        ChatRoom chatRoom = createChatRoom();
+        createChatMember(user, chatRoom, ChatMemberRole.ADMIN);
+
+        // when
+        ResponseEntity<?> response = performRequest(user, chatRoom.getId(), Long.MAX_VALUE, 30);
+
+        // then
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
+                () -> {
+                    SliceResponseTemplate<ChatRes.ChatDetail> slice = extractChatDetail(response);
+
+                    assertThat(slice.contents()).isEmpty();
+                    assertThat(slice.hasNext()).isFalse();
                 }
         );
     }
