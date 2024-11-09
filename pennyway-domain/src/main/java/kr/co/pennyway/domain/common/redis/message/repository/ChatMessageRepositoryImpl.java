@@ -61,12 +61,12 @@ public class ChatMessageRepositoryImpl implements ChatMessageRepository {
         Set<String> messageJsonSet = redisTemplate.opsForZSet().reverseRangeByScore( // ZREVRANGEBYSCORE
                 chatRoomKey,
                 0, // 최소값
-                lastMessageId - 1, // 마지막으로 조회한 메시지 이전까지
+                lastMessageId, // 마지막으로 조회한 메시지 이전까지
                 0, // offset
                 size + 1 // size + 1 만큼 조회하여 다음 페이지 존재 여부 확인
         );
-
         List<ChatMessage> messages = convertToMessages(messageJsonSet);
+
         boolean hasNext = messages.size() > size;
 
         if (hasNext) {
