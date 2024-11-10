@@ -2,7 +2,7 @@ package kr.co.pennyway.domain.common.redis.message.service;
 
 import kr.co.pennyway.common.annotation.DomainService;
 import kr.co.pennyway.domain.common.redis.message.domain.ChatMessage;
-import kr.co.pennyway.domain.common.redis.message.repository.ChatMessageRepositoryImpl;
+import kr.co.pennyway.domain.common.redis.message.repository.ChatMessageRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Slice;
@@ -13,10 +13,10 @@ import java.util.List;
 @DomainService
 @RequiredArgsConstructor
 public class ChatMessageService {
-    private final ChatMessageRepositoryImpl chatMessageRepositoryImpl;
+    private final ChatMessageRepository chatMessageRepository;
 
     public ChatMessage create(ChatMessage chatMessage) {
-        return chatMessageRepositoryImpl.save(chatMessage);
+        return chatMessageRepository.save(chatMessage);
     }
 
     /**
@@ -27,7 +27,7 @@ public class ChatMessageService {
      * @return 최근 시간 순으로 정렬된 최근 메시지 목록
      */
     public List<ChatMessage> readRecentMessages(Long roomId, int limit) {
-        return chatMessageRepositoryImpl.findRecentMessages(roomId, limit);
+        return chatMessageRepository.findRecentMessages(roomId, limit);
     }
 
     /**
@@ -41,7 +41,7 @@ public class ChatMessageService {
      * @return 페이징된 메시지 목록
      */
     public Slice<ChatMessage> readMessagesBefore(Long roomId, Long lastMessageId, int size) {
-        return chatMessageRepositoryImpl.findMessagesBefore(roomId, lastMessageId, size);
+        return chatMessageRepository.findMessagesBefore(roomId, lastMessageId, size);
     }
 
     /**
@@ -52,6 +52,6 @@ public class ChatMessageService {
      * @return 안 읽은 메시지 개수
      */
     public Long countUnreadMessages(Long roomId, Long lastReadMessageId) {
-        return chatMessageRepositoryImpl.countUnreadMessages(roomId, lastReadMessageId);
+        return chatMessageRepository.countUnreadMessages(roomId, lastReadMessageId);
     }
 }

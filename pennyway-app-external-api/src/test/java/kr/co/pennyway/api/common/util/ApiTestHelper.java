@@ -9,6 +9,9 @@ import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.infra.common.jwt.JwtProvider;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.*;
+import org.springframework.web.util.UriComponentsBuilder;
+
+import java.util.Map;
 
 public final class ApiTestHelper {
     private final TestRestTemplate restTemplate;
@@ -46,6 +49,77 @@ public final class ApiTestHelper {
                 createHttpEntity(user, request),
                 Object.class,
                 uriVariables
+        );
+
+        Object body = response.getBody();
+        if (body == null) {
+            throw new IllegalStateException("예상치 못한 반환 타입입니다. : " + response);
+        }
+
+        return response.getStatusCode().is2xxSuccessful()
+                ? createSuccessResponse(response, body, successResponseType)
+                : createErrorResponse(response, body);
+    }
+
+    /**
+     * API 요청을 보내고 응답을 처리하는 일반화된 메서드
+     * 쿼리 파라미터를 추가할 수 있습니다.
+     *
+     * @param url                 API 엔드포인트 URL
+     * @param method              HTTP 메서드
+     * @param user                요청하는 사용자
+     * @param request             요청 바디 (없을 경우 null)
+     * @param successResponseType 성공 응답 타입
+     * @param queryParams         쿼리 파라미터들
+     * @param uriVariables        URL 변수들
+     * @return ResponseEntity
+     */
+    public <T, R> ResponseEntity<?> callApi(
+            String url,
+            HttpMethod method,
+            User user,
+            T request,
+            TypeReference<SuccessResponse<R>> successResponseType,
+            Map<String, String> queryParams,
+            Object... uriVariables) {
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(url);
+        if (queryParams != null) {
+            queryParams.forEach(builder::queryParam);
+        }
+
+        ResponseEntity<Object> response = restTemplate.exchange(
+                builder.buildAndExpand(uriVariables).toUri(),
+                method,
+                createHttpEntity(user, request),
+                Object.class
+        );
+
+        Object body = response.getBody();
+        if (body == null) {
+            throw new IllegalStateException("예상치 못한 반환 타입입니다. : " + response);
+        }
+
+        return response.getStatusCode().is2xxSuccessful()
+                ? createSuccessResponse(response, body, successResponseType)
+                : createErrorResponse(response, body);
+    }
+
+    /**
+     * API 요청을 보내고 응답을 처리하는 일반화된 메서드
+     *
+     * @param parameters          {@link RequestParameters}
+     * @param successResponseType 성공 응답 타입
+     * @return ResponseEntity
+     */
+    public <R> ResponseEntity<?> callApi(
+            RequestParameters parameters,
+            TypeReference<SuccessResponse<R>> successResponseType) {
+
+        ResponseEntity<Object> response = restTemplate.exchange(
+                parameters.createUri(),
+                parameters.getMethod(),
+                createHttpEntity(parameters.getUser(), parameters.getRequest()),
+                Object.class
         );
 
         Object body = response.getBody();
