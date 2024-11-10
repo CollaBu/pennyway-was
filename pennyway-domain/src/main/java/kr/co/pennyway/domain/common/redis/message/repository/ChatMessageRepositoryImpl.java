@@ -6,7 +6,9 @@ import kr.co.pennyway.domain.common.redis.message.domain.ChatMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Range;
 import org.springframework.data.domain.SliceImpl;
+import org.springframework.data.redis.connection.Limit;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -19,6 +21,8 @@ import java.util.Set;
 @Repository
 @RequiredArgsConstructor
 public class ChatMessageRepositoryImpl implements ChatMessageRepository {
+    private static final int COUNTER_DIGITS = 4;
+    private static final String SEPARATOR = "|";
     private final RedisTemplate<String, String> redisTemplate;
     private final ObjectMapper objectMapper;
 
@@ -28,11 +32,9 @@ public class ChatMessageRepositoryImpl implements ChatMessageRepository {
             String messageJson = objectMapper.writeValueAsString(message);
             String chatRoomKey = getChatRoomKey(message.getChatRoomId());
 
-            redisTemplate.opsForZSet().add( // ZADD
-                    chatRoomKey,
-                    messageJson,
-                    message.getChatId()
-            );
+            String tsidKey = formatTsidKey(message.getChatId());
+
+            redisTemplate.opsForZSet().add(chatRoomKey, tsidKey + SEPARATOR + messageJson, 0);
         } catch (JsonProcessingException e) {
             log.error("Failed to save chat message: {}", message, e);
             throw new RuntimeException("Failed to save chat message", e);
@@ -45,11 +47,7 @@ public class ChatMessageRepositoryImpl implements ChatMessageRepository {
     public List<ChatMessage> findRecentMessages(Long roomId, int limit) {
         String chatRoomKey = getChatRoomKey(roomId);
 
-        Set<String> messageJsonSet = redisTemplate.opsForZSet().reverseRange( // ZREVRANGE
-                chatRoomKey,
-                0,
-                limit - 1
-        );
+        Set<String> messageJsonSet = redisTemplate.opsForZSet().reverseRangeByLex(chatRoomKey, Range.unbounded(), Limit.limit().count(limit));
 
         return convertToMessages(messageJsonSet);
     }
@@ -57,13 +55,12 @@ public class ChatMessageRepositoryImpl implements ChatMessageRepository {
     @Override
     public SliceImpl<ChatMessage> findMessagesBefore(Long roomId, Long lastMessageId, int size) {
         String chatRoomKey = getChatRoomKey(roomId);
+        String tsidKey = formatTsidKey(lastMessageId);
 
-        Set<String> messageJsonSet = redisTemplate.opsForZSet().reverseRangeByScore( // ZREVRANGEBYSCORE
+        Set<String> messageJsonSet = redisTemplate.opsForZSet().reverseRangeByLex(
                 chatRoomKey,
-                0, // 최소값
-                lastMessageId - 100, // 마지막으로 조회한 메시지 이전까지
-                0, // offset
-                size + 1 // size + 1 만큼 조회하여 다음 페이지 존재 여부 확인
+                Range.of(Range.Bound.unbounded(), Range.Bound.exclusive(tsidKey)),
+                Limit.limit().count(size + 1)
         );
         List<ChatMessage> messages = convertToMessages(messageJsonSet);
 
@@ -74,6 +71,16 @@ public class ChatMessageRepositoryImpl implements ChatMessageRepository {
         }
 
         return new SliceImpl<>(messages, PageRequest.of(0, size), hasNext);
+    }
+
+    @Override
+    public Long countUnreadMessages(Long roomId, Long lastReadMessageId) {
+        String chatRoomKey = getChatRoomKey(roomId);
+        String tsidKey = formatTsidKey(lastReadMessageId);
+
+        Long totalCount = redisTemplate.opsForZSet().lexCount(chatRoomKey, Range.of(Range.Bound.inclusive(tsidKey), Range.Bound.unbounded()));
+
+        return totalCount > 0 ? totalCount - 1 : 0;
     }
 
     /**
@@ -89,26 +96,17 @@ public class ChatMessageRepositoryImpl implements ChatMessageRepository {
         }
 
         return messageJsonSet.stream()
-                .map(json -> {
+                .map(value -> {
                     try {
+                        String json = value.substring(value.indexOf(SEPARATOR) + 1);
                         return objectMapper.readValue(json, ChatMessage.class);
                     } catch (JsonProcessingException e) {
-                        log.error("Failed to parse chat message JSON: {}", json, e);
+                        log.error("Failed to parse chat message JSON: {}", value, e);
                         return null;
                     }
                 })
                 .filter(Objects::nonNull)
                 .toList();
-    }
-
-    public Long countUnreadMessages(Long roomId, Long lastReadMessageId) {
-        String chatRoomKey = getChatRoomKey(roomId);
-
-        return redisTemplate.opsForZSet().count( // ZCOUNT
-                chatRoomKey,
-                lastReadMessageId + 1,  // 최소값 (lastReadMessageId 이후)
-                Double.POSITIVE_INFINITY  // 최대값
-        );
     }
 
     /**
@@ -119,5 +117,18 @@ public class ChatMessageRepositoryImpl implements ChatMessageRepository {
      */
     private String getChatRoomKey(Long roomId) {
         return "chatroom:" + roomId + ":message";
+    }
+
+    /**
+     * TSID를 lexicographical sorting이 가능한 형태의 문자열로 변환
+     * format: {timestamp부분:16진수}:{counter부분:4자리}
+     */
+    private String formatTsidKey(long tsid) {
+        String tsidStr = String.valueOf(tsid);
+
+        String timestamp = tsidStr.substring(0, tsidStr.length() - COUNTER_DIGITS);
+        String counter = tsidStr.substring(tsidStr.length() - COUNTER_DIGITS);
+
+        return timestamp + ":" + counter;
     }
 }
