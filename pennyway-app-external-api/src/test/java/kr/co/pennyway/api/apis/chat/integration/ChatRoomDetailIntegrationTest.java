@@ -22,6 +22,7 @@ import kr.co.pennyway.domain.domains.member.service.ChatMemberService;
 import kr.co.pennyway.domain.domains.member.type.ChatMemberRole;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.service.UserService;
+import kr.co.pennyway.infra.client.guid.IdGenerator;
 import kr.co.pennyway.infra.common.jwt.JwtProvider;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
@@ -72,6 +73,9 @@ public class ChatRoomDetailIntegrationTest extends ExternalApiDBTestConfig {
 
     @Autowired
     private ChatMessageRepositoryImpl chatMessageRepository;
+
+    @Autowired
+    private IdGenerator<Long> idGenerator;
 
     private ApiTestHelper apiTestHelper;
 
@@ -191,11 +195,11 @@ public class ChatRoomDetailIntegrationTest extends ExternalApiDBTestConfig {
         );
     }
 
-    private ChatMessage createTestMessage(Long chatRoomId, Long chatId, Long senderId) {
+    private ChatMessage createTestMessage(Long chatRoomId, Long idx, Long senderId) {
         return ChatMessageBuilder.builder()
                 .chatRoomId(chatRoomId)
-                .chatId(chatId)
-                .content("Test message " + chatId)
+                .chatId(idGenerator.generate())
+                .content("Test message " + idx)
                 .contentType(MessageContentType.TEXT)
                 .categoryType(MessageCategoryType.NORMAL)
                 .sender(senderId)
