@@ -42,8 +42,9 @@ public interface ChatMessageRepository {
      * 사용자가 마지막으로 읽은 메시지 이후의 안 읽은 메시지 개수를 조회합니다.
      *
      * @param roomId            채팅방 ID
-     * @param lastReadMessageId 사용자가 마지막으로 읽은 메시지의 TSID
+     * @param lastReadMessageId 사용자가 마지막으로 읽은 메시지의 TSID. 이 값이 0일 경우 모든 메시지 개수를 조회합니다.
      * @return 안 읽은 메시지 개수
+     * @throws IllegalArgumentException lastReadMessageId가 null이거나 음수인 경우
      */
     Long countUnreadMessages(Long roomId, Long lastReadMessageId);
 }

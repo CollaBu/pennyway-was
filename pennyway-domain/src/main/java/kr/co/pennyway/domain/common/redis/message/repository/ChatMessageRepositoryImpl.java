@@ -75,6 +75,14 @@ public class ChatMessageRepositoryImpl implements ChatMessageRepository {
 
     @Override
     public Long countUnreadMessages(Long roomId, Long lastReadMessageId) {
+        if (lastReadMessageId == null || lastReadMessageId < 0) {
+            throw new IllegalArgumentException("lastReadMessageId must not be null");
+        }
+
+        if (lastReadMessageId == 0L) {
+            return redisTemplate.opsForZSet().zCard(getChatRoomKey(roomId));
+        }
+
         String chatRoomKey = getChatRoomKey(roomId);
         String tsidKey = formatTsidKey(lastReadMessageId);
 
