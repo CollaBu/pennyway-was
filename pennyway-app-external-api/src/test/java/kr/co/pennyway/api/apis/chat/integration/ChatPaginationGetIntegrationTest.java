@@ -104,7 +104,7 @@ public class ChatPaginationGetIntegrationTest extends ExternalApiDBTestConfig {
         List<ChatMessage> messages = setupTestMessages(chatRoom.getId(), user.getId(), 50);
 
         // when
-        ResponseEntity<?> response = performRequest(user, chatRoom.getId(), messages.get(49).getChatId() + 100, 30); // 마지막 메시지를 포함하여 요청
+        ResponseEntity<?> response = performRequest(user, chatRoom.getId(), messages.get(49).getChatId(), 30);
 
         // then
         assertAll(
@@ -112,7 +112,7 @@ public class ChatPaginationGetIntegrationTest extends ExternalApiDBTestConfig {
                 () -> {
                     SliceResponseTemplate<ChatRes.ChatDetail> slice = extractChatDetail(response);
 
-                    assertEquals(messages.get(49).getChatId(), slice.contents().get(0).chatId());
+                    assertEquals(messages.get(48).getChatId(), slice.contents().get(0).chatId(), "lastMessageId에 해당하는 메시지는 포함되지 않아야 합니다");
                     assertThat(slice.contents()).hasSize(30);
                     assertThat(slice.hasNext()).isTrue();
                 }
@@ -155,7 +155,6 @@ public class ChatPaginationGetIntegrationTest extends ExternalApiDBTestConfig {
         ChatRoom chatRoom = createChatRoom();
         createChatMember(user, chatRoom, ChatMemberRole.ADMIN);
         List<ChatMessage> messages = setupTestMessages(chatRoom.getId(), user.getId(), 10);
-        log.info("messages: {}", messages);
 
         // when
         ResponseEntity<?> response = performRequest(user, chatRoom.getId(), messages.get(0).getChatId(), 10);
