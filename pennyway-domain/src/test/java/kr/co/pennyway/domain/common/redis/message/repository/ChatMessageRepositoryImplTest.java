@@ -22,6 +22,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -33,13 +34,14 @@ import static org.junit.jupiter.api.Assertions.*;
 @Import({ChatMessageRepositoryImpl.class})
 @ActiveProfiles("test")
 public class ChatMessageRepositoryImplTest extends ContainerRedisTestConfig {
+    private static final long CUSTOM_EPOCH = 1577836800000L;
+
     @Autowired
     private RedisTemplate<String, String> redisTemplate;
 
     @Autowired
     private ObjectMapper objectMapper;
 
-    //    @Autowired
     private ChatMessageRepositoryImpl chatMessageRepositoryImpl;
 
     private ChatMessage chatMessage;
@@ -49,7 +51,7 @@ public class ChatMessageRepositoryImplTest extends ContainerRedisTestConfig {
         chatMessageRepositoryImpl = new ChatMessageRepositoryImpl(redisTemplate, objectMapper);
         chatMessage = ChatMessageBuilder.builder()
                 .chatRoomId(1L)
-                .chatId(1L)
+                .chatId(createChatId(1))
                 .content("Hello")
                 .contentType(MessageContentType.TEXT)
                 .categoryType(MessageCategoryType.NORMAL)
@@ -90,10 +92,10 @@ public class ChatMessageRepositoryImplTest extends ContainerRedisTestConfig {
     @DisplayName("특정 메시지 이전의 메시지들을 페이징하여 조회한다")
     void successFindMessagesAfter() {
         // given
-        saveMessagesInOrder(1L, 10);
+        List<ChatMessage> messages = saveMessagesInOrder(1L, 10);
 
         // when
-        Slice<ChatMessage> messageSlice = chatMessageRepositoryImpl.findMessagesBefore(1L, 8L, 2);
+        Slice<ChatMessage> messageSlice = chatMessageRepositoryImpl.findMessagesBefore(1L, messages.get(7).getChatId(), 2);
 
         // then
         assertAll(
@@ -127,10 +129,10 @@ public class ChatMessageRepositoryImplTest extends ContainerRedisTestConfig {
     @DisplayName("안 읽은 메시지 개수를 정확히 계산한다")
     void successCountUnreadMessages() {
         // given
-        saveMessagesInOrder(1L, 5);
+        List<ChatMessage> messages = saveMessagesInOrder(1L, 5);
 
         // when
-        Long unreadCount = chatMessageRepositoryImpl.countUnreadMessages(1L, 3L);
+        Long unreadCount = chatMessageRepositoryImpl.countUnreadMessages(1L, messages.get(2).getChatId());
 
         // then
         assertEquals(2L, unreadCount, "마지막으로 읽은 메시지(ID: 3) 이후의 메시지 개수(4, 5)가 반환되어야 합니다");
@@ -177,10 +179,10 @@ public class ChatMessageRepositoryImplTest extends ContainerRedisTestConfig {
     @DisplayName("BVA: 마지막 페이지(가장 오래된 메시지)까지 정상적으로 조회된다")
     void successFindLastPage() {
         // given
-        saveMessagesInOrder(1L, 5);
+        List<ChatMessage> messages = saveMessagesInOrder(1L, 5);
 
         // when
-        Slice<ChatMessage> messageSlice = chatMessageRepositoryImpl.findMessagesBefore(1L, 2L, 2);
+        Slice<ChatMessage> messageSlice = chatMessageRepositoryImpl.findMessagesBefore(1L, messages.get(1).getChatId(), 2);
 
         // then
         assertAll(
@@ -224,7 +226,7 @@ public class ChatMessageRepositoryImplTest extends ContainerRedisTestConfig {
     @DisplayName("존재하지 않는 메시지 ID로 페이징 조회 시 빈 Slice를 반환한다")
     void returnEmptySliceForNonExistingMessage() {
         // when
-        Slice<ChatMessage> messageSlice = chatMessageRepositoryImpl.findMessagesBefore(1L, 999L, 10);
+        Slice<ChatMessage> messageSlice = chatMessageRepositoryImpl.findMessagesBefore(1L, createChatId(999), 10);
 
         // then
         assertAll(
@@ -255,7 +257,7 @@ public class ChatMessageRepositoryImplTest extends ContainerRedisTestConfig {
         for (long i = 1; i <= messageCount; i++) {
             ChatMessage message = ChatMessageBuilder.builder()
                     .chatRoomId(1L)
-                    .chatId(i)
+                    .chatId(createChatId(i))
                     .content("Message " + i)
                     .contentType(MessageContentType.TEXT)
                     .categoryType(MessageCategoryType.NORMAL)
@@ -278,18 +280,88 @@ public class ChatMessageRepositoryImplTest extends ContainerRedisTestConfig {
         );
     }
 
-    private void saveMessagesInOrder(Long roomId, int messageCount) {
+    @Test
+    @DisplayName("같은 밀리초에 생성된 메시지들 중 ID의 차이가 10의 자리 수 이내인 경우에도 조회에 성공한다.")
+    void successSortingWithCloseIds() {
+        // given
+        long timestamp = (System.currentTimeMillis() - CUSTOM_EPOCH);
+        int gap = 5;
+
+        List<ChatMessage> messages = new ArrayList<>();
+        for (int i = 0; i < 3; i++) {
+            ChatMessage message = ChatMessageBuilder.builder()
+                    .chatRoomId(1L)
+                    .chatId(Long.parseLong(timestamp + String.format("%07d", i + gap)))  // 5씩 차이나는 ID
+                    .content("Message " + (i + 1))
+                    .contentType(MessageContentType.TEXT)
+                    .categoryType(MessageCategoryType.NORMAL)
+                    .sender(1L)
+                    .build();
+            ReflectionTestUtils.setField(message, "createdAt", LocalDateTime.now());
+            messages.add(chatMessageRepositoryImpl.save(message));
+        }
+
+        // when
+        Slice<ChatMessage> messageSlice = chatMessageRepositoryImpl.findMessagesBefore(
+                1L,
+                messages.get(1).getChatId(), // 2번째 메시지 ID
+                1
+        );
+
+        // then
+        assertAll(
+                () -> assertEquals(1, messageSlice.getContent().size(), "정확히 1개의 메시지가 조회되어야 합니다"),
+                () -> assertEquals("Message 1", messageSlice.getContent().get(0).getContent(),
+                        "가장 첫 번째 메시지가 조회되어야 합니다"),
+                () -> assertFalse(messageSlice.hasNext(), "더 이전 메시지가 없어야 합니다")
+        );
+    }
+
+    @Test
+    @DisplayName("같은 밀리초에 생성된 메시지들 중 ID의 차이가 10의 자리 수 이내인 경우에도 읽지 않은 메시지 개수를 정확히 계산한다.")
+    void successCountUnreadMessagesWithCloseIds() {
+        // given
+        long timestamp = (System.currentTimeMillis() - CUSTOM_EPOCH);
+        int gap = 5;
+
+        List<ChatMessage> messages = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            ChatMessage message = ChatMessageBuilder.builder()
+                    .chatRoomId(1L)
+                    .chatId(Long.parseLong(timestamp + String.format("%07d", i + gap)))  // 5씩 차이나는 ID
+                    .content("Message " + (i + 1))
+                    .contentType(MessageContentType.TEXT)
+                    .categoryType(MessageCategoryType.NORMAL)
+                    .sender(1L)
+                    .build();
+            ReflectionTestUtils.setField(message, "createdAt", LocalDateTime.now());
+            log.info("message: {}", message);
+            messages.add(chatMessageRepositoryImpl.save(message));
+        }
+
+        // when
+        Long unreadCount = chatMessageRepositoryImpl.countUnreadMessages(1L, messages.get(8).getChatId());
+
+        // then
+        assertEquals(1L, unreadCount, "마지막으로 읽은 메시지(ID: 3) 이후의 메시지 개수(7)가 반환되어야 합니다");
+    }
+
+    private List<ChatMessage> saveMessagesInOrder(Long roomId, int messageCount) {
+        List<ChatMessage> messages = new ArrayList<>();
+
         for (long i = 1; i <= messageCount; i++) {
             ChatMessage message = ChatMessageBuilder.builder()
                     .chatRoomId(roomId)
-                    .chatId(i)
+                    .chatId(createChatId(i))
                     .content("Message " + i)
                     .contentType(MessageContentType.TEXT)
                     .categoryType(MessageCategoryType.NORMAL)
                     .sender(1L)
                     .build();
-            chatMessageRepositoryImpl.save(message);
+            messages.add(chatMessageRepositoryImpl.save(message));
         }
+
+        return messages;
     }
 
     @AfterEach
@@ -298,5 +370,10 @@ public class ChatMessageRepositoryImplTest extends ContainerRedisTestConfig {
         if (keys != null && !keys.isEmpty()) {
             redisTemplate.delete(keys);
         }
+    }
+
+    private long createChatId(long i) {
+        long timestamp = (System.currentTimeMillis() - CUSTOM_EPOCH);
+        return Long.parseLong(timestamp + String.format("%07d", i));
     }
 }
