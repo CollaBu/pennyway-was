@@ -1,5 +1,6 @@
 package kr.co.pennyway.api.apis.chat.controller;
 
+import kr.co.pennyway.api.apis.chat.api.ChatApi;
 import kr.co.pennyway.api.apis.chat.usecase.ChatUseCase;
 import kr.co.pennyway.api.common.response.SuccessResponse;
 import lombok.RequiredArgsConstructor;
@@ -12,11 +13,12 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/v2/chat-rooms/{chatRoomId}/chats")
-public class ChatController {
+public class ChatController implements ChatApi {
     private static final String CHATS = "chats";
 
     private final ChatUseCase chatUseCase;
 
+    @Override
     @GetMapping("")
     @PreAuthorize("isAuthenticated() and @chatRoomManager.hasPermission(principal.userId, #chatRoomId)")
     public ResponseEntity<?> readChats(
