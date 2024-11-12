@@ -71,7 +71,7 @@ public class ReadNotificationsSliceUnitTest extends ContainerMySqlTestConfig {
         bulkInsertNotifications(notifications);
 
         // when
-        Slice<Notification> result = notificationService.readNotificationsSlice(user.getId(), pa);
+        Slice<Notification> result = notificationService.readNotificationsSlice(user.getId(), pa, NoticeType.ANNOUNCEMENT);
 
         // then
         assertEquals("Slice 데이터 개수는 5개여야 한다.", 5, result.getNumberOfElements());
