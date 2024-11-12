@@ -21,13 +21,13 @@ public class NotificationUseCase {
     private final NotificationSaveService notificationSaveService;
 
     public NotificationDto.SliceRes getReadNotifications(Long userId, Pageable pageable) {
-        Slice<Notification> notifications = notificationSearchService.getNotifications(userId, pageable);
+        Slice<Notification> notifications = notificationSearchService.getAnnounceNotifications(userId, pageable);
 
         return NotificationMapper.toSliceRes(notifications, pageable);
     }
 
     public List<NotificationDto.Info> getUnreadNotifications(Long userId) {
-        List<Notification> notifications = notificationSearchService.getUnreadNotifications(userId);
+        List<Notification> notifications = notificationSearchService.getAnnounceUnreadNotifications(userId);
 
         return NotificationMapper.toInfoList(notifications);
     }
