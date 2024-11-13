@@ -12,6 +12,11 @@ public interface CustomChatMemberRepository {
     boolean existsByChatRoomIdAndUserId(Long chatRoomId, Long userId);
 
     /**
+     * 해당 유저가 채팅방장으로 가입한 채팅방이 존재하는지 확인한다.
+     */
+    boolean existsOwnershipChatRoomByUserId(Long userId);
+
+    /**
      * 채팅방의 관리자 정보를 조회한다.
      */
     Optional<ChatMemberResult.Detail> findAdminByChatRoomId(Long chatRoomId);

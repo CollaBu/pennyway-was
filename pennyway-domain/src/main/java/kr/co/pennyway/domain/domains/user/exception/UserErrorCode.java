@@ -26,6 +26,7 @@ public enum UserErrorCode implements BaseErrorCode {
     ALREADY_SIGNUP(StatusCode.CONFLICT, ReasonCode.RESOURCE_ALREADY_EXISTS, "이미 회원가입한 유저입니다."),
     ALREADY_EXIST_USERNAME(StatusCode.CONFLICT, ReasonCode.RESOURCE_ALREADY_EXISTS, "이미 존재하는 아이디입니다."),
     ALREADY_EXIST_PHONE(StatusCode.CONFLICT, ReasonCode.RESOURCE_ALREADY_EXISTS, "이미 존재하는 휴대폰 번호입니다."),
+    HAS_OWNERSHIP_CHAT_ROOM(StatusCode.CONFLICT, ReasonCode.RESOURCE_ALREADY_EXISTS, "채팅방의 방장으로 참여하고 있는 경우 삭제할 수 없습니다."),
 
     /* 404 NOT_FOUND */
     NOT_FOUND(StatusCode.NOT_FOUND, ReasonCode.REQUESTED_RESOURCE_NOT_FOUND, "유저를 찾을 수 없습니다."),

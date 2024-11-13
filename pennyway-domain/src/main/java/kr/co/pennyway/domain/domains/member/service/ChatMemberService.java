@@ -124,6 +124,11 @@ public class ChatMemberService {
     }
 
     @Transactional(readOnly = true)
+    public boolean hasUserChatRoomOwnership(Long userId) {
+        return chatMemberRepository.existsOwnershipChatRoomByUserId(userId);
+    }
+
+    @Transactional(readOnly = true)
     public long countActiveMembers(Long chatRoomId) {
         return chatMemberRepository.countByChatRoomIdAndActive(chatRoomId);
     }
