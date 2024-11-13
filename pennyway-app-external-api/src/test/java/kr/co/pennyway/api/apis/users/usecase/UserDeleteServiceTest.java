@@ -3,13 +3,14 @@ package kr.co.pennyway.api.apis.users.usecase;
 import kr.co.pennyway.api.apis.users.service.UserDeleteService;
 import kr.co.pennyway.api.config.ExternalApiDBTestConfig;
 import kr.co.pennyway.api.config.TestJpaConfig;
-import kr.co.pennyway.api.config.fixture.DeviceTokenFixture;
-import kr.co.pennyway.api.config.fixture.SpendingCustomCategoryFixture;
-import kr.co.pennyway.api.config.fixture.SpendingFixture;
-import kr.co.pennyway.api.config.fixture.UserFixture;
+import kr.co.pennyway.api.config.fixture.*;
 import kr.co.pennyway.domain.config.JpaConfig;
+import kr.co.pennyway.domain.domains.chatroom.domain.ChatRoom;
+import kr.co.pennyway.domain.domains.chatroom.repository.ChatRoomRepository;
 import kr.co.pennyway.domain.domains.device.domain.DeviceToken;
 import kr.co.pennyway.domain.domains.device.service.DeviceTokenService;
+import kr.co.pennyway.domain.domains.member.repository.ChatMemberRepository;
+import kr.co.pennyway.domain.domains.member.service.ChatMemberService;
 import kr.co.pennyway.domain.domains.oauth.domain.Oauth;
 import kr.co.pennyway.domain.domains.oauth.service.OauthService;
 import kr.co.pennyway.domain.domains.oauth.type.Provider;
@@ -40,7 +41,7 @@ import static org.springframework.test.util.AssertionErrors.*;
 @Slf4j
 @ExtendWith(MockitoExtension.class)
 @DataJpaTest(properties = "spring.jpa.hibernate.ddl-auto=create")
-@ContextConfiguration(classes = {JpaConfig.class, UserDeleteService.class, UserService.class, OauthService.class, DeviceTokenService.class, SpendingService.class, SpendingCustomCategoryService.class})
+@ContextConfiguration(classes = {JpaConfig.class, UserDeleteService.class, UserService.class, OauthService.class, DeviceTokenService.class, SpendingService.class, SpendingCustomCategoryService.class, ChatMemberService.class})
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Import(TestJpaConfig.class)
 public class UserDeleteServiceTest extends ExternalApiDBTestConfig {
@@ -61,6 +62,12 @@ public class UserDeleteServiceTest extends ExternalApiDBTestConfig {
 
     @Autowired
     private SpendingCustomCategoryService spendingCustomCategoryService;
+
+    @Autowired
+    private ChatRoomRepository chatRoomRepository;
+
+    @Autowired
+    private ChatMemberRepository chatMemberRepository;
 
     @Test
     @Transactional
@@ -142,6 +149,20 @@ public class UserDeleteServiceTest extends ExternalApiDBTestConfig {
         assertTrue("사용자가 삭제되어 있어야 한다.", userService.readUser(user.getId()).isEmpty());
         assertTrue("지출 정보가 삭제되어 있어야 한다.", spendingService.readSpendings(user.getId(), spending1.getSpendAt().getYear(), spending1.getSpendAt().getMonthValue()).isEmpty());
         assertTrue("지출 카테고리가 삭제되어 있어야 한다.", spendingCustomCategoryService.readSpendingCustomCategory(category.getId()).isEmpty());
+    }
+
+    @Test
+    @Transactional
+    @DisplayName("사용자가 채팅방장으로 등록된 채팅방이 하나 이상 존재하는 경우, 삭제할 수 없다.")
+    void deleteAccountWithOwnershipChatRoom() {
+        // given
+        User user = userService.createUser(UserFixture.GENERAL_USER.toUser());
+        ChatRoom chatRoom = chatRoomRepository.save(ChatRoomFixture.PUBLIC_CHAT_ROOM.toEntity(1L));
+        chatMemberRepository.save(ChatMemberFixture.ADMIN.toEntity(user, chatRoom));
+
+        // when - then
+        UserErrorException ex = assertThrows(UserErrorException.class, () -> userDeleteService.execute(user.getId()));
+        assertEquals("채팅방장으로 등록된 채팅방이 하나 이상 존재하는 경우, 삭제할 수 없다.", UserErrorCode.HAS_OWNERSHIP_CHAT_ROOM, ex.getBaseErrorCode());
     }
 
     private Oauth createOauth(Provider provider, String providerId, User user) {

@@ -7,6 +7,7 @@ import kr.co.pennyway.domain.common.util.SliceUtil;
 import kr.co.pennyway.domain.domains.notification.domain.Notification;
 import kr.co.pennyway.domain.domains.notification.domain.QNotification;
 import kr.co.pennyway.domain.domains.notification.repository.NotificationRepository;
+import kr.co.pennyway.domain.domains.notification.type.NoticeType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -25,8 +26,10 @@ public class NotificationService {
     private final QNotification notification = QNotification.notification;
 
     @Transactional(readOnly = true)
-    public Slice<Notification> readNotificationsSlice(Long userId, Pageable pageable) {
-        Predicate predicate = notification.receiver.id.eq(userId).and(notification.readAt.isNotNull());
+    public Slice<Notification> readNotificationsSlice(Long userId, Pageable pageable, NoticeType noticeType) {
+        Predicate predicate = notification.receiver.id.eq(userId)
+                .and(notification.readAt.isNotNull())
+                .and(notification.type.eq(noticeType));
 
         QueryHandler queryHandler = query -> query
                 .offset(pageable.getOffset())
@@ -38,8 +41,10 @@ public class NotificationService {
     }
 
     @Transactional(readOnly = true)
-    public List<Notification> readUnreadNotifications(Long userId) {
-        Predicate predicate = notification.receiver.id.eq(userId).and(notification.readAt.isNull());
+    public List<Notification> readUnreadNotifications(Long userId, NoticeType noticeType) {
+        Predicate predicate = notification.receiver.id.eq(userId)
+                .and(notification.readAt.isNull())
+                .and(notification.type.eq(noticeType));
 
         return notificationRepository.findList(predicate, null, null);
     }

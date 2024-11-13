@@ -29,6 +29,16 @@ public class CustomChatMemberRepositoryImpl implements CustomChatMemberRepositor
     }
 
     @Override
+    public boolean existsOwnershipChatRoomByUserId(Long userId) {
+        return queryFactory.select(ConstantImpl.create(1))
+                .from(chatMember)
+                .where(chatMember.user.id.eq(userId)
+                        .and(chatMember.role.eq(ChatMemberRole.ADMIN))
+                        .and(chatMember.deletedAt.isNull()))
+                .fetchFirst() != null;
+    }
+
+    @Override
     public Optional<ChatMemberResult.Detail> findAdminByChatRoomId(Long chatRoomId) {
         ChatMemberResult.Detail result =
                 queryFactory.select(
