@@ -17,6 +17,7 @@ public class UserSession implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
+    private Long userId;
     private String deviceId;
     private String deviceName;
     @Convert(converter = UserStatusConverter.class)
@@ -28,14 +29,16 @@ public class UserSession implements Serializable {
 
     @JsonCreator
     private UserSession(
+            @JsonProperty("userId") Long userId,
             @JsonProperty("deviceId") String deviceId,
             @JsonProperty("deviceName") String deviceName,
             @JsonProperty("status") UserStatus status,
             @JsonProperty("currentChatRoomId") Long currentChatRoomId,
             @JsonProperty("lastActiveAt") LocalDateTime lastActiveAt
     ) {
-        validate(deviceId, deviceName, status, lastActiveAt);
+        validate(userId, deviceId, deviceName, status, lastActiveAt);
 
+        this.userId = userId;
         this.deviceId = deviceId;
         this.deviceName = deviceName;
         this.status = status;
@@ -48,8 +51,12 @@ public class UserSession implements Serializable {
      * 사용자의 상태는 ACTIVE_APP이며, 채팅방 관련 뷰룰 보고 있지 않음을 전제로 한다.
      * 마지막 활동 시간은 현재 시간으로 설정된다.
      */
-    public static UserSession of(String deviceId, String deviceName) {
-        return new UserSession(deviceId, deviceName, UserStatus.ACTIVE_APP, -1L, LocalDateTime.now());
+    public static UserSession of(Long userId, String deviceId, String deviceName) {
+        return new UserSession(userId, deviceId, deviceName, UserStatus.ACTIVE_APP, -1L, LocalDateTime.now());
+    }
+
+    public Long getUserId() {
+        return userId;
     }
 
     public String getDeviceId() {
@@ -81,18 +88,11 @@ public class UserSession implements Serializable {
         return lastActiveAt;
     }
 
-    public void updateStatus(UserStatus status) {
-        validate(deviceId, deviceName, status, lastActiveAt);
-
-        this.status = status;
-        updateLastActiveAt();
-    }
-
     public void updateStatus(UserStatus status, Long currentChatRoomId) {
-        validate(deviceId, deviceName, status, lastActiveAt);
+        validate(userId, deviceId, deviceName, status, lastActiveAt);
 
         if (status.equals(UserStatus.ACTIVE_CHAT_ROOM) && (currentChatRoomId == null || currentChatRoomId <= 0)) {
-            throw new IllegalArgumentException("채팅방 ID는 null 혹은 0을 포함한 음수를 허용하지 않습니다.");
+            throw new IllegalArgumentException("ACTIVE_CHAT_ROOM 상태에서 채팅방 ID는 null 혹은 0을 포함한 음수를 허용하지 않습니다.");
         }
 
         this.status = status;
@@ -112,7 +112,7 @@ public class UserSession implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         UserSession that = (UserSession) o;
-        return deviceId.equals(that.deviceId) && status == that.status && Objects.equals(currentChatRoomId, that.currentChatRoomId) && lastActiveAt.equals(that.lastActiveAt);
+        return userId.equals(that.userId) && deviceId.equals(that.deviceId) && Objects.equals(currentChatRoomId, that.currentChatRoomId) && lastActiveAt.equals(that.lastActiveAt);
     }
 
     @Override
@@ -121,8 +121,8 @@ public class UserSession implements Serializable {
             return hashCode;
         }
 
-        int result = deviceId.hashCode();
-        result = 31 * result + status.hashCode();
+        int result = userId.hashCode();
+        result = 31 * result + deviceId.hashCode();
         result = 31 * result + lastActiveAt.hashCode();
         return hashCode = result;
     }
@@ -132,17 +132,21 @@ public class UserSession implements Serializable {
         s.defaultReadObject();
 
         // 가변 요소를 방어적으로 복사
-        deviceId = String.copyValueOf(deviceId.toCharArray());
-        deviceName = String.copyValueOf(deviceName.toCharArray());
-        status = UserStatus.valueOf(status.name());
-        lastActiveAt = LocalDateTime.of(lastActiveAt.toLocalDate(), lastActiveAt.toLocalTime());
-        currentChatRoomId = this.currentChatRoomId == null ? -1L : Long.valueOf(currentChatRoomId);
+        this.userId = Long.valueOf(userId);
+        this.deviceId = String.copyValueOf(deviceId.toCharArray());
+        this.deviceName = String.copyValueOf(deviceName.toCharArray());
+        this.status = UserStatus.valueOf(status.name());
+        this.lastActiveAt = LocalDateTime.of(lastActiveAt.toLocalDate(), lastActiveAt.toLocalTime());
+        this.currentChatRoomId = this.currentChatRoomId == null ? -1L : currentChatRoomId;
 
         // 불변식을 만족하는지 검사한다.
-        validate(deviceId, deviceName, status, lastActiveAt);
+        validate(userId, deviceId, deviceName, status, lastActiveAt);
     }
 
-    private void validate(String deviceId, String deviceName, UserStatus status, LocalDateTime lastActiveAt) {
+    private void validate(Long userId, String deviceId, String deviceName, UserStatus status, LocalDateTime lastActiveAt) {
+        if (userId == null) {
+            throw new IllegalStateException("userId는 null일 수 없습니다.");
+        }
         if (deviceId == null) {
             throw new IllegalStateException("deviceId는 null일 수 없습니다.");
         }
@@ -160,7 +164,8 @@ public class UserSession implements Serializable {
     @Override
     public String toString() {
         return "UserSession{" +
-                "deviceId='" + deviceId + '\'' +
+                "userId='" + userId + '\'' +
+                ", deviceId='" + deviceId + '\'' +
                 ", deviceName='" + deviceName + '\'' +
                 ", status='" + status + '\'' +
                 ", currentChatRoomId='" + currentChatRoomId + '\'' +
