@@ -39,7 +39,7 @@ public class OauthUseCase {
 
         User user = userOauthSignService.readUser(request.oauthId(), provider);
 
-        return (user != null) ? Pair.of(user.getId(), jwtAuthHelper.createToken(user)) : Pair.of(-1L, null);
+        return (user != null) ? Pair.of(user.getId(), jwtAuthHelper.createToken(user, request.deviceId())) : Pair.of(-1L, null);
     }
 
     @Transactional(readOnly = true)
@@ -67,7 +67,7 @@ public class OauthUseCase {
         OidcDecodePayload payload = oauthOidcHelper.getPayload(provider, request.oauthId(), request.idToken(), request.nonce());
         User user = userOauthSignService.saveUser(request, userSync, provider, payload.sub());
 
-        return Pair.of(user.getId(), jwtAuthHelper.createToken(user));
+        return Pair.of(user.getId(), jwtAuthHelper.createToken(user, request.deviceId()));
     }
 
     /**
