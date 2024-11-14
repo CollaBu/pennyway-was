@@ -37,7 +37,7 @@ public class UserSessionCustomRepositoryTest extends ContainerRedisTestConfig {
         userId = 1L;
         deviceId = "123456789";
         deviceName = "TestDevice";
-        userSession = UserSession.of(deviceId, deviceName);
+        userSession = UserSession.of(userId, deviceId, deviceName);
     }
 
     @Test
@@ -58,12 +58,13 @@ public class UserSessionCustomRepositoryTest extends ContainerRedisTestConfig {
     }
 
     @Test
-    @DisplayName("모든 사용자 세션 조회 테스트")
+    @DisplayName("임의의 사용자의 모든 세션 조회 테스트")
     void findAllUserSessionsTest() throws JsonProcessingException {
         // given
         String deviceId2 = "987654321";
         String deviceName2 = "TestDevice2";
-        UserSession userSession2 = UserSession.of(deviceId2, deviceName2);
+        UserSession userSession2 = UserSession.of(userId, deviceId2, deviceName2);
+
         userSessionRepository.save(userId, deviceId, userSession);
         userSessionRepository.save(userId, deviceId2, userSession2);
 
