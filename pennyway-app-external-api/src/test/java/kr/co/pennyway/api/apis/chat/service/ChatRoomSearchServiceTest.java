@@ -1,6 +1,11 @@
 package kr.co.pennyway.api.apis.chat.service;
 
+import kr.co.pennyway.api.apis.chat.dto.ChatRoomRes;
+import kr.co.pennyway.domain.common.redis.message.domain.ChatMessage;
+import kr.co.pennyway.domain.common.redis.message.domain.ChatMessageBuilder;
 import kr.co.pennyway.domain.common.redis.message.service.ChatMessageService;
+import kr.co.pennyway.domain.common.redis.message.type.MessageCategoryType;
+import kr.co.pennyway.domain.common.redis.message.type.MessageContentType;
 import kr.co.pennyway.domain.domains.chatroom.dto.ChatRoomDetail;
 import kr.co.pennyway.domain.domains.chatroom.service.ChatRoomService;
 import kr.co.pennyway.domain.domains.chatstatus.service.ChatMessageStatusService;
@@ -15,11 +20,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ChatRoomSearchServiceTest {
@@ -34,7 +40,7 @@ class ChatRoomSearchServiceTest {
     private ChatMessageService chatMessageService;
 
     @Test
-    @DisplayName("사용자의 채팅방 목록과 각 방의 읽지 않은 메시지 수를 정상적으로 조회한다")
+    @DisplayName("사용자의 채팅방 목록과 각 방의 읽지 않은 메시지 수, 마지막 메시지를 정상적으로 조회한다")
     void successReadChatRooms() {
         // given
         Long userId = 1L;
@@ -46,21 +52,29 @@ class ChatRoomSearchServiceTest {
         given(chatRoomService.readChatRoomsByUserId(userId)).willReturn(chatRooms);
 
         // room1: 마지막으로 읽은 메시지 ID 10, 읽지 않은 메시지 5개
+        ChatMessage firstRoomLastMessage = ChatMessageBuilder.builder().chatRoomId(2L).chatId(1L).content("Hello").contentType(MessageContentType.TEXT).categoryType(MessageCategoryType.NORMAL).sender(userId).build();
+
         given(chatMessageStatusService.readLastReadMessageId(userId, 1L)).willReturn(10L);
         given(chatMessageService.countUnreadMessages(1L, 10L)).willReturn(5L);
+        given(chatMessageService.readRecentMessages(1L, 1)).willReturn(List.of(firstRoomLastMessage));
 
         // room2: 마지막으로 읽은 메시지 ID 20, 읽지 않은 메시지 3개
+        ChatMessage secondRoomLastMessage = ChatMessageBuilder.builder().chatRoomId(2L).chatId(100L).content("jayang님이 입장하셨습니다.").contentType(MessageContentType.TEXT).categoryType(MessageCategoryType.SYSTEM).sender(userId).build();
+
         given(chatMessageStatusService.readLastReadMessageId(userId, 2L)).willReturn(20L);
         given(chatMessageService.countUnreadMessages(2L, 20L)).willReturn(3L);
+        given(chatMessageService.readRecentMessages(2L, 1)).willReturn(List.of(secondRoomLastMessage));
 
         // when
-        Map<ChatRoomDetail, Long> result = chatRoomSearchService.readChatRooms(userId);
+        List<ChatRoomRes.Info> result = chatRoomSearchService.readChatRooms(userId);
 
         // then
         assertAll(
-                () -> assertEquals(2, result.size()),
-                () -> assertEquals(5L, result.get(chatRooms.get(0))),
-                () -> assertEquals(3L, result.get(chatRooms.get(1)))
+                () -> assertEquals(2, result.size(), "조회된 채팅방 목록은 2개여야 한다."),
+                () -> assertEquals(5L, result.get(0).unreadMessageCount(), "Room1의 읽지 않은 메시지 수는 5개여야 한다."),
+                () -> assertEquals(firstRoomLastMessage.getChatId(), result.get(0).lastMessage().chatId(), "Room1의 마지막 메시지는 ID가 일치해야 한다."),
+                () -> assertEquals(3L, result.get(1).unreadMessageCount(), "Room2의 읽지 않은 메시지 수는 3개여야 한다."),
+                () -> assertEquals(secondRoomLastMessage.getChatId(), result.get(1).lastMessage().chatId(), "Room2의 마지막 메시지는 ID가 일치해야 한다.")
         );
     }
 
@@ -72,10 +86,13 @@ class ChatRoomSearchServiceTest {
         given(chatRoomService.readChatRoomsByUserId(userId)).willReturn(Collections.emptyList());
 
         // when
-        Map<ChatRoomDetail, Long> result = chatRoomSearchService.readChatRooms(userId);
+        List<ChatRoomRes.Info> result = chatRoomSearchService.readChatRooms(userId);
 
         // then
         assertTrue(result.isEmpty());
+        verify(chatMessageStatusService, never()).readLastReadMessageId(eq(userId), anyLong());
+        verify(chatMessageService, never()).countUnreadMessages(anyLong(), anyLong());
+        verify(chatMessageService, never()).countUnreadMessages(anyLong(), anyLong());
     }
 
     @Test
@@ -110,10 +127,11 @@ class ChatRoomSearchServiceTest {
                 new ChatRoomDetail(1L, "Room1", "", "", 123456, LocalDateTime.now(), true, 2)
         );
 
-        InOrder inOrder = inOrder(chatRoomService, chatMessageStatusService, chatMessageService);
+        InOrder inOrder = inOrder(chatRoomService, chatMessageStatusService, chatMessageService, chatMessageService);
 
         given(chatRoomService.readChatRoomsByUserId(userId)).willReturn(chatRooms);
         given(chatMessageStatusService.readLastReadMessageId(userId, 1L)).willReturn(10L);
+        given(chatMessageService.readRecentMessages(1L, 1)).willReturn(Collections.emptyList());
         given(chatMessageService.countUnreadMessages(userId, 10L)).willReturn(5L);
 
         // when

@@ -26,7 +26,7 @@ public class ChatMemberUseCase {
     public ChatRoomRes.Detail joinChatRoom(Long userId, Long chatRoomId, Integer password) {
         Triple<ChatRoom, Integer, Long> chatRoom = chatMemberJoinService.execute(userId, chatRoomId, password);
 
-        return ChatRoomMapper.toChatRoomResDetail(chatRoom.getLeft(), false, chatRoom.getMiddle(), chatRoom.getRight());
+        return ChatRoomMapper.toChatRoomResDetail(chatRoom.getLeft(), null, false, chatRoom.getMiddle(), chatRoom.getRight());
     }
 
     public List<ChatMemberRes.MemberDetail> readChatMembers(Long chatRoomId, Set<Long> chatMemberIds) {

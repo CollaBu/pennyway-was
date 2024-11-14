@@ -16,7 +16,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 @UseCase
@@ -31,11 +30,11 @@ public class ChatRoomUseCase {
     public ChatRoomRes.Detail createChatRoom(ChatRoomReq.Create request, Long userId) {
         ChatRoom chatRoom = chatRoomSaveService.createChatRoom(request, userId);
 
-        return ChatRoomMapper.toChatRoomResDetail(chatRoom, true, 1, 0);
+        return ChatRoomMapper.toChatRoomResDetail(chatRoom, null, true, 1, 0);
     }
 
     public List<ChatRoomRes.Detail> getChatRooms(Long userId) {
-        Map<ChatRoomDetail, Long> chatRooms = chatRoomSearchService.readChatRooms(userId);
+        List<ChatRoomRes.Info> chatRooms = chatRoomSearchService.readChatRooms(userId);
 
         return ChatRoomMapper.toChatRoomResDetails(chatRooms);
     }
