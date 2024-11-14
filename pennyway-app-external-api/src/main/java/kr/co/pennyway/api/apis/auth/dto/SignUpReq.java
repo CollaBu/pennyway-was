@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
  * 일반 회원가입 시엔 General, 소셜 회원가입 시엔 Oauth를 사용합니다.
  */
 public class SignUpReq {
-    public record Info(String username, String name, String password, String phone, String code) {
+    public record Info(String username, String name, String password, String phone, String code, String deviceId) {
         public String password(PasswordEncoder passwordEncoder) {
             return passwordEncoder.encode(password);
         }
@@ -43,7 +43,7 @@ public class SignUpReq {
     }
 
     public record OauthInfo(String oauthId, String idToken, String nonce, String name, String username, String phone,
-                            String code) {
+                            String code, String deviceId) {
         public User toUser() {
             return User.builder()
                     .username(username)
@@ -77,10 +77,13 @@ public class SignUpReq {
             @Schema(description = "6자리 정수 인증번호", example = "123456")
             @NotBlank(message = "인증번호는 필수입니다.")
             @Pattern(regexp = "^\\d{6}$", message = "인증번호는 6자리 숫자여야 합니다.")
-            String code
+            String code,
+            @Schema(description = "사용자 기기 고유 식별자", example = "AA-BBB-CCC")
+            @NotBlank(message = "사용자 기기 고유 식별자를 입력해주세요")
+            String deviceId
     ) {
         public Info toInfo() {
-            return new Info(username, name, password, phone, code);
+            return new Info(username, name, password, phone, code, deviceId);
         }
     }
 
@@ -100,7 +103,7 @@ public class SignUpReq {
             String code
     ) {
         public Info toInfo() {
-            return new Info(null, null, password, phone, code);
+            return new Info(null, null, password, phone, code, null);
         }
     }
 
@@ -130,10 +133,13 @@ public class SignUpReq {
             @Schema(description = "6자리 정수 인증번호", example = "123456")
             @NotBlank(message = "인증번호는 필수입니다.")
             @Pattern(regexp = "^\\d{6}$", message = "인증번호는 6자리 숫자여야 합니다.")
-            String code
+            String code,
+            @Schema(description = "사용자 기기 고유 식별자", example = "AA-BBB-CCC")
+            @NotBlank(message = "사용자 기기 고유 식별자를 입력해주세요")
+            String deviceId
     ) {
         public OauthInfo toOauthInfo() {
-            return new OauthInfo(oauthId, idToken, nonce, name, username, phone, code);
+            return new OauthInfo(oauthId, idToken, nonce, name, username, phone, code, deviceId);
         }
     }
 
@@ -155,10 +161,13 @@ public class SignUpReq {
             @Schema(description = "6자리 정수 인증번호", example = "123456")
             @NotBlank(message = "인증번호는 필수입니다.")
             @Pattern(regexp = "^\\d{6}$", message = "인증번호는 6자리 숫자여야 합니다.")
-            String code
+            String code,
+            @Schema(description = "사용자 기기 고유 식별자", example = "AA-BBB-CCC")
+            @NotBlank(message = "사용자 기기 고유 식별자를 입력해주세요")
+            String deviceId
     ) {
         public OauthInfo toOauthInfo() {
-            return new OauthInfo(oauthId, idToken, nonce, null, null, phone, code);
+            return new OauthInfo(oauthId, idToken, nonce, null, null, phone, code, deviceId);
         }
     }
 }
