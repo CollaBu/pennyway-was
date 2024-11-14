@@ -13,23 +13,32 @@ import org.springframework.data.redis.core.RedisHash;
 @EqualsAndHashCode(of = {"userId", "token"})
 public class RefreshToken {
     @Id
+    private final String id;
     private final Long userId;
+    private final String deviceId;
     private final long ttl;
     private String token;
 
     @Builder
-    private RefreshToken(String token, Long userId, long ttl) {
-        this.token = token;
+    private RefreshToken(Long userId, String deviceId, String token, long ttl) {
+        this.id = createId(userId, deviceId);
         this.userId = userId;
+        this.deviceId = deviceId;
+        this.token = token;
         this.ttl = ttl;
     }
 
-    public static RefreshToken of(Long userId, String token, long ttl) {
+    public static RefreshToken of(Long userId, String deviceId, String token, long ttl) {
         return RefreshToken.builder()
                 .userId(userId)
+                .deviceId(deviceId)
                 .token(token)
                 .ttl(ttl)
                 .build();
+    }
+
+    public static String createId(Long userId, String deviceId) {
+        return userId + ":" + deviceId;
     }
 
     protected void rotation(String token) {
