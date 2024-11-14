@@ -23,6 +23,8 @@ public class DeviceToken {
     private Long id;
 
     private String token;
+    private String deviceId;
+    private String deviceName;
 
     @ColumnDefault("true")
     private Boolean activated;
@@ -36,15 +38,17 @@ public class DeviceToken {
     @JoinColumn(name = "user_id")
     private User user;
 
-    private DeviceToken(String token, Boolean activated, User user) {
+    private DeviceToken(String token, String deviceId, String deviceName, Boolean activated, User user) {
         this.token = Objects.requireNonNull(token, "token은 null이 될 수 없습니다.");
+        this.deviceId = Objects.requireNonNull(deviceId, "deviceId는 null이 될 수 없습니다.");
+        this.deviceName = Objects.requireNonNull(deviceName, "deviceName은 null이 될 수 없습니다.");
         this.activated = Objects.requireNonNull(activated, "activated는 null이 될 수 없습니다.");
         this.user = Objects.requireNonNull(user, "user는 null이 될 수 없습니다.");
         this.lastSignedInAt = LocalDateTime.now();
     }
 
-    public static DeviceToken of(String token, User user) {
-        return new DeviceToken(token, Boolean.TRUE, user);
+    public static DeviceToken of(String token, String deviceId, String deviceName, User user) {
+        return new DeviceToken(token, deviceId, deviceName, Boolean.TRUE, user);
     }
 
     public Boolean isActivated() {
