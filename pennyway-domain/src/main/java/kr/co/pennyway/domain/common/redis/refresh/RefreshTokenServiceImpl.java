@@ -9,7 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class RefreshTokenServiceImpl implements RefreshTokenService {
     private final RefreshTokenRepository refreshTokenRepository;
-    
+
     @Override
     public void save(RefreshToken refreshToken) {
         refreshTokenRepository.save(refreshToken);
@@ -17,8 +17,8 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     }
 
     @Override
-    public RefreshToken refresh(Long userId, String oldRefreshToken, String newRefreshToken) throws IllegalArgumentException, IllegalStateException {
-        RefreshToken refreshToken = findOrElseThrow(userId);
+    public RefreshToken refresh(Long userId, String deviceId, String oldRefreshToken, String newRefreshToken) throws IllegalArgumentException, IllegalStateException {
+        RefreshToken refreshToken = findOrElseThrow(userId, deviceId);
 
         validateToken(oldRefreshToken, refreshToken);
 
@@ -30,14 +30,14 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     }
 
     @Override
-    public void delete(Long userId, String refreshToken) throws IllegalArgumentException {
-        RefreshToken token = findOrElseThrow(userId);
+    public void delete(Long userId, String deviceId) throws IllegalArgumentException {
+        RefreshToken token = findOrElseThrow(userId, deviceId);
         refreshTokenRepository.delete(token);
         log.info("사용자 {}의 리프레시 토큰 삭제", userId);
     }
 
-    private RefreshToken findOrElseThrow(Long userId) {
-        return refreshTokenRepository.findById(userId)
+    private RefreshToken findOrElseThrow(Long userId, String deviceId) {
+        return refreshTokenRepository.findById(RefreshToken.createId(userId, deviceId))
                 .orElseThrow(() -> new IllegalArgumentException("refresh token not found"));
     }
 
