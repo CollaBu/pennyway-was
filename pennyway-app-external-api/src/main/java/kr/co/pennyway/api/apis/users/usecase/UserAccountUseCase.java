@@ -36,7 +36,7 @@ public class UserAccountUseCase {
 
     @Transactional
     public DeviceTokenDto.RegisterRes registerDeviceToken(Long userId, DeviceTokenDto.RegisterReq request) {
-        DeviceToken deviceToken = deviceTokenRegisterService.execute(userId, request.token());
+        DeviceToken deviceToken = deviceTokenRegisterService.execute(userId, request.deviceId(), request.deviceName(), request.token());
         return DeviceTokenMapper.toRegisterRes(deviceToken);
     }
 
