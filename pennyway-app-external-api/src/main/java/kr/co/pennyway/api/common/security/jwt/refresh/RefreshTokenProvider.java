@@ -22,8 +22,7 @@ import java.util.Base64;
 import java.util.Date;
 import java.util.Map;
 
-import static kr.co.pennyway.api.common.security.jwt.refresh.RefreshTokenClaimKeys.ROLE;
-import static kr.co.pennyway.api.common.security.jwt.refresh.RefreshTokenClaimKeys.USER_ID;
+import static kr.co.pennyway.api.common.security.jwt.refresh.RefreshTokenClaimKeys.*;
 
 @Slf4j
 @Component
@@ -56,7 +55,11 @@ public class RefreshTokenProvider implements JwtProvider {
     @Override
     public JwtClaims getJwtClaimsFromToken(String token) {
         Claims claims = getClaimsFromToken(token);
-        return RefreshTokenClaim.of(Long.parseLong(claims.get(USER_ID.getValue(), String.class)), claims.get(ROLE.getValue(), String.class));
+        return RefreshTokenClaim.of(
+                Long.parseLong(claims.get(USER_ID.getValue(), String.class)),
+                claims.get(DEVICE_ID.getValue(), String.class),
+                claims.get(ROLE.getValue(), String.class)
+        );
     }
 
     @Override
