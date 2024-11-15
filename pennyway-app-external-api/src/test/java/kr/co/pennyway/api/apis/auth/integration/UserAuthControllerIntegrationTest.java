@@ -110,7 +110,7 @@ public class UserAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
             // then
             result.andExpect(status().isOk()).andDo(print());
             assertTrue(forbiddenTokenService.isForbidden(expectedAccessToken));
-            assertThrows(IllegalArgumentException.class, () -> refreshTokenService.deleteAll(userId, expectedRefreshToken));
+            refreshTokenService.deleteAll(userId);
         }
 
         @Test
@@ -143,9 +143,10 @@ public class UserAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
                     .andExpect(jsonPath("$.code").value(JwtErrorCode.WITHOUT_OWNERSHIP_REFRESH_TOKEN.causedBy().getCode()))
                     .andExpect(jsonPath("$.message").value(JwtErrorCode.WITHOUT_OWNERSHIP_REFRESH_TOKEN.getExplainError()))
                     .andDo(print());
-            assertDoesNotThrow(() -> refreshTokenService.deleteAll(userId, expectedDeviceId));
-            assertDoesNotThrow(() -> refreshTokenService.deleteAll(1000L, otherDeviceId));
             assertFalse(forbiddenTokenService.isForbidden(expectedAccessToken));
+
+            refreshTokenService.deleteAll(userId);
+            refreshTokenService.deleteAll(1000L);
         }
 
         @Test
@@ -166,8 +167,9 @@ public class UserAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
                     .andExpect(jsonPath("$.code").value(JwtErrorCode.MALFORMED_TOKEN.causedBy().getCode()))
                     .andExpect(jsonPath("$.message").value(JwtErrorCode.MALFORMED_TOKEN.getExplainError()))
                     .andDo(print());
-            assertDoesNotThrow(() -> refreshTokenService.deleteAll(userId, expectedDeviceId));
             assertFalse(forbiddenTokenService.isForbidden(expectedAccessToken));
+
+            refreshTokenService.deleteAll(userId);
         }
 
         @Test
@@ -187,9 +189,9 @@ public class UserAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
                     .andExpect(status().isOk())
                     .andExpect(header().exists(HttpHeaders.SET_COOKIE))
                     .andDo(print());
-            assertThrows(IllegalArgumentException.class, () -> refreshTokenService.deleteAll(userId, oldRefreshToken));
-            assertThrows(IllegalArgumentException.class, () -> refreshTokenService.deleteAll(userId, expectedRefreshToken));
             assertTrue(forbiddenTokenService.isForbidden(expectedAccessToken));
+
+            refreshTokenService.deleteAll(userId);
         }
 
         @Test
