@@ -11,6 +11,7 @@ import org.springframework.boot.test.autoconfigure.data.redis.DataRedisTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.util.AssertionErrors.assertEquals;
 import static org.springframework.test.util.AssertionErrors.assertFalse;
@@ -88,5 +89,39 @@ public class RefreshTokenServiceIntegrationTest extends ContainerRedisTestConfig
         // then
         assertEquals("리프레시 토큰이 탈취되었을 때 예외가 발생해야 합니다.", "refresh token mismatched", exception.getMessage());
         assertFalse("리프레시 토큰이 탈취되었을 때 저장된 리프레시 토큰이 삭제되어야 합니다.", refreshTokenRepository.existsById(refreshToken.getId()));
+    }
+
+    @Test
+    @DisplayName("사용자에게 할당된 모든 Device의 리프레시 토큰 삭제 테스트")
+    void deleteAllTest() {
+        // given
+        RefreshToken refreshToken1 = RefreshToken.builder()
+                .userId(1L)
+                .deviceId("AA-BBB-CC-DDD")
+                .token("refreshToken1")
+                .ttl(1000L)
+                .build();
+        RefreshToken refreshToken2 = RefreshToken.builder()
+                .userId(1L)
+                .deviceId("AA-BBB-CC-EEE")
+                .token("refreshToken2")
+                .ttl(1000L)
+                .build();
+        refreshTokenService.save(refreshToken1);
+        refreshTokenService.save(refreshToken2);
+
+        // when
+        refreshTokenService.deleteAll(refreshToken1.getUserId());
+
+        // then
+        assertFalse("사용자에게 할당된 모든 Device의 리프레시 토큰이 삭제되어야 합니다.", refreshTokenRepository.existsById(refreshToken1.getId()));
+        assertFalse("사용자에게 할당된 모든 Device의 리프레시 토큰이 삭제되어야 합니다.", refreshTokenRepository.existsById(refreshToken2.getId()));
+    }
+
+    @Test
+    @DisplayName("userId에 해당하는 리프레시 토큰이 없어도, 삭제 수행에서 예외가 발생하지 않아야 합니다.")
+    void deleteAllWithoutRefreshTokenTest() {
+        // when - then
+        assertDoesNotThrow(() -> refreshTokenService.deleteAll(1L));
     }
 }
