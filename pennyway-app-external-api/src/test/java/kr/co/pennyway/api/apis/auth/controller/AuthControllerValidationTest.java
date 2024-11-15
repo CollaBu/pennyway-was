@@ -52,11 +52,11 @@ public class AuthControllerValidationTest {
                 .build();
     }
 
-    @DisplayName("[1] 아이디, 이름, 비밀번호, 전화번호, 인증번호 필수 입력")
+    @DisplayName("[1] 아이디, 이름, 비밀번호, 전화번호, 인증번호, 디바이스 아이디 필수 입력")
     @Test
     void requiredInputError() throws Exception {
         // given
-        SignUpReq.General request = new SignUpReq.General("", "", "", "", "");
+        SignUpReq.General request = new SignUpReq.General("", "", "", "", "", "");
 
         // when
         ResultActions resultActions = mockMvc.perform(
@@ -73,6 +73,7 @@ public class AuthControllerValidationTest {
                 .andExpect(jsonPath("$.fieldErrors.password").exists())
                 .andExpect(jsonPath("$.fieldErrors.phone").exists())
                 .andExpect(jsonPath("$.fieldErrors.code").exists())
+                .andExpect(jsonPath("$.fieldErrors.deviceId").exists())
                 .andDo(print());
     }
 
@@ -81,7 +82,7 @@ public class AuthControllerValidationTest {
     void idValidError() throws Exception {
         // given
         SignUpReq.General request = new SignUpReq.General("#pennyway", "페니웨이", "pennyway1234",
-                "010-1234-5678", "123456");
+                "010-1234-5678", "123456", "AA-BBB-CCC");
 
         // when
         ResultActions resultActions = mockMvc.perform(
@@ -102,7 +103,7 @@ public class AuthControllerValidationTest {
     void nameValidError() throws Exception {
         // given
         SignUpReq.General request = new SignUpReq.General("pennyway", "페니웨이12345", "pennyway1234",
-                "010-1234-5678", "123456");
+                "010-1234-5678", "123456", "AA-BBB-CCC");
 
         // when
         ResultActions resultActions = mockMvc.perform(
@@ -123,7 +124,7 @@ public class AuthControllerValidationTest {
     void passwordValidError() throws Exception {
         // given
         SignUpReq.General request = new SignUpReq.General("pennyway", "페니웨이", "pennyway",
-                "010-1234-5678", "123456");
+                "010-1234-5678", "123456", "AA-BBB-CCC");
 
         // when
         ResultActions resultActions = mockMvc.perform(
@@ -145,7 +146,7 @@ public class AuthControllerValidationTest {
     void phoneValidError() throws Exception {
         // given
         SignUpReq.General request = new SignUpReq.General("pennyway", "페니웨이", "pennyway1234",
-                "01012345673", "123456");
+                "01012345673", "123456", "AA-BBB-CCC");
 
         // when
         ResultActions resultActions = mockMvc.perform(
@@ -166,7 +167,7 @@ public class AuthControllerValidationTest {
     void codeValidError() throws Exception {
         // given
         SignUpReq.General request = new SignUpReq.General("pennyway", "페니웨이", "pennyway1234",
-                "010-1234-5678", "12345");
+                "010-1234-5678", "12345", "AA-BBB-CCC");
 
         // when
         ResultActions resultActions = mockMvc.perform(
@@ -187,7 +188,7 @@ public class AuthControllerValidationTest {
     void someFieldMissingError() throws Exception {
         // given
         SignUpReq.General request = new SignUpReq.General("pennyway", "페니웨이", "pennyway1234",
-                "010-1234-5678", "123456");
+                "010-1234-5678", "123456", "AA-BBB-CCC");
 
         // when
         ResultActions resultActions = mockMvc.perform(
@@ -210,7 +211,7 @@ public class AuthControllerValidationTest {
     void signUp() throws Exception {
         // given
         SignUpReq.General request = new SignUpReq.General("pennyway123", "페니웨이", "pennyway1234",
-                "010-1234-5678", "123456");
+                "010-1234-5678", "123456", "AA-BBB-CCC");
         ResponseCookie expectedCookie = ResponseCookie.from("refreshToken", "refreshToken")
                 .maxAge(Duration.ofDays(7).toSeconds()).httpOnly(true).path("/").build();
 

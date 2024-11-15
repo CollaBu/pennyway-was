@@ -35,6 +35,7 @@ public class RefreshTokenServiceIntegrationTest extends ContainerRedisTestConfig
         // given
         RefreshToken refreshToken = RefreshToken.builder()
                 .userId(1L)
+                .deviceId("AA-BBB-CC-DDD")
                 .token("refreshToken")
                 .ttl(1000L)
                 .build();
@@ -43,7 +44,7 @@ public class RefreshTokenServiceIntegrationTest extends ContainerRedisTestConfig
         refreshTokenService.save(refreshToken);
 
         // then
-        RefreshToken savedRefreshToken = refreshTokenRepository.findById(1L).orElse(null);
+        RefreshToken savedRefreshToken = refreshTokenRepository.findById(refreshToken.getId()).orElse(null);
         assertEquals("저장된 리프레시 토큰이 일치하지 않습니다.", refreshToken, savedRefreshToken);
         log.info("저장된 리프레시 토큰 정보 : {}", savedRefreshToken);
     }
@@ -54,16 +55,17 @@ public class RefreshTokenServiceIntegrationTest extends ContainerRedisTestConfig
         // given
         RefreshToken refreshToken = RefreshToken.builder()
                 .userId(1L)
+                .deviceId("AA-BBB-CC-DDD")
                 .token("refreshToken")
                 .ttl(1000L)
                 .build();
         refreshTokenService.save(refreshToken);
 
         // when
-        refreshTokenService.refresh(1L, "refreshToken", "newRefreshToken");
+        refreshTokenService.refresh(refreshToken.getUserId(), refreshToken.getDeviceId(), refreshToken.getToken(), "newRefreshToken");
 
         // then
-        RefreshToken savedRefreshToken = refreshTokenRepository.findById(1L).orElse(null);
+        RefreshToken savedRefreshToken = refreshTokenRepository.findById(refreshToken.getId()).orElse(null);
         assertEquals("갱신된 리프레시 토큰이 일치하지 않습니다.", "newRefreshToken", savedRefreshToken.getToken());
         log.info("갱신된 리프레시 토큰 정보 : {}", savedRefreshToken);
     }
@@ -74,16 +76,17 @@ public class RefreshTokenServiceIntegrationTest extends ContainerRedisTestConfig
         // given
         RefreshToken refreshToken = RefreshToken.builder()
                 .userId(1L)
+                .deviceId("AA-BBB-CC-DDD")
                 .token("refreshToken")
                 .ttl(1000L)
                 .build();
         refreshTokenService.save(refreshToken);
 
         // when
-        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> refreshTokenService.refresh(1L, "anotherRefreshToken", "newRefreshToken"));
+        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> refreshTokenService.refresh(refreshToken.getUserId(), refreshToken.getDeviceId(), "anotherRefreshToken", "newRefreshToken"));
 
         // then
         assertEquals("리프레시 토큰이 탈취되었을 때 예외가 발생해야 합니다.", "refresh token mismatched", exception.getMessage());
-        assertFalse("리프레시 토큰이 탈취되었을 때 저장된 리프레시 토큰이 삭제되어야 합니다.", refreshTokenRepository.existsById(1L));
+        assertFalse("리프레시 토큰이 탈취되었을 때 저장된 리프레시 토큰이 삭제되어야 합니다.", refreshTokenRepository.existsById(refreshToken.getId()));
     }
 }

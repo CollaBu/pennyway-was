@@ -61,11 +61,12 @@ public class JwtAuthHelperTest extends ExternalApiDBTestConfig {
         // given
         RefreshToken refreshToken = RefreshToken.builder()
                 .userId(1L)
+                .deviceId("AA-BBB-CC-DDD")
                 .token("refreshToken")
                 .ttl(1000L)
                 .build();
         refreshTokenRepository.save(refreshToken);
-        given(refreshTokenProvider.getJwtClaimsFromToken(refreshToken.getToken())).willReturn(RefreshTokenClaim.of(refreshToken.getUserId(), Role.USER.getType()));
+        given(refreshTokenProvider.getJwtClaimsFromToken(refreshToken.getToken())).willReturn(RefreshTokenClaim.of(refreshToken.getUserId(), refreshToken.getDeviceId(), Role.USER.getType()));
         given(accessTokenProvider.generateToken(any())).willReturn("newAccessToken");
         given(refreshTokenProvider.generateToken(any())).willReturn("newRefreshToken");
 
@@ -76,7 +77,7 @@ public class JwtAuthHelperTest extends ExternalApiDBTestConfig {
         assertEquals("사용자 아이디가 일치하지 않습니다.", refreshToken.getUserId(), jwts.getLeft());
         assertEquals("갱신된 액세스 토큰이 일치하지 않습니다.", "newAccessToken", jwts.getRight().accessToken());
         assertEquals("리프레시 토큰이 갱신되지 않았습니다.", "newRefreshToken", jwts.getRight().refreshToken());
-        log.info("갱신된 리프레시 토큰 정보 : {}", refreshTokenRepository.findById(refreshToken.getUserId()).orElse(null));
+        log.info("갱신된 리프레시 토큰 정보 : {}", refreshTokenRepository.findById(refreshToken.getId()).orElse(null));
     }
 
     @Test
@@ -85,12 +86,13 @@ public class JwtAuthHelperTest extends ExternalApiDBTestConfig {
         // given
         RefreshToken refreshToken = RefreshToken.builder()
                 .userId(1L)
+                .deviceId("AA-BBB-CC-DDD")
                 .token("refreshToken")
                 .ttl(1000L)
                 .build();
         refreshTokenRepository.save(refreshToken);
 
-        given(refreshTokenProvider.getJwtClaimsFromToken("anotherRefreshToken")).willReturn(RefreshTokenClaim.of(refreshToken.getUserId(), Role.USER.toString()));
+        given(refreshTokenProvider.getJwtClaimsFromToken("anotherRefreshToken")).willReturn(RefreshTokenClaim.of(refreshToken.getUserId(), refreshToken.getDeviceId(), Role.USER.toString()));
         given(refreshTokenProvider.generateToken(any())).willReturn("newRefreshToken");
 
         // when
@@ -98,6 +100,6 @@ public class JwtAuthHelperTest extends ExternalApiDBTestConfig {
 
         // then
         assertEquals("탈취 시나리오 예외가 발생하지 않았습니다.", JwtErrorCode.TAKEN_AWAY_TOKEN, jwtErrorException.getErrorCode());
-        assertFalse("리프레시 토큰이 삭제되지 않았습니다.", refreshTokenRepository.existsById(refreshToken.getUserId()));
+        assertFalse("리프레시 토큰이 삭제되지 않았습니다.", refreshTokenRepository.existsById(refreshToken.getId()));
     }
 }
