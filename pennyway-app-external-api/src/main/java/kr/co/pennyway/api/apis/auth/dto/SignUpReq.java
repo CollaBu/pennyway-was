@@ -100,10 +100,13 @@ public class SignUpReq {
             @Schema(description = "6자리 정수 인증번호", example = "123456")
             @NotBlank(message = "인증번호는 필수입니다.")
             @Pattern(regexp = "^\\d{6}$", message = "인증번호는 6자리 숫자여야 합니다.")
-            String code
+            String code,
+            @Schema(description = "사용자 기기 고유 식별자", example = "AA-BBB-CCC")
+            @NotBlank(message = "사용자 기기 고유 식별자를 입력해주세요")
+            String deviceId
     ) {
         public Info toInfo() {
-            return new Info(null, null, password, phone, code, null);
+            return new Info(null, null, password, phone, code, deviceId);
         }
     }
 
