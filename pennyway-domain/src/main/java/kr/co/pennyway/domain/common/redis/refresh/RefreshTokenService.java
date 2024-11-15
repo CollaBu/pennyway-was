@@ -22,11 +22,9 @@ public interface RefreshTokenService {
     RefreshToken refresh(Long userId, String deviceId, String oldRefreshToken, String newRefreshToken) throws IllegalArgumentException, IllegalStateException;
 
     /**
-     * 사용자의 device에 해당하는 refresh token을 삭제한다.
+     * 사용자에게 할당된 모든 Device의 refresh token을 삭제한다.
      *
-     * @param userId   : 토큰 주인 pk
-     * @param deviceId : 토큰 발급한 디바이스
-     * @throws IllegalArgumentException : userId에 해당하는 refresh token이 없을 경우
+     * @param userId : 토큰 주인 pk
      */
-    void delete(Long userId, String deviceId) throws IllegalArgumentException;
+    void deleteAll(Long userId);
 }

@@ -120,7 +120,7 @@ public class JwtAuthHelper {
         }
 
         try {
-            refreshTokenService.delete(refreshTokenUserId, refreshTokenDeviceId);
+            refreshTokenService.deleteAll(refreshTokenUserId);
         } catch (IllegalArgumentException e) {
             log.warn("refresh token not found. id : {}", userId);
         }

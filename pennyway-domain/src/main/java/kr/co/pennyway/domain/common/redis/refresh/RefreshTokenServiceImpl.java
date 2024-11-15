@@ -30,9 +30,8 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     }
 
     @Override
-    public void delete(Long userId, String deviceId) throws IllegalArgumentException {
-        RefreshToken token = findOrElseThrow(userId, deviceId);
-        refreshTokenRepository.delete(token);
+    public void deleteAll(Long userId) {
+        refreshTokenRepository.deleteAllByUserId(userId);
         log.info("사용자 {}의 리프레시 토큰 삭제", userId);
     }
 
@@ -49,7 +48,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     private void validateToken(String requestRefreshToken, RefreshToken expectedRefreshToken) throws IllegalStateException {
         if (isTakenAway(requestRefreshToken, expectedRefreshToken.getToken())) {
             log.warn("리프레시 토큰 불일치(탈취). expected : {}, actual : {}", requestRefreshToken, expectedRefreshToken.getToken());
-            refreshTokenRepository.delete(expectedRefreshToken);
+            refreshTokenRepository.deleteAllByUserId(expectedRefreshToken.getUserId());
             log.info("사용자 {}의 리프레시 토큰 삭제", expectedRefreshToken.getUserId());
 
             throw new IllegalStateException("refresh token mismatched");
