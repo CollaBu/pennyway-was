@@ -104,22 +104,23 @@ public class JwtAuthHelper {
         }
 
         if (jwtClaims != null) {
-            deleteRefreshToken(userId, jwtClaims, refreshToken);
+            deleteRefreshToken(userId, jwtClaims);
         }
 
         deleteAccessToken(userId, accessToken);
     }
 
-    private void deleteRefreshToken(Long userId, JwtClaims jwtClaims, String refreshToken) {
-        Long refreshTokenUserId = Long.parseLong((String) jwtClaims.getClaims().get(RefreshTokenClaimKeys.USER_ID.getValue()));
-        log.info("로그아웃 요청 refresh token id : {}", refreshTokenUserId);
+    private void deleteRefreshToken(Long userId, JwtClaims jwtClaims) {
+        Long refreshTokenUserId = JwtClaimsParserUtil.getClaimsValue(jwtClaims, RefreshTokenClaimKeys.USER_ID.getValue(), Long::parseLong);
+        String refreshTokenDeviceId = JwtClaimsParserUtil.getClaimsValue(jwtClaims, RefreshTokenClaimKeys.DEVICE_ID.getValue(), String.class);
+        log.info("로그아웃 요청 refresh token userId : {}, deviceId : {}", refreshTokenUserId, refreshTokenDeviceId);
 
         if (!userId.equals(refreshTokenUserId)) {
             throw new JwtErrorException(JwtErrorCode.WITHOUT_OWNERSHIP_REFRESH_TOKEN);
         }
 
         try {
-            refreshTokenService.delete(refreshTokenUserId, refreshToken);
+            refreshTokenService.delete(refreshTokenUserId, refreshTokenDeviceId);
         } catch (IllegalArgumentException e) {
             log.warn("refresh token not found. id : {}", userId);
         }
