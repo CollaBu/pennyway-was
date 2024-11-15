@@ -46,14 +46,14 @@ public class AuthUseCase {
         UserSyncDto userSync = checkOauthUserNotGeneralSignUp(request.phone());
         User user = userGeneralSignService.saveUserWithEncryptedPassword(request, userSync);
 
-        return Pair.of(user.getId(), jwtAuthHelper.createToken(user));
+        return Pair.of(user.getId(), jwtAuthHelper.createToken(user, request.deviceId()));
     }
 
     @Transactional(readOnly = true)
     public Pair<Long, Jwts> signIn(SignInReq.General request) {
         User user = userGeneralSignService.readUserIfValid(request.username(), request.password());
 
-        return Pair.of(user.getId(), jwtAuthHelper.createToken(user));
+        return Pair.of(user.getId(), jwtAuthHelper.createToken(user, request.deviceId()));
     }
 
     public Pair<Long, Jwts> refresh(String refreshToken) {
