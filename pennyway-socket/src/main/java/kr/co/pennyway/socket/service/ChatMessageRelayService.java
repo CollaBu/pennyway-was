@@ -1,7 +1,7 @@
 package kr.co.pennyway.socket.service;
 
 import kr.co.pennyway.domain.services.chat.context.ChatPushNotificationContext;
-import kr.co.pennyway.domain.services.chat.service.ChatMemberForPushRelaySearchService;
+import kr.co.pennyway.domain.services.chat.service.ChatNotificationCoordinatorService;
 import kr.co.pennyway.infra.common.event.NotificationEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,13 +18,18 @@ import java.util.function.Supplier;
 public class ChatMessageRelayService {
     private final ApplicationEventPublisher eventPublisher;
 
-    private final ChatMemberForPushRelaySearchService chatMemberForPushRelaySearchService;
+    private final ChatNotificationCoordinatorService chatNotificationCoordinatorService;
 
+    /**
+     * 채팅방, 채팅 리스트 뷰를 보고 있지 않은 사용자들에게만 푸시 알림을 전송합니다.
+     *
+     * @param senderId   Long 전송자 아이디
+     * @param chatRoomId Long 채팅방 아이디
+     * @param content    String 채팅 내용
+     */
     public void execute(Long senderId, Long chatRoomId, String content) {
-        ChatPushNotificationContext context = executeInTransaction(() -> chatMemberForPushRelaySearchService.determineRecipients(senderId, chatRoomId));
+        ChatPushNotificationContext context = executeInTransaction(() -> chatNotificationCoordinatorService.determineRecipients(senderId, chatRoomId));
 
-        // 4. 해당 채팅방에 있는 사용자에게만 푸시 알림 전송 (sender 이름, 프로필 사진 url, 채팅 내용, 전송 시간, DeepLink 정보 포함)
-        // 필요한 정보.. 채팅 내용, 채팅방 아이디(그대로 사용), sender(이름, 프로필 사진 url), deviceTokens(푸시 알림 대상자들의 deviceToken)
         NotificationEvent notificationEvent = NotificationEvent.of(
                 context.senderName(),
                 content,
