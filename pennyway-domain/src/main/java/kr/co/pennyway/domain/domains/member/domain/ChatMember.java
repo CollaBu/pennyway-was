@@ -97,6 +97,14 @@ public class ChatMember extends DateAuditable {
         return deletedAt != null && banned;
     }
 
+    public void notifyEnabled() {
+        this.notifyEnabled = true;
+    }
+
+    public void notifyDisabled() {
+        this.notifyEnabled = false;
+    }
+
     public void ban() {
         this.banned = true;
         this.deletedAt = LocalDateTime.now();
