@@ -26,6 +26,7 @@ public class ChatMessageRelayService {
      * @param senderId   Long 전송자 아이디
      * @param chatRoomId Long 채팅방 아이디
      * @param content    String 채팅 내용
+     * @apiNote push notification 전송 실패에 대한 재시도를 수행하고 있지 않습니다.
      */
     public void execute(Long senderId, Long chatRoomId, String content) {
         ChatPushNotificationContext context = executeInTransaction(() -> chatNotificationCoordinatorService.determineRecipients(senderId, chatRoomId));
