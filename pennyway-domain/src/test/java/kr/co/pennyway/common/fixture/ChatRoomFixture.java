@@ -27,4 +27,14 @@ public enum ChatRoomFixture {
                 .password(password != null ? Integer.valueOf(password) : null)
                 .build();
     }
+
+    public ChatRoom toEntityWithId(Long id) {
+        return ChatRoom.builder()
+                .id(id)
+                .title(title)
+                .description(description)
+                .backgroundImageUrl(backgroundImageUrl)
+                .password(password != null ? Integer.valueOf(password) : null)
+                .build();
+    }
 }

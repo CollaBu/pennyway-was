@@ -5,6 +5,7 @@ import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.type.ProfileVisibility;
 import kr.co.pennyway.domain.domains.user.type.Role;
 import lombok.Getter;
+import org.springframework.test.util.ReflectionTestUtils;
 
 @Getter
 public enum UserFixture {
@@ -45,5 +46,21 @@ public enum UserFixture {
                 .notifySetting(notifySetting)
                 .locked(locked)
                 .build();
+    }
+
+    public User toUserWithCustomSetting(Long id, String username, String name, NotifySetting notifySetting) {
+        User user = User.builder()
+                .username(username)
+                .password(password)
+                .name(name)
+                .phone(phone)
+                .role(role)
+                .profileVisibility(profileVisibility)
+                .notifySetting(notifySetting)
+                .locked(locked)
+                .build();
+        ReflectionTestUtils.setField(user, "id", id);
+
+        return user;
     }
 }
