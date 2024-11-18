@@ -55,7 +55,7 @@ public class DeviceTokenRegisterServiceTest extends ExternalApiDBTestConfig {
         DeviceTokenDto.RegisterReq request = DeviceTokenFixture.INIT.toRegisterReq();
 
         // when
-        DeviceToken response = deviceTokenRegisterService.execute(requestUser.getId(), request.token());
+        DeviceToken response = deviceTokenRegisterService.execute(requestUser.getId(), request.deviceId(), request.deviceName(), request.token());
 
         // then
         deviceTokenService.readDeviceByUserIdAndToken(requestUser.getId(), request.token()).ifPresentOrElse(
@@ -79,7 +79,7 @@ public class DeviceTokenRegisterServiceTest extends ExternalApiDBTestConfig {
         DeviceTokenDto.RegisterReq request = DeviceTokenFixture.INIT.toRegisterReq();
 
         // when
-        DeviceToken response = deviceTokenRegisterService.execute(requestUser.getId(), request.token());
+        DeviceToken response = deviceTokenRegisterService.execute(requestUser.getId(), request.deviceId(), request.deviceName(), request.token());
 
         // then
         deviceTokenService.readDeviceByUserIdAndToken(requestUser.getId(), request.token()).ifPresentOrElse(
@@ -105,7 +105,7 @@ public class DeviceTokenRegisterServiceTest extends ExternalApiDBTestConfig {
         DeviceTokenDto.RegisterReq request = DeviceTokenFixture.INIT.toRegisterReq();
 
         // when
-        DeviceToken response = deviceTokenRegisterService.execute(requestUser.getId(), request.token());
+        DeviceToken response = deviceTokenRegisterService.execute(requestUser.getId(), request.deviceId(), request.deviceName(), request.token());
 
         // then
         assertTrue("디바이스가 활성화 상태여야 한다.", response.getActivated());

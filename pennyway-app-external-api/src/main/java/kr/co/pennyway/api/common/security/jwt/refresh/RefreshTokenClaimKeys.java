@@ -2,7 +2,8 @@ package kr.co.pennyway.api.common.security.jwt.refresh;
 
 public enum RefreshTokenClaimKeys {
     USER_ID("id"),
-    ROLE("role");
+    ROLE("role"),
+    DEVICE_ID("deviceId");
 
     private final String value;
 

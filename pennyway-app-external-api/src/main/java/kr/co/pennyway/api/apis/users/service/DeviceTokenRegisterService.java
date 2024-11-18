@@ -21,10 +21,10 @@ public class DeviceTokenRegisterService {
     private final DeviceTokenService deviceTokenService;
 
     @Transactional
-    public DeviceToken execute(Long userId, String token) {
+    public DeviceToken execute(Long userId, String deviceId, String deviceName, String token) {
         User user = userService.readUser(userId).orElseThrow(() -> new UserErrorException(UserErrorCode.NOT_FOUND));
 
-        return getOrCreateDevice(user, token);
+        return getOrCreateDevice(user, deviceId, deviceName, token);
     }
 
     /**
@@ -32,7 +32,7 @@ public class DeviceTokenRegisterService {
      * <p>
      * 이미 등록된 디바이스 토큰인 경우 마지막 로그인 시간을 갱신한다.
      */
-    private DeviceToken getOrCreateDevice(User user, String token) {
+    private DeviceToken getOrCreateDevice(User user, String deviceId, String deviceName, String token) {
         Optional<DeviceToken> deviceToken = deviceTokenService.readDeviceByUserIdAndToken(user.getId(), token);
 
         if (deviceToken.isPresent()) {
@@ -41,7 +41,7 @@ public class DeviceTokenRegisterService {
             device.updateLastSignedInAt();
             return device;
         } else {
-            return deviceTokenService.createDevice(DeviceToken.of(token, user));
+            return deviceTokenService.createDevice(DeviceToken.of(token, deviceId, deviceName, user));
         }
     }
 }

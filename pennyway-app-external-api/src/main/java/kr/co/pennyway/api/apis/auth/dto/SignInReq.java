@@ -11,7 +11,10 @@ public class SignInReq {
             String username,
             @Schema(description = "비밀번호", example = "pennyway1234")
             @NotBlank(message = "비밀번호를 입력해주세요")
-            String password
+            String password,
+            @Schema(description = "사용자 기기 고유 식별자", example = "AA-BBB-CCC")
+            @NotBlank(message = "사용자 기기 고유 식별자를 입력해주세요")
+            String deviceId
     ) {
     }
 
@@ -25,7 +28,10 @@ public class SignInReq {
             String idToken,
             @Schema(description = "OIDC nonce")
             @NotBlank(message = "OIDC nonce는 필수 입력값입니다.")
-            String nonce
+            String nonce,
+            @Schema(description = "사용자 기기 고유 식별자", example = "AA-BBB-CCC")
+            @NotBlank(message = "사용자 기기 고유 식별자를 입력해주세요")
+            String deviceId
     ) {
     }
 }

@@ -43,6 +43,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class AuthControllerIntegrationTest extends ExternalApiDBTestConfig {
     private final String expectedPhone = "010-1234-5678";
     private final String expectedCode = "123456";
+    private final String expectedDeviceId = "AA-BB-CC-DD";
 
     @Autowired
     private MockMvc mockMvc;
@@ -224,7 +225,7 @@ public class AuthControllerIntegrationTest extends ExternalApiDBTestConfig {
         }
 
         private ResultActions performGeneralSignUpRequest(String code) throws Exception {
-            SignUpReq.General request = new SignUpReq.General(UserFixture.GENERAL_USER.getUsername(), "pennyway", "dkssudgktpdy1", expectedPhone, code);
+            SignUpReq.General request = new SignUpReq.General(UserFixture.GENERAL_USER.getUsername(), "pennyway", "dkssudgktpdy1", expectedPhone, code, expectedDeviceId);
             return mockMvc.perform(
                     post("/v1/auth/sign-up")
                             .contentType(MediaType.APPLICATION_JSON)
@@ -286,7 +287,7 @@ public class AuthControllerIntegrationTest extends ExternalApiDBTestConfig {
         }
 
         private ResultActions performSyncWithOauthSignUpRequest(String expectedPhone, String code) throws Exception {
-            SignUpReq.SyncWithOauth request = new SignUpReq.SyncWithOauth("dkssudgktpdy1", expectedPhone, code);
+            SignUpReq.SyncWithOauth request = new SignUpReq.SyncWithOauth("dkssudgktpdy1", expectedPhone, code, expectedDeviceId);
             return mockMvc.perform(
                     post("/v1/auth/link-oauth")
                             .contentType(MediaType.APPLICATION_JSON)

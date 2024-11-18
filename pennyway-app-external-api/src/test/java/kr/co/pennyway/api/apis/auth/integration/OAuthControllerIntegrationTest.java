@@ -64,6 +64,7 @@ public class OAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
     private final String expectedNonce = "testNonce";
     private final String expectedPhone = "010-1234-5678";
     private final String expectedCode = "123456";
+    private final String expectedDeviceId = "testDeviceId";
     @Autowired
     private MockMvc mockMvc;
     @Autowired
@@ -226,7 +227,7 @@ public class OAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
         }
 
         private ResultActions performOauthSignIn(Provider provider, String oauthId, String idToken, String nonce) throws Exception {
-            SignInReq.Oauth request = new SignInReq.Oauth(oauthId, idToken, expectedNonce);
+            SignInReq.Oauth request = new SignInReq.Oauth(oauthId, idToken, expectedNonce, expectedDeviceId);
 
             return mockMvc.perform(post("/v1/auth/oauth/sign-in")
                     .param("provider", provider.name())
@@ -557,7 +558,7 @@ public class OAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
         }
 
         private ResultActions performOauthSignUpAccountLinking(Provider provider, String code, String oauthId) throws Exception {
-            SignUpReq.SyncWithAuth request = new SignUpReq.SyncWithAuth(oauthId, expectedIdToken, expectedNonce, expectedPhone, code);
+            SignUpReq.SyncWithAuth request = new SignUpReq.SyncWithAuth(oauthId, expectedIdToken, expectedNonce, expectedPhone, code, expectedDeviceId);
             return mockMvc.perform(post("/v1/auth/oauth/link-auth")
                     .param("provider", provider.name())
                     .contentType("application/json")
@@ -645,7 +646,7 @@ public class OAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
         }
 
         private ResultActions performOauthSignUp(Provider provider, String code) throws Exception {
-            SignUpReq.Oauth request = new SignUpReq.Oauth(expectedOauthId, expectedIdToken, expectedNonce, "jayang", expectedUsername, expectedPhone, code);
+            SignUpReq.Oauth request = new SignUpReq.Oauth(expectedOauthId, expectedIdToken, expectedNonce, "jayang", expectedUsername, expectedPhone, code, expectedDeviceId);
             return mockMvc.perform(post("/v1/auth/oauth/sign-up")
                     .param("provider", provider.name())
                     .contentType("application/json")
