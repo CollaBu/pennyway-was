@@ -33,7 +33,7 @@ public class ChatNotificationCoordinatorService {
      * <pre>
      * [판별 기준]
      * - 전송자는 푸시 알림을 받지 않습니다.
-     * - 채팅방에 참여 중인 사용자 중에서 채팅방 리스트 뷰를 보고 있지 않는 사용자들만 필터링합니다.
+     * - 채팅방에 참여 중인 사용자 중에서 채팅방 리스트 뷰 혹은 채팅 메시지가 전송된 채팅방 뷰를 보고 있지 않는 사용자들만 필터링합니다.
      * - 채팅방에 참여 중인 사용자 중에서 채팅 알림을 받지 않는 사용자들은 제외합니다.
      * - 채팅방에 참여 중인 사용자 중에서 채팅방의 알림을 받지 않는 사용자들은 제외합니다.
      * </pre>
@@ -41,13 +41,19 @@ public class ChatNotificationCoordinatorService {
      * @param senderId   Long 전송자 아이디. Must not be null.
      * @param chatRoomId Long 채팅방 아이디. Must not be null.
      * @return {@link ChatPushNotificationContext} 전송자와 푸시 알림을 받아야 하는 사용자들의 정보를 담은 컨텍스트
+     * @throws IllegalArgumentException 전송자 정보를 찾을 수 없을 때 발생합니다.
      */
     @Transactional(readOnly = true)
     public ChatPushNotificationContext determineRecipients(Long senderId, Long chatRoomId) {
         User sender = userService.readUser(senderId).orElseThrow(() -> new IllegalArgumentException("전송자 정보를 찾을 수 없습니다."));
+        log.debug("전송자 정보: {}", sender);
 
         Map<Long, Set<UserSession>> participants = getUserSessionGroupByUserId(senderId, chatRoomId);
+        log.debug("채팅방 참여자 정보: {}", participants);
+
         Set<UserSession> targets = filterNotificationEnabledUserSessions(participants, chatRoomId);
+        log.debug("푸시 알림을 받아야 하는 사용자 정보: {}", targets);
+
         List<String> deviceTokens = getDeviceTokens(targets);
 
         return ChatPushNotificationContext.of(sender.getName(), sender.getProfileImageUrl(), deviceTokens);
@@ -59,6 +65,7 @@ public class ChatNotificationCoordinatorService {
      * 1. 채팅방에 참여 중인 사용자 세션들을 가져옴 (사용자 별로 여러 세션이 존재할 수 있음)
      * 2. 사용자 세션 중에서 전송자는 제외하고, 채팅방에 참여 중 혹은 채팅방 리스트 뷰를 보고 있지 않은 사용자들만 필터링
      * 3. 사용자 세션을 사용자 아이디 별로 그룹핑
+     * 4. 사용자 세션 중 하나라도 해당 채팅방에 참여 중인 경우, 해당 사용자의 전체 세션 제외
      * </pre>
      *
      * @return 사용자 아이디 별로 사용자 세션들을 그룹핑한 맵
@@ -66,28 +73,40 @@ public class ChatNotificationCoordinatorService {
     private Map<Long, Set<UserSession>> getUserSessionGroupByUserId(Long senderId, Long chatRoomId) {
         Set<Long> userIds = chatMemberService.readUserIdsByChatRoomId(chatRoomId);
 
+        log.debug("채팅방 참여자 아이디 목록: {}", userIds);
+
         List<Map<String, UserSession>> userSessions = userIds.stream()
+                .filter(userId -> !userId.equals(senderId))
                 .map(userSessionService::readAll)
                 .toList();
 
-        return userSessions.stream()
+        log.debug("채팅방 참여자 세션 목록: {}", userSessions);
+
+        Map<Long, Set<UserSession>> sessions = userSessions.stream()
                 .flatMap(userSessionMap -> userSessionMap.entrySet().stream())
-                .filter(entry -> isTargetStatus(entry, senderId, chatRoomId))
+                .filter(entry -> isTargetStatus(entry, chatRoomId))
                 .collect(Collectors.groupingBy(entry -> entry.getValue().getUserId(), Collectors.mapping(Map.Entry::getValue, Collectors.toSet())));
+
+        sessions.entrySet().removeIf(entry -> entry.getValue().stream().anyMatch(userSession -> isExistsViewingChatRoom(Map.entry(entry.getKey(), userSession), chatRoomId)));
+
+        return sessions;
     }
 
     /**
      * 사용자 세션의 상태가 푸시 알림을 받아야 하는 상태인지 판별합니다.
      *
-     * @return 세션 정보가 '전송자'거나, '채팅방에 참여 중'이 아니거나, '채팅방 리스트 뷰'를 보고 있지 않은 경우 false를 반환합니다.
+     * @return '채팅방에 참여 중'이 아니거나, '채팅방 리스트 뷰'를 보고 있지 않은 경우 false를 반환합니다.
      */
-    private boolean isTargetStatus(Map.Entry<String, UserSession> entry, Long senderId, Long chatRoomId) {
-        if (entry.getValue().getUserId().equals(senderId)) {
-            return false;
-        }
+    private boolean isTargetStatus(Map.Entry<String, UserSession> entry, Long chatRoomId) {
+        return !(UserStatus.ACTIVE_CHAT_ROOM.equals(entry.getValue().getStatus()) && chatRoomId.equals(entry.getValue().getCurrentChatRoomId())) &&
+                !(UserStatus.ACTIVE_CHAT_ROOM_LIST.equals(entry.getValue().getStatus()));
+    }
 
-        return !(UserStatus.ACTIVE_CHAT_ROOM.equals(entry.getValue().getStatus()) && chatRoomId.equals(entry.getValue().getCurrentChatRoomId()) &&
-                !(UserStatus.ACTIVE_CHAT_ROOM_LIST.equals(entry.getValue().getStatus())));
+    /**
+     * chatRoomId에 해당하는 채팅방을 보고 있는 사용자 세션이 존재하는지 판별합니다.
+     */
+    private boolean isExistsViewingChatRoom(Map.Entry<Long, UserSession> entry, Long chatRoomId) {
+        return UserStatus.ACTIVE_CHAT_ROOM.equals(entry.getValue().getStatus()) && chatRoomId.equals(entry.getValue().getCurrentChatRoomId());
     }
 
     /**
@@ -110,11 +129,14 @@ public class ChatNotificationCoordinatorService {
 
     private boolean isChatNotifyEnabled(Long userId) {
         Optional<User> user = userService.readUser(userId);
+        log.debug("{}의 채팅 알림 설정 정보 : {}", user.get().getName(), user.get().getNotifySetting().isChatNotify());
         return user.isPresent() && user.get().getNotifySetting().isChatNotify();
     }
 
     private boolean isChatRoomNotifyEnabled(Long userId, Long chatRoomId) {
         Optional<ChatMember> chatMember = chatMemberService.readChatMember(userId, chatRoomId);
+        log.debug("{}의 채팅방 멤버 정보 : {}", chatMember.get());
+        log.debug("{}의 채팅방 알림 설정 정보 : {}", chatMember.get().getName(), chatMember.get().isNotifyEnabled());
         return chatMember.isPresent() && chatMember.get().isNotifyEnabled();
     }
 
