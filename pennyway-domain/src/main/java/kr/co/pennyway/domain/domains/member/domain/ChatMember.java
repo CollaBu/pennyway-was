@@ -58,6 +58,7 @@ public class ChatMember extends DateAuditable {
         this.user = user;
         this.chatRoom = chatRoom;
         this.role = role;
+        this.notifyEnabled = true;
     }
 
     public static ChatMember of(User user, ChatRoom chatRoom, ChatMemberRole role) {
@@ -97,11 +98,11 @@ public class ChatMember extends DateAuditable {
         return deletedAt != null && banned;
     }
 
-    public void notifyEnabled() {
+    public void enableNotify() {
         this.notifyEnabled = true;
     }
 
-    public void notifyDisabled() {
+    public void disableNotify() {
         this.notifyEnabled = false;
     }
 
