@@ -46,13 +46,10 @@ public class ChatNotificationCoordinatorService {
     @Transactional(readOnly = true)
     public ChatPushNotificationContext determineRecipients(Long senderId, Long chatRoomId) {
         User sender = userService.readUser(senderId).orElseThrow(() -> new IllegalArgumentException("전송자 정보를 찾을 수 없습니다."));
-        log.debug("전송자 정보: {}", sender);
 
         Map<Long, Set<UserSession>> participants = getUserSessionGroupByUserId(senderId, chatRoomId);
-        log.debug("채팅방 참여자 정보: {}", participants);
 
         Set<UserSession> targets = filterNotificationEnabledUserSessions(participants, chatRoomId);
-        log.debug("푸시 알림을 받아야 하는 사용자 정보: {}", targets);
 
         List<String> deviceTokens = getDeviceTokens(targets);
 
@@ -73,14 +70,10 @@ public class ChatNotificationCoordinatorService {
     private Map<Long, Set<UserSession>> getUserSessionGroupByUserId(Long senderId, Long chatRoomId) {
         Set<Long> userIds = chatMemberService.readUserIdsByChatRoomId(chatRoomId);
 
-        log.debug("채팅방 참여자 아이디 목록: {}", userIds);
-
         List<Map<String, UserSession>> userSessions = userIds.stream()
                 .filter(userId -> !userId.equals(senderId))
                 .map(userSessionService::readAll)
                 .toList();
-
-        log.debug("채팅방 참여자 세션 목록: {}", userSessions);
 
         Map<Long, Set<UserSession>> sessions = userSessions.stream()
                 .flatMap(userSessionMap -> userSessionMap.entrySet().stream())
@@ -95,11 +88,10 @@ public class ChatNotificationCoordinatorService {
     /**
      * 사용자 세션의 상태가 푸시 알림을 받아야 하는 상태인지 판별합니다.
      *
-     * @return '채팅방에 참여 중'이 아니거나, '채팅방 리스트 뷰'를 보고 있지 않은 경우 false를 반환합니다.
+     * @return '채팅방 리스트 뷰'를 보고 있지 않은 경우 false를 반환합니다.
      */
     private boolean isTargetStatus(Map.Entry<String, UserSession> entry, Long chatRoomId) {
-        return !(UserStatus.ACTIVE_CHAT_ROOM.equals(entry.getValue().getStatus()) && chatRoomId.equals(entry.getValue().getCurrentChatRoomId())) &&
-                !(UserStatus.ACTIVE_CHAT_ROOM_LIST.equals(entry.getValue().getStatus()));
+        return !(UserStatus.ACTIVE_CHAT_ROOM_LIST.equals(entry.getValue().getStatus()));
     }
 
     /**
@@ -129,14 +121,13 @@ public class ChatNotificationCoordinatorService {
 
     private boolean isChatNotifyEnabled(Long userId) {
         Optional<User> user = userService.readUser(userId);
-        log.debug("{}의 채팅 알림 설정 정보 : {}", user.get().getName(), user.get().getNotifySetting().isChatNotify());
+
         return user.isPresent() && user.get().getNotifySetting().isChatNotify();
     }
 
     private boolean isChatRoomNotifyEnabled(Long userId, Long chatRoomId) {
         Optional<ChatMember> chatMember = chatMemberService.readChatMember(userId, chatRoomId);
-        log.debug("{}의 채팅방 멤버 정보 : {}", chatMember.get());
-        log.debug("{}의 채팅방 알림 설정 정보 : {}", chatMember.get().getName(), chatMember.get().isNotifyEnabled());
+
         return chatMember.isPresent() && chatMember.get().isNotifyEnabled();
     }
 
