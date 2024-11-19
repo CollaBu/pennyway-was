@@ -29,6 +29,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -65,8 +66,8 @@ public class ChatNotificationCoordinatorServiceUnitTest {
         // given
         ChatRoom chatRoom = ChatRoomFixture.PUBLIC_CHAT_ROOM.toEntityWithId(1L);
 
-        ChatNotificationTestFlow.DeviceTokenInfo senderToken = ChatNotificationTestFlow.DeviceTokenInfo.of("token1", "deviceId1", "iPhone Pro 15");
-        ChatNotificationTestFlow.DeviceTokenInfo recipientToken = ChatNotificationTestFlow.DeviceTokenInfo.of("token2", "deviceId2", "iPhone SE");
+        ChatNotificationTestFlow.DeviceTokenInfo senderToken = ChatNotificationTestFlow.DeviceTokenInfo.createActivateToken(1L, "token1", "deviceId1", "iPhone Pro 15");
+        ChatNotificationTestFlow.DeviceTokenInfo recipientToken = ChatNotificationTestFlow.DeviceTokenInfo.createActivateToken(2L, "token2", "deviceId2", "iPhone SE");
 
         ChatNotificationTestFlow.init(userService, chatMemberService, userSessionService, deviceTokenService)
                 .givenSender(1L)
@@ -80,7 +81,9 @@ public class ChatNotificationCoordinatorServiceUnitTest {
                 .withNotifyEnabled()
                 .withChatRoomNotifyEnabled()
                 .inChatRoom(chatRoom)
-                .withStatus(UserStatus.ACTIVE_CHAT_ROOM, 1L)
+                .withSessionStatuses(Map.of(
+                        recipientToken.deviceId(), ChatNotificationTestFlow.SessionStatus.of(UserStatus.ACTIVE_APP)
+                ))
                 .withDeviceTokens(List.of(recipientToken))
                 .and()
                 .whenMocking();
@@ -117,44 +120,162 @@ public class ChatNotificationCoordinatorServiceUnitTest {
         senderSession.updateStatus(UserStatus.ACTIVE_CHAT_ROOM, chatRoomId);
 
         given(chatMemberService.readUserIdsByChatRoomId(anyLong())).willReturn(new HashSet<>(List.of(sender.getId())));
-        given(userSessionService.readAll(anyLong())).willReturn(Map.of(deviceToken.getDeviceId(), senderSession));
 
         // when
         ChatPushNotificationContext context = service.determineRecipients(sender.getId(), chatRoomId);
 
         // then
         assertThat(context.deviceTokens()).isEmpty();
+
+        verify(userSessionService, never()).readAll(anyLong());
     }
 
     @Test
     @DisplayName("채팅방 알림이 비활성화된 사용자의 모든 디바이스 토큰은 제외된다.")
     public void excludeUserWithDisabledChatRoomNotification() {
         // given
+        ChatRoom chatRoom = ChatRoomFixture.PUBLIC_CHAT_ROOM.toEntityWithId(1L);
+        ChatNotificationTestFlow.DeviceTokenInfo recipientToken1 = ChatNotificationTestFlow.DeviceTokenInfo.createActivateToken(2L, "token2", "deviceId2", "iPhone SE");
+        ChatNotificationTestFlow.DeviceTokenInfo recipientToken2 = ChatNotificationTestFlow.DeviceTokenInfo.createActivateToken(3L, "token3", "deviceId3", "Galaxy S21");
 
+        ChatNotificationTestFlow.init(userService, chatMemberService, userSessionService, deviceTokenService)
+                .givenSender(1L)
+                .withNotifyEnabled()
+                .inChatRoom(chatRoom)
+                .and()
+                .givenRecipient(2L)
+                .withNotifyDisabled()  // 채팅 알림 비활성화
+                .withChatRoomNotifyEnabled()
+                .withDeviceTokens(List.of(recipientToken1, recipientToken2))
+                .withSessionStatuses(Map.of(
+                        recipientToken1.deviceId(), ChatNotificationTestFlow.SessionStatus.of(UserStatus.ACTIVE_APP),
+                        recipientToken2.deviceId(), ChatNotificationTestFlow.SessionStatus.of(UserStatus.ACTIVE_APP)
+                ))
+                .inChatRoom(chatRoom)
+                .and()
+                .whenMocking();
 
         // when
+        ChatPushNotificationContext context = service.determineRecipients(1L, chatRoom.getId());
 
         // then
+        assertThat(context.deviceTokens()).isEmpty();
     }
 
     @Test
     @DisplayName("채팅 알림이 비활성화된 사용자의 모든 디바이스 토큰은 제외된다.")
     public void excludeUserWithDisabledChatNotification() {
         // given
+        ChatRoom chatRoom = ChatRoomFixture.PUBLIC_CHAT_ROOM.toEntityWithId(1L);
+        ChatNotificationTestFlow.DeviceTokenInfo recipientToken1 = ChatNotificationTestFlow.DeviceTokenInfo.createActivateToken(2L, "token2", "deviceId2", "iPhone SE");
+        ChatNotificationTestFlow.DeviceTokenInfo recipientToken2 = ChatNotificationTestFlow.DeviceTokenInfo.createActivateToken(3L, "token3", "deviceId3", "Galaxy S21");
+
+        ChatNotificationTestFlow.init(userService, chatMemberService, userSessionService, deviceTokenService)
+                .givenSender(1L)
+                .withNotifyEnabled()
+                .inChatRoom(chatRoom)
+                .and()
+                .givenRecipient(2L)
+                .withNotifyEnabled()
+                .withChatRoomNotifyDisabled()  // 채팅 알림 비활성화
+                .withDeviceTokens(List.of(recipientToken1, recipientToken2))
+                .withSessionStatuses(Map.of(
+                        recipientToken1.deviceId(), ChatNotificationTestFlow.SessionStatus.of(UserStatus.ACTIVE_APP),
+                        recipientToken2.deviceId(), ChatNotificationTestFlow.SessionStatus.of(UserStatus.ACTIVE_APP)
+                ))
+                .inChatRoom(chatRoom)
+                .and()
+                .whenMocking();
 
         // when
+        ChatPushNotificationContext context = service.determineRecipients(1L, chatRoom.getId());
 
         // then
+        assertThat(context.deviceTokens()).isEmpty();
     }
 
     @Test
-    @DisplayName("채팅방 혹은 채팅방 리스트 뷰를 보고 있는 사용자는 대상에서 제외된다.")
+    @DisplayName("같은 채팅방 혹은 채팅방 리스트 뷰를 보고 있는 사용자는 대상에서 제외된다.")
     public void excludeUserViewingChatRoom() {
         // given
+        ChatRoom chatRoom = ChatRoomFixture.PUBLIC_CHAT_ROOM.toEntityWithId(1L);
+        ChatRoom otherChatRoom = ChatRoomFixture.PUBLIC_CHAT_ROOM.toEntityWithId(2L);
+
+        ChatNotificationTestFlow.DeviceTokenInfo recipientToken1 = ChatNotificationTestFlow.DeviceTokenInfo.createActivateToken(2L, "token2", "deviceId2", "iPhone SE");
+        ChatNotificationTestFlow.DeviceTokenInfo recipientToken2 = ChatNotificationTestFlow.DeviceTokenInfo.createActivateToken(3L, "token3", "deviceId3", "Galaxy S21");
+        ChatNotificationTestFlow.DeviceTokenInfo recipientToken3 = ChatNotificationTestFlow.DeviceTokenInfo.createActivateToken(4L, "token4", "deviceId4", "Galaxy Flip 6");
+
+        ChatNotificationTestFlow.init(userService, chatMemberService, userSessionService, deviceTokenService)
+                .givenSender(1L)
+                .withNotifyEnabled()
+                .inChatRoom(chatRoom)
+                .and()
+                .givenRecipient(2L) // 다른 채팅방에 참여 중
+                .withNotifyEnabled()
+                .withChatRoomNotifyEnabled()
+                .withDeviceTokens(List.of(recipientToken1))
+                .withSessionStatuses(Map.of(
+                        recipientToken1.deviceId(), ChatNotificationTestFlow.SessionStatus.of(UserStatus.ACTIVE_CHAT_ROOM, otherChatRoom.getId())
+                ))
+                .inChatRoom(otherChatRoom)
+                .and()
+                .givenRecipient(3L) // 채팅방 리스트 뷰
+                .withNotifyEnabled()
+                .withChatRoomNotifyEnabled()
+                .withDeviceTokens(List.of(recipientToken2))
+                .withSessionStatuses(Map.of(
+                        recipientToken2.deviceId(), ChatNotificationTestFlow.SessionStatus.of(UserStatus.ACTIVE_CHAT_ROOM_LIST)
+                ))
+                .inChatRoom(chatRoom)
+                .and()
+                .givenRecipient(4L) // 같은 채팅방 참여 중
+                .withNotifyEnabled()
+                .withChatRoomNotifyEnabled()
+                .withDeviceTokens(List.of(recipientToken3))
+                .withSessionStatuses(Map.of(
+                        recipientToken3.deviceId(), ChatNotificationTestFlow.SessionStatus.of(UserStatus.ACTIVE_CHAT_ROOM, chatRoom.getId())
+                ))
+                .inChatRoom(chatRoom)
+                .and()
+                .whenMocking();
 
         // when
+        ChatPushNotificationContext context = service.determineRecipients(1L, chatRoom.getId());
 
         // then
+        assertThat(context.deviceTokens()).contains(recipientToken1.token());
+    }
+
+    @Test
+    @DisplayName("사용자 세션 중 하나라도 해당 채팅방을 보고 있을 경우, 사용자의 모든 디바이스 토큰은 제외된다.")
+    public void excludeUserViewingChatRoomAtLeastOne() {
+        // given
+        ChatRoom chatRoom = ChatRoomFixture.PUBLIC_CHAT_ROOM.toEntityWithId(1L);
+        ChatNotificationTestFlow.DeviceTokenInfo recipientToken1 = ChatNotificationTestFlow.DeviceTokenInfo.createActivateToken(2L, "token2", "deviceId2", "iPhone SE");
+        ChatNotificationTestFlow.DeviceTokenInfo recipientToken2 = ChatNotificationTestFlow.DeviceTokenInfo.createActivateToken(3L, "token3", "deviceId3", "Galaxy S21");
+
+        ChatNotificationTestFlow.init(userService, chatMemberService, userSessionService, deviceTokenService)
+                .givenSender(1L)
+                .withNotifyEnabled()
+                .inChatRoom(chatRoom)
+                .and()
+                .givenRecipient(2L)
+                .withNotifyEnabled()
+                .withChatRoomNotifyEnabled()
+                .withDeviceTokens(List.of(recipientToken1, recipientToken2))
+                .withSessionStatuses(Map.of(
+                        recipientToken1.deviceId(), ChatNotificationTestFlow.SessionStatus.of(UserStatus.ACTIVE_APP),
+                        recipientToken2.deviceId(), ChatNotificationTestFlow.SessionStatus.of(UserStatus.ACTIVE_CHAT_ROOM, chatRoom.getId())
+                ))
+                .inChatRoom(chatRoom)
+                .and()
+                .whenMocking();
+
+        // when
+        ChatPushNotificationContext context = service.determineRecipients(1L, chatRoom.getId());
+
+        // then
+        assertThat(context.deviceTokens()).isEmpty();
     }
 
     @Test
@@ -170,6 +291,125 @@ public class ChatNotificationCoordinatorServiceUnitTest {
 
         // then
         assertThat(context.deviceTokens()).isEmpty();
+    }
+
+    @Test
+    @DisplayName("비활성화된 디바이스 토큰은 푸시 알림 대상에서 제외된다")
+    public void excludeInactiveDeviceTokens() {
+        // given
+        ChatRoom chatRoom = ChatRoomFixture.PUBLIC_CHAT_ROOM.toEntityWithId(1L);
+        ChatNotificationTestFlow.DeviceTokenInfo activeToken = ChatNotificationTestFlow.DeviceTokenInfo.createActivateToken(2L, "token2", "deviceId2", "iPhone SE");
+        ChatNotificationTestFlow.DeviceTokenInfo inactiveToken = ChatNotificationTestFlow.DeviceTokenInfo.createDeactivateToken(3L, "token3", "deviceId3", "iPad Pro");
+
+        ChatNotificationTestFlow.init(userService, chatMemberService, userSessionService, deviceTokenService)
+                .givenSender(1L)
+                .withNotifyEnabled()
+                .inChatRoom(chatRoom)
+                .and()
+                .givenRecipient(2L)
+                .withNotifyEnabled()
+                .withChatRoomNotifyEnabled()
+                .withDeviceTokens(List.of(activeToken, inactiveToken))
+                .withSessionStatuses(Map.of(
+                        activeToken.deviceId(), ChatNotificationTestFlow.SessionStatus.of(UserStatus.ACTIVE_APP),
+                        inactiveToken.deviceId(), ChatNotificationTestFlow.SessionStatus.of(UserStatus.ACTIVE_APP)
+                ))
+                .inChatRoom(chatRoom)
+                .and()
+                .whenMocking();
+
+        // when
+        ChatPushNotificationContext context = service.determineRecipients(1L, chatRoom.getId());
+
+        // then
+        assertThat(context.deviceTokens()).containsExactly(activeToken.token());
+    }
+
+    @Test
+    @DisplayName("사용자가 매우 많은 디바이스를 가지고 있는 경우에도 정상적으로 처리된다")
+    public void handleUserWithManyDevices() {
+        // given
+        ChatRoom chatRoom = ChatRoomFixture.PUBLIC_CHAT_ROOM.toEntityWithId(1L);
+        List<ChatNotificationTestFlow.DeviceTokenInfo> manyDevices = IntStream.range(0, 10)
+                .mapToObj(i -> ChatNotificationTestFlow.DeviceTokenInfo.createActivateToken(
+                        (long) (i + 2),
+                        "token" + (i + 2),
+                        "deviceId" + (i + 2),
+                        "Device " + (i + 2)
+                ))
+                .collect(Collectors.toList());
+
+        Map<String, ChatNotificationTestFlow.SessionStatus> deviceStatuses = manyDevices.stream()
+                .collect(Collectors.toMap(
+                        ChatNotificationTestFlow.DeviceTokenInfo::deviceId,
+                        deviceToken -> ChatNotificationTestFlow.SessionStatus.of(UserStatus.ACTIVE_APP)
+                ));
+
+        ChatNotificationTestFlow.init(userService, chatMemberService, userSessionService, deviceTokenService)
+                .givenSender(1L)
+                .withNotifyEnabled()
+                .inChatRoom(chatRoom)
+                .and()
+                .givenRecipient(2L)
+                .withNotifyEnabled()
+                .withChatRoomNotifyEnabled()
+                .withDeviceTokens(manyDevices)
+                .withSessionStatuses(deviceStatuses)
+                .inChatRoom(chatRoom)
+                .and()
+                .whenMocking();
+
+        // when
+        ChatPushNotificationContext context = service.determineRecipients(1L, chatRoom.getId());
+
+        // then
+        assertThat(context.deviceTokens())
+                .hasSize(10)
+                .containsExactlyInAnyOrderElementsOf(
+                        manyDevices.stream().map(ChatNotificationTestFlow.DeviceTokenInfo::token).collect(Collectors.toList())
+                );
+    }
+
+    @Test
+    @DisplayName("채팅방에 매우 많은 사용자가 있는 경우에도 정상적으로 처리된다")
+    public void handleChatRoomWithManyUsers() {
+        // given
+        ChatRoom chatRoom = ChatRoomFixture.PUBLIC_CHAT_ROOM.toEntityWithId(1L);
+        ChatNotificationTestFlow flow = ChatNotificationTestFlow.init(
+                        userService, chatMemberService, userSessionService, deviceTokenService
+                )
+                .givenSender(1L)
+                .withNotifyEnabled()
+                .inChatRoom(chatRoom)
+                .and();
+
+        // 100명의 사용자 추가
+        IntStream.range(0, 100).forEach(i -> {
+            ChatNotificationTestFlow.DeviceTokenInfo token = ChatNotificationTestFlow.DeviceTokenInfo.createActivateToken(
+                    (long) (i + 2),
+                    "token" + (i + 2),
+                    "deviceId" + (i + 2),
+                    "Device " + (i + 2)
+            );
+
+            flow.givenRecipient((long) (i + 2))
+                    .withNotifyEnabled()
+                    .withChatRoomNotifyEnabled()
+                    .withDeviceTokens(List.of(token))
+                    .withSessionStatuses(Map.of(
+                            token.deviceId(), ChatNotificationTestFlow.SessionStatus.of(UserStatus.ACTIVE_APP)
+                    ))
+                    .inChatRoom(chatRoom)
+                    .and();
+        });
+
+        flow.whenMocking();
+
+        // when
+        ChatPushNotificationContext context = service.determineRecipients(1L, chatRoom.getId());
+
+        // then
+        assertThat(context.deviceTokens()).hasSize(100);
     }
 }
 
@@ -205,6 +445,7 @@ public class ChatNotificationCoordinatorServiceUnitTest {
  *     .whenMocking();
  * }</pre>
  */
+@Slf4j
 @TestComponent
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 class ChatNotificationTestFlow {
@@ -290,10 +531,6 @@ class ChatNotificationTestFlow {
         return new RecipientBuilder().new RecipientBuilderImpl(this, recipientId);
     }
 
-    public ChatNotificationTestFlow and() {
-        return this;
-    }
-
     /**
      * 설정된 시나리오에 따라 모든 필요한 모킹을 수행합니다.
      * 이 메서드는 시나리오 구성의 마지막 단계로 호출되어야 합니다.
@@ -301,61 +538,110 @@ class ChatNotificationTestFlow {
      * @return {@link ChatNotificationTestFlow}
      */
     public ChatNotificationTestFlow whenMocking() {
+        printScenarioPreCondition();
+
         // 기본 모킹 설정 (언제나 수행)
         // 발신자 정보 반환
-        given(userService.readUser(senderId))
-                .willReturn(Optional.ofNullable(sender));
-
-        // 수신자(발신자 포함) 정보 반환
-        for (Map.Entry<Long, User> entry : recipients.entrySet()) {
-            if (entry.getKey().equals(senderId)) {
-                continue;
-            }
-
-            given(userService.readUser(entry.getKey()))
-                    .willReturn(Optional.ofNullable(entry.getValue()));
-        }
+        given(userService.readUser(senderId)).willReturn(Optional.ofNullable(sender));
 
         // 모든 수신자 ID 반환
-        given(chatMemberService.readUserIdsByChatRoomId(chatRoomId))
-                .willReturn(recipientIds);
+        given(chatMemberService.readUserIdsByChatRoomId(chatRoomId)).willReturn(recipientIds);
 
         // 사용자별 세션 정보 반환
         sessions.forEach((userId, userSessions) -> {
+            if (userId.equals(senderId)) {
+                return;
+            }
+
+            log.debug("User ID: {}, Sessions: {}", userId, userSessions);
             given(userSessionService.readAll(userId)).willReturn(userSessions.stream()
-                    .collect(Collectors.toMap(
-                            UserSession::getDeviceId,
-                            session -> session
-                    )));
+                    .collect(Collectors.toMap(UserSession::getDeviceId, session -> session)));
         });
 
         // 4. 수신자의 채팅방 알림 설정과 디바이스 토큰은 필요한 경우에만 모킹
         recipients.forEach((userId, recipient) -> {
-            if (!userId.equals(senderId)) {
-                // 채팅방 알림 설정이 켜져있는 경우에만 모킹
-                ChatMember chatMember = chatMembers.get(userId);
-                if (chatMember != null && chatMember.isNotifyEnabled()) {
-                    given(userService.readUser(userId))
-                            .willReturn(Optional.of(recipient));
-                    given(chatMemberService.readChatMember(userId, chatRoomId))
-                            .willReturn(Optional.of(chatMember));
+            // 발신자는 제외
+            if (userId.equals(senderId)) {
+                return;
+            }
 
-                    // 디바이스 토큰도 필요한 경우에만 모킹
-                    List<DeviceToken> tokens = deviceTokens.get(userId);
-                    if (tokens != null && !tokens.isEmpty()) {
-                        given(deviceTokenService.readAllByUserId(userId))
-                                .willReturn(tokens);
-                    }
-                }
+            if (!isRequireMoking(userId)) {
+                return;
+            }
+
+            given(userService.readUser(userId)).willReturn(Optional.ofNullable(recipient));
+
+            // 채팅 알림 설정이 비활성화된 사용자는 제외
+            if (!recipient.getNotifySetting().isChatNotify()) {
+                return;
+            }
+
+            ChatMember chatMember = chatMembers.get(userId);
+            given(chatMemberService.readChatMember(userId, chatRoomId)).willReturn(Optional.of(chatMember));
+
+            // 채팅방 알림 설정이 비활성화된 사용자는 제외
+            if (!chatMember.isNotifyEnabled()) {
+                return;
+            }
+
+            List<DeviceToken> tokens = deviceTokens.get(userId);
+            if (tokens != null && !tokens.isEmpty()) {
+                log.debug("User ID: {}, Device Tokens: {}", userId, tokens);
+                given(deviceTokenService.readAllByUserId(userId)).willReturn(tokens);
             }
         });
 
         return this;
     }
 
-    public record DeviceTokenInfo(String token, String deviceId, String deviceName) {
-        public static DeviceTokenInfo of(String token, String deviceId, String deviceName) {
-            return new DeviceTokenInfo(token, deviceId, deviceName);
+    // 사용자 세션 중 하나라도 해당 채팅방을 보고 있거나, 모든 세션이 모킹 대상이 아닐 경우
+    private boolean isRequireMoking(Long userId) {
+        boolean flag = false;
+
+        for (UserSession session : sessions.get(userId)) {
+            if (UserStatus.ACTIVE_CHAT_ROOM.equals(session.getStatus()) && chatRoomId.equals(session.getCurrentChatRoomId())) {
+                flag = false;
+                break;
+            }
+
+            if (!UserStatus.ACTIVE_CHAT_ROOM_LIST.equals(session.getStatus())) {
+                flag = true;
+            }
+        }
+
+        return flag;
+    }
+
+    private void printScenarioPreCondition() {
+        log.debug("Scenario Pre-Condition");
+        log.debug("Sender: {}", sender);
+        log.debug("Recipients: {}", recipients);
+        log.debug("Chat Members: {}", chatMembers);
+        log.debug("Sessions: {}", sessions);
+        log.debug("Device Tokens: {}", deviceTokens);
+        log.debug("Chat Rooms: {}", chatRooms);
+    }
+
+    public record DeviceTokenInfo(Long id, String token, String deviceId, String deviceName, Boolean activated) {
+        public static DeviceTokenInfo createActivateToken(Long id, String token, String deviceId, String deviceName) {
+            return new DeviceTokenInfo(id, token, deviceId, deviceName, true);
+        }
+
+        public static DeviceTokenInfo createDeactivateToken(Long id, String token, String deviceId, String deviceName) {
+            return new DeviceTokenInfo(id, token, deviceId, deviceName, false);
+        }
+    }
+
+    /**
+     * 세션 상태 정보를 담는 레코드
+     */
+    public record SessionStatus(UserStatus status, Long chatRoomId) {
+        public static SessionStatus of(UserStatus status) {
+            return new SessionStatus(status, null);
+        }
+
+        public static SessionStatus of(UserStatus status, Long chatRoomId) {
+            return new SessionStatus(status, chatRoomId);
         }
     }
 
@@ -464,7 +750,7 @@ class ChatNotificationTestFlow {
             public ConfigurationStep withNotifyDisabled() {
                 this.sender = UserFixture.GENERAL_USER.toUserWithCustomSetting(
                         senderId, "sender", "발신자",
-                        NotifySetting.of(false, true, true)
+                        NotifySetting.of(true, true, false)
                 );
                 return this;
             }
@@ -504,6 +790,8 @@ class ChatNotificationTestFlow {
                             deviceToken.deviceName(),
                             sender
                     );
+                    ReflectionTestUtils.setField(token, "id", deviceToken.id());
+
                     this.deviceTokens.add(token);
                 });
                 return this;
@@ -523,8 +811,6 @@ class ChatNotificationTestFlow {
                 }
 
                 flow.sender = sender;
-                flow.recipientIds.add(senderId);
-                flow.recipients.put(senderId, sender);
 
                 if (!deviceTokens.isEmpty()) {
                     flow.deviceTokens.put(senderId, new ArrayList<>(deviceTokens));
@@ -595,7 +881,7 @@ class ChatNotificationTestFlow {
             ConfigurationStep withChatRoomNotifyDisabled();
 
             /**
-             * 수신자의 세션 상태를 설정합니다.
+             * 수신자의 세션 상태를 모두 동일하게 설정합니다.
              * 채팅방 뷰 상태를 설정하고 싶다면, {@link #withStatus(UserStatus, Long)} 메서드를 사용하세요.
              *
              * @return {@link RecipientBuilder}
@@ -603,7 +889,7 @@ class ChatNotificationTestFlow {
             ConfigurationStep withStatus(UserStatus status);
 
             /**
-             * 수신자의 채팅방 뷰 세션 상태를 설정합니다.
+             * 수신자의 채팅방 뷰 세션 상태를 모두 동일하게 설정합니다.
              *
              * @return {@link RecipientBuilder}
              */
@@ -629,6 +915,22 @@ class ChatNotificationTestFlow {
             ConfigurationStep inChatRoom(ChatRoom chatRoom);
 
             /**
+             * 수신자의 디바이스별 세션 상태를 설정합니다.
+             * <p>
+             * 예시:
+             * <pre>
+             * .withSessionStatuses(Map.of(
+             *     "deviceId1", new SessionStatus(UserStatus.ACTIVE_CHAT_ROOM, chatRoom.getId()),
+             *     "deviceId2", new SessionStatus(UserStatus.ACTIVE_APP, null)
+             * ))
+             * </pre>
+             *
+             * @param deviceStatuses 디바이스ID를 키로, 세션 상태 정보를 값으로 하는 Map
+             * @return {@link ConfigurationStep}
+             */
+            ConfigurationStep withSessionStatuses(Map<String, SessionStatus> deviceStatuses);
+
+            /**
              * 설정이 완료되었으며, 다음 설정을 위해 {@link ChatNotificationTestFlow}로 돌아갑니다.
              *
              * @return {@link ChatNotificationTestFlow}
@@ -640,6 +942,7 @@ class ChatNotificationTestFlow {
             private final ChatNotificationTestFlow flow;
             private final Long recipientId;
             private final List<DeviceToken> deviceTokens = new ArrayList<>();
+            private Map<String, SessionStatus> sessionStatuses = new HashMap<>();
             private User recipient;
             private UserStatus status = UserStatus.ACTIVE_APP;
             private Long activeChatRoomId;
@@ -668,7 +971,7 @@ class ChatNotificationTestFlow {
                         recipientId,
                         "recipient" + recipientId,
                         "수신자" + recipientId,
-                        NotifySetting.of(false, true, true)
+                        NotifySetting.of(true, true, false)
                 );
                 return this;
             }
@@ -710,9 +1013,21 @@ class ChatNotificationTestFlow {
                             deviceToken.deviceName(),
                             recipient
                     );
+                    ReflectionTestUtils.setField(token, "id", deviceToken.id());
+
+                    if (!deviceToken.activated()) {
+                        token.deactivate();
+                    }
+
                     this.deviceTokens.add(token);
                 });
 
+                return this;
+            }
+
+            @Override
+            public ConfigurationStep withSessionStatuses(Map<String, SessionStatus> deviceStatuses) {
+                this.sessionStatuses = new HashMap<>(deviceStatuses);
                 return this;
             }
 
@@ -742,7 +1057,14 @@ class ChatNotificationTestFlow {
                                         token.getDeviceId(),
                                         token.getDeviceName()
                                 );
-                                session.updateStatus(status, activeChatRoomId);
+
+                                // 디바이스별 상태 설정
+                                SessionStatus sessionStatus = sessionStatuses.getOrDefault(
+                                        token.getDeviceId(),
+                                        new SessionStatus(UserStatus.ACTIVE_APP, null)  // 기본값
+                                );
+                                session.updateStatus(sessionStatus.status(), sessionStatus.chatRoomId());
+
                                 return session;
                             })
                             .collect(Collectors.toList());
