@@ -25,15 +25,17 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.TestComponent;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 
 @Slf4j
 @ExtendWith(MockitoExtension.class)
@@ -60,53 +62,6 @@ public class ChatNotificationCoordinatorServiceUnitTest {
     @Test
     @DisplayName("Happy Path: 채팅방 참여자 중 푸시 알림을 받을 수 있는 사용자가 있는 경우 정상적으로 처리된다.")
     public void determineRecipientsSuccessfully() {
-        // given
-        ChatRoom activeChatRoom = ChatRoomFixture.PUBLIC_CHAT_ROOM.toEntity();
-
-        User sender = UserFixture.GENERAL_USER.toUserWithCustomSetting(1L, "sender", "발신자", NotifySetting.of(true, true, true));
-        User recipient = UserFixture.GENERAL_USER.toUserWithCustomSetting(2L, "recipient1", "참여자1", NotifySetting.of(true, true, true));
-
-        ChatMember senderMember = ChatMember.of(sender, activeChatRoom, ChatMemberRole.MEMBER);
-        ChatMember recipientMember = ChatMember.of(recipient, activeChatRoom, ChatMemberRole.MEMBER);
-
-        DeviceToken deviceTokenOfSender = DeviceToken.of("token1", "deviceId1", "iPhone Pro 15", sender);
-        DeviceToken deviceTokenOfRecipient = DeviceToken.of("token2", "deviceId2", "iPhone SE", recipient);
-
-        UserSession senderSession = UserSession.of(sender.getId(), deviceTokenOfSender.getDeviceId(), deviceTokenOfSender.getDeviceName());
-        UserSession recipientSession = UserSession.of(recipient.getId(), deviceTokenOfRecipient.getDeviceId(), deviceTokenOfRecipient.getDeviceName());
-        senderSession.updateStatus(UserStatus.ACTIVE_CHAT_ROOM, activeChatRoom.getId());
-        recipientSession.updateStatus(UserStatus.ACTIVE_CHAT_ROOM, activeChatRoom.getId());
-
-        given(userService.readUser(anyLong())).willReturn(Optional.of(sender));
-        given(chatMemberService.readUserIdsByChatRoomId(anyLong())).willReturn(new HashSet<>(List.of(sender.getId(), recipient.getId())));
-        given(userSessionService.readAll(anyLong())).will(invocation -> {
-            Long userId = invocation.getArgument(0);
-            if (userId.equals(sender.getId())) {
-                return Map.of(deviceTokenOfSender.getDeviceId(), senderSession);
-            } else {
-                return Map.of(deviceTokenOfRecipient.getDeviceId(), recipientSession);
-            }
-        });
-        given(chatMemberService.readChatMember(anyLong(), anyLong())).will(invocation -> {
-            Long userId = invocation.getArgument(0);
-            if (userId.equals(sender.getId())) {
-                return Optional.of(senderMember);
-            } else {
-                return Optional.of(recipientMember);
-            }
-        });
-        given(deviceTokenService.readAllByUserId(recipient.getId())).willReturn(List.of(deviceTokenOfRecipient));
-
-        // when
-        ChatPushNotificationContext context = service.determineRecipients(sender.getId(), activeChatRoom.getId());
-
-        // then
-        assertThat(context.deviceTokens()).contains(deviceTokenOfRecipient.getToken());
-    }
-
-    @Test
-    @DisplayName("Happy Path: 채팅방 참여자 중 푸시 알림을 받을 수 있는 사용자가 있는 경우 정상적으로 처리된다.")
-    public void determineRecipientsSuccessfully2() {
         // given
         ChatRoom chatRoom = ChatRoomFixture.PUBLIC_CHAT_ROOM.toEntityWithId(1L);
 
@@ -145,6 +100,8 @@ public class ChatNotificationCoordinatorServiceUnitTest {
 
         // when - then
         assertThrows(IllegalArgumentException.class, () -> service.determineRecipients(1L, 1L));
+
+        verify(chatMemberService, never()).readUserIdsByChatRoomId(anyLong());
     }
 
     @Test
@@ -170,7 +127,7 @@ public class ChatNotificationCoordinatorServiceUnitTest {
     }
 
     @Test
-    @DisplayName("채팅방 알림이 비활성화된 사용자는 제외된다.")
+    @DisplayName("채팅방 알림이 비활성화된 사용자의 모든 디바이스 토큰은 제외된다.")
     public void excludeUserWithDisabledChatRoomNotification() {
         // given
 
@@ -181,7 +138,7 @@ public class ChatNotificationCoordinatorServiceUnitTest {
     }
 
     @Test
-    @DisplayName("채팅 알림이 비활성화된 사용자는 제외된다.")
+    @DisplayName("채팅 알림이 비활성화된 사용자의 모든 디바이스 토큰은 제외된다.")
     public void excludeUserWithDisabledChatNotification() {
         // given
 
@@ -344,46 +301,54 @@ class ChatNotificationTestFlow {
      * @return {@link ChatNotificationTestFlow}
      */
     public ChatNotificationTestFlow whenMocking() {
-        // 기본 모킹 설정
+        // 기본 모킹 설정 (언제나 수행)
+        // 발신자 정보 반환
         given(userService.readUser(senderId))
                 .willReturn(Optional.ofNullable(sender));
+
+        // 수신자(발신자 포함) 정보 반환
+        for (Map.Entry<Long, User> entry : recipients.entrySet()) {
+            if (entry.getKey().equals(senderId)) {
+                continue;
+            }
+
+            given(userService.readUser(entry.getKey()))
+                    .willReturn(Optional.ofNullable(entry.getValue()));
+        }
 
         // 모든 수신자 ID 반환
         given(chatMemberService.readUserIdsByChatRoomId(chatRoomId))
                 .willReturn(recipientIds);
 
         // 사용자별 세션 정보 반환
-        given(userSessionService.readAll(any()))
-                .willAnswer(invocation -> {
-                    Long userId = invocation.getArgument(0);
-                    List<UserSession> userSessions = sessions.get(userId);
+        sessions.forEach((userId, userSessions) -> {
+            given(userSessionService.readAll(userId)).willReturn(userSessions.stream()
+                    .collect(Collectors.toMap(
+                            UserSession::getDeviceId,
+                            session -> session
+                    )));
+        });
 
-                    if (userSessions == null || userSessions.isEmpty()) {
-                        return Collections.emptyMap();
-                    }
+        // 4. 수신자의 채팅방 알림 설정과 디바이스 토큰은 필요한 경우에만 모킹
+        recipients.forEach((userId, recipient) -> {
+            if (!userId.equals(senderId)) {
+                // 채팅방 알림 설정이 켜져있는 경우에만 모킹
+                ChatMember chatMember = chatMembers.get(userId);
+                if (chatMember != null && chatMember.isNotifyEnabled()) {
+                    given(userService.readUser(userId))
+                            .willReturn(Optional.of(recipient));
+                    given(chatMemberService.readChatMember(userId, chatRoomId))
+                            .willReturn(Optional.of(chatMember));
 
-                    return userSessions.stream()
-                            .collect(Collectors.toMap(
-                                    UserSession::getDeviceId,
-                                    session -> session
-                            ));
-                });
-
-        // 사용자별 디바이스 토큰 반환
-        given(deviceTokenService.readAllByUserId(any()))
-                .willAnswer(invocation -> {
-                    Long userId = invocation.getArgument(0);
+                    // 디바이스 토큰도 필요한 경우에만 모킹
                     List<DeviceToken> tokens = deviceTokens.get(userId);
-                    return tokens != null ? tokens : Collections.emptyList();
-                });
-
-        // 각 사용자별 채팅방 알림 설정 반환
-        given(chatMemberService.readChatMember(any(), any()))
-                .willAnswer(invocation -> {
-                    Long userId = invocation.getArgument(0);
-                    ChatMember chatMember = chatMembers.get(userId);
-                    return Optional.ofNullable(chatMember);
-                });
+                    if (tokens != null && !tokens.isEmpty()) {
+                        given(deviceTokenService.readAllByUserId(userId))
+                                .willReturn(tokens);
+                    }
+                }
+            }
+        });
 
         return this;
     }
@@ -558,6 +523,8 @@ class ChatNotificationTestFlow {
                 }
 
                 flow.sender = sender;
+                flow.recipientIds.add(senderId);
+                flow.recipients.put(senderId, sender);
 
                 if (!deviceTokens.isEmpty()) {
                     flow.deviceTokens.put(senderId, new ArrayList<>(deviceTokens));
@@ -584,8 +551,10 @@ class ChatNotificationTestFlow {
                         targetChatRoom,
                         ChatMemberRole.MEMBER
                 );
+                ReflectionTestUtils.setField(chatMember, "id", senderId);
+
                 if (!notifyEnabled) {
-                    chatMember.notifyDisabled();
+                    chatMember.disableNotify();
                 }
                 flow.chatMembers.put(senderId, chatMember);
 
@@ -788,8 +757,10 @@ class ChatNotificationTestFlow {
                         targetChatRoom,
                         ChatMemberRole.MEMBER
                 );
+                ReflectionTestUtils.setField(chatMember, "id", recipientId);
+
                 if (!notifyEnabled) {
-                    chatMember.notifyDisabled();
+                    chatMember.disableNotify();
                 }
                 flow.chatMembers.put(recipientId, chatMember);
 
