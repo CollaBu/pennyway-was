@@ -51,8 +51,15 @@ public class DeviceToken {
         return new DeviceToken(token, deviceId, deviceName, Boolean.TRUE, user);
     }
 
+    /**
+     * 디바이스 토큰이 활성화되었는지 확인한다.
+     *
+     * @return 토큰이 활성화 되었고, 마지막 로그인 시간이 7일 이내이면 true, 그렇지 않으면 false
+     */
     public Boolean isActivated() {
-        return activated;
+        LocalDateTime now = LocalDateTime.now();
+
+        return activated && lastSignedInAt.plusDays(7).isAfter(now);
     }
 
     public void activate() {
