@@ -23,7 +23,6 @@ public class ChatMessageRelayEventListener {
                     exchange = @Exchange(value = "${pennyway.rabbitmq.chat.exchange}", type = "topic"),
                     key = "${pennyway.rabbitmq.chat.routing-key}"
             ),
-            exclusive = true,
             concurrency = "1"
     )
     public void handleSendEvent(ChatMessageDto.Response event) {
