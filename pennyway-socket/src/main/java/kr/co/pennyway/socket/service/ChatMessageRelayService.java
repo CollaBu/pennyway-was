@@ -30,6 +30,7 @@ public class ChatMessageRelayService {
      */
     public void execute(Long senderId, Long chatRoomId, String content) {
         ChatPushNotificationContext context = executeInTransaction(() -> chatNotificationCoordinatorService.determineRecipients(senderId, chatRoomId));
+        log.info("채팅 메시지 알림 전송 컨텍스트: {}", context);
 
         NotificationEvent notificationEvent = NotificationEvent.of(
                 context.senderName(),
