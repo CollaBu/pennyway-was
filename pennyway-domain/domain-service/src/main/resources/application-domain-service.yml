@@ -1,0 +1,23 @@
+spring:
+  profiles:
+    group:
+      local: common, domain-rds, domain-redis
+      dev: common, domain-rds, domain-redis
+
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+---
+spring:
+  config:
+    activate:
+      on-profile: test
