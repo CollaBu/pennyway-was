@@ -10,7 +10,7 @@ import java.util.Optional;
 
 @DomainService
 @RequiredArgsConstructor
-public class UserService {
+public class UserRdsService {
     private final UserRepository userRepository;
 
     @Transactional

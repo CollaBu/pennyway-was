@@ -28,7 +28,7 @@ import java.util.Optional;
 @Slf4j
 @DomainService
 @RequiredArgsConstructor
-public class SpendingService {
+public class SpendingRdsService {
     private final SpendingRepository spendingRepository;
 
     private final QUser user = QUser.user;

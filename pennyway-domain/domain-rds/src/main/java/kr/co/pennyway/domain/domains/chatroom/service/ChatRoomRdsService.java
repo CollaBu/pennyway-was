@@ -16,7 +16,7 @@ import java.util.Optional;
 @Slf4j
 @DomainService
 @RequiredArgsConstructor
-public class ChatRoomService {
+public class ChatRoomRdsService {
     private final ChatRoomRepository chatRoomRepository;
 
     @Transactional
