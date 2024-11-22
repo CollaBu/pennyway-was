@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Slf4j
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 @DomainService
-public class ForbiddenTokenService {
+public class ForbiddenTokenRedisService {
     private final ForbiddenTokenRepository forbiddenTokenRepository;
 
     /**
