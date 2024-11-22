@@ -1,5 +1,6 @@
 package kr.co.pennyway.socket.relay;
 
+import kr.co.pennyway.domain.common.redis.message.type.MessageCategoryType;
 import kr.co.pennyway.socket.dto.ChatMessageDto;
 import kr.co.pennyway.socket.service.ChatMessageRelayService;
 import lombok.RequiredArgsConstructor;
@@ -23,11 +24,14 @@ public class ChatMessageRelayEventListener {
                     exchange = @Exchange(value = "${pennyway.rabbitmq.chat.exchange}", type = "topic"),
                     key = "${pennyway.rabbitmq.chat.routing-key}"
             ),
-            exclusive = true,
             concurrency = "1"
     )
     public void handleSendEvent(ChatMessageDto.Response event) {
         log.info("ChatMessageSendEventListener.handleSendEvent: {}", event);
+
+        if (MessageCategoryType.SYSTEM.equals(event.categoryType())) {
+            return;
+        }
 
         chatMessageRelayService.execute(event.senderId(), event.chatRoomId(), event.content());
     }

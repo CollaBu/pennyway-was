@@ -21,7 +21,7 @@ public class FcmNotificationEventHandler implements NotificationEventHandler {
     @Override
     @TransactionalEventListener
     public void handleEvent(NotificationEvent event) {
-        log.debug("handleEvent: {}", event);
+        log.info("handleEvent: {}", event);
         ApiFuture<?> response = fcmManager.sendMessage(event);
 
         if (response == null) {
