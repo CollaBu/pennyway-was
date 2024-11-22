@@ -1,14 +1,13 @@
 package kr.co.pennyway.domain.domains.message.type;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import kr.co.pennyway.domain.common.converter.LegacyCommonType;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Map;
 import java.util.stream.Stream;
 
 @RequiredArgsConstructor
-public enum MessageContentType implements LegacyCommonType {
+public enum MessageContentType {
     TEXT("0", "TEXT"),
     IMAGE("1", "IMAGE"),
     VIDEO("2", "VIDEO"),
@@ -23,7 +22,6 @@ public enum MessageContentType implements LegacyCommonType {
         return stringToEnum.get(type.toUpperCase());
     }
 
-    @Override
     public String getCode() {
         return code;
     }
