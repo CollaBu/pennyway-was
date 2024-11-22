@@ -11,4 +11,6 @@ include 'pennyway-domain:domain-redis'
 findProject(':pennyway-domain:domain-redis')?.name = 'domain-redis'
 include 'pennyway-domain:domain-rds'
 findProject(':pennyway-domain:domain-rds')?.name = 'domain-rds'
+include 'pennyway-domain:domain-service'
+findProject(':pennyway-domain:domain-service')?.name = 'domain-service'
 
