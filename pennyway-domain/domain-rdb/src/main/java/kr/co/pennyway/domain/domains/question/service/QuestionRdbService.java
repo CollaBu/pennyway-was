@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @DomainService
 @RequiredArgsConstructor
-public class QuestionRdsService {
+public class QuestionRdbService {
     private final QuestionRepository questionRepository;
 
     @Transactional

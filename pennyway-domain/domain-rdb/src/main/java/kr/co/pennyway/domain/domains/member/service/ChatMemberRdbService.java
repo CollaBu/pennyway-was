@@ -21,7 +21,7 @@ import java.util.*;
 @Slf4j
 @DomainService
 @RequiredArgsConstructor
-public class ChatMemberRdsService {
+public class ChatMemberRdbService {
     private final ChatMemberRepository chatMemberRepository;
 
     private final QChatMember qChatMember = QChatMember.chatMember;

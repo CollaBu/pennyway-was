@@ -14,7 +14,7 @@ import java.util.Optional;
 @Slf4j
 @DomainService
 @RequiredArgsConstructor
-public class TargetAmountRdsService {
+public class TargetAmountRdbService {
     private final TargetAmountRepository targetAmountRepository;
 
     @Transactional

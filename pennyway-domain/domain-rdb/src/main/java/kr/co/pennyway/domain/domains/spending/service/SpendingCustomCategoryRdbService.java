@@ -13,7 +13,7 @@ import java.util.Optional;
 @Slf4j
 @DomainService
 @RequiredArgsConstructor
-public class SpendingCustomCategoryService {
+public class SpendingCustomCategoryRdbService {
     private final SpendingCustomCategoryRepository spendingCustomCategoryRepository;
 
     @Transactional

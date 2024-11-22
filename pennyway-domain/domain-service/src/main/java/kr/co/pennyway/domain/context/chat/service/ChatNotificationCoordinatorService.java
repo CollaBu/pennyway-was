@@ -3,14 +3,14 @@ package kr.co.pennyway.domain.context.chat.service;
 import kr.co.pennyway.common.annotation.DomainService;
 import kr.co.pennyway.domain.context.chat.dto.ChatPushNotificationContext;
 import kr.co.pennyway.domain.domains.device.domain.DeviceToken;
-import kr.co.pennyway.domain.domains.device.service.DeviceTokenRdsService;
+import kr.co.pennyway.domain.domains.device.service.DeviceTokenRdbService;
 import kr.co.pennyway.domain.domains.member.domain.ChatMember;
-import kr.co.pennyway.domain.domains.member.service.ChatMemberRdsService;
+import kr.co.pennyway.domain.domains.member.service.ChatMemberRdbService;
 import kr.co.pennyway.domain.domains.session.domain.UserSession;
 import kr.co.pennyway.domain.domains.session.service.UserSessionRedisService;
 import kr.co.pennyway.domain.domains.session.type.UserStatus;
 import kr.co.pennyway.domain.domains.user.domain.User;
-import kr.co.pennyway.domain.domains.user.service.UserRdsService;
+import kr.co.pennyway.domain.domains.user.service.UserRdbService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,9 +22,9 @@ import java.util.stream.Collectors;
 @DomainService
 @RequiredArgsConstructor
 public class ChatNotificationCoordinatorService {
-    private final UserRdsService userRdsService;
-    private final ChatMemberRdsService chatMemberRdsService;
-    private final DeviceTokenRdsService deviceTokenRdsService;
+    private final UserRdbService userRdbService;
+    private final ChatMemberRdbService chatMemberRdbService;
+    private final DeviceTokenRdbService deviceTokenRdbService;
 
     private final UserSessionRedisService userSessionRedisService;
 
@@ -46,7 +46,7 @@ public class ChatNotificationCoordinatorService {
      */
     @Transactional(readOnly = true)
     public ChatPushNotificationContext determineRecipients(Long senderId, Long chatRoomId) {
-        User sender = userRdsService.readUser(senderId).orElseThrow(() -> new IllegalArgumentException("전송자 정보를 찾을 수 없습니다."));
+        User sender = userRdbService.readUser(senderId).orElseThrow(() -> new IllegalArgumentException("전송자 정보를 찾을 수 없습니다."));
 
         Map<Long, Set<UserSession>> participants = getUserSessionGroupByUserId(senderId, chatRoomId);
 
@@ -69,7 +69,7 @@ public class ChatNotificationCoordinatorService {
      * @return 사용자 아이디 별로 사용자 세션들을 그룹핑한 맵
      */
     private Map<Long, Set<UserSession>> getUserSessionGroupByUserId(Long senderId, Long chatRoomId) {
-        Set<Long> userIds = chatMemberRdsService.readUserIdsByChatRoomId(chatRoomId);
+        Set<Long> userIds = chatMemberRdbService.readUserIdsByChatRoomId(chatRoomId);
 
         List<Map<String, UserSession>> userSessions = userIds.stream()
                 .filter(userId -> !userId.equals(senderId))
@@ -121,13 +121,13 @@ public class ChatNotificationCoordinatorService {
     }
 
     private boolean isChatNotifyEnabled(Long userId) {
-        Optional<User> user = userRdsService.readUser(userId);
+        Optional<User> user = userRdbService.readUser(userId);
 
         return user.isPresent() && user.get().getNotifySetting().isChatNotify();
     }
 
     private boolean isChatRoomNotifyEnabled(Long userId, Long chatRoomId) {
-        Optional<ChatMember> chatMember = chatMemberRdsService.readChatMember(userId, chatRoomId);
+        Optional<ChatMember> chatMember = chatMemberRdbService.readChatMember(userId, chatRoomId);
 
         return chatMember.isPresent() && chatMember.get().isNotifyEnabled();
     }
@@ -141,7 +141,7 @@ public class ChatNotificationCoordinatorService {
         List<String> deviceTokens = new ArrayList<>();
 
         for (UserSession target : targets) {
-            deviceTokenRdsService.readAllByUserId(target.getUserId()).stream()
+            deviceTokenRdbService.readAllByUserId(target.getUserId()).stream()
                     .filter(DeviceToken::isActivated)
                     .filter(deviceToken -> deviceToken.getDeviceId().equals(target.getDeviceId()))
                     .findFirst()

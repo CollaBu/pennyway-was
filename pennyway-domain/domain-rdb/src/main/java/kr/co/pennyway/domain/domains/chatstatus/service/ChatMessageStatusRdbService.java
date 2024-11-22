@@ -11,7 +11,7 @@ import java.util.Map;
 @Slf4j
 @DomainService
 @RequiredArgsConstructor
-public class ChatMessageStatusRdsService {
+public class ChatMessageStatusRdbService {
     private final ChatMessageStatusRepository chatMessageStatusRepository;
 
     /**

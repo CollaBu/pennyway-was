@@ -12,7 +12,7 @@ import java.util.Set;
 
 @DomainService
 @RequiredArgsConstructor
-public class OauthRdsService {
+public class OauthRdbService {
     private final OauthRepository oauthRepository;
 
     @Transactional

@@ -20,7 +20,7 @@ import java.util.List;
 @Slf4j
 @DomainService
 @RequiredArgsConstructor
-public class NotificationRdsService {
+public class NotificationRdbService {
     private final NotificationRepository notificationRepository;
 
     private final QNotification notification = QNotification.notification;

@@ -13,7 +13,7 @@ import java.util.Optional;
 @Slf4j
 @DomainService
 @RequiredArgsConstructor
-public class DeviceTokenRdsService {
+public class DeviceTokenRdbService {
     private final DeviceTokenRepository deviceTokenRepository;
 
     @Transactional
