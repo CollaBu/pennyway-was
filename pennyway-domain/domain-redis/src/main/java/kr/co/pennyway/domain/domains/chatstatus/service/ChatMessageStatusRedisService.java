@@ -13,15 +13,11 @@ import java.util.Optional;
 public class ChatMessageStatusRedisService {
     private final ChatMessageStatusCacheRepository chatMessageStatusCacheRepository;
 
-    public Optional<Long> findLastReadMessageId(Long userId, Long chatRoomId) {
+    public Optional<Long> readLastReadMessageId(Long userId, Long chatRoomId) {
         return chatMessageStatusCacheRepository.findLastReadMessageId(userId, chatRoomId);
     }
 
     public void saveLastReadMessageId(Long userId, Long chatRoomId, Long messageId) {
         chatMessageStatusCacheRepository.saveLastReadMessageId(userId, chatRoomId, messageId);
-    }
-
-    public void deleteLastReadMessageId(Long userId, Long chatRoomId) {
-        chatMessageStatusCacheRepository.deleteLastReadMessageId(userId, chatRoomId);
     }
 }
