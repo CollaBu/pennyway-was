@@ -1,0 +1,8 @@
+bootJar { enabled = false }
+jar { enabled = true }
+
+dependencies {
+    implementation project(':pennyway-common')
+    implementation project(':pennyway-domain:domain-rds')
+    implementation project(':pennyway-domain:domain-redis')
+}
