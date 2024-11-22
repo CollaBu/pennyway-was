@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-@Import(PennywayRdsDomainConfigImportSelector.class)
-public @interface EnablePennywayRdsDomainConfig {
-    PennywayRdsDomainConfigGroup[] value();
+@Import(PennywayRedisDomainConfigImportSelector.class)
+public @interface EnablePennywayRedisDomainConfig {
+    PennywayRedisDomainConfigGroup[] value();
 }

@@ -4,14 +4,14 @@ import kr.co.pennyway.domain.common.aop.CallTransactionFactory;
 import kr.co.pennyway.domain.common.aop.DistributedLockAspect;
 import kr.co.pennyway.domain.common.aop.RedissonCallNewTransaction;
 import kr.co.pennyway.domain.common.aop.RedissonCallSameTransaction;
-import kr.co.pennyway.domain.common.importer.PennywayRdsDomainConfig;
+import kr.co.pennyway.domain.common.importer.PennywayRedisDomainConfig;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 
-public class RedissonConfig implements PennywayRdsDomainConfig {
+public class RedissonConfig implements PennywayRedisDomainConfig {
     private static final String REDISSON_HOST_PREFIX = "redis://";
     private final String host;
     private final int port;

@@ -8,7 +8,7 @@ import org.springframework.lang.NonNull;
 import java.util.Arrays;
 import java.util.Map;
 
-public class PennywayRdsDomainConfigImportSelector implements DeferredImportSelector {
+public class PennywayRedisDomainConfigImportSelector implements DeferredImportSelector {
     @NonNull
     @Override
     public String[] selectImports(@NonNull AnnotationMetadata metadata) {
@@ -17,8 +17,8 @@ public class PennywayRdsDomainConfigImportSelector implements DeferredImportSele
                 .toArray(String[]::new);
     }
 
-    private PennywayRdsDomainConfigGroup[] getGroups(AnnotationMetadata metadata) {
-        Map<String, Object> attributes = metadata.getAnnotationAttributes(EnablePennywayRdsDomainConfig.class.getName());
-        return (PennywayRdsDomainConfigGroup[]) MapUtils.getObject(attributes, "value", new PennywayRdsDomainConfigGroup[]{});
+    private PennywayRedisDomainConfigGroup[] getGroups(AnnotationMetadata metadata) {
+        Map<String, Object> attributes = metadata.getAnnotationAttributes(EnablePennywayRedisDomainConfig.class.getName());
+        return (PennywayRedisDomainConfigGroup[]) MapUtils.getObject(attributes, "value", new PennywayRedisDomainConfigGroup[]{});
     }
 }
