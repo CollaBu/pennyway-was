@@ -7,4 +7,6 @@ include 'pennyway-infra'
 include 'pennyway-common'
 include 'pennyway-socket'
 include 'pennyway-socket-relay'
+include 'pennyway-domain:domain-redis'
+findProject(':pennyway-domain:domain-redis')?.name = 'domain-redis'
 
