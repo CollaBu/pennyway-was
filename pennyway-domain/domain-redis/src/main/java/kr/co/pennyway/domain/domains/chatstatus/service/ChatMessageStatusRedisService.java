@@ -18,6 +18,20 @@ public class ChatMessageStatusRedisService {
     }
 
     public void saveLastReadMessageId(Long userId, Long chatRoomId, Long messageId) {
+        validateInputs(userId, chatRoomId, messageId);
+
         chatMessageStatusCacheRepository.saveLastReadMessageId(userId, chatRoomId, messageId);
+    }
+
+    private void validateInputs(Long userId, Long chatRoomId, Long lastReadMessageId) {
+        if (userId == null || userId <= 0) {
+            throw new IllegalArgumentException("Invalid userId: " + userId);
+        }
+        if (chatRoomId == null || chatRoomId <= 0) {
+            throw new IllegalArgumentException("Invalid chatRoomId: " + chatRoomId);
+        }
+        if (lastReadMessageId == null || lastReadMessageId <= 0) {
+            throw new IllegalArgumentException("Invalid lastReadMessageId: " + lastReadMessageId);
+        }
     }
 }

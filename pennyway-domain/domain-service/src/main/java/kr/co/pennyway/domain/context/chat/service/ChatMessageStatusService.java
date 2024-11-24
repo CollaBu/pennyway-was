@@ -20,7 +20,6 @@ public class ChatMessageStatusService {
      * @throws IllegalArgumentException 사용자 ID, 채팅방 ID, 메시지 ID가 null이거나 0보다 작을 경우
      */
     public void saveLastReadMessageId(Long userId, Long roomId, Long messageId) {
-        validateInputs(userId, roomId, messageId);
         redisService.saveLastReadMessageId(userId, roomId, messageId);
     }
 
@@ -40,17 +39,5 @@ public class ChatMessageStatusService {
                             return lastReadId;
                         })
                         .orElse(0L));
-    }
-
-    private void validateInputs(Long userId, Long chatRoomId, Long lastReadMessageId) {
-        if (userId == null || userId <= 0) {
-            throw new IllegalArgumentException("Invalid userId: " + userId);
-        }
-        if (chatRoomId == null || chatRoomId <= 0) {
-            throw new IllegalArgumentException("Invalid chatRoomId: " + chatRoomId);
-        }
-        if (lastReadMessageId == null || lastReadMessageId <= 0) {
-            throw new IllegalArgumentException("Invalid lastReadMessageId: " + lastReadMessageId);
-        }
     }
 }
