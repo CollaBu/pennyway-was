@@ -1,20 +1,20 @@
-package kr.co.pennyway.domain.services.chat.service;
+package kr.co.pennyway.domain.context.chat.service;
 
-import kr.co.pennyway.common.fixture.ChatRoomFixture;
-import kr.co.pennyway.common.fixture.UserFixture;
-import kr.co.pennyway.domain.common.redis.session.UserSession;
-import kr.co.pennyway.domain.common.redis.session.UserSessionService;
-import kr.co.pennyway.domain.common.redis.session.UserStatus;
+import kr.co.pennyway.domain.context.chat.dto.ChatPushNotificationContext;
+import kr.co.pennyway.domain.context.common.fixture.ChatRoomFixture;
+import kr.co.pennyway.domain.context.common.fixture.UserFixture;
 import kr.co.pennyway.domain.domains.chatroom.domain.ChatRoom;
 import kr.co.pennyway.domain.domains.device.domain.DeviceToken;
-import kr.co.pennyway.domain.domains.device.service.DeviceTokenService;
+import kr.co.pennyway.domain.domains.device.service.DeviceTokenRdbService;
 import kr.co.pennyway.domain.domains.member.domain.ChatMember;
-import kr.co.pennyway.domain.domains.member.service.ChatMemberService;
+import kr.co.pennyway.domain.domains.member.service.ChatMemberRdbService;
 import kr.co.pennyway.domain.domains.member.type.ChatMemberRole;
+import kr.co.pennyway.domain.domains.session.domain.UserSession;
+import kr.co.pennyway.domain.domains.session.service.UserSessionRedisService;
+import kr.co.pennyway.domain.domains.session.type.UserStatus;
 import kr.co.pennyway.domain.domains.user.domain.NotifySetting;
 import kr.co.pennyway.domain.domains.user.domain.User;
-import kr.co.pennyway.domain.domains.user.service.UserService;
-import kr.co.pennyway.domain.services.chat.context.ChatPushNotificationContext;
+import kr.co.pennyway.domain.domains.user.service.UserRdbService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,16 +42,16 @@ import static org.mockito.Mockito.verify;
 @ExtendWith(MockitoExtension.class)
 public class ChatNotificationCoordinatorServiceUnitTest {
     @Mock
-    private UserService userService;
+    private UserRdbService userService;
 
     @Mock
-    private ChatMemberService chatMemberService;
+    private ChatMemberRdbService chatMemberService;
 
     @Mock
-    private DeviceTokenService deviceTokenService;
+    private DeviceTokenRdbService deviceTokenService;
 
     @Mock
-    private UserSessionService userSessionService;
+    private UserSessionRedisService userSessionService;
 
     private ChatNotificationCoordinatorService service;
 
@@ -449,10 +449,10 @@ public class ChatNotificationCoordinatorServiceUnitTest {
 @TestComponent
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 class ChatNotificationTestFlow {
-    private final UserService userService;
-    private final ChatMemberService chatMemberService;
-    private final UserSessionService userSessionService;
-    private final DeviceTokenService deviceTokenService;
+    private final UserRdbService userService;
+    private final ChatMemberRdbService chatMemberService;
+    private final UserSessionRedisService userSessionService;
+    private final DeviceTokenRdbService deviceTokenService;
 
     private final Long DEFAULT_SENDER_ID = 1L;
     private final Long DEFAULT_CHAT_ROOM_ID = 1L;
@@ -478,10 +478,10 @@ class ChatNotificationTestFlow {
      * @return {@link ChatNotificationTestFlow}
      */
     public static ChatNotificationTestFlow init(
-            UserService userService,
-            ChatMemberService chatMemberService,
-            UserSessionService userSessionService,
-            DeviceTokenService deviceTokenService
+            UserRdbService userService,
+            ChatMemberRdbService chatMemberService,
+            UserSessionRedisService userSessionService,
+            DeviceTokenRdbService deviceTokenService
     ) {
         return new ChatNotificationTestFlow(userService, chatMemberService, userSessionService, deviceTokenService);
     }
