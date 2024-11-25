@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Map;
+
 @Slf4j
 @DomainService
 @RequiredArgsConstructor
@@ -39,5 +41,16 @@ public class ChatMessageStatusService {
                             return lastReadId;
                         })
                         .orElse(0L));
+    }
+
+    @Transactional
+    public void deleteReadStatus(Map<Long, Map<Long, Long>> updates) {
+        rdbService.bulkUpdateReadStatus(updates);
+
+        updates.forEach((userId, roomUpdates) ->
+                roomUpdates.forEach((roomId, messageId) -> {
+                    redisService.deleteReadStatus(userId, roomId);
+                })
+        );
     }
 }
