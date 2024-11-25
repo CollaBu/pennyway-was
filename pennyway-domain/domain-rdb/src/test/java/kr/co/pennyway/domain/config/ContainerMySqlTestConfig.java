@@ -7,7 +7,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
 @Testcontainers
-public class ContainerMySqlTestContainer {
+public class ContainerMySqlTestConfig {
     private static final String MYSQL_CONTAINER_IMAGE = "mysql:8.0.26";
 
     private static final MySQLContainer<?> MYSQL_CONTAINER;
