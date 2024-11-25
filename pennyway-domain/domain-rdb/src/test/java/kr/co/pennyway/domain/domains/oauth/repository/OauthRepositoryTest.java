@@ -2,7 +2,7 @@ package kr.co.pennyway.domain.domains.oauth.repository;
 
 import kr.co.pennyway.domain.config.ContainerMySqlTestConfig;
 import kr.co.pennyway.domain.config.JpaConfig;
-import kr.co.pennyway.domain.config.TestJpaConfig;
+import kr.co.pennyway.domain.config.JpaTestConfig;
 import kr.co.pennyway.domain.domains.oauth.domain.Oauth;
 import kr.co.pennyway.domain.domains.oauth.type.Provider;
 import kr.co.pennyway.domain.domains.user.domain.NotifySetting;
@@ -27,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 @DataJpaTest(properties = {"spring.jpa.hibernate.ddl-auto=create"})
 @ContextConfiguration(classes = JpaConfig.class)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@Import(TestJpaConfig.class)
+@Import(JpaTestConfig.class)
 @ActiveProfiles("test")
 public class OauthRepositoryTest extends ContainerMySqlTestConfig {
     @Autowired
