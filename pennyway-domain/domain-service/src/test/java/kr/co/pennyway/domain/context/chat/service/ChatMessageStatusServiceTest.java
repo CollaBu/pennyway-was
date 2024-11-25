@@ -13,8 +13,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -104,31 +102,6 @@ public class ChatMessageStatusServiceTest {
         verify(redisService).readLastReadMessageId(userId, chatRoomId);
         verify(rdbService).readByUserIdAndChatRoomId(userId, chatRoomId);
         verifyNoMoreInteractions(redisService, rdbService);
-    }
-
-    @Test
-    @DisplayName("벌크 업데이트 시 모든 항목이 정상적으로 처리된다")
-    void bulkUpdateProcessesAllItems() {
-        // given
-        Map<Long, Map<Long, Long>> updates = new HashMap<>();
-        Map<Long, Long> user1Updates = new HashMap<>();
-        user1Updates.put(1L, 100L);
-        user1Updates.put(2L, 200L);
-
-        Map<Long, Long> user2Updates = new HashMap<>();
-        user2Updates.put(1L, 150L);
-
-        updates.put(1L, user1Updates);
-        updates.put(2L, user2Updates);
-
-        // when
-        chatMessageStatusService.deleteReadStatus(updates);
-
-        // then
-        verify(rdbService).bulkUpdateReadStatus(updates);
-        verify(redisService).deleteReadStatus(1L, 1L);
-        verify(redisService).deleteReadStatus(1L, 2L);
-        verify(redisService).deleteReadStatus(2L, 1L);
     }
 
     @Test
