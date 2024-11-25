@@ -23,6 +23,10 @@ public class ChatMessageStatusRedisService {
         chatMessageStatusCacheRepository.saveLastReadMessageId(userId, chatRoomId, messageId);
     }
 
+    public void deleteReadStatus(Long userId, Long roomId) {
+        chatMessageStatusCacheRepository.deleteLastReadMessageId(userId, roomId);
+    }
+
     private void validateInputs(Long userId, Long chatRoomId, Long lastReadMessageId) {
         if (userId == null || userId <= 0) {
             throw new IllegalArgumentException("Invalid userId: " + userId);
