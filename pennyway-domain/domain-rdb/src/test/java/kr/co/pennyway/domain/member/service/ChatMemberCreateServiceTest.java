@@ -1,12 +1,13 @@
-package kr.co.pennyway.domain.domains.member.service;
+package kr.co.pennyway.domain.member.service;
 
-import kr.co.pennyway.common.fixture.ChatRoomFixture;
-import kr.co.pennyway.common.fixture.UserFixture;
+import kr.co.pennyway.domain.common.fixture.ChatRoomFixture;
+import kr.co.pennyway.domain.common.fixture.UserFixture;
 import kr.co.pennyway.domain.domains.chatroom.domain.ChatRoom;
 import kr.co.pennyway.domain.domains.member.domain.ChatMember;
 import kr.co.pennyway.domain.domains.member.exception.ChatMemberErrorCode;
 import kr.co.pennyway.domain.domains.member.exception.ChatMemberErrorException;
 import kr.co.pennyway.domain.domains.member.repository.ChatMemberRepository;
+import kr.co.pennyway.domain.domains.member.service.ChatMemberRdbService;
 import kr.co.pennyway.domain.domains.member.type.ChatMemberRole;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import lombok.extern.slf4j.Slf4j;
@@ -32,14 +33,14 @@ import static org.mockito.BDDMockito.given;
 public class ChatMemberCreateServiceTest {
     @Mock
     private ChatMemberRepository chatMemberRepository;
-    private ChatMemberService chatMemberService;
+    private ChatMemberRdbService chatMemberService;
 
     private User user;
     private ChatRoom chatRoom;
 
     @BeforeEach
     void setUp() {
-        chatMemberService = new ChatMemberService(chatMemberRepository);
+        chatMemberService = new ChatMemberRdbService(chatMemberRepository);
         user = UserFixture.GENERAL_USER.toUser();
         chatRoom = ChatRoomFixture.PUBLIC_CHAT_ROOM.toEntity();
     }
