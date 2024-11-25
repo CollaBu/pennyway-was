@@ -5,11 +5,12 @@ import com.querydsl.sql.MySQLTemplates;
 import com.querydsl.sql.SQLTemplates;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import kr.co.pennyway.domain.common.importer.PennywayRdbDomainConfig;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
-public class QueryDslConfig implements PennywayRdbDomainConfig {
+@Configuration
+public class QueryDslConfig {
     @PersistenceContext
     private EntityManager entityManager;
 
