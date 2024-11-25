@@ -14,7 +14,9 @@ repositories {
 
 dependencies {
     implementation project(':pennyway-common')
-    implementation project(':pennyway-domain')
+    implementation project(':pennyway-domain:domain-service')
+    implementation project(':pennyway-domain:domain-rdb')
+    implementation project(':pennyway-domain:domain-redis')
     implementation project(':pennyway-infra')
 
     /* Web Socket */
