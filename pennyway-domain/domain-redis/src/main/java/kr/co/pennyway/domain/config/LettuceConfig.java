@@ -47,7 +47,11 @@ public class LettuceConfig implements PennywayRedisDomainConfig {
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(host, port);
         config.setPassword(password);
         LettuceClientConfiguration clientConfig = LettuceClientConfiguration.builder().build();
-        return new LettuceConnectionFactory(config, clientConfig);
+
+        LettuceConnectionFactory factory = new LettuceConnectionFactory(config, clientConfig);
+        factory.start();
+
+        return factory;
     }
 
     @Bean
