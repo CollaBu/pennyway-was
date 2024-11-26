@@ -8,11 +8,11 @@ import kr.co.pennyway.api.config.ExternalApiDBTestConfig;
 import kr.co.pennyway.api.config.ExternalApiIntegrationTest;
 import kr.co.pennyway.api.config.fixture.SpendingCustomCategoryFixture;
 import kr.co.pennyway.api.config.fixture.UserFixture;
+import kr.co.pennyway.domain.context.account.service.UserService;
+import kr.co.pennyway.domain.context.finance.service.SpendingCategoryService;
 import kr.co.pennyway.domain.domains.spending.domain.SpendingCustomCategory;
-import kr.co.pennyway.domain.domains.spending.service.SpendingCustomCategoryService;
 import kr.co.pennyway.domain.domains.spending.type.SpendingCategory;
 import kr.co.pennyway.domain.domains.user.domain.User;
-import kr.co.pennyway.domain.domains.user.service.UserService;
 import kr.co.pennyway.infra.common.jwt.JwtProvider;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
@@ -38,7 +38,7 @@ public class SpendingCategoryUpdateIntegrationTest extends ExternalApiDBTestConf
     private UserService userService;
 
     @Autowired
-    private SpendingCustomCategoryService spendingCustomCategoryService;
+    private SpendingCategoryService spendingCategoryService;
 
     @Autowired
     private JwtProvider accessTokenProvider;
@@ -64,7 +64,7 @@ public class SpendingCategoryUpdateIntegrationTest extends ExternalApiDBTestConf
     void success() {
         // given
         User user = userService.createUser(UserFixture.GENERAL_USER.toUser());
-        SpendingCustomCategory category = spendingCustomCategoryService.createSpendingCustomCategory(SpendingCustomCategoryFixture.GENERAL_SPENDING_CUSTOM_CATEGORY.toCustomSpendingCategory(user));
+        SpendingCustomCategory category = spendingCategoryService.createSpendingCustomCategory(SpendingCustomCategoryFixture.GENERAL_SPENDING_CUSTOM_CATEGORY.toCustomSpendingCategory(user));
         String expectedName = "뉴 카테고리";
 
         // when

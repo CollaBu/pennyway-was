@@ -8,13 +8,13 @@ import kr.co.pennyway.api.config.ExternalApiDBTestConfig;
 import kr.co.pennyway.api.config.ExternalApiIntegrationTest;
 import kr.co.pennyway.api.config.fixture.SpendingFixture;
 import kr.co.pennyway.api.config.fixture.UserFixture;
+import kr.co.pennyway.domain.context.account.service.UserService;
+import kr.co.pennyway.domain.context.finance.service.SpendingCategoryService;
+import kr.co.pennyway.domain.context.finance.service.SpendingService;
 import kr.co.pennyway.domain.domains.spending.domain.Spending;
 import kr.co.pennyway.domain.domains.spending.domain.SpendingCustomCategory;
-import kr.co.pennyway.domain.domains.spending.service.SpendingCustomCategoryService;
-import kr.co.pennyway.domain.domains.spending.service.SpendingService;
 import kr.co.pennyway.domain.domains.spending.type.SpendingCategory;
 import kr.co.pennyway.domain.domains.user.domain.User;
-import kr.co.pennyway.domain.domains.user.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,7 +50,7 @@ public class SpendingControllerIntegrationTest extends ExternalApiDBTestConfig {
     @Autowired
     private SpendingService spendingService;
     @Autowired
-    private SpendingCustomCategoryService spendingCustomCategoryService;
+    private SpendingCategoryService spendingCategoryService;
     @Autowired
     private NamedParameterJdbcTemplate jdbcTemplate;
 
@@ -85,7 +85,7 @@ public class SpendingControllerIntegrationTest extends ExternalApiDBTestConfig {
         void createSpendingWithCustomCategorySuccess() throws Exception {
             // given
             User user = userService.createUser(UserFixture.GENERAL_USER.toUser());
-            SpendingCustomCategory category = spendingCustomCategoryService.createSpendingCustomCategory(SpendingCustomCategory.of("잉여비", SpendingCategory.LIVING, user));
+            SpendingCustomCategory category = spendingCategoryService.createSpendingCustomCategory(SpendingCustomCategory.of("잉여비", SpendingCategory.LIVING, user));
             SpendingReq request = new SpendingReq(10000, category.getId(), SpendingCategory.CUSTOM, LocalDate.now(), "소비처", "메모");
 
             // when

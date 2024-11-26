@@ -7,13 +7,13 @@ import kr.co.pennyway.api.config.ExternalApiIntegrationTest;
 import kr.co.pennyway.api.config.fixture.SpendingCustomCategoryFixture;
 import kr.co.pennyway.api.config.fixture.SpendingFixture;
 import kr.co.pennyway.api.config.fixture.UserFixture;
+import kr.co.pennyway.domain.context.account.service.UserService;
+import kr.co.pennyway.domain.context.finance.service.SpendingCategoryService;
+import kr.co.pennyway.domain.context.finance.service.SpendingService;
 import kr.co.pennyway.domain.domains.spending.domain.Spending;
 import kr.co.pennyway.domain.domains.spending.domain.SpendingCustomCategory;
-import kr.co.pennyway.domain.domains.spending.service.SpendingCustomCategoryService;
-import kr.co.pennyway.domain.domains.spending.service.SpendingService;
 import kr.co.pennyway.domain.domains.spending.type.SpendingCategory;
 import kr.co.pennyway.domain.domains.user.domain.User;
-import kr.co.pennyway.domain.domains.user.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -42,7 +42,7 @@ public class SpendingCategoryIntegrationTest extends ExternalApiDBTestConfig {
     @Autowired
     private UserService userService;
     @Autowired
-    private SpendingCustomCategoryService spendingCustomCategoryService;
+    private SpendingCategoryService spendingCustomCategoryService;
 
     @Test
     @DisplayName("사용자 정의 지출 카테고리를 삭제하고, 삭제된 카테고리를 가지는 지출 내역 또한 삭제된다.")
