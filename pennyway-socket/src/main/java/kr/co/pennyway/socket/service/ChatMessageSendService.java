@@ -1,8 +1,8 @@
 package kr.co.pennyway.socket.service;
 
-import kr.co.pennyway.domain.common.redis.message.domain.ChatMessage;
-import kr.co.pennyway.domain.common.redis.message.domain.ChatMessageBuilder;
-import kr.co.pennyway.domain.common.redis.message.service.ChatMessageService;
+import kr.co.pennyway.domain.context.chat.service.ChatMessageService;
+import kr.co.pennyway.domain.domains.message.domain.ChatMessage;
+import kr.co.pennyway.domain.domains.message.domain.ChatMessageBuilder;
 import kr.co.pennyway.infra.client.broker.MessageBrokerAdapter;
 import kr.co.pennyway.infra.client.guid.IdGenerator;
 import kr.co.pennyway.infra.common.properties.ChatExchangeProperties;
