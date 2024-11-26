@@ -4,7 +4,6 @@ import kr.co.pennyway.api.common.security.jwt.Jwts;
 import kr.co.pennyway.api.common.security.jwt.access.AccessTokenProvider;
 import kr.co.pennyway.api.common.security.jwt.refresh.RefreshTokenClaim;
 import kr.co.pennyway.api.common.security.jwt.refresh.RefreshTokenProvider;
-import kr.co.pennyway.api.config.ExternalApiDBTestConfig;
 import kr.co.pennyway.domain.context.account.service.ForbiddenTokenService;
 import kr.co.pennyway.domain.context.account.service.RefreshTokenService;
 import kr.co.pennyway.domain.domains.refresh.domain.RefreshToken;
@@ -30,7 +29,7 @@ import static org.mockito.Mockito.verify;
 
 @Slf4j
 @ExtendWith(MockitoExtension.class)
-public class JwtAuthHelperTest extends ExternalApiDBTestConfig {
+public class JwtAuthHelperTest {
     private JwtAuthHelper jwtAuthHelper;
 
     @Mock
