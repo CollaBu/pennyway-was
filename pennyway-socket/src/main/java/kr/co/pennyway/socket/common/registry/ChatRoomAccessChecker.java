@@ -1,6 +1,6 @@
 package kr.co.pennyway.socket.common.registry;
 
-import kr.co.pennyway.domain.domains.member.service.ChatMemberService;
+import kr.co.pennyway.domain.context.chat.service.ChatMemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
