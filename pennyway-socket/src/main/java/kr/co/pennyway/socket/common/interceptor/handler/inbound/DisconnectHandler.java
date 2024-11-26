@@ -1,7 +1,7 @@
 package kr.co.pennyway.socket.common.interceptor.handler.inbound;
 
-import kr.co.pennyway.domain.common.redis.session.UserSessionService;
-import kr.co.pennyway.domain.common.redis.session.UserStatus;
+import kr.co.pennyway.domain.context.account.service.UserSessionService;
+import kr.co.pennyway.domain.domains.session.type.UserStatus;
 import kr.co.pennyway.socket.common.interceptor.marker.DisconnectCommandHandler;
 import kr.co.pennyway.socket.common.security.authenticate.UserPrincipal;
 import lombok.RequiredArgsConstructor;
