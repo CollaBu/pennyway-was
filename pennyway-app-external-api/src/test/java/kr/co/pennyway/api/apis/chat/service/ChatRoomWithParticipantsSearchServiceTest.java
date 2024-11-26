@@ -4,18 +4,18 @@ import kr.co.pennyway.api.apis.chat.dto.ChatRoomRes;
 import kr.co.pennyway.api.config.fixture.ChatMemberFixture;
 import kr.co.pennyway.api.config.fixture.ChatRoomFixture;
 import kr.co.pennyway.api.config.fixture.UserFixture;
-import kr.co.pennyway.domain.common.redis.message.domain.ChatMessage;
-import kr.co.pennyway.domain.common.redis.message.domain.ChatMessageBuilder;
-import kr.co.pennyway.domain.common.redis.message.service.ChatMessageService;
-import kr.co.pennyway.domain.common.redis.message.type.MessageCategoryType;
-import kr.co.pennyway.domain.common.redis.message.type.MessageContentType;
+import kr.co.pennyway.domain.context.chat.service.ChatMemberService;
+import kr.co.pennyway.domain.context.chat.service.ChatMessageService;
 import kr.co.pennyway.domain.domains.chatroom.domain.ChatRoom;
 import kr.co.pennyway.domain.domains.member.domain.ChatMember;
 import kr.co.pennyway.domain.domains.member.dto.ChatMemberResult;
 import kr.co.pennyway.domain.domains.member.exception.ChatMemberErrorCode;
 import kr.co.pennyway.domain.domains.member.exception.ChatMemberErrorException;
-import kr.co.pennyway.domain.domains.member.service.ChatMemberService;
 import kr.co.pennyway.domain.domains.member.type.ChatMemberRole;
+import kr.co.pennyway.domain.domains.message.domain.ChatMessage;
+import kr.co.pennyway.domain.domains.message.domain.ChatMessageBuilder;
+import kr.co.pennyway.domain.domains.message.type.MessageCategoryType;
+import kr.co.pennyway.domain.domains.message.type.MessageContentType;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
@@ -65,8 +65,8 @@ public class ChatRoomWithParticipantsSearchServiceTest {
 
         given(chatMemberService.readChatMember(userId, chatRoom.getId())).willReturn(Optional.of(myInfo));
         given(chatMessageService.readRecentMessages(eq(chatRoom.getId()), anyInt())).willReturn(recentMessages);
-        given(chatMemberService.readChatMembersByUserIdIn(eq(chatRoom.getId()), anySet())).willReturn(recentParticipants);
-        given(chatMemberService.readChatMemberIdsByUserIdNotIn(eq(chatRoom.getId()), anySet())).willReturn(otherParticipants);
+        given(chatMemberService.readChatMembersByUserIds(eq(chatRoom.getId()), anySet())).willReturn(recentParticipants);
+        given(chatMemberService.readChatMemberIdsByUserIdsNotIn(eq(chatRoom.getId()), anySet())).willReturn(otherParticipants);
 
         // when
         ChatRoomRes.RoomWithParticipants result = service.execute(userId, chatRoom.getId());
@@ -84,8 +84,8 @@ public class ChatRoomWithParticipantsSearchServiceTest {
         // verify
         verify(chatMemberService).readChatMember(userId, chatRoom.getId());
         verify(chatMessageService).readRecentMessages(eq(chatRoom.getId()), anyInt());
-        verify(chatMemberService).readChatMembersByUserIdIn(eq(chatRoom.getId()), anySet());
-        verify(chatMemberService).readChatMemberIdsByUserIdNotIn(eq(chatRoom.getId()), anySet());
+        verify(chatMemberService).readChatMembersByUserIds(eq(chatRoom.getId()), anySet());
+        verify(chatMemberService).readChatMemberIdsByUserIdsNotIn(eq(chatRoom.getId()), anySet());
         verify(chatMemberService, never()).readAdmin(chatRoom.getId());
     }
 
@@ -101,9 +101,9 @@ public class ChatRoomWithParticipantsSearchServiceTest {
 
         given(chatMemberService.readChatMember(userId, chatRoom.getId())).willReturn(Optional.of(myInfo));
         given(chatMessageService.readRecentMessages(eq(chatRoom.getId()), eq(15))).willReturn(recentMessages);
-        given(chatMemberService.readChatMembersByUserIdIn(eq(chatRoom.getId()), anySet())).willReturn(recentParticipants);
+        given(chatMemberService.readChatMembersByUserIds(eq(chatRoom.getId()), anySet())).willReturn(recentParticipants);
         given(chatMemberService.readAdmin(chatRoom.getId())).willReturn(Optional.of(adminDetail));
-        given(chatMemberService.readChatMemberIdsByUserIdNotIn(eq(chatRoom.getId()), anySet())).willReturn(otherParticipants);
+        given(chatMemberService.readChatMemberIdsByUserIdsNotIn(eq(chatRoom.getId()), anySet())).willReturn(otherParticipants);
 
         // when
         ChatRoomRes.RoomWithParticipants result = service.execute(userId, chatRoom.getId());

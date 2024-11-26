@@ -1,13 +1,13 @@
 package kr.co.pennyway.socket.service;
 
-import kr.co.pennyway.domain.common.redis.message.domain.ChatMessage;
-import kr.co.pennyway.domain.common.redis.message.domain.ChatMessageBuilder;
-import kr.co.pennyway.domain.common.redis.message.service.ChatMessageService;
+import kr.co.pennyway.domain.context.chat.service.ChatMessageService;
+import kr.co.pennyway.domain.domains.message.domain.ChatMessage;
+import kr.co.pennyway.domain.domains.message.domain.ChatMessageBuilder;
 import kr.co.pennyway.infra.client.broker.MessageBrokerAdapter;
 import kr.co.pennyway.infra.client.guid.IdGenerator;
 import kr.co.pennyway.infra.common.properties.ChatExchangeProperties;
 import kr.co.pennyway.socket.command.SendMessageCommand;
-import kr.co.pennyway.socket.dto.ChatMessageDto;
+import kr.co.pennyway.socket.common.dto.ChatMessageDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;

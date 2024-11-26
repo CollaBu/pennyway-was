@@ -1,13 +1,13 @@
 package kr.co.pennyway.api.apis.users.service;
 
-import kr.co.pennyway.domain.domains.device.service.DeviceTokenService;
-import kr.co.pennyway.domain.domains.member.service.ChatMemberService;
-import kr.co.pennyway.domain.domains.oauth.service.OauthService;
-import kr.co.pennyway.domain.domains.spending.service.SpendingCustomCategoryService;
-import kr.co.pennyway.domain.domains.spending.service.SpendingService;
+import kr.co.pennyway.domain.context.account.service.DeviceTokenService;
+import kr.co.pennyway.domain.context.account.service.OauthService;
+import kr.co.pennyway.domain.context.account.service.UserService;
+import kr.co.pennyway.domain.context.chat.service.ChatMemberService;
+import kr.co.pennyway.domain.context.finance.service.SpendingCategoryService;
+import kr.co.pennyway.domain.context.finance.service.SpendingService;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorCode;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorException;
-import kr.co.pennyway.domain.domains.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -31,7 +31,7 @@ public class UserDeleteService {
     private final ChatMemberService chatMemberService;
 
     private final SpendingService spendingService;
-    private final SpendingCustomCategoryService spendingCustomCategoryService;
+    private final SpendingCategoryService spendingCategoryService;
 
     /**
      * 사용자와 관련한 모든 데이터를 삭제(soft delete)하는 메서드
@@ -48,11 +48,11 @@ public class UserDeleteService {
             throw new UserErrorException(UserErrorCode.HAS_OWNERSHIP_CHAT_ROOM);
         }
 
-        oauthService.deleteOauthsByUserIdInQuery(userId);
-        deviceTokenService.deleteDevicesByUserIdInQuery(userId);
+        oauthService.deleteOauth(userId);
+        deviceTokenService.deleteDeviceTokensByUserId(userId);
 
-        spendingService.deleteSpendingsByUserIdInQuery(userId);
-        spendingCustomCategoryService.deleteSpendingCustomCategoriesByUserIdInQuery(userId);
+        spendingService.deleteSpendingsByUserId(userId);
+        spendingCategoryService.deleteSpendingCustomCategoriesByUserId(userId);
 
         userService.deleteUser(userId);
     }

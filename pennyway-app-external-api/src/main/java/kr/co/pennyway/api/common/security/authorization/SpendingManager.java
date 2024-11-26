@@ -1,6 +1,6 @@
 package kr.co.pennyway.api.common.security.authorization;
 
-import kr.co.pennyway.domain.domains.spending.service.SpendingService;
+import kr.co.pennyway.domain.context.finance.service.SpendingService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -26,7 +26,7 @@ public class SpendingManager {
 
     @Transactional(readOnly = true)
     public boolean hasPermissions(Long userId, List<Long> spendingIds) {
-        if (spendingService.countByUserIdAndIdIn(userId, spendingIds) != (long) spendingIds.size()) {
+        if (spendingService.countByUserIdAndSpendingIds(userId, spendingIds) != (long) spendingIds.size()) {
             return false;
         }
 

@@ -1,10 +1,10 @@
 package kr.co.pennyway.socket.common.interceptor.handler.inbound;
 
-import kr.co.pennyway.domain.common.redis.session.UserSession;
-import kr.co.pennyway.domain.common.redis.session.UserSessionService;
-import kr.co.pennyway.domain.common.redis.session.UserStatus;
+import kr.co.pennyway.domain.context.account.service.UserService;
+import kr.co.pennyway.domain.context.account.service.UserSessionService;
+import kr.co.pennyway.domain.domains.session.domain.UserSession;
+import kr.co.pennyway.domain.domains.session.type.UserStatus;
 import kr.co.pennyway.domain.domains.user.domain.User;
-import kr.co.pennyway.domain.domains.user.service.UserService;
 import kr.co.pennyway.infra.common.exception.JwtErrorCode;
 import kr.co.pennyway.infra.common.exception.JwtErrorException;
 import kr.co.pennyway.infra.common.jwt.AuthConstants;

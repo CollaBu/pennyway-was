@@ -1,8 +1,9 @@
 spring:
   profiles:
     group:
-      local: common, domain, infra
-      dev: common, domain, infra
+      local: common, domain-rdb, domain-redis, infra
+      dev: common, domain-rdb, domain-redis, infra
+      test: common, domain-rdb, domain-redis, infra
 
   batch:
     job:
@@ -19,12 +20,7 @@ spring:
   datasource:
     hikari:
       maximum-pool-size: 2
-
-  data:
-    redis:
-      repositories:
-        enabled: false
-
+      
 ---
 spring:
   config:

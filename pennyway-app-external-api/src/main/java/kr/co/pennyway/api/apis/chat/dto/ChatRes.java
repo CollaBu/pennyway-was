@@ -4,9 +4,9 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
-import kr.co.pennyway.domain.common.redis.message.domain.ChatMessage;
-import kr.co.pennyway.domain.common.redis.message.type.MessageCategoryType;
-import kr.co.pennyway.domain.common.redis.message.type.MessageContentType;
+import kr.co.pennyway.domain.domains.message.domain.ChatMessage;
+import kr.co.pennyway.domain.domains.message.type.MessageCategoryType;
+import kr.co.pennyway.domain.domains.message.type.MessageContentType;
 
 import java.time.LocalDateTime;
 

@@ -1,8 +1,10 @@
 package kr.co.pennyway.api.common.query;
 
 import jakarta.annotation.Nonnull;
-import kr.co.pennyway.domain.common.redis.phone.PhoneCodeKeyType;
 import kr.co.pennyway.domain.domains.oauth.type.Provider;
+import kr.co.pennyway.domain.domains.phone.type.PhoneCodeKeyType;
+
+import static kr.co.pennyway.domain.domains.phone.type.PhoneCodeKeyType.*;
 
 public enum VerificationType {
     GENERAL("general", PhoneCodeKeyType.SIGN_UP),
@@ -21,7 +23,11 @@ public enum VerificationType {
 
     public PhoneCodeKeyType toPhoneVerificationType(@Nonnull Provider provider) {
         if (this.equals(OAUTH)) {
-            return PhoneCodeKeyType.getOauthSignUpTypeByProvider(provider);
+            return switch (provider) {
+                case KAKAO -> OAUTH_SIGN_UP_KAKAO;
+                case GOOGLE -> OAUTH_SIGN_UP_GOOGLE;
+                case APPLE -> OAUTH_SIGN_UP_APPLE;
+            };
         }
 
         return phoneCodeKeyType;

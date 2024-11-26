@@ -2,14 +2,14 @@ package kr.co.pennyway.api.apis.chat.service;
 
 import kr.co.pennyway.api.apis.chat.dto.ChatRoomRes;
 import kr.co.pennyway.api.apis.chat.mapper.ChatRoomMapper;
-import kr.co.pennyway.domain.common.redis.message.domain.ChatMessage;
-import kr.co.pennyway.domain.common.redis.message.service.ChatMessageService;
+import kr.co.pennyway.domain.context.chat.service.ChatMemberService;
+import kr.co.pennyway.domain.context.chat.service.ChatMessageService;
 import kr.co.pennyway.domain.domains.member.domain.ChatMember;
 import kr.co.pennyway.domain.domains.member.dto.ChatMemberResult;
 import kr.co.pennyway.domain.domains.member.exception.ChatMemberErrorCode;
 import kr.co.pennyway.domain.domains.member.exception.ChatMemberErrorException;
-import kr.co.pennyway.domain.domains.member.service.ChatMemberService;
 import kr.co.pennyway.domain.domains.member.type.ChatMemberRole;
+import kr.co.pennyway.domain.domains.message.domain.ChatMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -47,7 +47,7 @@ public class ChatRoomWithParticipantsSearchService {
 
         // 최근 메시지의 발신자 상세 정보 조회
         List<ChatMemberResult.Detail> recentParticipants = new ArrayList<>(
-                chatMemberService.readChatMembersByUserIdIn(chatRoomId, recentParticipantIds)
+                chatMemberService.readChatMembersByUserIds(chatRoomId, recentParticipantIds)
         );
 
         // 내가 관리자가 아니거나, 최근 활동자에 관리자가 없다면 관리자 정보 조회
@@ -60,7 +60,7 @@ public class ChatRoomWithParticipantsSearchService {
         recentParticipantIds.add(userId);
 
         // 채팅방에 속한 다른 사용자 요약 정보 조회
-        List<ChatMemberResult.Summary> otherMemberIds = chatMemberService.readChatMemberIdsByUserIdNotIn(chatRoomId, recentParticipantIds);
+        List<ChatMemberResult.Summary> otherMemberIds = chatMemberService.readChatMemberIdsByUserIdsNotIn(chatRoomId, recentParticipantIds);
 
         return ChatRoomMapper.toChatRoomResRoomWithParticipants(myDetail, recentParticipants, otherMemberIds, chatMessages);
     }

@@ -5,7 +5,7 @@ import kr.co.pennyway.api.apis.chat.mapper.ChatMapper;
 import kr.co.pennyway.api.apis.chat.service.ChatSearchService;
 import kr.co.pennyway.api.common.response.SliceResponseTemplate;
 import kr.co.pennyway.common.annotation.UseCase;
-import kr.co.pennyway.domain.common.redis.message.domain.ChatMessage;
+import kr.co.pennyway.domain.domains.message.domain.ChatMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Slice;

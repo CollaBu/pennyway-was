@@ -2,14 +2,13 @@ package kr.co.pennyway.api.apis.users.service;
 
 import kr.co.pennyway.api.apis.auth.dto.PhoneVerificationDto;
 import kr.co.pennyway.api.apis.auth.service.PhoneVerificationService;
-import kr.co.pennyway.domain.common.redis.phone.PhoneCodeKeyType;
-import kr.co.pennyway.domain.common.redis.phone.PhoneCodeService;
+import kr.co.pennyway.domain.context.account.service.PhoneCodeService;
+import kr.co.pennyway.domain.context.account.service.UserService;
+import kr.co.pennyway.domain.domains.phone.type.PhoneCodeKeyType;
 import kr.co.pennyway.domain.domains.user.domain.NotifySetting;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorCode;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorException;
-import kr.co.pennyway.domain.domains.user.service.UserService;
-import kr.co.pennyway.infra.client.aws.s3.AwsS3Provider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -20,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class UserProfileUpdateService {
     private final UserService userService;
-    private final AwsS3Provider awsS3Provider;
 
     private final PhoneVerificationService phoneVerificationService;
     private final PhoneCodeService phoneCodeService;

@@ -1,6 +1,6 @@
 package kr.co.pennyway.socket.service;
 
-import kr.co.pennyway.domain.domains.chatstatus.service.ChatMessageStatusService;
+import kr.co.pennyway.domain.context.chat.service.ChatMessageStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

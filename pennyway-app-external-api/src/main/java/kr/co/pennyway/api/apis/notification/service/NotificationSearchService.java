@@ -1,7 +1,7 @@
 package kr.co.pennyway.api.apis.notification.service;
 
+import kr.co.pennyway.domain.context.alter.service.NotificationService;
 import kr.co.pennyway.domain.domains.notification.domain.Notification;
-import kr.co.pennyway.domain.domains.notification.service.NotificationService;
 import kr.co.pennyway.domain.domains.notification.type.NoticeType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +20,7 @@ public class NotificationSearchService {
 
     @Transactional(readOnly = true)
     public Slice<Notification> getAnnounceNotifications(Long userId, Pageable pageable) {
-        return notificationService.readNotificationsSlice(userId, pageable, NoticeType.ANNOUNCEMENT);
+        return notificationService.readNotifications(userId, pageable, NoticeType.ANNOUNCEMENT);
     }
 
     @Transactional(readOnly = true)
