@@ -1,14 +1,14 @@
 package kr.co.pennyway.api.apis.chat.service;
 
 import kr.co.pennyway.api.apis.chat.dto.ChatRoomRes;
-import kr.co.pennyway.domain.common.redis.message.domain.ChatMessage;
-import kr.co.pennyway.domain.common.redis.message.domain.ChatMessageBuilder;
-import kr.co.pennyway.domain.common.redis.message.service.ChatMessageService;
-import kr.co.pennyway.domain.common.redis.message.type.MessageCategoryType;
-import kr.co.pennyway.domain.common.redis.message.type.MessageContentType;
+import kr.co.pennyway.domain.context.chat.service.ChatMessageService;
+import kr.co.pennyway.domain.context.chat.service.ChatMessageStatusService;
+import kr.co.pennyway.domain.context.chat.service.ChatRoomService;
 import kr.co.pennyway.domain.domains.chatroom.dto.ChatRoomDetail;
-import kr.co.pennyway.domain.domains.chatroom.service.ChatRoomService;
-import kr.co.pennyway.domain.domains.chatstatus.service.ChatMessageStatusService;
+import kr.co.pennyway.domain.domains.message.domain.ChatMessage;
+import kr.co.pennyway.domain.domains.message.domain.ChatMessageBuilder;
+import kr.co.pennyway.domain.domains.message.type.MessageCategoryType;
+import kr.co.pennyway.domain.domains.message.type.MessageContentType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
