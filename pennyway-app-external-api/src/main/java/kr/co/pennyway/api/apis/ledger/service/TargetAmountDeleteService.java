@@ -1,9 +1,9 @@
 package kr.co.pennyway.api.apis.ledger.service;
 
+import kr.co.pennyway.domain.context.finance.service.TargetAmountService;
 import kr.co.pennyway.domain.domains.target.domain.TargetAmount;
 import kr.co.pennyway.domain.domains.target.exception.TargetAmountErrorCode;
 import kr.co.pennyway.domain.domains.target.exception.TargetAmountErrorException;
-import kr.co.pennyway.domain.domains.target.service.TargetAmountService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
