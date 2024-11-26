@@ -6,9 +6,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @EnablePennywayDomainConfig(value = {
-        PennywayDomainConfigGroup.REDIS_DOMAIN,
-        PennywayDomainConfigGroup.REDISSON_DOMAIN,
-        PennywayDomainConfigGroup.LETTUCE_DOMAIN
+        PennywayDomainConfigGroup.REDISSON_DOMAIN
 })
 public class DomainConfig {
 }
