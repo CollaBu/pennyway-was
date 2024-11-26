@@ -2,13 +2,11 @@ package kr.co.pennyway.api.apis.users.usecase;
 
 import kr.co.pennyway.api.apis.users.service.UserDeleteService;
 import kr.co.pennyway.api.config.ExternalApiDBTestConfig;
-import kr.co.pennyway.api.config.TestJpaConfig;
+import kr.co.pennyway.api.config.ExternalApiIntegrationTest;
 import kr.co.pennyway.api.config.fixture.*;
-import kr.co.pennyway.domain.config.JpaConfig;
 import kr.co.pennyway.domain.context.account.service.DeviceTokenService;
 import kr.co.pennyway.domain.context.account.service.OauthService;
 import kr.co.pennyway.domain.context.account.service.UserService;
-import kr.co.pennyway.domain.context.chat.service.ChatMemberService;
 import kr.co.pennyway.domain.context.finance.service.SpendingCategoryService;
 import kr.co.pennyway.domain.context.finance.service.SpendingService;
 import kr.co.pennyway.domain.domains.chatroom.domain.ChatRoom;
@@ -25,13 +23,7 @@ import kr.co.pennyway.domain.domains.user.exception.UserErrorException;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -39,11 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.util.AssertionErrors.*;
 
 @Slf4j
-@ExtendWith(MockitoExtension.class)
-@DataJpaTest(properties = "spring.jpa.hibernate.ddl-auto=create")
-@ContextConfiguration(classes = {JpaConfig.class, UserDeleteService.class, UserService.class, OauthService.class, DeviceTokenService.class, SpendingService.class, SpendingCategoryService.class, ChatMemberService.class})
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@Import(TestJpaConfig.class)
+@ExternalApiIntegrationTest
 public class UserDeleteServiceTest extends ExternalApiDBTestConfig {
     @Autowired
     private UserService userService;
