@@ -42,7 +42,7 @@ public class SpendingCategoryService {
     }
 
     @Transactional
-    public void deleteSpendingCustomCategoriesByUserIdInQuery(Long userId) {
+    public void deleteSpendingCustomCategoriesByUserId(Long userId) {
         spendingCustomCategoryRdbService.deleteSpendingCustomCategoriesByUserIdInQuery(userId);
     }
 }
