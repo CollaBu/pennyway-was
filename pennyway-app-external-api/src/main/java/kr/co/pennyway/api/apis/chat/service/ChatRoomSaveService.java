@@ -2,13 +2,13 @@ package kr.co.pennyway.api.apis.chat.service;
 
 import kr.co.pennyway.api.apis.chat.dto.ChatRoomReq;
 import kr.co.pennyway.api.common.storage.AwsS3Adapter;
+import kr.co.pennyway.domain.context.account.service.UserService;
+import kr.co.pennyway.domain.context.chat.service.ChatMemberService;
+import kr.co.pennyway.domain.context.chat.service.ChatRoomService;
 import kr.co.pennyway.domain.domains.chatroom.domain.ChatRoom;
-import kr.co.pennyway.domain.domains.chatroom.service.ChatRoomService;
-import kr.co.pennyway.domain.domains.member.service.ChatMemberService;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorCode;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorException;
-import kr.co.pennyway.domain.domains.user.service.UserService;
 import kr.co.pennyway.infra.client.aws.s3.ActualIdProvider;
 import kr.co.pennyway.infra.client.guid.IdGenerator;
 import lombok.RequiredArgsConstructor;
