@@ -5,9 +5,9 @@ import kr.co.pennyway.domain.RedisPackageLocation;
 import kr.co.pennyway.domain.common.annotation.DomainRedisCacheManager;
 import kr.co.pennyway.domain.common.annotation.DomainRedisConnectionFactory;
 import kr.co.pennyway.domain.common.annotation.DomainRedisTemplate;
-import kr.co.pennyway.domain.common.importer.PennywayRedisDomainConfig;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
@@ -24,9 +24,10 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import java.time.Duration;
 
+@Configuration
 @EnableRedisRepositories(basePackageClasses = RedisPackageLocation.class)
 @EnableTransactionManagement
-public class LettuceConfig implements PennywayRedisDomainConfig {
+public class LettuceConfig {
     private final String host;
     private final int port;
     private final String password;
