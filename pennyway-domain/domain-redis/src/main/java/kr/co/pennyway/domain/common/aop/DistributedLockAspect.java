@@ -25,7 +25,7 @@ public class DistributedLockAspect {
     private final RedissonClient redissonClient;
     private final CallTransactionFactory callTransactionFactory;
 
-    @Around("@annotation(kr.co.pennyway.domain.common.redisson.DistributedLock)")
+    @Around("@annotation(kr.co.pennyway.domain.common.annotation.DistributedLock)")
     public Object lock(final ProceedingJoinPoint joinPoint) throws Throwable {
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         Method method = signature.getMethod();
