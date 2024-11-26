@@ -1,7 +1,7 @@
 package kr.co.pennyway.socket.service;
 
-import kr.co.pennyway.domain.services.chat.context.ChatPushNotificationContext;
-import kr.co.pennyway.domain.services.chat.service.ChatNotificationCoordinatorService;
+import kr.co.pennyway.domain.context.chat.dto.ChatPushNotificationContext;
+import kr.co.pennyway.domain.context.chat.service.ChatNotificationCoordinatorService;
 import kr.co.pennyway.infra.common.event.NotificationEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
