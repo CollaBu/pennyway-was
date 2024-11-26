@@ -1,6 +1,6 @@
 package kr.co.pennyway.api.common.security.authentication;
 
-import kr.co.pennyway.domain.domains.user.service.UserService;
+import kr.co.pennyway.domain.context.account.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.userdetails.UserDetails;
