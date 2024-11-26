@@ -1,14 +1,14 @@
 package kr.co.pennyway.api.apis.ledger.service;
 
-import kr.co.pennyway.domain.common.redisson.DistributedLock;
+import kr.co.pennyway.domain.common.annotation.DistributedLock;
+import kr.co.pennyway.domain.context.account.service.UserService;
+import kr.co.pennyway.domain.context.finance.service.TargetAmountService;
 import kr.co.pennyway.domain.domains.target.domain.TargetAmount;
 import kr.co.pennyway.domain.domains.target.exception.TargetAmountErrorCode;
 import kr.co.pennyway.domain.domains.target.exception.TargetAmountErrorException;
-import kr.co.pennyway.domain.domains.target.service.TargetAmountService;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorCode;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorException;
-import kr.co.pennyway.domain.domains.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
