@@ -1,11 +1,11 @@
 package kr.co.pennyway.api.apis.users.service;
 
+import kr.co.pennyway.domain.context.account.service.DeviceTokenService;
+import kr.co.pennyway.domain.context.account.service.UserService;
 import kr.co.pennyway.domain.domains.device.domain.DeviceToken;
-import kr.co.pennyway.domain.domains.device.service.DeviceTokenService;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorCode;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorException;
-import kr.co.pennyway.domain.domains.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -33,7 +33,7 @@ public class DeviceTokenRegisterService {
      * 이미 등록된 디바이스 토큰인 경우 마지막 로그인 시간을 갱신한다.
      */
     private DeviceToken getOrCreateDevice(User user, String deviceId, String deviceName, String token) {
-        Optional<DeviceToken> deviceToken = deviceTokenService.readDeviceByUserIdAndToken(user.getId(), token);
+        Optional<DeviceToken> deviceToken = deviceTokenService.readDeviceTokenByUserIdAndToken(user.getId(), token);
 
         if (deviceToken.isPresent()) {
             DeviceToken device = deviceToken.get();
@@ -41,7 +41,7 @@ public class DeviceTokenRegisterService {
             device.updateLastSignedInAt();
             return device;
         } else {
-            return deviceTokenService.createDevice(DeviceToken.of(token, deviceId, deviceName, user));
+            return deviceTokenService.createDeviceToken(DeviceToken.of(token, deviceId, deviceName, user));
         }
     }
 }
