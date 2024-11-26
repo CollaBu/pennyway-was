@@ -6,14 +6,16 @@ import kr.co.pennyway.domain.domains.phone.type.PhoneCodeKeyType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.time.LocalDateTime;
+
 @Slf4j
 @DomainService
 @RequiredArgsConstructor
 public class PhoneCodeService {
     private final PhoneCodeRedisService phoneCodeRedisService;
 
-    public void create(String phone, String code, PhoneCodeKeyType codeType) {
-        phoneCodeRedisService.create(phone, code, codeType);
+    public LocalDateTime create(String phone, String code, PhoneCodeKeyType codeType) {
+        return phoneCodeRedisService.create(phone, code, codeType);
     }
 
     public String readByPhone(String phone, PhoneCodeKeyType codeKeyType) {
