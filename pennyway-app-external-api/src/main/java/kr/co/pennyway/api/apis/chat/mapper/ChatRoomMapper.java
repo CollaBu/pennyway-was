@@ -5,10 +5,10 @@ import kr.co.pennyway.api.apis.chat.dto.ChatRes;
 import kr.co.pennyway.api.apis.chat.dto.ChatRoomRes;
 import kr.co.pennyway.api.common.response.SliceResponseTemplate;
 import kr.co.pennyway.common.annotation.Mapper;
-import kr.co.pennyway.domain.common.redis.message.domain.ChatMessage;
 import kr.co.pennyway.domain.domains.chatroom.domain.ChatRoom;
 import kr.co.pennyway.domain.domains.chatroom.dto.ChatRoomDetail;
 import kr.co.pennyway.domain.domains.member.dto.ChatMemberResult;
+import kr.co.pennyway.domain.domains.message.domain.ChatMessage;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 
