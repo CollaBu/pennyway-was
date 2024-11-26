@@ -57,7 +57,7 @@ public class LettuceConfig implements PennywayRedisDomainConfig {
     @Bean
     @Primary
     @DomainRedisTemplate
-    public RedisTemplate<String, ?> redisTemplate(ObjectMapper redisObjectMapper) {
+    public RedisTemplate<String, ?> stringKeyRedisTemplate(ObjectMapper redisObjectMapper) {
         RedisTemplate<String, ?> template = new RedisTemplate<>();
 
         template.setConnectionFactory(redisConnectionFactory());
