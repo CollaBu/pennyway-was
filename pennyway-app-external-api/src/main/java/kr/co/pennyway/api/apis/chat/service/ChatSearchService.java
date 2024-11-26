@@ -1,7 +1,7 @@
 package kr.co.pennyway.api.apis.chat.service;
 
-import kr.co.pennyway.domain.common.redis.message.domain.ChatMessage;
-import kr.co.pennyway.domain.common.redis.message.service.ChatMessageService;
+import kr.co.pennyway.domain.context.chat.service.ChatMessageService;
+import kr.co.pennyway.domain.domains.message.domain.ChatMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Slice;
@@ -14,6 +14,6 @@ public class ChatSearchService {
     private final ChatMessageService chatMessageService;
 
     public Slice<ChatMessage> readChats(Long chatRoomId, Long lastMessageId, int size) {
-        return chatMessageService.readMessagesBefore(chatRoomId, lastMessageId, size);
+        return chatMessageService.readMessageBefore(chatRoomId, lastMessageId, size);
     }
 }
