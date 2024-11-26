@@ -1,6 +1,6 @@
 package kr.co.pennyway.api.common.security.authorization;
 
-import kr.co.pennyway.domain.domains.target.service.TargetAmountService;
+import kr.co.pennyway.domain.context.finance.service.TargetAmountService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
