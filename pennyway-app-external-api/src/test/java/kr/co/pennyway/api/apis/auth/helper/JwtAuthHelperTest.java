@@ -5,12 +5,12 @@ import kr.co.pennyway.api.common.security.jwt.access.AccessTokenProvider;
 import kr.co.pennyway.api.common.security.jwt.refresh.RefreshTokenClaim;
 import kr.co.pennyway.api.common.security.jwt.refresh.RefreshTokenProvider;
 import kr.co.pennyway.api.config.ExternalApiDBTestConfig;
-import kr.co.pennyway.domain.common.redis.forbidden.ForbiddenTokenService;
-import kr.co.pennyway.domain.common.redis.refresh.RefreshToken;
-import kr.co.pennyway.domain.common.redis.refresh.RefreshTokenRepository;
-import kr.co.pennyway.domain.common.redis.refresh.RefreshTokenService;
-import kr.co.pennyway.domain.common.redis.refresh.RefreshTokenServiceImpl;
 import kr.co.pennyway.domain.config.RedisConfig;
+import kr.co.pennyway.domain.context.account.service.ForbiddenTokenService;
+import kr.co.pennyway.domain.context.account.service.RefreshTokenService;
+import kr.co.pennyway.domain.domains.refresh.domain.RefreshToken;
+import kr.co.pennyway.domain.domains.refresh.repository.RefreshTokenRepository;
+import kr.co.pennyway.domain.domains.refresh.service.RefreshTokenRedisServiceImpl;
 import kr.co.pennyway.domain.domains.user.type.Role;
 import kr.co.pennyway.infra.common.exception.JwtErrorCode;
 import kr.co.pennyway.infra.common.exception.JwtErrorException;
@@ -35,7 +35,7 @@ import static org.springframework.test.util.AssertionErrors.assertFalse;
 @Slf4j
 @ExtendWith(MockitoExtension.class)
 @DataRedisTest(properties = "spring.config.location=classpath:application-domain.yml")
-@ContextConfiguration(classes = {RedisConfig.class, JwtAuthHelper.class, RefreshTokenServiceImpl.class})
+@ContextConfiguration(classes = {RedisConfig.class, JwtAuthHelper.class, RefreshTokenRedisServiceImpl.class})
 @ActiveProfiles("test")
 public class JwtAuthHelperTest extends ExternalApiDBTestConfig {
     @Autowired

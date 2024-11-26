@@ -12,15 +12,15 @@ import kr.co.pennyway.api.common.security.jwt.refresh.RefreshTokenProvider;
 import kr.co.pennyway.api.config.ExternalApiDBTestConfig;
 import kr.co.pennyway.api.config.ExternalApiIntegrationTest;
 import kr.co.pennyway.api.config.fixture.UserFixture;
-import kr.co.pennyway.domain.common.redis.forbidden.ForbiddenTokenService;
-import kr.co.pennyway.domain.common.redis.refresh.RefreshToken;
-import kr.co.pennyway.domain.common.redis.refresh.RefreshTokenService;
+import kr.co.pennyway.domain.context.account.service.ForbiddenTokenService;
+import kr.co.pennyway.domain.context.account.service.OauthService;
+import kr.co.pennyway.domain.context.account.service.RefreshTokenService;
+import kr.co.pennyway.domain.context.account.service.UserService;
 import kr.co.pennyway.domain.domains.oauth.domain.Oauth;
 import kr.co.pennyway.domain.domains.oauth.exception.OauthErrorCode;
-import kr.co.pennyway.domain.domains.oauth.service.OauthService;
 import kr.co.pennyway.domain.domains.oauth.type.Provider;
+import kr.co.pennyway.domain.domains.refresh.domain.RefreshToken;
 import kr.co.pennyway.domain.domains.user.domain.User;
-import kr.co.pennyway.domain.domains.user.service.UserService;
 import kr.co.pennyway.domain.domains.user.type.Role;
 import kr.co.pennyway.infra.common.exception.JwtErrorCode;
 import kr.co.pennyway.infra.common.oidc.OidcDecodePayload;
@@ -100,7 +100,7 @@ public class UserAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
         @DisplayName("Scenario #1 유효한 accessToken과 refreshToken이 있다면, accessToken은 forbiddenToken으로, refreshToken은 삭제한다.")
         void validAccessTokenAndValidRefreshToken() throws Exception {
             // given
-            refreshTokenService.save(RefreshToken.of(userId, expectedDeviceId, expectedRefreshToken, refreshTokenProvider.getExpiryDate(expectedRefreshToken).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()));
+            refreshTokenService.create(RefreshToken.of(userId, expectedDeviceId, expectedRefreshToken, refreshTokenProvider.getExpiryDate(expectedRefreshToken).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()));
 
             // when
             ResultActions result = mockMvc.perform(performSignOut()
@@ -130,8 +130,8 @@ public class UserAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
             // given
             String otherDeviceId = "BB-CCC-DDD";
             String unexpectedRefreshToken = refreshTokenProvider.generateToken(RefreshTokenClaim.of(1000L, otherDeviceId, Role.USER.getType()));
-            refreshTokenService.save(RefreshToken.of(userId, expectedDeviceId, expectedRefreshToken, refreshTokenProvider.getExpiryDate(expectedRefreshToken).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()));
-            refreshTokenService.save(RefreshToken.of(1000L, otherDeviceId, unexpectedRefreshToken, refreshTokenProvider.getExpiryDate(unexpectedRefreshToken).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()));
+            refreshTokenService.create(RefreshToken.of(userId, expectedDeviceId, expectedRefreshToken, refreshTokenProvider.getExpiryDate(expectedRefreshToken).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()));
+            refreshTokenService.create(RefreshToken.of(1000L, otherDeviceId, unexpectedRefreshToken, refreshTokenProvider.getExpiryDate(unexpectedRefreshToken).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()));
 
             // when
             ResultActions result = mockMvc
@@ -154,7 +154,7 @@ public class UserAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
         void validAccessTokenAndInvalidRefreshToken() throws Exception {
             // given
             long ttl = refreshTokenProvider.getExpiryDate(expectedRefreshToken).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
-            refreshTokenService.save(RefreshToken.of(userId, expectedDeviceId, expectedRefreshToken, ttl));
+            refreshTokenService.create(RefreshToken.of(userId, expectedDeviceId, expectedRefreshToken, ttl));
 
             // when
             ResultActions result = mockMvc.perform(performSignOut()
@@ -177,7 +177,7 @@ public class UserAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
         void validAccessTokenAndOldRefreshToken() throws Exception {
             // given
             String oldRefreshToken = refreshTokenProvider.generateToken(RefreshTokenClaim.of(userId, expectedDeviceId, Role.USER.getType()));
-            refreshTokenService.save(RefreshToken.of(userId, expectedDeviceId, expectedRefreshToken, refreshTokenProvider.getExpiryDate(expectedRefreshToken).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()));
+            refreshTokenService.create(RefreshToken.of(userId, expectedDeviceId, expectedRefreshToken, refreshTokenProvider.getExpiryDate(expectedRefreshToken).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()));
 
             // when
             ResultActions result = mockMvc.perform(performSignOut()
@@ -198,7 +198,7 @@ public class UserAuthControllerIntegrationTest extends ExternalApiDBTestConfig {
         @DisplayName("Scenario #3 유효하지 않은 accessToken과 유효한 refreshToken이 있다면 401 에러를 반환한다.")
         void invalidAccessTokenAndValidRefreshToken() throws Exception {
             // given
-            refreshTokenService.save(RefreshToken.of(userId, expectedDeviceId, expectedRefreshToken, refreshTokenProvider.getExpiryDate(expectedRefreshToken).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()));
+            refreshTokenService.create(RefreshToken.of(userId, expectedDeviceId, expectedRefreshToken, refreshTokenProvider.getExpiryDate(expectedRefreshToken).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()));
 
             // when
             ResultActions result = mockMvc.perform(performSignOut()
