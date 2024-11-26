@@ -7,9 +7,9 @@ import kr.co.pennyway.api.common.security.jwt.access.AccessTokenClaim;
 import kr.co.pennyway.api.common.security.jwt.refresh.RefreshTokenClaim;
 import kr.co.pennyway.api.common.security.jwt.refresh.RefreshTokenClaimKeys;
 import kr.co.pennyway.common.annotation.Helper;
-import kr.co.pennyway.domain.common.redis.forbidden.ForbiddenTokenService;
-import kr.co.pennyway.domain.common.redis.refresh.RefreshToken;
-import kr.co.pennyway.domain.common.redis.refresh.RefreshTokenService;
+import kr.co.pennyway.domain.context.account.service.ForbiddenTokenService;
+import kr.co.pennyway.domain.context.account.service.RefreshTokenService;
+import kr.co.pennyway.domain.domains.refresh.domain.RefreshToken;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.infra.common.exception.JwtErrorCode;
 import kr.co.pennyway.infra.common.exception.JwtErrorException;
@@ -54,7 +54,7 @@ public class JwtAuthHelper {
         String accessToken = accessTokenProvider.generateToken(AccessTokenClaim.of(user.getId(), user.getRole().getType()));
         String refreshToken = refreshTokenProvider.generateToken(RefreshTokenClaim.of(user.getId(), deviceId, user.getRole().getType()));
 
-        refreshTokenService.save(RefreshToken.of(user.getId(), deviceId, refreshToken, toSeconds(refreshTokenProvider.getExpiryDate(refreshToken))));
+        refreshTokenService.create(RefreshToken.of(user.getId(), deviceId, refreshToken, toSeconds(refreshTokenProvider.getExpiryDate(refreshToken))));
         return Jwts.of(accessToken, refreshToken);
     }
 
