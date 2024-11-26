@@ -6,12 +6,12 @@ import kr.co.pennyway.api.config.TestJpaConfig;
 import kr.co.pennyway.api.config.fixture.DeviceTokenFixture;
 import kr.co.pennyway.api.config.fixture.UserFixture;
 import kr.co.pennyway.domain.config.JpaConfig;
+import kr.co.pennyway.domain.context.account.service.DeviceTokenService;
+import kr.co.pennyway.domain.context.account.service.UserService;
 import kr.co.pennyway.domain.domains.device.domain.DeviceToken;
 import kr.co.pennyway.domain.domains.device.exception.DeviceTokenErrorCode;
 import kr.co.pennyway.domain.domains.device.exception.DeviceTokenErrorException;
-import kr.co.pennyway.domain.domains.device.service.DeviceTokenService;
 import kr.co.pennyway.domain.domains.user.domain.User;
-import kr.co.pennyway.domain.domains.user.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -56,13 +56,13 @@ public class DeviceTokenUnregisterServiceTest extends ExternalApiDBTestConfig {
     void unregisterDevice() {
         // given
         DeviceToken deviceToken = DeviceTokenFixture.INIT.toDevice(requestUser);
-        deviceTokenService.createDevice(deviceToken);
+        deviceTokenService.createDeviceToken(deviceToken);
 
         // when
         deviceTokenUnregisterService.execute(requestUser.getId(), deviceToken.getToken());
 
         // then
-        DeviceToken deletedDevice = deviceTokenService.readDeviceByUserIdAndToken(requestUser.getId(), deviceToken.getToken()).get();
+        DeviceToken deletedDevice = deviceTokenService.readDeviceTokenByUserIdAndToken(requestUser.getId(), deviceToken.getToken()).get();
         assertFalse("디바이스가 비활성화 되어있어야 한다.", deletedDevice.isActivated());
     }
 
@@ -72,7 +72,7 @@ public class DeviceTokenUnregisterServiceTest extends ExternalApiDBTestConfig {
     void unregisterDeviceWhenDeviceIsNotExists() {
         // given
         DeviceToken deviceToken = DeviceTokenFixture.INIT.toDevice(requestUser);
-        deviceTokenService.createDevice(deviceToken);
+        deviceTokenService.createDeviceToken(deviceToken);
 
         // when - then
         DeviceTokenErrorException ex = assertThrows(DeviceTokenErrorException.class, () -> deviceTokenUnregisterService.execute(requestUser.getId(), "notExistsToken"));

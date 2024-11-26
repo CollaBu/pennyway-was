@@ -5,23 +5,23 @@ import kr.co.pennyway.api.config.ExternalApiDBTestConfig;
 import kr.co.pennyway.api.config.TestJpaConfig;
 import kr.co.pennyway.api.config.fixture.*;
 import kr.co.pennyway.domain.config.JpaConfig;
+import kr.co.pennyway.domain.context.account.service.DeviceTokenService;
+import kr.co.pennyway.domain.context.account.service.OauthService;
+import kr.co.pennyway.domain.context.account.service.UserService;
+import kr.co.pennyway.domain.context.chat.service.ChatMemberService;
+import kr.co.pennyway.domain.context.finance.service.SpendingCategoryService;
+import kr.co.pennyway.domain.context.finance.service.SpendingService;
 import kr.co.pennyway.domain.domains.chatroom.domain.ChatRoom;
 import kr.co.pennyway.domain.domains.chatroom.repository.ChatRoomRepository;
 import kr.co.pennyway.domain.domains.device.domain.DeviceToken;
-import kr.co.pennyway.domain.domains.device.service.DeviceTokenService;
 import kr.co.pennyway.domain.domains.member.repository.ChatMemberRepository;
-import kr.co.pennyway.domain.domains.member.service.ChatMemberService;
 import kr.co.pennyway.domain.domains.oauth.domain.Oauth;
-import kr.co.pennyway.domain.domains.oauth.service.OauthService;
 import kr.co.pennyway.domain.domains.oauth.type.Provider;
 import kr.co.pennyway.domain.domains.spending.domain.Spending;
 import kr.co.pennyway.domain.domains.spending.domain.SpendingCustomCategory;
-import kr.co.pennyway.domain.domains.spending.service.SpendingCustomCategoryService;
-import kr.co.pennyway.domain.domains.spending.service.SpendingService;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorCode;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorException;
-import kr.co.pennyway.domain.domains.user.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -41,7 +41,7 @@ import static org.springframework.test.util.AssertionErrors.*;
 @Slf4j
 @ExtendWith(MockitoExtension.class)
 @DataJpaTest(properties = "spring.jpa.hibernate.ddl-auto=create")
-@ContextConfiguration(classes = {JpaConfig.class, UserDeleteService.class, UserService.class, OauthService.class, DeviceTokenService.class, SpendingService.class, SpendingCustomCategoryService.class, ChatMemberService.class})
+@ContextConfiguration(classes = {JpaConfig.class, UserDeleteService.class, UserService.class, OauthService.class, DeviceTokenService.class, SpendingService.class, SpendingCategoryService.class, ChatMemberService.class})
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Import(TestJpaConfig.class)
 public class UserDeleteServiceTest extends ExternalApiDBTestConfig {
@@ -61,7 +61,7 @@ public class UserDeleteServiceTest extends ExternalApiDBTestConfig {
     private SpendingService spendingService;
 
     @Autowired
-    private SpendingCustomCategoryService spendingCustomCategoryService;
+    private SpendingCategoryService spendingCategoryService;
 
     @Autowired
     private ChatRoomRepository chatRoomRepository;
@@ -123,12 +123,12 @@ public class UserDeleteServiceTest extends ExternalApiDBTestConfig {
         userService.createUser(user);
 
         DeviceToken deviceToken = DeviceTokenFixture.INIT.toDevice(user);
-        deviceTokenService.createDevice(deviceToken);
+        deviceTokenService.createDeviceToken(deviceToken);
 
         // when - then
         assertDoesNotThrow(() -> userDeleteService.execute(user.getId()));
         assertTrue("사용자가 삭제되어 있어야 한다.", userService.readUser(user.getId()).isEmpty());
-        assertFalse("디바이스가 비활성화 있어야 한다.", deviceTokenService.readDeviceByUserIdAndToken(user.getId(), deviceToken.getToken()).get().getActivated());
+        assertFalse("디바이스가 비활성화 있어야 한다.", deviceTokenService.readDeviceTokenByUserIdAndToken(user.getId(), deviceToken.getToken()).get().getActivated());
     }
 
     @Test
@@ -138,7 +138,7 @@ public class UserDeleteServiceTest extends ExternalApiDBTestConfig {
         // given
         User user = userService.createUser(UserFixture.GENERAL_USER.toUser());
 
-        SpendingCustomCategory category = spendingCustomCategoryService.createSpendingCustomCategory(SpendingCustomCategoryFixture.GENERAL_SPENDING_CUSTOM_CATEGORY.toCustomSpendingCategory(user));
+        SpendingCustomCategory category = spendingCategoryService.createSpendingCustomCategory(SpendingCustomCategoryFixture.GENERAL_SPENDING_CUSTOM_CATEGORY.toCustomSpendingCategory(user));
 
         Spending spending1 = spendingService.createSpending(SpendingFixture.GENERAL_SPENDING.toSpending(user));
         Spending spending2 = spendingService.createSpending(SpendingFixture.CUSTOM_CATEGORY_SPENDING.toCustomCategorySpending(user, category));
@@ -148,7 +148,7 @@ public class UserDeleteServiceTest extends ExternalApiDBTestConfig {
         assertDoesNotThrow(() -> userDeleteService.execute(user.getId()));
         assertTrue("사용자가 삭제되어 있어야 한다.", userService.readUser(user.getId()).isEmpty());
         assertTrue("지출 정보가 삭제되어 있어야 한다.", spendingService.readSpendings(user.getId(), spending1.getSpendAt().getYear(), spending1.getSpendAt().getMonthValue()).isEmpty());
-        assertTrue("지출 카테고리가 삭제되어 있어야 한다.", spendingCustomCategoryService.readSpendingCustomCategory(category.getId()).isEmpty());
+        assertTrue("지출 카테고리가 삭제되어 있어야 한다.", spendingCategoryService.readSpendingCustomCategory(category.getId()).isEmpty());
     }
 
     @Test

@@ -7,10 +7,10 @@ import kr.co.pennyway.api.config.TestJpaConfig;
 import kr.co.pennyway.api.config.fixture.DeviceTokenFixture;
 import kr.co.pennyway.api.config.fixture.UserFixture;
 import kr.co.pennyway.domain.config.JpaConfig;
+import kr.co.pennyway.domain.context.account.service.DeviceTokenService;
+import kr.co.pennyway.domain.context.account.service.UserService;
 import kr.co.pennyway.domain.domains.device.domain.DeviceToken;
-import kr.co.pennyway.domain.domains.device.service.DeviceTokenService;
 import kr.co.pennyway.domain.domains.user.domain.User;
-import kr.co.pennyway.domain.domains.user.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -58,7 +58,7 @@ public class DeviceTokenRegisterServiceTest extends ExternalApiDBTestConfig {
         DeviceToken response = deviceTokenRegisterService.execute(requestUser.getId(), request.deviceId(), request.deviceName(), request.token());
 
         // then
-        deviceTokenService.readDeviceByUserIdAndToken(requestUser.getId(), request.token()).ifPresentOrElse(
+        deviceTokenService.readDeviceTokenByUserIdAndToken(requestUser.getId(), request.token()).ifPresentOrElse(
                 device -> {
                     assertEquals("요청한 디바이스 토큰과 동일해야 한다.", response.getToken(), device.getToken());
                     assertEquals("디바이스 ID가 일치해야 한다.", response.getId(), device.getId());
@@ -75,14 +75,14 @@ public class DeviceTokenRegisterServiceTest extends ExternalApiDBTestConfig {
     void registerNewDeviceWhenDeviceIsAlreadyExists() {
         // given
         DeviceToken originDeviceToken = DeviceTokenFixture.INIT.toDevice(requestUser);
-        deviceTokenService.createDevice(originDeviceToken);
+        deviceTokenService.createDeviceToken(originDeviceToken);
         DeviceTokenDto.RegisterReq request = DeviceTokenFixture.INIT.toRegisterReq();
 
         // when
         DeviceToken response = deviceTokenRegisterService.execute(requestUser.getId(), request.deviceId(), request.deviceName(), request.token());
 
         // then
-        deviceTokenService.readDeviceByUserIdAndToken(requestUser.getId(), request.token()).ifPresentOrElse(
+        deviceTokenService.readDeviceTokenByUserIdAndToken(requestUser.getId(), request.token()).ifPresentOrElse(
                 device -> {
                     assertEquals("요청한 디바이스 토큰과 동일해야 한다.", response.getToken(), device.getToken());
                     assertEquals("디바이스 ID가 일치해야 한다.", originDeviceToken.getId(), device.getId());
@@ -101,7 +101,7 @@ public class DeviceTokenRegisterServiceTest extends ExternalApiDBTestConfig {
         // given
         DeviceToken originDeviceToken = DeviceTokenFixture.INIT.toDevice(requestUser);
         originDeviceToken.deactivate();
-        deviceTokenService.createDevice(originDeviceToken);
+        deviceTokenService.createDeviceToken(originDeviceToken);
         DeviceTokenDto.RegisterReq request = DeviceTokenFixture.INIT.toRegisterReq();
 
         // when
