@@ -1,6 +1,6 @@
 package kr.co.pennyway.socket.relay;
 
-import kr.co.pennyway.domain.common.redis.message.type.MessageCategoryType;
+import kr.co.pennyway.domain.domains.message.type.MessageCategoryType;
 import kr.co.pennyway.socket.dto.ChatMessageDto;
 import kr.co.pennyway.socket.service.ChatMessageRelayService;
 import lombok.RequiredArgsConstructor;
