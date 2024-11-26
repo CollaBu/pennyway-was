@@ -9,9 +9,9 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum PennywayRedisDomainConfigGroup {
-    REDIS(RedisConfig.class),
-    REDISSON(RedissonConfig.class),
-    LETTUCE(LettuceConfig.class);
+    REDIS_INFRA(RedisConfig.class),
+    REDISSON_INFRA(RedissonConfig.class),
+    LETTUCE_INFRA(LettuceConfig.class);
 
     private final Class<? extends PennywayRedisDomainConfig> configClass;
 }

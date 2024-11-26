@@ -6,8 +6,8 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @EnablePennywayRedisDomainConfig(value = {
-        PennywayRedisDomainConfigGroup.REDIS,
-        PennywayRedisDomainConfigGroup.LETTUCE
+        PennywayRedisDomainConfigGroup.REDIS_INFRA,
+        PennywayRedisDomainConfigGroup.LETTUCE_INFRA
 })
 public class DomainConfig {
 }

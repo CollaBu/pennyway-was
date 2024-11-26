@@ -6,8 +6,8 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @EnablePennywayDomainConfig(value = {
-        PennywayDomainConfigGroup.REDIS,
-        PennywayDomainConfigGroup.REDISSON
+        PennywayDomainConfigGroup.REDIS_DOMAIN,
+        PennywayDomainConfigGroup.REDISSON_DOMAIN
 })
 public class DomainConfig {
 }

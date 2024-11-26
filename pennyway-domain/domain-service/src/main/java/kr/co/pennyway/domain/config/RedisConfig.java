@@ -4,6 +4,6 @@ import kr.co.pennyway.domain.common.importer.EnablePennywayRedisDomainConfig;
 import kr.co.pennyway.domain.common.importer.PennywayDomainConfig;
 import kr.co.pennyway.domain.common.importer.PennywayRedisDomainConfigGroup;
 
-@EnablePennywayRedisDomainConfig(value = PennywayRedisDomainConfigGroup.REDIS)
+@EnablePennywayRedisDomainConfig(value = PennywayRedisDomainConfigGroup.REDIS_INFRA)
 public class RedisConfig implements PennywayDomainConfig {
 }
