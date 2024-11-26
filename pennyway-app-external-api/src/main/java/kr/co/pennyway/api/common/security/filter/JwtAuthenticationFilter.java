@@ -5,7 +5,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import kr.co.pennyway.api.common.security.jwt.access.AccessTokenClaimKeys;
-import kr.co.pennyway.domain.common.redis.forbidden.ForbiddenTokenService;
+import kr.co.pennyway.domain.context.account.service.ForbiddenTokenService;
 import kr.co.pennyway.infra.common.exception.JwtErrorCode;
 import kr.co.pennyway.infra.common.exception.JwtErrorException;
 import kr.co.pennyway.infra.common.jwt.JwtClaims;
