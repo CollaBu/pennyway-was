@@ -1,7 +1,7 @@
 package kr.co.pennyway.socket.service;
 
-import kr.co.pennyway.domain.common.redis.session.UserSession;
-import kr.co.pennyway.domain.common.redis.session.UserSessionService;
+import kr.co.pennyway.domain.context.account.service.UserSessionService;
+import kr.co.pennyway.domain.domains.session.domain.UserSession;
 import kr.co.pennyway.socket.common.dto.ServerSideMessage;
 import kr.co.pennyway.socket.common.dto.StatusMessage;
 import kr.co.pennyway.socket.common.event.ReceiptEvent;
