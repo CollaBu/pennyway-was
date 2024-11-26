@@ -1,6 +1,6 @@
 package kr.co.pennyway.socket.common.dto;
 
-import kr.co.pennyway.domain.common.redis.session.UserStatus;
+import kr.co.pennyway.domain.domains.session.type.UserStatus;
 import kr.co.pennyway.socket.common.exception.MessageErrorCode;
 import kr.co.pennyway.socket.common.exception.MessageErrorException;
 
