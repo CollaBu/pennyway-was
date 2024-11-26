@@ -2,11 +2,11 @@ package kr.co.pennyway.api.apis.chat.service;
 
 import kr.co.pennyway.api.apis.chat.dto.ChatRes;
 import kr.co.pennyway.api.apis.chat.dto.ChatRoomRes;
-import kr.co.pennyway.domain.common.redis.message.domain.ChatMessage;
-import kr.co.pennyway.domain.common.redis.message.service.ChatMessageService;
+import kr.co.pennyway.domain.context.chat.service.ChatMessageService;
+import kr.co.pennyway.domain.context.chat.service.ChatMessageStatusService;
+import kr.co.pennyway.domain.context.chat.service.ChatRoomService;
 import kr.co.pennyway.domain.domains.chatroom.dto.ChatRoomDetail;
-import kr.co.pennyway.domain.domains.chatroom.service.ChatRoomService;
-import kr.co.pennyway.domain.domains.chatstatus.service.ChatMessageStatusService;
+import kr.co.pennyway.domain.domains.message.domain.ChatMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
