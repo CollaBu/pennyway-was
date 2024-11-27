@@ -13,7 +13,6 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.SQLDelete;
-import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -28,8 +27,6 @@ public class ChatMember extends DateAuditable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    private String name;
 
     @Convert(converter = ChatMemberRoleConverter.class)
     private ChatMemberRole role;
@@ -51,10 +48,9 @@ public class ChatMember extends DateAuditable {
     private ChatRoom chatRoom;
 
     @Builder
-    protected ChatMember(String name, User user, ChatRoom chatRoom, ChatMemberRole role) {
-        validate(name, user, chatRoom, role);
+    protected ChatMember(User user, ChatRoom chatRoom, ChatMemberRole role) {
+        validate(user, chatRoom, role);
 
-        this.name = name;
         this.user = user;
         this.chatRoom = chatRoom;
         this.role = role;
@@ -63,18 +59,13 @@ public class ChatMember extends DateAuditable {
 
     public static ChatMember of(User user, ChatRoom chatRoom, ChatMemberRole role) {
         return ChatMember.builder()
-                .name(user.getName())
                 .user(user)
                 .chatRoom(chatRoom)
                 .role(role)
                 .build();
     }
 
-    private void validate(String name, User user, ChatRoom chatRoom, ChatMemberRole role) {
-        if (!StringUtils.hasText(name)) {
-            throw new IllegalArgumentException("name은 null이거나 빈 문자열이 될 수 없습니다.");
-        }
-
+    private void validate(User user, ChatRoom chatRoom, ChatMemberRole role) {
         Objects.requireNonNull(user, "user는 null이 될 수 없습니다.");
         Objects.requireNonNull(chatRoom, "chatRoom은 null이 될 수 없습니다.");
         Objects.requireNonNull(role, "role은 null이 될 수 없습니다.");
@@ -115,7 +106,6 @@ public class ChatMember extends DateAuditable {
     public String toString() {
         return "ChatMember{" +
                 "id=" + id +
-                ", name='" + name + '\'' +
                 ", banned=" + banned +
                 ", notifyEnabled=" + notifyEnabled +
                 ", deletedAt=" + deletedAt +
