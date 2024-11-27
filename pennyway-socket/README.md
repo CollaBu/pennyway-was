@@ -1,10 +1,16 @@
-## Socket 모듈
+## 🔌 Socket 모듈
 
-### 🤝 Rule
+### 🎯 핵심 역할
 
-- 사용성에 따라 모든 계층에 의존성을 추가하여 사용할 수 있다.
-- STOMP 기반의 WebSocket 의존성을 갖는다.
-- 언제나 분산 서버로 확장할 수 있는 구조를 가져야 함에 유의한다.
+- 실시간 양방향 통신 제공
+- STOMP 기반 WebSocket 처리
+- 분산 환경 고려한 설계
+
+### ⚡ 주요 특징
+
+- Redis Pub/Sub 활용한 세션 관리
+- 무상태(Stateless) 설계로 수평 확장 용이
+- 실시간 이벤트 처리에 최적화
 
 ### 🏷️ Directory Structure
 
@@ -16,11 +22,9 @@ pennyway-socket
 │   ├── main
 │   │   ├── java.kr.co.pennyway
 │   │   │   ├── socket
-│   │   │   │   ├── chat
-│   │   │   │   │   ├── controller
-│   │   │   │   │   ├── dto
-│   │   │   │   │   ├── service
-│   │   │   │   │   └── …
+│   │   │   │   ├── controller
+│   │   │   │   ├── service
+│   │   │   │   ├── relay # 추후 분리 용이성을 위해 구분
 │   │   │   │   ├── common
 │   │   │   │   ├── config
 │   │   │   │   └── PennywaySocketApplication.java
