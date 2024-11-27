@@ -7,6 +7,7 @@
 |  v0.0.1   |  2024.03.07   | 프로젝트 기본 설명 작성                        |  양재서   |
 |  v0.0.2   |  2024.03.29   | ERD 추가, 라이브러리 버전 수정, Infra 추가        |  양재서   |
 |  v0.0.3   |  2024.04.05   | ERD 수정, 기술 스택 추가, Infra 및 아키텍처 추가/수정 |  양재서   |
+|  v0.0.4   |  2024.11.27   | 멀티 모듈 아키텍처 수정, 인프라 아키텍처 수정, 기술 스택 추가 |  양재서   |
 
 <br/>
 
@@ -86,13 +87,13 @@
 ### 2️⃣ Infrastructure Architecture
 
 <div align="center">
-  <img src="https://github.com/CollaBu/pennyway-was/assets/96044622/388d9e1f-14af-4dda-8c6f-a2e1572f412f" width="600">
+  <img src="https://github.com/user-attachments/assets/47235d40-3c0f-45da-a1c0-8974ec7f7f88" width="600">
 </div>
 
 ### 3️⃣ Multi Module Architecture
 
 <div align="center">
-  <img src="https://github.com/CollaBu/pennyway-was/assets/96044622/d5e6ac96-5398-44e9-bea9-6b95d12897cb" width="600">
+  <img src="https://github.com/user-attachments/assets/02a52ac9-5205-4d6a-a6d6-3ee0361d0d70" width="600">
 </div>
 
 ### 4️⃣ ERD
@@ -121,6 +122,8 @@
 - jjwt 0.12.5
 - httpclient5 5.2.25.RELEASE
 - OpenFeign 4.0.6
+- Spring Boot Starter WebSocket 3.3.4
+- Spring Boot Starter Batch 3.3.0
 
 ### 2️⃣ Build Tools
 
@@ -140,6 +143,8 @@
 - AWS VPC
 - AWS Elastic Load Balancer
 - AWS SNS
+- AWS RDS
 - Docker & Docker-compose
 - Ngnix
 - GitHub Actions
+- RabbitMQ
