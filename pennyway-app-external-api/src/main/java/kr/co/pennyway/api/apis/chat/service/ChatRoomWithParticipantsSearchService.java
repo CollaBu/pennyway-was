@@ -2,6 +2,7 @@ package kr.co.pennyway.api.apis.chat.service;
 
 import kr.co.pennyway.api.apis.chat.dto.ChatRoomRes;
 import kr.co.pennyway.api.apis.chat.mapper.ChatRoomMapper;
+import kr.co.pennyway.domain.context.account.service.UserService;
 import kr.co.pennyway.domain.context.chat.service.ChatMemberService;
 import kr.co.pennyway.domain.context.chat.service.ChatMessageService;
 import kr.co.pennyway.domain.domains.member.domain.ChatMember;
@@ -10,6 +11,7 @@ import kr.co.pennyway.domain.domains.member.exception.ChatMemberErrorCode;
 import kr.co.pennyway.domain.domains.member.exception.ChatMemberErrorException;
 import kr.co.pennyway.domain.domains.member.type.ChatMemberRole;
 import kr.co.pennyway.domain.domains.message.domain.ChatMessage;
+import kr.co.pennyway.domain.domains.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -26,15 +28,19 @@ import java.util.stream.Collectors;
 public class ChatRoomWithParticipantsSearchService {
     private static final int MESSAGE_LIMIT = 15;
 
+    private final UserService userService;
     private final ChatMemberService chatMemberService;
     private final ChatMessageService chatMessageService;
 
     @Transactional(readOnly = true)
     public ChatRoomRes.RoomWithParticipants execute(Long userId, Long chatRoomId) {
         // 내 정보 조회
+        User me = userService.readUser(userId)
+                .orElseThrow(() -> new ChatMemberErrorException(ChatMemberErrorCode.NOT_FOUND));
+
         ChatMember myInfo = chatMemberService.readChatMember(userId, chatRoomId)
                 .orElseThrow(() -> new ChatMemberErrorException(ChatMemberErrorCode.NOT_FOUND));
-        ChatMemberResult.Detail myDetail = new ChatMemberResult.Detail(myInfo.getId(), myInfo.getName(), myInfo.getRole(), myInfo.isNotifyEnabled(), userId, myInfo.getCreatedAt());
+        ChatMemberResult.Detail myDetail = new ChatMemberResult.Detail(myInfo.getId(), me.getName(), myInfo.getRole(), myInfo.isNotifyEnabled(), userId, myInfo.getCreatedAt());
 
         // 최근 메시지 조회 (15건)
         List<ChatMessage> chatMessages = chatMessageService.readRecentMessages(chatRoomId, MESSAGE_LIMIT);

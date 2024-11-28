@@ -70,7 +70,7 @@ public class ChatMemberRdbService {
 
         Map<String, Expression<?>> bindings = new LinkedHashMap<>();
         bindings.put("id", qChatMember.id);
-        bindings.put("name", qChatMember.name);
+        bindings.put("name", qChatMember.user.name);
         bindings.put("role", qChatMember.role);
         bindings.put("notification", qChatMember.notifyEnabled);
         bindings.put("userId", qChatMember.user.id);
@@ -87,7 +87,7 @@ public class ChatMemberRdbService {
 
         Map<String, Expression<?>> bindings = new LinkedHashMap<>();
         bindings.put("id", qChatMember.id);
-        bindings.put("name", qChatMember.name);
+        bindings.put("name", qChatMember.user.name);
         bindings.put("role", qChatMember.role);
         bindings.put("notification", qChatMember.notifyEnabled);
         bindings.put("userId", qChatMember.user.id);
@@ -104,7 +104,7 @@ public class ChatMemberRdbService {
 
         Map<String, Expression<?>> bindings = new LinkedHashMap<>();
         bindings.put("id", qChatMember.id);
-        bindings.put("name", qChatMember.name);
+        bindings.put("name", qChatMember.user.name);
 
         return chatMemberRepository.selectList(predicate, ChatMemberResult.Summary.class, bindings, null, null);
     }

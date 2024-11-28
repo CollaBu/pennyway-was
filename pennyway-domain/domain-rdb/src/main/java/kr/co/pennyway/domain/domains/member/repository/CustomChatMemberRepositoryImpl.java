@@ -45,7 +45,7 @@ public class CustomChatMemberRepositoryImpl implements CustomChatMemberRepositor
                                 Projections.constructor(
                                         ChatMemberResult.Detail.class,
                                         chatMember.id,
-                                        chatMember.name,
+                                        chatMember.user.name,
                                         chatMember.role,
                                         chatMember.notifyEnabled,
                                         chatMember.user.id,

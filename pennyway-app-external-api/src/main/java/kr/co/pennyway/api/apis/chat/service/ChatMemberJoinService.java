@@ -62,7 +62,7 @@ public class ChatMemberJoinService {
         ChatMember member = chatMemberService.createMember(user, chatRoom);
         Long unreadMessageCount = chatMessageService.countUnreadMessages(chatRoomId, 0L);
 
-        eventPublisher.publishEvent(ChatRoomJoinEvent.of(chatRoomId, member.getName()));
+        eventPublisher.publishEvent(ChatRoomJoinEvent.of(chatRoomId, user.getName()));
 
         return ImmutableTriple.of(chatRoom, currentMemberCount.intValue() + 1, unreadMessageCount);
     }
