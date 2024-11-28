@@ -4,6 +4,7 @@ import kr.co.pennyway.api.apis.chat.dto.ChatRoomRes;
 import kr.co.pennyway.api.config.fixture.ChatMemberFixture;
 import kr.co.pennyway.api.config.fixture.ChatRoomFixture;
 import kr.co.pennyway.api.config.fixture.UserFixture;
+import kr.co.pennyway.domain.context.account.service.UserService;
 import kr.co.pennyway.domain.context.chat.service.ChatMemberService;
 import kr.co.pennyway.domain.context.chat.service.ChatMessageService;
 import kr.co.pennyway.domain.domains.chatroom.domain.ChatRoom;
@@ -45,6 +46,8 @@ public class ChatRoomWithParticipantsSearchServiceTest {
     @InjectMocks
     private ChatRoomWithParticipantsSearchService service;
     @Mock
+    private UserService userService;
+    @Mock
     private ChatMemberService chatMemberService;
     @Mock
     private ChatMessageService chatMessageService;
@@ -63,6 +66,7 @@ public class ChatRoomWithParticipantsSearchServiceTest {
         List<ChatMemberResult.Detail> recentParticipants = createRecentParticipantDetails();
         List<ChatMemberResult.Summary> otherParticipants = createOtherParticipantSummaries();
 
+        given(userService.readUser(userId)).willReturn(Optional.of(UserFixture.GENERAL_USER.toUser()));
         given(chatMemberService.readChatMember(userId, chatRoom.getId())).willReturn(Optional.of(myInfo));
         given(chatMessageService.readRecentMessages(eq(chatRoom.getId()), anyInt())).willReturn(recentMessages);
         given(chatMemberService.readChatMembersByUserIds(eq(chatRoom.getId()), anySet())).willReturn(recentParticipants);
@@ -82,6 +86,7 @@ public class ChatRoomWithParticipantsSearchServiceTest {
         );
 
         // verify
+        verify(userService).readUser(userId);
         verify(chatMemberService).readChatMember(userId, chatRoom.getId());
         verify(chatMessageService).readRecentMessages(eq(chatRoom.getId()), anyInt());
         verify(chatMemberService).readChatMembersByUserIds(eq(chatRoom.getId()), anySet());
@@ -99,6 +104,7 @@ public class ChatRoomWithParticipantsSearchServiceTest {
         List<ChatMemberResult.Detail> recentParticipants = createRecentParticipantDetails();
         List<ChatMemberResult.Summary> otherParticipants = createOtherParticipantSummaries();
 
+        given(userService.readUser(userId)).willReturn(Optional.of(UserFixture.GENERAL_USER.toUser()));
         given(chatMemberService.readChatMember(userId, chatRoom.getId())).willReturn(Optional.of(myInfo));
         given(chatMessageService.readRecentMessages(eq(chatRoom.getId()), eq(15))).willReturn(recentMessages);
         given(chatMemberService.readChatMembersByUserIds(eq(chatRoom.getId()), anySet())).willReturn(recentParticipants);
@@ -127,6 +133,7 @@ public class ChatRoomWithParticipantsSearchServiceTest {
     @DisplayName("존재하지 않는 채팅방 멤버 조회 시 예외가 발생한다")
     void throwExceptionWhenChatMemberNotFound() {
         // given
+        given(userService.readUser(userId)).willReturn(Optional.of(UserFixture.GENERAL_USER.toUser()));
         given(chatMemberService.readChatMember(userId, chatRoom.getId())).willReturn(Optional.empty());
 
         // when
