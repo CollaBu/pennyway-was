@@ -62,7 +62,19 @@ public class DeviceToken {
         return activated && lastSignedInAt.plusDays(7).isAfter(now);
     }
 
+    /**
+     * 디바이스 토큰이 만료되었는지 확인한다.
+     *
+     * @return 토큰이 갱신된지 7일이 지났으면 true, 그렇지 않으면 false
+     */
+    public boolean isExpired() {
+        LocalDateTime now = LocalDateTime.now();
+
+        return lastSignedInAt.plusDays(7).isBefore(now);
+    }
+
     public void activate() {
+        lastSignedInAt = LocalDateTime.now();
         this.activated = Boolean.TRUE;
     }
 
@@ -75,14 +87,17 @@ public class DeviceToken {
     }
 
     /**
-     * 디바이스 토큰이 만료되었는지 확인한다.
-     *
-     * @return 토큰이 갱신된지 7일이 지났으면 true, 그렇지 않으면 false
+     * 토큰의 소유자를 확인하고 필요한 상태 변경을 수행합니다.
+     * 다른 소유자인 경우 소유자를 갱신하고, 같은 소유자인 경우 활성화만 수행합니다.
      */
-    public boolean isExpired() {
-        LocalDateTime now = LocalDateTime.now();
+    public void handleOwner(User newUser) {
+        Objects.requireNonNull(newUser, "user는 null이 될 수 없습니다.");
 
-        return lastSignedInAt.plusDays(7).isBefore(now);
+        if (!this.user.equals(newUser)) {
+            this.user = newUser;
+        }
+
+        this.activate();
     }
 
     @Override
