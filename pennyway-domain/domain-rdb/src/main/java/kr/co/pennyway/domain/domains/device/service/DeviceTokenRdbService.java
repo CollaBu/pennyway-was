@@ -29,6 +29,16 @@ public class DeviceTokenRdbService {
         return deviceTokenRepository.findByUser_IdAndToken(userId, token);
     }
 
+    @Transactional(readOnly = true)
+    public Optional<DeviceToken> readByDeviceIdAndToken(String deviceId, String token) {
+        return deviceTokenRepository.findByDeviceIdAndToken(deviceId, token);
+    }
+
+    @Transactional(readOnly = true)
+    public List<DeviceToken> readByUserIdAndDeviceId(Long userId, String deviceId) {
+        return deviceTokenRepository.findAllByUser_IdAndDeviceId(userId, deviceId);
+    }
+
     /**
      * @return 비활성화된 디바이스 토큰 정보를 포함합니다.
      */
