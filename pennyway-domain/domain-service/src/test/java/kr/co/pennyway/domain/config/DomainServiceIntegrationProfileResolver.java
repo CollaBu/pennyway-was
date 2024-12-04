@@ -7,6 +7,6 @@ public class DomainServiceIntegrationProfileResolver implements ActiveProfilesRe
     @Override
     @NonNull
     public String[] resolve(@NonNull Class<?> testClass) {
-        return new String[]{"common", "infra", "domain-rdb", "domain-redis"};
+        return new String[]{"test", "common", "infra", "domain-rdb", "domain-redis"};
     }
 }
