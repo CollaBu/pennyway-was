@@ -8,6 +8,7 @@ import kr.co.pennyway.api.apis.users.mapper.UserProfileMapper;
 import kr.co.pennyway.api.apis.users.service.*;
 import kr.co.pennyway.api.common.storage.AwsS3Adapter;
 import kr.co.pennyway.common.annotation.UseCase;
+import kr.co.pennyway.domain.context.account.service.DeviceTokenRegisterService;
 import kr.co.pennyway.domain.domains.device.domain.DeviceToken;
 import kr.co.pennyway.domain.domains.oauth.domain.Oauth;
 import kr.co.pennyway.domain.domains.user.domain.NotifySetting;
