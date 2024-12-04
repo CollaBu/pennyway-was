@@ -14,7 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @DomainService
@@ -52,24 +51,26 @@ public class DeviceTokenRegisterService {
      * 만약, 이미 등록된 디바이스 토큰이 존재한다면, 해당 토큰을 갱신하고 반환합니다.
      */
     private DeviceToken getOrCreateDevice(User user, String deviceId, String deviceName, String deviceToken) {
-        Optional<DeviceToken> device = deviceTokenRdbService.readDeviceByToken(deviceToken);
+        return deviceTokenRdbService.readDeviceByToken(deviceToken)
+                .map(originalDeviceToken -> updateDevice(user, deviceId, originalDeviceToken))
+                .orElseGet(() -> createDevice(user, deviceId, deviceName, deviceToken));
+    }
 
-        if (device.isPresent()) {
-            DeviceToken deviceTokenEntity = device.get();
-
-            if (!deviceTokenEntity.getDeviceId().equals(deviceId) && deviceTokenEntity.isActivated()) {
-                throw new DeviceTokenErrorException(DeviceTokenErrorCode.DUPLICATED_DEVICE_TOKEN);
-            }
-
-            deviceTokenEntity.handleOwner(user, deviceId);
-            return deviceTokenEntity;
-        } else {
-            deactivateExistingTokens(user.getId(), deviceId);
-
-            DeviceToken newDeviceToken = DeviceToken.of(deviceToken, deviceId, deviceName, user);
-
-            return deviceTokenRdbService.createDevice(newDeviceToken);
+    private DeviceToken updateDevice(User user, String deviceId, DeviceToken originalDeviceToken) {
+        if (!originalDeviceToken.getDeviceId().equals(deviceId) && originalDeviceToken.isActivated()) {
+            throw new DeviceTokenErrorException(DeviceTokenErrorCode.DUPLICATED_DEVICE_TOKEN);
         }
+
+        originalDeviceToken.handleOwner(user, deviceId);
+        return originalDeviceToken;
+    }
+
+    private DeviceToken createDevice(User user, String deviceId, String deviceName, String deviceToken) {
+        deactivateExistingTokens(user.getId(), deviceId);
+
+        DeviceToken newDeviceToken = DeviceToken.of(deviceToken, deviceId, deviceName, user);
+
+        return deviceTokenRdbService.createDevice(newDeviceToken);
     }
 
     /**
