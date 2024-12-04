@@ -9,7 +9,11 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum DeviceTokenErrorCode implements BaseErrorCode {
     /* 404 NOT_FOUND */
-    NOT_FOUND_DEVICE(StatusCode.NOT_FOUND, ReasonCode.REQUESTED_RESOURCE_NOT_FOUND, "디바이스를 찾을 수 없습니다.");
+    NOT_FOUND_DEVICE(StatusCode.NOT_FOUND, ReasonCode.REQUESTED_RESOURCE_NOT_FOUND, "디바이스를 찾을 수 없습니다."),
+
+    /* 409 CONFLICT */
+    DUPLICATED_DEVICE_TOKEN(StatusCode.CONFLICT, ReasonCode.RESOURCE_ALREADY_EXISTS, "이미 등록된 디바이스 토큰입니다."),
+    ;
 
     private final StatusCode statusCode;
     private final ReasonCode reasonCode;

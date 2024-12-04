@@ -15,6 +15,10 @@ public interface DeviceTokenRepository extends JpaRepository<DeviceToken, Long> 
 
     List<DeviceToken> findAllByUser_Id(Long userId);
 
+    Optional<DeviceToken> findByToken(String token);
+
+    List<DeviceToken> findAllByUser_IdAndDeviceId(Long userId, String deviceId);
+
     @Modifying(clearAutomatically = true)
     @Transactional
     @Query("UPDATE DeviceToken d SET d.activated = false WHERE d.user.id = :userId")
