@@ -65,12 +65,12 @@ public class DeviceToken {
     /**
      * 디바이스 토큰이 만료되었는지 확인한다.
      *
-     * @return 토큰이 갱신된지 7일이 지났으면 true, 그렇지 않으면 false
+     * @return 토큰이 갱신된지 7일이 지났거나 토큰이 비활성화 되었다면 true, 그렇지 않으면 false
      */
     public boolean isExpired() {
         LocalDateTime now = LocalDateTime.now();
 
-        return lastSignedInAt.plusDays(7).isBefore(now);
+        return !activated || lastSignedInAt.plusDays(7).isBefore(now);
     }
 
     public void activate() {
