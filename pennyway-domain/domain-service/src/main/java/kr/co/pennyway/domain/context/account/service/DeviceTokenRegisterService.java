@@ -2,6 +2,8 @@ package kr.co.pennyway.domain.context.account.service;
 
 import kr.co.pennyway.common.annotation.DomainService;
 import kr.co.pennyway.domain.domains.device.domain.DeviceToken;
+import kr.co.pennyway.domain.domains.device.exception.DeviceTokenErrorCode;
+import kr.co.pennyway.domain.domains.device.exception.DeviceTokenErrorException;
 import kr.co.pennyway.domain.domains.device.service.DeviceTokenRdbService;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorCode;
@@ -50,10 +52,15 @@ public class DeviceTokenRegisterService {
      * 만약, 이미 등록된 디바이스 토큰이 존재한다면, 해당 토큰을 갱신하고 반환합니다.
      */
     private DeviceToken getOrCreateDevice(User user, String deviceId, String deviceName, String deviceToken) {
-        Optional<DeviceToken> device = deviceTokenRdbService.readByDeviceIdAndToken(deviceId, deviceToken);
+        Optional<DeviceToken> device = deviceTokenRdbService.readDeviceByToken(deviceToken);
 
         if (device.isPresent()) {
             DeviceToken deviceTokenEntity = device.get();
+
+            if (!deviceTokenEntity.getDeviceId().equals(deviceId)) {
+                throw new DeviceTokenErrorException(DeviceTokenErrorCode.DUPLICATED_DEVICE_TOKEN);
+            }
+
             deviceTokenEntity.handleOwner(user);
             return deviceTokenEntity;
         } else {
