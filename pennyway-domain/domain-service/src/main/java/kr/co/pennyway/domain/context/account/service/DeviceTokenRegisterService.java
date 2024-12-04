@@ -57,11 +57,11 @@ public class DeviceTokenRegisterService {
         if (device.isPresent()) {
             DeviceToken deviceTokenEntity = device.get();
 
-            if (!deviceTokenEntity.getDeviceId().equals(deviceId)) {
+            if (!deviceTokenEntity.getDeviceId().equals(deviceId) && deviceTokenEntity.isActivated()) {
                 throw new DeviceTokenErrorException(DeviceTokenErrorCode.DUPLICATED_DEVICE_TOKEN);
             }
 
-            deviceTokenEntity.handleOwner(user);
+            deviceTokenEntity.handleOwner(user, deviceId);
             return deviceTokenEntity;
         } else {
             deactivateExistingTokens(user.getId(), deviceId);
