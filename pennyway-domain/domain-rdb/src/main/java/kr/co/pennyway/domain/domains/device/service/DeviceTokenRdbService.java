@@ -42,8 +42,8 @@ public class DeviceTokenRdbService {
     }
 
     @Transactional(readOnly = true)
-    public Optional<DeviceToken> readByDeviceIdAndToken(String deviceId, String token) {
-        return deviceTokenRepository.findByDeviceIdAndToken(deviceId, token);
+    public Optional<DeviceToken> readDeviceByToken(String token) {
+        return deviceTokenRepository.findByToken(token);
     }
 
     @Transactional(readOnly = true)
