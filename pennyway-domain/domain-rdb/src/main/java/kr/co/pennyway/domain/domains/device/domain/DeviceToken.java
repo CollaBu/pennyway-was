@@ -90,11 +90,16 @@ public class DeviceToken {
      * 토큰의 소유자를 확인하고 필요한 상태 변경을 수행합니다.
      * 다른 소유자인 경우 소유자를 갱신하고, 같은 소유자인 경우 활성화만 수행합니다.
      */
-    public void handleOwner(User newUser) {
+    public void handleOwner(User newUser, String newDeviceId) {
         Objects.requireNonNull(newUser, "user는 null이 될 수 없습니다.");
+        Objects.requireNonNull(newDeviceId, "deviceId는 null이 될 수 없습니다.");
 
         if (!this.user.equals(newUser)) {
             this.user = newUser;
+        }
+
+        if (!this.deviceId.equals(newDeviceId)) {
+            this.deviceId = newDeviceId;
         }
 
         this.activate();
