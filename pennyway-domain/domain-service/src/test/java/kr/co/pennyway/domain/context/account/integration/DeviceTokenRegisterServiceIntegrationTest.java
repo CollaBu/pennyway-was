@@ -101,7 +101,7 @@ public class DeviceTokenRegisterServiceIntegrationTest extends DomainServiceTest
         // DB에 실제로 저장되었는지 확인
         List<DeviceToken> savedTokens = deviceTokenRepository.findAllByUser_Id(savedUser.getId());
         assertEquals(2, savedTokens.size());
-        assertTrue(savedTokens.stream().filter(DeviceToken::isActivated).count() == 1);
+        assertEquals(1L, savedTokens.stream().filter(DeviceToken::isActivated).count(), "활성화된 토큰은 1개여야 합니다");
     }
 
     @Test
@@ -139,6 +139,12 @@ public class DeviceTokenRegisterServiceIntegrationTest extends DomainServiceTest
         assertEquals(firstUserToken.getId(), secondUserToken.getId());
         assertEquals(anotherUser.getId(), secondUserToken.getUser().getId());
         assertTrue(secondUserToken.isActivated());
+
+        List<DeviceToken> firstUserTokens = deviceTokenRepository.findAllByUser_Id(savedUser.getId());
+        List<DeviceToken> secondUserTokens = deviceTokenRepository.findAllByUser_Id(anotherUser.getId());
+
+        assertTrue(firstUserTokens.isEmpty(), "첫 번째 사용자의 토큰이 없어야 합니다");
+        assertEquals(1, secondUserTokens.size(), "두 번째 사용자의 토큰이 1개 있어야 합니다");
     }
 
     @Test
