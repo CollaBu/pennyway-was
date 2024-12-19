@@ -6,10 +6,12 @@ import kr.co.pennyway.domain.domains.device.exception.DeviceTokenErrorException;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorCode;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.NonNull;
 
 import java.util.List;
 
+@Slf4j
 public class DeviceTokenRegisterCollection {
     private final List<DeviceToken> userDeviceTokens;
     private DeviceToken deviceToken;
@@ -53,6 +55,7 @@ public class DeviceTokenRegisterCollection {
      */
     public DeviceToken register(User owner, @NonNull String deviceId, @NonNull String deviceName, @NonNull String token) {
         if (owner == null) {
+            log.error("디바이스 토큰을 등록할 사용자 정보가 없습니다.");
             throw new UserErrorException(UserErrorCode.NOT_FOUND);
         }
 
@@ -73,10 +76,12 @@ public class DeviceTokenRegisterCollection {
 
     private DeviceToken updateDevice(User user, String deviceId, DeviceToken originalDeviceToken) {
         if (isDuplicatedDeviceToken(deviceId, originalDeviceToken)) {
+            log.error("활성화된 토큰을 다른 디바이스에서 사용 중입니다.");
             throw new DeviceTokenErrorException(DeviceTokenErrorCode.DUPLICATED_DEVICE_TOKEN);
         }
 
         originalDeviceToken.handleOwner(user, deviceId);
+        log.info("디바이스 토큰이 갱신되었습니다. deviceId: {}, token: {}", deviceId, originalDeviceToken.getToken());
 
         return originalDeviceToken;
     }
@@ -87,6 +92,7 @@ public class DeviceTokenRegisterCollection {
 
     private DeviceToken createDevice(User user, String deviceId, String deviceName, String token) {
         this.deviceToken = DeviceToken.of(token, deviceId, deviceName, user);
+        log.info("새로운 디바이스 토큰이 생성되었습니다. deviceId: {}, token: {}", deviceId, token);
 
         deactivateExistingTokens();
 
