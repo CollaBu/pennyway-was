@@ -1,6 +1,8 @@
 package kr.co.pennyway.domain.context.account.collection;
 
 import kr.co.pennyway.domain.domains.device.domain.DeviceToken;
+import kr.co.pennyway.domain.domains.device.exception.DeviceTokenErrorCode;
+import kr.co.pennyway.domain.domains.device.exception.DeviceTokenErrorException;
 import kr.co.pennyway.domain.domains.user.domain.User;
 
 public class DeviceTokenCollection {
@@ -18,6 +20,10 @@ public class DeviceTokenCollection {
         DeviceToken existingDeviceToken = this.getDeviceTokenByToken(token);
 
         if (existingDeviceToken != null) {
+            if (!existingDeviceToken.getDeviceId().equals(deviceId) && existingDeviceToken.isActivated()) {
+                throw new DeviceTokenErrorException(DeviceTokenErrorCode.DUPLICATED_DEVICE_TOKEN);
+            }
+
             existingDeviceToken.handleOwner(user, deviceId);
             return existingDeviceToken;
         }
