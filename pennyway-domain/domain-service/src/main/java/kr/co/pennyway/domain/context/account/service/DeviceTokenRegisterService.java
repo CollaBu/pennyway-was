@@ -35,9 +35,11 @@ public class DeviceTokenRegisterService {
         Optional<DeviceToken> existingDeviceToken = deviceTokenRdbService.readDeviceByToken(deviceToken);
         List<DeviceToken> userDeviceTokens = deviceTokenRdbService.readByUserIdAndDeviceId(userId, deviceId);
 
-        return new DeviceTokenRegisterCollection(
+        DeviceToken newDeviceToken = new DeviceTokenRegisterCollection(
                 existingDeviceToken.orElse(null),
                 userDeviceTokens
         ).register(user.orElse(null), deviceId, deviceName, deviceToken);
+
+        return deviceTokenRdbService.createDevice(newDeviceToken);
     }
 }
