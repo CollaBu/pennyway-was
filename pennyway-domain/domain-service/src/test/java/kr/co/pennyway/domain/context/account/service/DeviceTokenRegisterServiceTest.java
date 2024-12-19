@@ -1,5 +1,6 @@
 package kr.co.pennyway.domain.context.account.service;
 
+import kr.co.pennyway.domain.context.account.collection.DeviceTokenCollection;
 import kr.co.pennyway.domain.context.common.fixture.UserFixture;
 import kr.co.pennyway.domain.domains.device.domain.DeviceToken;
 import kr.co.pennyway.domain.domains.device.exception.DeviceTokenErrorException;
@@ -95,26 +96,23 @@ public class DeviceTokenRegisterServiceTest {
 
     @Test
     @DisplayName("새로운 토큰 등록 시 올바른 정보로 생성됩니다")
-    void shouldCreateNewTokenWithCorrectInformation() {
+    void when_user_has_no_token_should_create_new_token() {
         // given
+        DeviceTokenCollection deviceTokenCollection = new DeviceTokenCollection();
+
         User user = UserFixture.GENERAL_USER.toUserWithCustomSetting(1L, "jayang", "Yang", UserFixture.GENERAL_USER.getNotifySetting());
         String expectedToken = "token1";
-        String expectedDeviceId = "device1";
-        String expectedDeviceName = "Android";
-
-        given(userRdbService.readUser(user.getId())).willReturn(Optional.of(user));
-        given(deviceTokenRdbService.readDeviceByToken(expectedToken)).willReturn(Optional.empty());
-        given(deviceTokenRdbService.readByUserIdAndDeviceId(user.getId(), expectedDeviceId)).willReturn(List.of());
-        given(deviceTokenRdbService.createDevice(any())).willAnswer(invocation -> invocation.getArgument(0));
+        String expectedDeviceId = "재서의 까리한 플립";
+        String expectedDeviceName = "Galaxy Flip 6";
 
         // when
-        DeviceToken result = deviceTokenRegisterService.execute(user.getId(), expectedDeviceId, expectedDeviceName, expectedToken);
+        DeviceToken actual = deviceTokenCollection.register(user, expectedDeviceId, expectedDeviceName, expectedToken);
 
         // then
-        assertEquals(expectedToken, result.getToken());
-        assertEquals(expectedDeviceId, result.getDeviceId());
-        assertEquals(expectedDeviceName, result.getDeviceName());
-        assertEquals(user, result.getUser());
+        assertEquals(expectedToken, actual.getToken());
+        assertEquals(expectedDeviceId, actual.getDeviceId());
+        assertEquals(expectedDeviceName, actual.getDeviceName());
+        assertEquals(user, actual.getUser());
     }
 
     @Test
