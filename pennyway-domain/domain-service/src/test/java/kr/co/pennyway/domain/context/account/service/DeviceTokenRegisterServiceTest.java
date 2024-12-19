@@ -60,6 +60,31 @@ public class DeviceTokenRegisterServiceTest {
     }
 
     @Test
+    @DisplayName("동일한 deviceToken이 이미 비활성화된 상태로 등록되어 있다면, 소유자와 마지막 로그인 시간을 변경하고 토큰을 활성화한다.")
+    void when_token_exists_should_update_owner_and_last_signed_at() {
+        // given
+        User originalOwner = UserFixture.GENERAL_USER.toUserWithCustomSetting(1L, "jayang", "Yang", UserFixture.GENERAL_USER.getNotifySetting());
+        DeviceToken existingToken = DeviceToken.of("token1", "device1", "Android", originalOwner);
+        existingToken.deactivate();
+        DeviceTokenCollection deviceTokenCollection = new DeviceTokenCollection(existingToken);
+
+        User newOwner = UserFixture.GENERAL_USER.toUserWithCustomSetting(2L, "another", "User", UserFixture.GENERAL_USER.getNotifySetting());
+        String expectedToken = "token1";
+        String expectedDeviceId = "device1";
+        String expectedDeviceName = "Android";
+
+        // when
+        DeviceToken actual = deviceTokenCollection.register(newOwner, expectedDeviceId, expectedDeviceName, expectedToken);
+
+        // then
+        assertTrue(actual.isActivated());
+        assertEquals(expectedToken, actual.getToken());
+        assertEquals(expectedDeviceId, actual.getDeviceId());
+        assertEquals(expectedDeviceName, actual.getDeviceName());
+        assertEquals(newOwner, actual.getUser());
+    }
+
+    @Test
     @DisplayName("새로운 토큰 등록 시 기존 활성 토큰들은 비활성화되고, 새로 등록된 토큰이 반환됩니다")
     void shouldDeactivateExistingTokensWhenRegisteringNew() {
         // given
