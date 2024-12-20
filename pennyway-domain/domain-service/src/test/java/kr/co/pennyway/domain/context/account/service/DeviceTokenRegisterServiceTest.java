@@ -1,259 +1,169 @@
 package kr.co.pennyway.domain.context.account.service;
 
+import kr.co.pennyway.domain.context.account.collection.DeviceTokenRegisterCollection;
 import kr.co.pennyway.domain.context.common.fixture.UserFixture;
 import kr.co.pennyway.domain.domains.device.domain.DeviceToken;
 import kr.co.pennyway.domain.domains.device.exception.DeviceTokenErrorException;
-import kr.co.pennyway.domain.domains.device.service.DeviceTokenRdbService;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorException;
-import kr.co.pennyway.domain.domains.user.service.UserRdbService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
 
-@ExtendWith(MockitoExtension.class)
 public class DeviceTokenRegisterServiceTest {
-    @Mock
-    private UserRdbService userRdbService;
-
-    @Mock
-    private DeviceTokenRdbService deviceTokenRdbService;
-
-    @InjectMocks
-    private DeviceTokenRegisterService deviceTokenRegisterService;
-
-    @Test
-    @DisplayName("이미 소유 중인 토큰인 경우 마지막 로그인 날짜만 갱신합니다")
-    void shouldUpdateOwnerWhenTokenExists() {
-        // given
-        User user = UserFixture.GENERAL_USER.toUser();
-        String expectedToken = "token1";
-        String expectedDeviceId = "device1";
-        String expectedDeviceName = "Android";
-        DeviceToken existingToken = DeviceToken.of(expectedToken, expectedDeviceId, expectedDeviceName, user);
-
-        given(userRdbService.readUser(1L)).willReturn(Optional.of(user));
-        given(deviceTokenRdbService.readDeviceByToken(expectedToken)).willReturn(Optional.of(existingToken));
-
-        // when
-        DeviceToken result = deviceTokenRegisterService.execute(1L, expectedDeviceId, expectedDeviceName, expectedToken);
-
-        // then
-        assertEquals(existingToken, result);
-        assertEquals(user, result.getUser());
-        assertTrue(existingToken.isActivated());
-
-        verify(deviceTokenRdbService, never()).createDevice(any());
-    }
-
-    @Test
-    @DisplayName("새로운 토큰 등록 시 기존 활성 토큰들은 비활성화되고, 새로 등록된 토큰이 반환됩니다")
-    void shouldDeactivateExistingTokensWhenRegisteringNew() {
-        // given
-        User user = UserFixture.GENERAL_USER.toUserWithCustomSetting(1L, "jayang", "Yang", UserFixture.GENERAL_USER.getNotifySetting());
-        String expectedToken = "oldToken";
-        String expectedDeviceId = "device1";
-        String expectedDeviceName = "Android";
-        String expectedNewToken = "newToken";
-        DeviceToken originToken = DeviceToken.of(expectedToken, expectedDeviceId, expectedDeviceName, user);
-
-        given(userRdbService.readUser(user.getId())).willReturn(Optional.of(user));
-        given(deviceTokenRdbService.readDeviceByToken(expectedNewToken)).willReturn(Optional.empty());
-        given(deviceTokenRdbService.readByUserIdAndDeviceId(user.getId(), expectedDeviceId)).willReturn(List.of(originToken));
-        given(deviceTokenRdbService.createDevice(any())).willAnswer(invocation -> invocation.getArgument(0));
-
-        // when
-        DeviceToken result = deviceTokenRegisterService.execute(user.getId(), expectedDeviceId, expectedDeviceName, expectedNewToken);
-
-        // then
-        assertTrue(originToken.isExpired());
-        assertEquals(expectedNewToken, result.getToken());
-    }
-
     @Test
     @DisplayName("사용자가 존재하지 않으면 예외가 발생합니다")
-    void shouldThrowExceptionWhenUserNotFound() {
+    void when_user_not_found_then_throw_exception() {
         // given
-        given(userRdbService.readUser(1L)).willReturn(Optional.empty());
+        DeviceTokenRegisterCollection collection = new DeviceTokenRegisterCollection();
 
         // when & then
-        assertThrows(UserErrorException.class, () ->
-                deviceTokenRegisterService.execute(1L, "device1", "Android", "token1"));
+        assertThrows(UserErrorException.class, () -> collection.register(null, "device1", "Android", "token1"));
     }
 
     @Test
     @DisplayName("새로운 토큰 등록 시 올바른 정보로 생성됩니다")
-    void shouldCreateNewTokenWithCorrectInformation() {
+    void when_user_has_no_token_should_create_new_token() {
         // given
+        DeviceTokenRegisterCollection deviceTokenRegisterCollection = new DeviceTokenRegisterCollection();
+
         User user = UserFixture.GENERAL_USER.toUserWithCustomSetting(1L, "jayang", "Yang", UserFixture.GENERAL_USER.getNotifySetting());
         String expectedToken = "token1";
-        String expectedDeviceId = "device1";
-        String expectedDeviceName = "Android";
-
-        given(userRdbService.readUser(user.getId())).willReturn(Optional.of(user));
-        given(deviceTokenRdbService.readDeviceByToken(expectedToken)).willReturn(Optional.empty());
-        given(deviceTokenRdbService.readByUserIdAndDeviceId(user.getId(), expectedDeviceId)).willReturn(List.of());
-        given(deviceTokenRdbService.createDevice(any())).willAnswer(invocation -> invocation.getArgument(0));
+        String expectedDeviceId = "재서의 까리한 플립";
+        String expectedDeviceName = "Galaxy Flip 6";
 
         // when
-        DeviceToken result = deviceTokenRegisterService.execute(user.getId(), expectedDeviceId, expectedDeviceName, expectedToken);
+        DeviceToken actual = deviceTokenRegisterCollection.register(user, expectedDeviceId, expectedDeviceName, expectedToken);
 
         // then
-        assertEquals(expectedToken, result.getToken());
-        assertEquals(expectedDeviceId, result.getDeviceId());
-        assertEquals(expectedDeviceName, result.getDeviceName());
-        assertEquals(user, result.getUser());
+        assertEquals(expectedToken, actual.getToken());
+        assertEquals(expectedDeviceId, actual.getDeviceId());
+        assertEquals(expectedDeviceName, actual.getDeviceName());
+        assertEquals(user, actual.getUser());
     }
 
     @Test
-    @DisplayName("기기의 토큰이 다른 소유자에게 등록되어 있지만 deviceId가 같은 경우, 소유자 정보를 갱신합니다")
-    void shouldUpdateOwnerWhenTokenExistsWithDifferentUser() {
+    @DisplayName("이미 소유 중인 토큰인 경우 마지막 로그인 날짜만 갱신합니다")
+    void when_token_exists_should_update_last_signed_at() {
         // given
-        User user = UserFixture.GENERAL_USER.toUserWithCustomSetting(1L, "jayang", "Yang", UserFixture.GENERAL_USER.getNotifySetting());
-        User anotherUser = UserFixture.GENERAL_USER.toUserWithCustomSetting(2L, "another", "User", UserFixture.GENERAL_USER.getNotifySetting());
-        String expectedToken = "token1";
-        String expectedDeviceId = "device1";
-        String expectedDeviceName = "Android";
-        DeviceToken existingToken = DeviceToken.of(expectedToken, expectedDeviceId, expectedDeviceName, anotherUser);
-
-        given(userRdbService.readUser(user.getId())).willReturn(Optional.of(user));
-        given(deviceTokenRdbService.readDeviceByToken(expectedToken)).willReturn(Optional.of(existingToken));
-
-        // when
-        DeviceToken result = deviceTokenRegisterService.execute(user.getId(), expectedDeviceId, expectedDeviceName, expectedToken);
-
-        // then
-        assertEquals(existingToken, result);
-        assertEquals(user, result.getUser());
-        assertTrue(existingToken.isActivated());
-
-        verify(deviceTokenRdbService, never()).createDevice(any());
-    }
-
-    @Test
-    @DisplayName("다른 디바이스에서 이미 사용 중인 토큰으로 등록을 시도하면 예외가 발생합니다")
-    void shouldThrowExceptionWhenTokenExistsForDifferentDevice() {
-        // given
-        User user = UserFixture.GENERAL_USER.toUser();
-        String token = "token1";
-        String deviceId = "device2";
-        DeviceToken existingToken = DeviceToken.of(token, "device1", "Android", user);
-
-        given(userRdbService.readUser(user.getId())).willReturn(Optional.of(user));
-        given(deviceTokenRdbService.readDeviceByToken(token)).willReturn(Optional.of(existingToken));
-
-        // when & then
-        assertThrows(DeviceTokenErrorException.class, () ->
-                deviceTokenRegisterService.execute(user.getId(), deviceId, "Android", token));
-    }
-
-    @Test
-    @DisplayName("다른 디바이스에 이미 등록된 토큰이지만 비활성화된 경우 소유권을 갱신하고 활성화합니다")
-    void shouldUpdateOwnerAndActivateWhenTokenExistsButDeactivated() {
-        // given
-        User user = UserFixture.GENERAL_USER.toUser();
-        String token = "token1";
-        String oldDeviceId = "device1";
-        String newDeviceId = "device2";
-        DeviceToken existingToken = DeviceToken.of(token, oldDeviceId, "Android", user);
-        existingToken.deactivate();
-
-        given(userRdbService.readUser(user.getId())).willReturn(Optional.of(user));
-        given(deviceTokenRdbService.readDeviceByToken(token)).willReturn(Optional.of(existingToken));
-
-        // when
-        DeviceToken result = deviceTokenRegisterService.execute(user.getId(), newDeviceId, "Android", token);
-
-        // then
-        assertEquals(existingToken, result);
-        assertEquals(user, result.getUser());
-        assertTrue(result.isActivated());
-        assertEquals(newDeviceId, result.getDeviceId());
-
-        verify(deviceTokenRdbService, never()).createDevice(any());
-    }
-
-    @Test
-    @DisplayName("같은 사용자가 여러 기기에 토큰을 등록할 수 있습니다")
-    void shouldAllowSameUserToRegisterMultipleDevices() {
-        // given
-        User user = UserFixture.GENERAL_USER.toUser();
-        String device1Token = "token1";
-        String device2Token = "token2";
-
-        given(userRdbService.readUser(user.getId())).willReturn(Optional.of(user));
-        given(deviceTokenRdbService.readDeviceByToken(device1Token)).willReturn(Optional.empty());
-        given(deviceTokenRdbService.readDeviceByToken(device2Token)).willReturn(Optional.empty());
-        given(deviceTokenRdbService.createDevice(any())).willAnswer(invocation -> invocation.getArgument(0));
-
-        // when
-        DeviceToken result1 = deviceTokenRegisterService.execute(user.getId(), "device1", "Android", device1Token);
-        DeviceToken result2 = deviceTokenRegisterService.execute(user.getId(), "device2", "iPhone", device2Token);
-
-        // then
-        assertTrue(result1.isActivated());
-        assertTrue(result2.isActivated());
-        assertNotEquals(result1.getDeviceId(), result2.getDeviceId());
-    }
-
-    @Test
-    @DisplayName("이미 등록된 토큰에 대해 같은 디바이스로 재등록을 시도하면 소유자 정보만 갱신됩니다")
-    void shouldUpdateOwnerWhenTokenExistsForSameDevice() {
-        // given
-        User user = UserFixture.GENERAL_USER.toUser();
+        User owner = UserFixture.GENERAL_USER.toUser();
         String token = "token1";
         String deviceId = "device1";
-        User previousOwner = UserFixture.GENERAL_USER.toUserWithCustomSetting(2L, "other", "User", UserFixture.GENERAL_USER.getNotifySetting());
-        DeviceToken existingToken = DeviceToken.of(token, deviceId, "Android", previousOwner);
-
-        given(userRdbService.readUser(user.getId())).willReturn(Optional.of(user));
-        given(deviceTokenRdbService.readDeviceByToken(token)).willReturn(Optional.of(existingToken));
+        DeviceToken existingToken = DeviceToken.of(token, deviceId, "Android", owner);
+        DeviceTokenRegisterCollection collection = new DeviceTokenRegisterCollection(existingToken);
 
         // when
-        DeviceToken result = deviceTokenRegisterService.execute(user.getId(), deviceId, "Android", token);
+        DeviceToken actual = collection.register(owner, deviceId, "Android", token);
 
         // then
-        assertEquals(existingToken, result);
-        assertEquals(user, result.getUser());
-        assertTrue(result.isActivated());
-        verify(deviceTokenRdbService, never()).createDevice(any());
+        assertEquals(existingToken, actual);
+        assertEquals(owner, actual.getUser());
+        assertTrue(actual.isActivated());
+    }
+
+    @Test
+    @DisplayName("동일한 deviceToken이 이미 비활성화된 상태로 등록되어 있다면, 소유자와 마지막 로그인 시간을 변경하고 토큰을 활성화한다.")
+    void when_token_exists_should_update_owner_and_last_signed_at() {
+        // given
+        User originalOwner = UserFixture.GENERAL_USER.toUserWithCustomSetting(1L, "jayang", "Yang", UserFixture.GENERAL_USER.getNotifySetting());
+        DeviceToken existingToken = DeviceToken.of("token1", "device1", "Android", originalOwner);
+        existingToken.deactivate();
+        DeviceTokenRegisterCollection deviceTokenRegisterCollection = new DeviceTokenRegisterCollection(existingToken);
+
+        User newOwner = UserFixture.GENERAL_USER.toUserWithCustomSetting(2L, "another", "User", UserFixture.GENERAL_USER.getNotifySetting());
+        String expectedToken = "token1";
+        String expectedDeviceId = "device1";
+        String expectedDeviceName = "Android";
+
+        // when
+        DeviceToken actual = deviceTokenRegisterCollection.register(newOwner, expectedDeviceId, expectedDeviceName, expectedToken);
+
+        // then
+        assertTrue(actual.isActivated());
+        assertEquals(expectedToken, actual.getToken());
+        assertEquals(expectedDeviceId, actual.getDeviceId());
+        assertEquals(expectedDeviceName, actual.getDeviceName());
+        assertEquals(newOwner, actual.getUser());
+    }
+
+    @Test
+    @DisplayName("새로운 토큰 등록 시, 디바이스의 기존 활성 토큰들은 비활성화되고, 새로 등록된 토큰이 반환됩니다")
+    void when_registering_new_token_should_deactivate_existing_token_for_same_device() {
+        // given
+        User user = UserFixture.GENERAL_USER.toUser();
+        DeviceToken existingToken = DeviceToken.of("oldToken", "device1", "Android", user);
+        List<DeviceToken> userTokens = List.of(existingToken);
+
+        String expectedToken = "newToken";
+
+        DeviceTokenRegisterCollection collection = new DeviceTokenRegisterCollection(null, userTokens);
+
+        // when
+        DeviceToken actual = collection.register(user, "device1", "Android", expectedToken);
+
+        // then
+        assertFalse(existingToken.isActivated());
+        assertTrue(actual.isActivated());
+        assertEquals(expectedToken, actual.getToken());
+    }
+
+
+    @Test
+    @DisplayName("다른 디바이스에서 이미 사용 중인 활성화 토큰으로 등록을 시도하면 예외가 발생합니다")
+    void should_throw_duplicate_exception_when_token_exists_for_different_device_id() {
+        // given
+        User owner = UserFixture.GENERAL_USER.toUserWithCustomSetting(1L, "jayang", "Yang", UserFixture.GENERAL_USER.getNotifySetting());
+        User hacker = UserFixture.GENERAL_USER.toUserWithCustomSetting(2L, "another", "User", UserFixture.GENERAL_USER.getNotifySetting());
+
+        String token = "token1";
+        DeviceToken existingToken = DeviceToken.of(token, "token1", "Android", owner);
+
+        DeviceTokenRegisterCollection deviceTokenRegisterCollection = new DeviceTokenRegisterCollection(existingToken);
+
+        // when & then
+        assertThrows(DeviceTokenErrorException.class, () -> deviceTokenRegisterCollection.register(hacker, "HACKER_DEVICE_ID", "Android", token));
+    }
+
+    @Test
+    @DisplayName("비활성화된 토큰은 다른 디바이스에서도 재사용할 수 있습니다")
+    void when_token_deactivated_should_allow_reuse_on_different_device() {
+        // given
+        User user = UserFixture.GENERAL_USER.toUser();
+        String token = "token1";
+        String newDeviceId = "newDeviceId";
+
+        DeviceToken existingToken = DeviceToken.of(token, "old-device", "Android", user);
+        existingToken.deactivate();
+        DeviceTokenRegisterCollection collection = new DeviceTokenRegisterCollection(existingToken);
+
+        // when
+        DeviceToken actual = collection.register(user, newDeviceId, "Android", token);
+
+        // then
+        assertEquals(existingToken, actual);
+        assertEquals(newDeviceId, actual.getDeviceId());
+        assertTrue(actual.isActivated());
     }
 
     @Test
     @DisplayName("같은 사용자가 같은 디바이스에 대해 새로운 토큰을 등록하면 기존 토큰은 비활성화됩니다")
-    void shouldDeactivateExistingTokensWhenRegisteringNewTokenForSameDevice() {
+    void when_registering_different_token_for_same_device_should_deactivate_existing() {
         // given
         User user = UserFixture.GENERAL_USER.toUser();
-        String oldToken = "oldToken";
-        String newToken = "newToken";
-        String deviceId = "device1";
-        DeviceToken existingToken = DeviceToken.of(oldToken, deviceId, "Android", user);
-        existingToken.activate();
+        DeviceToken existingToken = DeviceToken.of("oldToken", "device1", "Android", user);
+        List<DeviceToken> userTokens = List.of(existingToken);
 
-        given(userRdbService.readUser(user.getId())).willReturn(Optional.of(user));
-        given(deviceTokenRdbService.readDeviceByToken(newToken)).willReturn(Optional.empty());
-        given(deviceTokenRdbService.readByUserIdAndDeviceId(user.getId(), deviceId))
-                .willReturn(List.of(existingToken));
-        given(deviceTokenRdbService.createDevice(any())).willAnswer(invocation -> invocation.getArgument(0));
+        DeviceTokenRegisterCollection collection = new DeviceTokenRegisterCollection(null, userTokens);
 
         // when
-        DeviceToken result = deviceTokenRegisterService.execute(user.getId(), deviceId, "Android", newToken);
+        DeviceToken result = collection.register(user, "device1", "Android", "newToken");
 
         // then
         assertFalse(existingToken.isActivated());
         assertTrue(result.isActivated());
-        assertEquals(newToken, result.getToken());
+        assertEquals("newToken", result.getToken());
     }
 }
