@@ -1,15 +1,18 @@
 package kr.co.pennyway;
 
-import java.util.TimeZone;
+import jakarta.annotation.PostConstruct
+import org.springframework.boot.autoconfigure.SpringBootApplication
+import org.springframework.boot.runApplication
+import java.util.*
 
 @SpringBootApplication
-public class PennywaySocketApplication {
-    public static void main(String[] args) {
-        SpringApplication.run(PennywaySocketApplication.class, args);
-    }
+class PennywaySocketApplication
 
-    @PostConstruct
-    public void init() {
-        TimeZone.setDefault(TimeZone.getTimeZone("Asia/Seoul"));
-    }
+fun main(args: Array<String>) {
+    runApplication<PennywaySocketApplication>(*args)
+}
+
+@PostConstruct
+fun setDefaultTimeZone() {
+    TimeZone.setDefault(TimeZone.getTimeZone("Asia/Seoul"))
 }
