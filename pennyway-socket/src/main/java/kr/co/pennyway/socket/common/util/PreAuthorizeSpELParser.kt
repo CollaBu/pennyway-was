@@ -71,6 +71,7 @@ object PreAuthorizeSpELParser {
             context.setBeanResolver(BeanFactoryResolver(applicationContext))
 
             method.parameters.forEachIndexed { index, parameter ->
+                println("parameter.name: ${parameter.name} -> args[index]: ${args[index]}")
                 setVariable(parameter.name, args[index])
             }
         }
@@ -106,11 +107,13 @@ object PreAuthorizeSpELParser {
     /**
      * 모든 사용자에게 접근을 허용합니다.
      */
+    @JvmStatic
     fun permitAll(): Boolean = true
 
     /**
      * 주어진 Principal이 인증된 사용자인지 확인합니다.
      */
+    @JvmStatic
     fun isAuthenticated(principal: Principal): Boolean = when (principal) {
         is UserPrincipal -> principal.isAuthenticated()
         else -> false
