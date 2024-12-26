@@ -1,6 +1,7 @@
 buildscript {
     repositories {
         mavenCentral()
+        gradlePluginPortal()
     }
 }
 
@@ -30,6 +31,7 @@ subprojects {
 
     repositories {
         mavenCentral()
+        gradlePluginPortal()
     }
 
     configurations {

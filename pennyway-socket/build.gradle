@@ -1,5 +1,9 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
     id 'java'
+    id 'org.jetbrains.kotlin.jvm' version '1.8.21'
+    id 'org.jetbrains.kotlin.plugin.spring' version '1.8.21'
 }
 
 bootJar { enabled = true }
@@ -32,4 +36,12 @@ dependencies {
     implementation group: 'org.openapitools', name: 'jackson-databind-nullable', version: '0.2.6'
 
     implementation 'org.springframework.boot:spring-boot-starter-validation:3.2.3'
+}
+
+tasks.withType(KotlinCompile) {
+    kotlinOptions {
+        freeCompilerArgs = ['-Xjsr305=strict']
+        javaParameters = true
+        jvmTarget = '17'
+    }
 }
