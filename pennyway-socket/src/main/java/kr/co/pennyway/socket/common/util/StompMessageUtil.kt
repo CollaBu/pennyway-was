@@ -22,6 +22,7 @@ object StompMessageUtil {
      * @param objectMapper Jackson ObjectMapper
      * @return 생성된 STOMP 메시지
      */
+    @JvmStatic
     fun createMessage(
         accessor: StompHeaderAccessor,
         payload: ServerSideMessage?,
