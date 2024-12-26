@@ -38,12 +38,14 @@ class PreAuthorizeAspect(private val applicationContext: ApplicationContext) {
         val preAuthorize = method.requireAnnotation<PreAuthorize>()
         val principal = joinPoint.args.findPrincipal()
 
-        return evaluateAccess(
+        evaluateAccess(
             principal = principal,
             preAuthorize = preAuthorize,
             method = method,
             args = joinPoint.args
-        ).let { joinPoint.proceed() }
+        )
+
+        return joinPoint.proceed()
     }
 
     private fun evaluateAccess(
