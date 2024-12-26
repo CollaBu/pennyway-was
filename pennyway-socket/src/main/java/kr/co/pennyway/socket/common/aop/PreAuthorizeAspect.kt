@@ -52,7 +52,12 @@ class PreAuthorizeAspect(private val applicationContext: ApplicationContext) {
         method: Method,
         args: Array<Any>
     ) = PreAuthorizeSpELParser
-        .evaluate(preAuthorize.value, method, args, applicationContext)
+        .evaluate(
+            expression = preAuthorize.value,
+            method = method,
+            args = args,
+            applicationContext = applicationContext
+        )
         .also { result -> handleEvaluationResult(result, principal) }
 
     private fun handleEvaluationResult(
