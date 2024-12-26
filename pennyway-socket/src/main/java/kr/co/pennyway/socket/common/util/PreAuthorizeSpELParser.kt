@@ -7,7 +7,6 @@ import org.springframework.expression.spel.standard.SpelExpressionParser
 import org.springframework.expression.spel.support.StandardEvaluationContext
 import java.lang.reflect.Method
 import java.security.Principal
-import java.time.LocalDateTime
 
 /**
  * WebSocket 인증 및 인가를 위한 Spring Expression Language (SpEL) 파서.
@@ -113,7 +112,7 @@ object PreAuthorizeSpELParser {
      * 주어진 Principal이 인증된 사용자인지 확인합니다.
      */
     fun isAuthenticated(principal: Principal): Boolean = when (principal) {
-        is UserPrincipal -> principal.expiresAt.isAfter(LocalDateTime.now())
+        is UserPrincipal -> principal.isAuthenticated()
         else -> false
     }
 
