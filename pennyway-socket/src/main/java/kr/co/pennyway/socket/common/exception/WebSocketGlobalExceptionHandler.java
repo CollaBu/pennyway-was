@@ -27,4 +27,16 @@ public class WebSocketGlobalExceptionHandler {
 
         template.convertAndSendToUser(principal.getName(), ERROR_DESTINATION, serverSideMessage);
     }
+
+    @MessageExceptionHandler(Exception.class)
+    public void handleException(Principal principal, Exception ex) {
+        ServerSideMessage serverSideMessage = ServerSideMessage.of("5000", ex.getMessage());
+        log.error("handleException: {}", serverSideMessage);
+
+        if (principal != null) {
+            template.convertAndSendToUser(principal.getName(), ERROR_DESTINATION, serverSideMessage);
+        } else {
+            log.warn("예외 메시지를 반환할 사용자가 없습니다.");
+        }
+    }
 }
