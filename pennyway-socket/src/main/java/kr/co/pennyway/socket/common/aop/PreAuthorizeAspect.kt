@@ -17,8 +17,6 @@ import java.security.Principal
 @Aspect
 @Component
 class PreAuthorizeAspect(private val applicationContext: ApplicationContext) {
-    private val log = logger()
-
     /**
      * {@link PreAuthorize} 어노테이션이 붙은 메서드를 가로채고 인증/인가를 수행합니다.
      *
@@ -27,14 +25,17 @@ class PreAuthorizeAspect(private val applicationContext: ApplicationContext) {
      * @throws Throwable 메서드 실행 중 발생한 예외
      */
     @Around("@annotation(kr.co.pennyway.socket.common.annotation.PreAuthorize)")
-    fun execute(joinPoint: ProceedingJoinPoint): Any = with(joinPoint) {
-        (signature as? MethodSignature)
-            ?.method
-            ?.let { method -> validateAccess(method, this) }
+    fun execute(joinPoint: ProceedingJoinPoint): Any? {
+        val methodSignature = joinPoint.signature as? MethodSignature
             ?: throw IllegalStateException("PreAuthorize는 메서드에만 적용할 수 있습니다")
+
+        val method = methodSignature.method
+        validateAccess(method, joinPoint)
+
+        return joinPoint.proceed()
     }
 
-    private fun validateAccess(method: Method, joinPoint: ProceedingJoinPoint): Any {
+    private fun validateAccess(method: Method, joinPoint: ProceedingJoinPoint) {
         val preAuthorize = method.requireAnnotation<PreAuthorize>()
         val principal = joinPoint.args.findPrincipal()
 
@@ -44,8 +45,6 @@ class PreAuthorizeAspect(private val applicationContext: ApplicationContext) {
             method = method,
             args = joinPoint.args
         )
-
-        return joinPoint.proceed()
     }
 
     private fun evaluateAccess(
@@ -86,5 +85,7 @@ class PreAuthorizeAspect(private val applicationContext: ApplicationContext) {
         fun Array<Any>.findPrincipal(): Principal? = asSequence()
             .filterIsInstance<Principal>()
             .firstOrNull()
+
+        val log = logger()
     }
 }
