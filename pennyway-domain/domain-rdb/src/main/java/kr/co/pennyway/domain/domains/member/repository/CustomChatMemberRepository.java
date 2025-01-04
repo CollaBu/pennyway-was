@@ -16,6 +16,8 @@ public interface CustomChatMemberRepository {
      */
     boolean existsOwnershipChatRoomByUserId(Long userId);
 
+    boolean existsByChatRoomIdAndUserIdAndId(Long chatRoomId, Long userId, Long chatMemberId);
+
     /**
      * 채팅방의 관리자 정보를 조회한다.
      */
