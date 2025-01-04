@@ -53,6 +53,11 @@ public class ChatMemberRdbService {
     }
 
     @Transactional(readOnly = true)
+    public Optional<ChatMember> readChatMemberByChatMemberId(Long chatMemberId, Long chatRoomId) {
+        return chatMemberRepository.findByChatRoom_IdAndId(chatRoomId, chatMemberId);
+    }
+
+    @Transactional(readOnly = true)
     public Optional<ChatMember> readChatMember(Long userId, Long chatRoomId) {
         return chatMemberRepository.findActiveChatMember(chatRoomId, userId).stream().findFirst();
     }
