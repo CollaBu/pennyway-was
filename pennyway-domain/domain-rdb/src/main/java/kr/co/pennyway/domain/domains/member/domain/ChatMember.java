@@ -12,7 +12,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
-import org.hibernate.annotations.SQLDelete;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -22,7 +21,6 @@ import java.util.Objects;
 @Table(name = "chat_member")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @DynamicInsert
-@SQLDelete(sql = "UPDATE chat_member SET deleted_at = NOW() WHERE id = ?")
 public class ChatMember extends DateAuditable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -95,6 +93,10 @@ public class ChatMember extends DateAuditable {
 
     public void disableNotify() {
         this.notifyEnabled = false;
+    }
+
+    public void leave() {
+        this.deletedAt = LocalDateTime.now();
     }
 
     public void ban() {
