@@ -78,6 +78,10 @@ public class ChatMember extends DateAuditable {
         return deletedAt == null;
     }
 
+    public boolean isAdmin() {
+        return role.equals(ChatMemberRole.ADMIN);
+    }
+
     /**
      * 사용자 추방된 이력이 있는 지 확인한다.
      *
