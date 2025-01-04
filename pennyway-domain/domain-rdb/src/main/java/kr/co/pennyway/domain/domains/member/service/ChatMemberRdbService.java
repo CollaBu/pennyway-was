@@ -133,6 +133,14 @@ public class ChatMemberRdbService {
         return chatMemberRepository.existsByChatRoomIdAndUserId(chatRoomId, userId);
     }
 
+    /**
+     * 삭제된 사용자 데이터는 조회하지 않는다.
+     */
+    @Transactional(readOnly = true)
+    public boolean isExists(Long chatRoomId, Long userId, Long chatMemberId) {
+        return chatMemberRepository.existsByChatRoomIdAndUserIdAndId(chatRoomId, userId, chatMemberId);
+    }
+
     @Transactional(readOnly = true)
     public boolean hasUserChatRoomOwnership(Long userId) {
         return chatMemberRepository.existsOwnershipChatRoomByUserId(userId);
