@@ -2,12 +2,15 @@ package kr.co.pennyway.domain.domains.chatroom.domain;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import kr.co.pennyway.domain.common.model.DateAuditable;
+import kr.co.pennyway.domain.domains.member.domain.ChatMember;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.Hibernate;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.SQLDelete;
@@ -15,6 +18,7 @@ import org.hibernate.annotations.SQLRestriction;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -35,6 +39,9 @@ public class ChatRoom extends DateAuditable {
 
     @ColumnDefault("NULL")
     private LocalDateTime deletedAt;
+
+    @OneToMany(mappedBy = "chatRoom")
+    private List<ChatMember> chatMembers;
 
     @Builder
     public ChatRoom(Long id, String title, String description, String backgroundImageUrl, Integer password) {
@@ -82,6 +89,10 @@ public class ChatRoom extends DateAuditable {
 
     public boolean matchPassword(Integer password) {
         return this.password.equals(password);
+    }
+
+    public boolean hasOnlyAdmin() {
+        return Hibernate.size(chatMembers) == 1 && chatMembers.get(0).isAdmin();
     }
 
     @Override
