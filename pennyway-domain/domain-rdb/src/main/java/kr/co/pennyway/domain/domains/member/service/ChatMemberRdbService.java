@@ -144,7 +144,7 @@ public class ChatMemberRdbService {
     }
 
     @Transactional
-    public void delete(ChatMember chatMember) {
-        chatMemberRepository.delete(chatMember);
+    public void update(ChatMember chatMember) {
+        chatMemberRepository.save(chatMember);
     }
 }
