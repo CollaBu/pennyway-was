@@ -53,8 +53,8 @@ public class ChatMemberRdbService {
     }
 
     @Transactional(readOnly = true)
-    public Optional<ChatMember> readChatMemberByChatMemberId(Long chatMemberId, Long chatRoomId) {
-        return chatMemberRepository.findByChatRoom_IdAndId(chatRoomId, chatMemberId);
+    public Optional<ChatMember> readChatMemberByChatMemberId(Long chatMemberId) {
+        return chatMemberRepository.findByChatRoom_Id(chatMemberId);
     }
 
     @Transactional(readOnly = true)
