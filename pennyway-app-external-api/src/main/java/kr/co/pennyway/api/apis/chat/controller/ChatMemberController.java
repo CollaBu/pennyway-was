@@ -52,4 +52,12 @@ public class ChatMemberController implements ChatMemberApi {
 
         return ResponseEntity.ok(SuccessResponse.from(CHAT_MEMBERS, chatMemberUseCase.readChatMembers(chatRoomId, chatMemberIds)));
     }
+
+    @DeleteMapping("/{chatMemberId}")
+    @PreAuthorize("isAuthenticated() and @chatRoomManager.hasPermission(principal.userId, #chatRoomId, #chatMemberId)")
+    public ResponseEntity<?> leaveChatRoom(@PathVariable("chatRoomId") Long chatRoomId, @PathVariable("chatMemberId") Long chatMemberId) {
+        chatMemberUseCase.leaveChatRoom(chatMemberId);
+
+        return ResponseEntity.ok(SuccessResponse.noContent());
+    }
 }
