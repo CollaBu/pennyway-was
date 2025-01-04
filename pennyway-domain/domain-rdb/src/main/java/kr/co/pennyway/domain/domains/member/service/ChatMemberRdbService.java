@@ -137,4 +137,9 @@ public class ChatMemberRdbService {
     public long countActiveMembers(Long chatRoomId) {
         return chatMemberRepository.countByChatRoomIdAndActive(chatRoomId);
     }
+
+    @Transactional
+    public void delete(ChatMember chatMember) {
+        chatMemberRepository.delete(chatMember);
+    }
 }
