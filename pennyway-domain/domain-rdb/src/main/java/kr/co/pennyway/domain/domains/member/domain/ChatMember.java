@@ -50,7 +50,7 @@ public class ChatMember extends DateAuditable {
         validate(user, chatRoom, role);
 
         this.user = user;
-        this.chatRoom = chatRoom;
+        this.participate(chatRoom);
         this.role = role;
         this.notifyEnabled = true;
     }
@@ -67,6 +67,15 @@ public class ChatMember extends DateAuditable {
         Objects.requireNonNull(user, "user는 null이 될 수 없습니다.");
         Objects.requireNonNull(chatRoom, "chatRoom은 null이 될 수 없습니다.");
         Objects.requireNonNull(role, "role은 null이 될 수 없습니다.");
+    }
+
+    private void participate(ChatRoom chatRoom) {
+        if (this.chatRoom != null) {
+            throw new IllegalStateException("ChatMember는 이미 ChatRoom에 속해있습니다.");
+        }
+
+        chatRoom.getChatMembers().add(this);
+        this.chatRoom = chatRoom;
     }
 
     /**

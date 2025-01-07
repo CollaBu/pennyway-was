@@ -18,6 +18,7 @@ import org.hibernate.annotations.SQLRestriction;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -41,7 +42,7 @@ public class ChatRoom extends DateAuditable {
     private LocalDateTime deletedAt;
 
     @OneToMany(mappedBy = "chatRoom")
-    private List<ChatMember> chatMembers;
+    private List<ChatMember> chatMembers = new ArrayList<>();
 
     @Builder
     public ChatRoom(Long id, String title, String description, String backgroundImageUrl, Integer password) {
