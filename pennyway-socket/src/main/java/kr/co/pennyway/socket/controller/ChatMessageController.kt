@@ -9,7 +9,6 @@ import kr.co.pennyway.socket.service.LastMessageIdSaveService
 import org.springframework.messaging.handler.annotation.DestinationVariable
 import org.springframework.messaging.handler.annotation.Header
 import org.springframework.messaging.handler.annotation.MessageMapping
-import org.springframework.messaging.simp.stomp.StompHeaderAccessor
 import org.springframework.stereotype.Controller
 import org.springframework.validation.annotation.Validated
 
@@ -29,7 +28,7 @@ class ChatMessageController(
         @DestinationVariable chatRoomId: Long,
         @Validated payload: ChatMessageDto.Request,
         principal: UserPrincipal,
-        @Header("x-message-id") messageId: StompHeaderAccessor?
+        @Header("x-message-id") messageId: String?
     ) {
         chatMessageSendService.execute(
             SendMessageCommand.createUserMessage(
