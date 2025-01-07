@@ -4,6 +4,8 @@ import kr.co.pennyway.domain.domains.message.type.MessageCategoryType;
 import kr.co.pennyway.domain.domains.message.type.MessageContentType;
 import kr.co.pennyway.socket.common.constants.SystemMessageConstants;
 
+import java.util.Map;
+
 /**
  * 채팅 메시지 전송을 위한 Command 클래스
  */
@@ -12,7 +14,9 @@ public record SendMessageCommand(
         String content,
         MessageContentType contentType,
         MessageCategoryType categoryType,
-        long senderId
+        long senderId,
+        String senderName,
+        Map<String, Object> messageIdHeader
 ) {
     public SendMessageCommand {
         if (chatRoomId <= 0) {
@@ -45,26 +49,32 @@ public record SendMessageCommand(
                 content,
                 MessageContentType.TEXT,
                 MessageCategoryType.SYSTEM,
-                SystemMessageConstants.SYSTEM_SENDER_ID
+                SystemMessageConstants.SYSTEM_SENDER_ID,
+                null,
+                null
         );
     }
 
     /**
      * 사용자 메시지를 생성합니다.
      *
-     * @param chatRoomId  long : 채팅방 아이디
-     * @param content     String : 메시지 내용
-     * @param contentType {@link MessageContentType} : 메시지 타입
-     * @param senderId    long : 발신자 아이디
+     * @param chatRoomId      long : 채팅방 아이디
+     * @param content         String : 메시지 내용
+     * @param contentType     {@link MessageContentType} : 메시지 타입
+     * @param senderId        long : 발신자 아이디
+     * @param senderName      String : 발신자 이름
+     * @param messageIdHeader Map<String, String> : `x-message-id` 헤더. null일 경우 성공 메시지를 반환하지 않음.
      * @return {@link MessageCategoryType#NORMAL}로 생성된 SendMessageCommand
      */
-    public static SendMessageCommand createUserMessage(long chatRoomId, String content, MessageContentType contentType, long senderId) {
+    public static SendMessageCommand createUserMessage(long chatRoomId, String content, MessageContentType contentType, long senderId, String senderName, Map<String, Object> messageIdHeader) {
         return new SendMessageCommand(
                 chatRoomId,
                 content,
                 contentType,
                 MessageCategoryType.NORMAL,
-                senderId
+                senderId,
+                senderName,
+                messageIdHeader
         );
     }
 }
