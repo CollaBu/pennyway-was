@@ -51,6 +51,7 @@ public class ChatRoomLeaveCollection {
 
     private ChatRoomLeaveResult handleMemberLeave() {
         chatMember.leave();
+        log.info("채팅방 멤버가 채팅방을 탈퇴합니다. chatRoom: {}, chatMember: {}", chatMember.getChatRoom(), chatMember);
         return new ChatRoomLeaveResult(chatMember, false);
     }
 
