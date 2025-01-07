@@ -2,6 +2,7 @@ package kr.co.pennyway.domain.context.chat.service;
 
 import kr.co.pennyway.common.annotation.DomainService;
 import kr.co.pennyway.domain.domains.chatroom.domain.ChatRoom;
+import kr.co.pennyway.domain.domains.chatroom.service.ChatRoomRdbService;
 import kr.co.pennyway.domain.domains.member.domain.ChatMember;
 import kr.co.pennyway.domain.domains.member.exception.ChatMemberErrorCode;
 import kr.co.pennyway.domain.domains.member.exception.ChatMemberErrorException;
@@ -15,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class ChatRoomLeaveService {
     private final ChatMemberRdbService chatMemberRdbService;
+    private final ChatRoomRdbService chatRoomRdbService;
 
     @Transactional
     public void execute(Long chatMemberId) {
@@ -32,7 +34,7 @@ public class ChatRoomLeaveService {
             if (chatRoom.hasOnlyAdmin()) {
                 chatMember.leave();
                 chatMemberRdbService.update(chatMember);
-                chatMemberRdbService.delete(chatRoom);
+                chatRoomRdbService.delete(chatRoom);
             } else {
                 log.warn("채팅방 방장은 채팅방을 탈퇴할 수 없습니다. chatRoomId: {}, chatMemberId: {}", chatRoom.getId(), chatMemberId);
                 throw new ChatMemberErrorException(ChatMemberErrorCode.ADMIN_CANNOT_LEAVE);
