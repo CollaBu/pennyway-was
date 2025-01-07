@@ -36,12 +36,12 @@ class ChatMessageSendService(
                 ChatMessageDto.Response.from(message)
             )
         }
-        
+
         command.senderName.takeIf { it.isNotBlank() }?.let { senderName ->
             simpMessagingTemplate.convertAndSendToUser(
                 senderName,
-                "/queue/chat/success",
-                message,
+                "/queue/success",
+                Unit,
                 command.messageIdHeader()
             )
         }
