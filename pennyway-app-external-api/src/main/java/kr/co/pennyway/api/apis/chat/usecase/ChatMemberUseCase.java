@@ -7,6 +7,7 @@ import kr.co.pennyway.api.apis.chat.mapper.ChatRoomMapper;
 import kr.co.pennyway.api.apis.chat.service.ChatMemberJoinService;
 import kr.co.pennyway.api.apis.chat.service.ChatMemberSearchService;
 import kr.co.pennyway.common.annotation.UseCase;
+import kr.co.pennyway.domain.context.chat.service.ChatRoomLeaveService;
 import kr.co.pennyway.domain.domains.chatroom.domain.ChatRoom;
 import kr.co.pennyway.domain.domains.member.dto.ChatMemberResult;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ import java.util.Set;
 public class ChatMemberUseCase {
     private final ChatMemberJoinService chatMemberJoinService;
     private final ChatMemberSearchService chatMemberSearchService;
+    private final ChatRoomLeaveService chatRoomLeaveService;
 
     public ChatRoomRes.Detail joinChatRoom(Long userId, Long chatRoomId, Integer password) {
         Triple<ChatRoom, Integer, Long> chatRoom = chatMemberJoinService.execute(userId, chatRoomId, password);
@@ -33,5 +35,9 @@ public class ChatMemberUseCase {
         List<ChatMemberResult.Detail> chatMembers = chatMemberSearchService.readChatMembers(chatRoomId, chatMemberIds);
 
         return ChatMemberMapper.toChatMemberResDetail(chatMembers);
+    }
+
+    public void leaveChatRoom(Long chatMemberId) {
+        chatRoomLeaveService.execute(chatMemberId);
     }
 }

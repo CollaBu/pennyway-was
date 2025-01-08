@@ -9,10 +9,8 @@ import kr.co.pennyway.api.config.ExternalApiDBTestConfig;
 import kr.co.pennyway.api.config.ExternalApiIntegrationTest;
 import kr.co.pennyway.api.config.fixture.ChatRoomFixture;
 import kr.co.pennyway.api.config.fixture.UserFixture;
-import kr.co.pennyway.domain.context.account.service.UserService;
-import kr.co.pennyway.domain.context.chat.service.ChatMemberService;
-import kr.co.pennyway.domain.context.chat.service.ChatRoomService;
 import kr.co.pennyway.domain.domains.chatroom.domain.ChatRoom;
+import kr.co.pennyway.domain.domains.chatroom.repository.ChatRoomRepository;
 import kr.co.pennyway.domain.domains.member.domain.ChatMember;
 import kr.co.pennyway.domain.domains.member.repository.ChatMemberRepository;
 import kr.co.pennyway.domain.domains.member.type.ChatMemberRole;
@@ -22,6 +20,7 @@ import kr.co.pennyway.domain.domains.message.repository.ChatMessageRepositoryImp
 import kr.co.pennyway.domain.domains.message.type.MessageCategoryType;
 import kr.co.pennyway.domain.domains.message.type.MessageContentType;
 import kr.co.pennyway.domain.domains.user.domain.User;
+import kr.co.pennyway.domain.domains.user.repository.UserRepository;
 import kr.co.pennyway.infra.client.guid.IdGenerator;
 import kr.co.pennyway.infra.common.jwt.JwtProvider;
 import lombok.extern.slf4j.Slf4j;
@@ -60,16 +59,13 @@ public class ChatRoomDetailIntegrationTest extends ExternalApiDBTestConfig {
     private RedisTemplate<String, String> redisTemplate;
 
     @Autowired
-    private UserService userService;
+    private UserRepository userRepository;
+
+    @Autowired
+    private ChatRoomRepository chatRoomRepository;
 
     @Autowired
     private ChatMemberRepository chatMemberRepository;
-
-    @Autowired
-    private ChatRoomService chatRoomService;
-
-    @Autowired
-    private ChatMemberService chatMemberService;
 
     @Autowired
     private ChatMessageRepositoryImpl chatMessageRepository;
@@ -82,17 +78,9 @@ public class ChatRoomDetailIntegrationTest extends ExternalApiDBTestConfig {
     @LocalServerPort
     private int port;
 
-    private User owner;
-    private ChatRoom chatRoom;
-    private ChatMember ownerMember;
-
     @BeforeEach
     void setUp() {
         apiTestHelper = new ApiTestHelper(restTemplate, objectMapper, accessTokenProvider);
-
-        owner = userService.createUser(UserFixture.GENERAL_USER.toUser());
-        chatRoom = chatRoomService.create(ChatRoomFixture.PUBLIC_CHAT_ROOM.toEntity(1L));
-        ownerMember = chatMemberService.createAdmin(owner, chatRoom);
     }
 
     @AfterEach
@@ -103,14 +91,20 @@ public class ChatRoomDetailIntegrationTest extends ExternalApiDBTestConfig {
         }
 
         chatMemberRepository.deleteAll();
+        chatRoomRepository.deleteAll();
+        userRepository.deleteAll();
     }
 
     @Test
     @DisplayName("Happy Path: 사용자는 채팅방 상세 정보를 조회할 수 있다.")
     void successGetChatRoomDetail() {
         // given
-        User member = userService.createUser(UserFixture.GENERAL_USER.toUser());
-        ChatMember participant = chatMemberService.createMember(member, chatRoom);
+        var owner = userRepository.save(UserFixture.GENERAL_USER.toUser());
+        var chatRoom = chatRoomRepository.save(ChatRoomFixture.PUBLIC_CHAT_ROOM.toEntity(1L));
+        var ownerMember = chatMemberRepository.save(ChatMember.of(owner, chatRoom, ChatMemberRole.ADMIN));
+
+        User member = userRepository.save(UserFixture.GENERAL_USER.toUser());
+        ChatMember participant = chatMemberRepository.save(ChatMember.of(member, chatRoom, ChatMemberRole.MEMBER));
 
         int expectedRecentParticipantCount = 1; // 나 자신은 제외
         int expectedMessageCount = 5;
@@ -142,8 +136,12 @@ public class ChatRoomDetailIntegrationTest extends ExternalApiDBTestConfig {
     @Test
     @DisplayName("채팅방 멤버가 아닌 사용자는 조회할 수 없다")
     void failGetChatRoomDetailWhenNotMember() {
+        var owner = userRepository.save(UserFixture.GENERAL_USER.toUser());
+        var chatRoom = chatRoomRepository.save(ChatRoomFixture.PUBLIC_CHAT_ROOM.toEntity(2L));
+        var ownerMember = chatMemberRepository.save(ChatMember.of(owner, chatRoom, ChatMemberRole.ADMIN));
+
         // given
-        User nonMember = userService.createUser(UserFixture.GENERAL_USER.toUser());
+        User nonMember = userRepository.save(UserFixture.GENERAL_USER.toUser());
 
         // when
         ResponseEntity<?> response = performApi(nonMember, chatRoom.getId());
@@ -156,8 +154,12 @@ public class ChatRoomDetailIntegrationTest extends ExternalApiDBTestConfig {
     @DisplayName("최근 메시지가 없는 채팅방도 정상적으로 조회된다")
     void successGetChatRoomDetailWithoutMessages() {
         // given
-        User member = userService.createUser(UserFixture.GENERAL_USER.toUser());
-        ChatMember participant = chatMemberService.createMember(member, chatRoom);
+        var owner = userRepository.save(UserFixture.GENERAL_USER.toUser());
+        var chatRoom = chatRoomRepository.save(ChatRoomFixture.PUBLIC_CHAT_ROOM.toEntity(3L));
+        var ownerMember = chatMemberRepository.save(ChatMember.of(owner, chatRoom, ChatMemberRole.ADMIN));
+
+        var member = userRepository.save(UserFixture.GENERAL_USER.toUser());
+        var participant = chatMemberRepository.save(ChatMember.of(member, chatRoom, ChatMemberRole.MEMBER));
 
         // when
         ResponseEntity<?> response = performApi(member, chatRoom.getId());
@@ -174,8 +176,12 @@ public class ChatRoomDetailIntegrationTest extends ExternalApiDBTestConfig {
     @DisplayName("채팅방에 다수의 참여자가 있는 경우 정상적으로 조회된다")
     void successGetChatRoomDetailWithManyParticipants() {
         // given
+        var owner = userRepository.save(UserFixture.GENERAL_USER.toUser());
+        var chatRoom = chatRoomRepository.save(ChatRoomFixture.PUBLIC_CHAT_ROOM.toEntity(4L));
+        var ownerMember = chatMemberRepository.save(ChatMember.of(owner, chatRoom, ChatMemberRole.ADMIN));
+
         int expectedParticipantCount = 10;
-        List<User> participants = createMultipleParticipants(expectedParticipantCount);
+        List<User> participants = createMultipleParticipants(expectedParticipantCount, chatRoom);
 
         chatMessageRepository.save(createTestMessage(chatRoom.getId(), 1L, owner.getId()));
         chatMessageRepository.save(createTestMessage(chatRoom.getId(), 2L, participants.get(0).getId()));
@@ -206,12 +212,12 @@ public class ChatRoomDetailIntegrationTest extends ExternalApiDBTestConfig {
                 .build();
     }
 
-    private List<User> createMultipleParticipants(int count) {
+    private List<User> createMultipleParticipants(int count, ChatRoom chatRoom) {
         List<User> participants = new ArrayList<>();
 
         for (int i = 0; i < count; ++i) {
-            User user = userService.createUser(UserFixture.GENERAL_USER.toUser());
-            chatMemberService.createMember(user, chatRoom);
+            var user = userRepository.save(UserFixture.GENERAL_USER.toUser());
+            chatMemberRepository.save(ChatMember.of(user, chatRoom, ChatMemberRole.MEMBER));
             participants.add(user);
         }
 

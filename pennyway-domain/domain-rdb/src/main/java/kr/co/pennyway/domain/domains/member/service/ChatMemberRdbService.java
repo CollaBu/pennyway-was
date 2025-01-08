@@ -53,6 +53,11 @@ public class ChatMemberRdbService {
     }
 
     @Transactional(readOnly = true)
+    public Optional<ChatMember> readChatMemberByChatMemberId(Long chatMemberId) {
+        return chatMemberRepository.findByChatRoom_Id(chatMemberId);
+    }
+
+    @Transactional(readOnly = true)
     public Optional<ChatMember> readChatMember(Long userId, Long chatRoomId) {
         return chatMemberRepository.findActiveChatMember(chatRoomId, userId).stream().findFirst();
     }
@@ -128,6 +133,14 @@ public class ChatMemberRdbService {
         return chatMemberRepository.existsByChatRoomIdAndUserId(chatRoomId, userId);
     }
 
+    /**
+     * 삭제된 사용자 데이터는 조회하지 않는다.
+     */
+    @Transactional(readOnly = true)
+    public boolean isExists(Long chatRoomId, Long userId, Long chatMemberId) {
+        return chatMemberRepository.existsByChatRoomIdAndUserIdAndId(chatRoomId, userId, chatMemberId);
+    }
+
     @Transactional(readOnly = true)
     public boolean hasUserChatRoomOwnership(Long userId) {
         return chatMemberRepository.existsOwnershipChatRoomByUserId(userId);
@@ -136,5 +149,10 @@ public class ChatMemberRdbService {
     @Transactional(readOnly = true)
     public long countActiveMembers(Long chatRoomId) {
         return chatMemberRepository.countByChatRoomIdAndActive(chatRoomId);
+    }
+
+    @Transactional
+    public void update(ChatMember chatMember) {
+        chatMemberRepository.save(chatMember);
     }
 }

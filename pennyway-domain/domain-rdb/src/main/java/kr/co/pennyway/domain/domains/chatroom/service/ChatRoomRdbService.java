@@ -38,4 +38,9 @@ public class ChatRoomRdbService {
     public Slice<ChatRoomDetail> readChatRooms(Long userId, String target, Pageable pageable) {
         return chatRoomRepository.findChatRooms(userId, target, pageable);
     }
+
+    @Transactional
+    public void delete(ChatRoom chatRoom) {
+        chatRoomRepository.delete(chatRoom);
+    }
 }
