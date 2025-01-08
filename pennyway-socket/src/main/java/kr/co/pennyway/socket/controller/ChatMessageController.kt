@@ -7,6 +7,7 @@ import kr.co.pennyway.socket.common.security.authenticate.UserPrincipal
 import kr.co.pennyway.socket.service.ChatMessageSendService
 import kr.co.pennyway.socket.service.LastMessageIdSaveService
 import org.springframework.messaging.handler.annotation.DestinationVariable
+import org.springframework.messaging.handler.annotation.Header
 import org.springframework.messaging.handler.annotation.MessageMapping
 import org.springframework.stereotype.Controller
 import org.springframework.validation.annotation.Validated
@@ -26,14 +27,17 @@ class ChatMessageController(
     fun sendMessage(
         @DestinationVariable chatRoomId: Long,
         @Validated payload: ChatMessageDto.Request,
-        principal: UserPrincipal
+        principal: UserPrincipal,
+        @Header("x-message-id") messageId: String?
     ) {
         chatMessageSendService.execute(
             SendMessageCommand.createUserMessage(
                 chatRoomId,
                 payload.content(),
                 payload.contentType(),
-                principal.userId
+                principal.userId,
+                principal.name,
+                messageId?.let { mapOf("x-message-id" to it) }
             )
         )
     }
