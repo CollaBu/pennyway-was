@@ -71,7 +71,6 @@ object PreAuthorizeSpELParser {
             context.setBeanResolver(BeanFactoryResolver(applicationContext))
 
             method.parameters.forEachIndexed { index, parameter ->
-                println("parameter.name: ${parameter.name} -> args[index]: ${args[index]}")
                 setVariable(parameter.name, args[index])
             }
         }
