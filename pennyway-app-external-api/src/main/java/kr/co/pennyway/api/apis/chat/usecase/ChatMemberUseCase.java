@@ -7,6 +7,8 @@ import kr.co.pennyway.api.apis.chat.mapper.ChatRoomMapper;
 import kr.co.pennyway.api.apis.chat.service.ChatMemberJoinService;
 import kr.co.pennyway.api.apis.chat.service.ChatMemberSearchService;
 import kr.co.pennyway.common.annotation.UseCase;
+import kr.co.pennyway.domain.context.chat.dto.ChatMemberBanCommand;
+import kr.co.pennyway.domain.context.chat.service.ChatMemberBanService;
 import kr.co.pennyway.domain.context.chat.service.ChatRoomLeaveService;
 import kr.co.pennyway.domain.domains.chatroom.domain.ChatRoom;
 import kr.co.pennyway.domain.domains.member.dto.ChatMemberResult;
@@ -24,6 +26,7 @@ public class ChatMemberUseCase {
     private final ChatMemberJoinService chatMemberJoinService;
     private final ChatMemberSearchService chatMemberSearchService;
     private final ChatRoomLeaveService chatRoomLeaveService;
+    private final ChatMemberBanService chatMemberBanService;
 
     public ChatRoomRes.Detail joinChatRoom(Long userId, Long chatRoomId, Integer password) {
         Triple<ChatRoom, Integer, Long> chatRoom = chatMemberJoinService.execute(userId, chatRoomId, password);
@@ -39,5 +42,9 @@ public class ChatMemberUseCase {
 
     public void leaveChatRoom(Long chatMemberId) {
         chatRoomLeaveService.execute(chatMemberId);
+    }
+
+    public void banChatMember(Long userId, Long targetMemberId, Long chatRoomId) {
+        chatMemberBanService.execute(ChatMemberBanCommand.of(userId, targetMemberId, chatRoomId));
     }
 }
