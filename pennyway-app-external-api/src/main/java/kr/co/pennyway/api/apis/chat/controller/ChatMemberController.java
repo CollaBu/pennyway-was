@@ -62,6 +62,7 @@ public class ChatMemberController implements ChatMemberApi {
         return ResponseEntity.ok(SuccessResponse.noContent());
     }
 
+    @Override
     @DeleteMapping("/{chatMemberId}/ban")
     @PreAuthorize("isAuthenticated() and @chatRoomManager.hasPermission(principal.userId, #chatRoomId)")
     public ResponseEntity<?> banChatMember(@PathVariable("chatRoomId") Long chatRoomId, @PathVariable("chatMemberId") Long chatMemberId, @AuthenticationPrincipal SecurityUserDetails user) {
