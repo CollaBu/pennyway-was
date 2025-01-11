@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 public enum ChatMemberErrorCode implements BaseErrorCode {
     /* 403 FORBIDDEN */
     BANNED(StatusCode.FORBIDDEN, ReasonCode.ACCESS_TO_THE_REQUESTED_RESOURCE_IS_FORBIDDEN, "차단된 회원입니다."),
+    NOT_ADMIN(StatusCode.FORBIDDEN, ReasonCode.ACCESS_TO_RESOURCE_NOT_ALLOWED_FOR_USER_ROLE, "관리자가 아닙니다."),
 
     /* 404 NOT FOUND */
     NOT_FOUND(StatusCode.NOT_FOUND, ReasonCode.REQUESTED_RESOURCE_NOT_FOUND, "회원을 찾을 수 없습니다."),
