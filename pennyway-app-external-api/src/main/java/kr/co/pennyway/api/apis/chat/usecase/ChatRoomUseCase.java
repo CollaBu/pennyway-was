@@ -3,10 +3,7 @@ package kr.co.pennyway.api.apis.chat.usecase;
 import kr.co.pennyway.api.apis.chat.dto.ChatRoomReq;
 import kr.co.pennyway.api.apis.chat.dto.ChatRoomRes;
 import kr.co.pennyway.api.apis.chat.mapper.ChatRoomMapper;
-import kr.co.pennyway.api.apis.chat.service.ChatMemberSearchService;
-import kr.co.pennyway.api.apis.chat.service.ChatRoomSaveService;
-import kr.co.pennyway.api.apis.chat.service.ChatRoomSearchService;
-import kr.co.pennyway.api.apis.chat.service.ChatRoomWithParticipantsSearchService;
+import kr.co.pennyway.api.apis.chat.service.*;
 import kr.co.pennyway.api.common.response.SliceResponseTemplate;
 import kr.co.pennyway.common.annotation.UseCase;
 import kr.co.pennyway.domain.domains.chatroom.domain.ChatRoom;
@@ -24,6 +21,7 @@ public class ChatRoomUseCase {
     private final ChatRoomSaveService chatRoomSaveService;
     private final ChatRoomSearchService chatRoomSearchService;
     private final ChatRoomWithParticipantsSearchService chatRoomWithParticipantsSearchService;
+    private final ChatRoomPatchHelper chatRoomPatchHelper;
 
     private final ChatMemberSearchService chatMemberSearchService;
 
@@ -53,5 +51,12 @@ public class ChatRoomUseCase {
         Slice<ChatRoomDetail> chatRooms = chatRoomSearchService.readChatRoomsBySearch(userId, target, pageable);
 
         return ChatRoomMapper.toChatRoomResDetails(chatRooms, pageable);
+    }
+
+    // 채팅방 자체의 정보 외엔 무의미한 데이터를 반환한다.
+    public ChatRoomRes.Detail updateChatRoom(ChatRoomReq.Update request) {
+        ChatRoom chatRoom = chatRoomPatchHelper.updateChatRoom(request);
+
+        return ChatRoomMapper.toChatRoomResDetail(chatRoom, null, true, 1, 0);
     }
 }
