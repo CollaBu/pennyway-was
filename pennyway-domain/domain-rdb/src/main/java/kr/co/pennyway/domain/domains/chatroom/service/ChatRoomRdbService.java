@@ -40,6 +40,11 @@ public class ChatRoomRdbService {
     }
 
     @Transactional
+    public ChatRoom update(ChatRoom chatRoom) {
+        return chatRoomRepository.save(chatRoom);
+    }
+
+    @Transactional
     public void delete(ChatRoom chatRoom) {
         chatRoomRepository.delete(chatRoom);
     }
