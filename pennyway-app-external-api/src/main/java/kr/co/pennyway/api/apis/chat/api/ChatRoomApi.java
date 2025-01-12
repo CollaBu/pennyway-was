@@ -45,4 +45,9 @@ public interface ChatRoomApi {
     @Parameter(name = "chatRoomId", description = "조회할 채팅방의 식별자", example = "1", required = true)
     @ApiResponse(responseCode = "200", description = "채팅방 조회 성공", content = @Content(schemaProperties = @SchemaProperty(name = "chatRoom", schema = @Schema(implementation = ChatRoomRes.RoomWithParticipants.class))))
     ResponseEntity<?> getChatRoom(@PathVariable("chatRoomId") Long chatRoomId, @AuthenticationPrincipal SecurityUserDetails user);
+
+    @Operation(summary = "채팅방 수정", method = "PUT", description = "채팅방의 정보를 수정한다. 채팅방의 정보 수정에 성공하면 수정된 채팅방의 상세 정보를 반환한다.")
+    @Parameter(name = "chatRoomId", description = "수정할 채팅방의 식별자", example = "1", required = true)
+    @ApiResponse(responseCode = "200", description = "채팅방 수정 성공", content = @Content(schemaProperties = @SchemaProperty(name = "chatRoom", schema = @Schema(implementation = ChatRoomRes.Detail.class))))
+    ResponseEntity<?> updateChatRoom(@PathVariable("chatRoomId") Long chatRoomId, @Validated @RequestBody ChatRoomReq.Update request);
 }
