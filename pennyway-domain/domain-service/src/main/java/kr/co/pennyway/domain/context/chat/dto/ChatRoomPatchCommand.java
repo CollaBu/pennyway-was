@@ -30,4 +30,8 @@ public record ChatRoomPatchCommand(
             throw new IllegalArgumentException("채팅방 배경 이미지 URL은 'chatroom/' 으로 시작해야 합니다.");
         }
     }
+
+    public static ChatRoomPatchCommand of(Long chatRoomId, String title, String description, String backgroundImageUrl, Integer password) {
+        return new ChatRoomPatchCommand(chatRoomId, title, description, backgroundImageUrl, password);
+    }
 }
