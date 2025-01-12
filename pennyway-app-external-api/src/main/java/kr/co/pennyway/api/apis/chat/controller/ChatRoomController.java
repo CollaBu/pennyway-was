@@ -50,9 +50,16 @@ public class ChatRoomController implements ChatRoomApi {
         return ResponseEntity.ok(SuccessResponse.from(CHAT_ROOM, chatRoomUseCase.searchChatRooms(user.getUserId(), query.target(), pageable)));
     }
 
+    @Override
     @GetMapping("/{chatRoomId}")
     @PreAuthorize("isAuthenticated() and @chatRoomManager.hasPermission(#user.getUserId(), #chatRoomId)")
     public ResponseEntity<?> getChatRoom(@PathVariable("chatRoomId") Long chatRoomId, @AuthenticationPrincipal SecurityUserDetails user) {
         return ResponseEntity.ok(SuccessResponse.from(CHAT_ROOM, chatRoomUseCase.getChatRoomWithParticipants(user.getUserId(), chatRoomId)));
+    }
+
+    @PutMapping("/{chatRoomId}")
+    @PreAuthorize("isAuthenticated() and @chatRoomManager.hasAdminPermission(principal.userId, #chatRoomId)")
+    public ResponseEntity<?> updateChatRoom(@PathVariable("chatRoomId") Long chatRoomId, @Validated @RequestBody ChatRoomReq.Update request) {
+        return ResponseEntity.ok(SuccessResponse.from(CHAT_ROOM, chatRoomUseCase.updateChatRoom(request)));
     }
 }
