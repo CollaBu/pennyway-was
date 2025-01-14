@@ -62,7 +62,7 @@ log:
   config:
     filename: app-dev
     maxHistory: 7
-    totalSizeCap: 10MB
+    totalSizeCap: 1MB
 
 ---
 spring:
