@@ -69,7 +69,7 @@ public interface ChatMemberApi {
             @Parameter(name = "chatMemberId", description = "채팅방 멤버 ID (user id가 아님)", required = true, in = ParameterIn.PATH)
     })
     @ApiResponseExplanations(errors = {
-            @ApiExceptionExplanation(value = ChatRoomErrorCode.class, constant = "ADMIN_CANNOT_LEAVE", summary = "채팅방장은 탈퇴할 수 없음", description = "채팅방장은 채팅방 멤버 탈퇴에 실패했습니다.")}
+            @ApiExceptionExplanation(value = ChatMemberErrorCode.class, constant = "ADMIN_CANNOT_LEAVE", summary = "채팅방장은 탈퇴할 수 없음", description = "채팅방장은 채팅방 멤버 탈퇴에 실패했습니다.")}
     )
     @ApiResponse(responseCode = "200", description = "채팅방 멤버 탈퇴 성공")
     ResponseEntity<?> leaveChatRoom(@PathVariable("chatRoomId") Long chatRoomId, @PathVariable("chatMemberId") Long chatMemberId);
