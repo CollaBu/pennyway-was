@@ -53,12 +53,7 @@ public class DeviceTokenRegisterCollection {
      * @throws UserErrorException        {@link UserErrorCode#NOT_FOUND} : 사용자 파라미터가 null인 경우
      * @throws DeviceTokenErrorException {@link DeviceTokenErrorCode#DUPLICATED_DEVICE_TOKEN} : 이미 등록된 활성화 디바이스 토큰의 deviceId와 다른 deviceId가 들어온 경우
      */
-    public DeviceToken register(User owner, @NonNull String deviceId, @NonNull String deviceName, @NonNull String token) {
-        if (owner == null) {
-            log.error("디바이스 토큰을 등록할 사용자 정보가 없습니다.");
-            throw new UserErrorException(UserErrorCode.NOT_FOUND);
-        }
-
+    public DeviceToken register(@NonNull User owner, @NonNull String deviceId, @NonNull String deviceName, @NonNull String token) {
         DeviceToken existingDeviceToken = this.getDeviceTokenByToken(token);
 
         return (existingDeviceToken != null)

@@ -5,7 +5,6 @@ import kr.co.pennyway.domain.context.common.fixture.UserFixture;
 import kr.co.pennyway.domain.domains.device.domain.DeviceToken;
 import kr.co.pennyway.domain.domains.device.exception.DeviceTokenErrorException;
 import kr.co.pennyway.domain.domains.user.domain.User;
-import kr.co.pennyway.domain.domains.user.exception.UserErrorException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -14,16 +13,6 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class DeviceTokenRegisterServiceTest {
-    @Test
-    @DisplayName("사용자가 존재하지 않으면 예외가 발생합니다")
-    void when_user_not_found_then_throw_exception() {
-        // given
-        DeviceTokenRegisterCollection collection = new DeviceTokenRegisterCollection();
-
-        // when & then
-        assertThrows(UserErrorException.class, () -> collection.register(null, "device1", "Android", "token1"));
-    }
-
     @Test
     @DisplayName("새로운 토큰 등록 시 올바른 정보로 생성됩니다")
     void when_user_has_no_token_should_create_new_token() {

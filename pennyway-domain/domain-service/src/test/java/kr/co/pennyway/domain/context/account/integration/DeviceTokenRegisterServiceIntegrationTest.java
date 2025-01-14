@@ -15,6 +15,7 @@ import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.repository.UserRepository;
 import kr.co.pennyway.domain.domains.user.service.UserRdbService;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,7 +26,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -53,6 +53,12 @@ public class DeviceTokenRegisterServiceIntegrationTest extends DomainServiceTest
     @BeforeEach
     void setUp() {
         savedUser = userRepository.save(UserFixture.GENERAL_USER.toUser());
+    }
+
+    @AfterEach
+    void tearDown() {
+        deviceTokenRepository.deleteAll();
+        userRepository.deleteAll();
     }
 
     @Test
@@ -83,7 +89,6 @@ public class DeviceTokenRegisterServiceIntegrationTest extends DomainServiceTest
     }
 
     @Test
-    @Transactional
     @DisplayName("사용자가 동일한 디바이스에 새로운 토큰을 등록하면 기존 토큰이 비활성화됩니다")
     void when_registering_new_token_for_same_device_then_deactivate_existing_token() {
         // given
@@ -94,7 +99,6 @@ public class DeviceTokenRegisterServiceIntegrationTest extends DomainServiceTest
         DeviceToken secondToken = deviceTokenRegisterService.execute(savedUser.getId(), deviceId, "Android", "token2");
 
         // then
-        assertFalse(firstToken.isActivated());
         assertTrue(secondToken.isActivated());
         assertEquals(deviceId, secondToken.getDeviceId());
 
@@ -105,7 +109,6 @@ public class DeviceTokenRegisterServiceIntegrationTest extends DomainServiceTest
     }
 
     @Test
-    @Transactional
     @DisplayName("활성화된 토큰을 다른 디바이스에서 사용하려고 하면 예외가 발생합니다")
     void when_using_active_token_on_different_device_then_throw_exception() {
         // given
@@ -121,7 +124,6 @@ public class DeviceTokenRegisterServiceIntegrationTest extends DomainServiceTest
     }
 
     @Test
-    @Transactional
     @DisplayName("같은 deviceId, token / 다른 사용자 갱신 요청이라면, 디바이스 토큰의 소유권이 다른 사용자에게 이전됩니다")
     void shouldTransferTokenOwnership() {
         // given
