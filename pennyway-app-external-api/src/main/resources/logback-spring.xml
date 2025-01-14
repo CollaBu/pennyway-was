@@ -8,8 +8,8 @@
     <!-- 로그 설정 프로퍼티 -->
     <property name="LOG_PATH" value="./pennyway-app-external-api/src/main/resources/logs"/>
     <springProperty name="LOG_FILE_NAME" source="log.config.filename"/>
-    <springProperty name="LOG_MAX_HISTORY" source="log.config.max-history"/>
-    <springProperty name="LOG_TOTAL_SIZE_CAP" source="log.config.total-size-cap"/>
+    <springProperty name="LOG_MAX_HISTORY" source="log.config.maxHistory"/>
+    <springProperty name="LOG_TOTAL_SIZE_CAP" source="log.config.totalSizeCap"/>
 
     <!-- 로그 패턴에 색상 적용 -->
     <conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter"/>
@@ -29,14 +29,23 @@
 
     <!-- 파일 출력 설정 -->
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${LOG_PATH}/${LOG_FILE_NAME}.log</file>
+        <!--        <file>${LOG_PATH}/${LOG_FILE_NAME}.log</file>-->
         <encoder>
             <pattern>${FILE_LOG_PATTERN}</pattern>
         </encoder>
+        
+        <!-- 에러 발생시 무시하도록 설정 -->
+        <prudent>true</prudent>
+
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${LOG_PATH}/${LOG_FILE_NAME}.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <!-- 롤링된 파일 명명 규칙 -->
+            <fileNamePattern>${LOG_PATH}/%d{yyyy-MM-dd}/${LOG_FILE_NAME}.%i.log</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <!-- 파일당 최대 크기 -->
+                <maxFileSize>${LOG_TOTAL_SIZE_CAP}</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <!-- 보관 주기 -->
             <maxHistory>${LOG_MAX_HISTORY}</maxHistory>
-            <totalSizeCap>${LOG_TOTAL_SIZE_CAP}</totalSizeCap>
         </rollingPolicy>
     </appender>
 
@@ -51,7 +60,8 @@
         <root level="info">
             <appender-ref ref="CONSOLE"/>
         </root>
-        <logger name="org.springframework.web" level="debug">
+
+        <logger name="org.springframework.web" level="debug" additivity="false">
             <appender-ref ref="FILE"/>
         </logger>
     </springProfile>
@@ -60,7 +70,7 @@
         <root level="info">
             <appender-ref ref="CONSOLE"/>
         </root>
-        <logger name="org.springframework.web" level="debug">
+        <logger name="org.springframework.web" level="debug" additivity="false">
             <appender-ref ref="FILE"/>
         </logger>
     </springProfile>
