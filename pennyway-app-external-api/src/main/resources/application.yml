@@ -37,7 +37,6 @@ springdoc:
 
 log:
   config:
-    path: ./logs
     filename: app-local
 
 ---

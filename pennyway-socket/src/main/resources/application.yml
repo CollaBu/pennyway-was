@@ -39,11 +39,22 @@ spring:
     activate:
       on-profile: local
 
+log:
+  config:
+    filename: socket-local
+
 ---
 spring:
   config:
     activate:
       on-profile: dev
+
+log:
+  config:
+    filename: socket-dev
+    maxHistory: 7
+    maxFileSize: 10MB
+    totalSizeCap: 500MB
 
 ---
 spring:
