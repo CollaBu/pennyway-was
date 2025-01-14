@@ -8,6 +8,7 @@
     <!-- 로그 설정 프로퍼티 -->
     <property name="LOG_PATH" value="./pennyway-app-external-api/src/main/resources/logs"/>
     <springProperty name="LOG_FILE_NAME" source="log.config.filename"/>
+    <springProperty name="LOG_MAX_FILE_SIZE" source="log.config.maxFileSize"/>
     <springProperty name="LOG_MAX_HISTORY" source="log.config.maxHistory"/>
     <springProperty name="LOG_TOTAL_SIZE_CAP" source="log.config.totalSizeCap"/>
 
@@ -33,7 +34,7 @@
         <encoder>
             <pattern>${FILE_LOG_PATTERN}</pattern>
         </encoder>
-        
+
         <!-- 에러 발생시 무시하도록 설정 -->
         <prudent>true</prudent>
 
@@ -42,10 +43,12 @@
             <fileNamePattern>${LOG_PATH}/%d{yyyy-MM-dd}/${LOG_FILE_NAME}.%i.log</fileNamePattern>
             <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                 <!-- 파일당 최대 크기 -->
-                <maxFileSize>${LOG_TOTAL_SIZE_CAP}</maxFileSize>
+                <maxFileSize>${LOG_MAX_FILE_SIZE}</maxFileSize>
             </timeBasedFileNamingAndTriggeringPolicy>
             <!-- 보관 주기 -->
             <maxHistory>${LOG_MAX_HISTORY}</maxHistory>
+            <!-- 총 파일 크기 제한 -->
+            <totalSizeCap>${LOG_TOTAL_SIZE_CAP}</totalSizeCap>
         </rollingPolicy>
     </appender>
 
