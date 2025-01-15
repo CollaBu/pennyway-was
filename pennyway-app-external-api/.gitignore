@@ -43,3 +43,6 @@ bin/
 
 ## Test API
 src/main/java/kr/co/pennyway/api/apis/test
+
+## Log Files
+**/logs

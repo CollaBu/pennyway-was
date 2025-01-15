@@ -44,3 +44,6 @@ bin/
 ### Test ###
 src/main/resources/compose.yml
 src/main/resources/static/
+
+## Log files ##
+**/logs

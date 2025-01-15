@@ -35,6 +35,10 @@ springdoc:
     groups:
       enabled: true
 
+log:
+  config:
+    filename: app-local
+
 ---
 spring:
   config:
@@ -52,6 +56,13 @@ springdoc:
   api-docs:
     groups:
       enabled: true
+
+log:
+  config:
+    filename: app-dev
+    maxHistory: 7
+    maxFileSize: 10MB
+    totalSizeCap: 500MB
 
 ---
 spring:
