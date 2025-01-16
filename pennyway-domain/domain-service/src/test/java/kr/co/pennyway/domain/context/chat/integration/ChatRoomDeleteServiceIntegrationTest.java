@@ -69,7 +69,7 @@ public class ChatRoomDeleteServiceIntegrationTest extends DomainServiceTestInfra
 
     @Test
     @DisplayName("관리자는 채팅방을 삭제할 수 있다.")
-    void shouldChatRoomDeletedWhenAdminDeleteChatRoom() {
+    void shouldChatRoomDeletedWhenAdminExecute() {
         // given
         var user = userRepository.save(UserFixture.GENERAL_USER.toUser());
         var chatRoom = chatRoomRepository.save(ChatRoomFixture.PUBLIC_CHAT_ROOM.toEntityWithId(1L));
@@ -78,7 +78,7 @@ public class ChatRoomDeleteServiceIntegrationTest extends DomainServiceTestInfra
         ChatRoomDeleteCommand command = ChatRoomDeleteCommand.of(user.getId(), chatRoom.getId());
 
         // when
-        chatRoomDeleteService.deleteChatRoom(command);
+        chatRoomDeleteService.execute(command);
 
         // then
         var chatMembers = chatMemberRepository.findAll();
@@ -89,7 +89,7 @@ public class ChatRoomDeleteServiceIntegrationTest extends DomainServiceTestInfra
 
     @Test
     @DisplayName("존재하지 않는 멤버가 채팅방 삭제를 시도하면 예외가 발생한다.")
-    void shouldThrowExceptionWhenNonExistMemberDeleteChatRoom() {
+    void shouldThrowExceptionWhenNonExistMemberExecute() {
         // given
         var user = userRepository.save(UserFixture.GENERAL_USER.toUser());
         var chatRoom = chatRoomRepository.save(ChatRoomFixture.PUBLIC_CHAT_ROOM.toEntityWithId(2L));
@@ -97,13 +97,13 @@ public class ChatRoomDeleteServiceIntegrationTest extends DomainServiceTestInfra
         ChatRoomDeleteCommand command = ChatRoomDeleteCommand.of(user.getId(), chatRoom.getId());
 
         // when & then
-        assertThatThrownBy(() -> chatRoomDeleteService.deleteChatRoom(command))
+        assertThatThrownBy(() -> chatRoomDeleteService.execute(command))
                 .isInstanceOf(ChatMemberErrorException.class);
     }
 
     @Test
     @DisplayName("일반 사용자는 채팅방을 삭제할 수 없다.")
-    void shouldThrowExceptionWhenGeneralUserDeleteChatRoom() {
+    void shouldThrowExceptionWhenGeneralUserExecute() {
         // given
         var user = userRepository.save(UserFixture.GENERAL_USER.toUser());
         var chatRoom = chatRoomRepository.save(ChatRoomFixture.PUBLIC_CHAT_ROOM.toEntityWithId(3L));
@@ -112,13 +112,13 @@ public class ChatRoomDeleteServiceIntegrationTest extends DomainServiceTestInfra
         ChatRoomDeleteCommand command = ChatRoomDeleteCommand.of(user.getId(), chatRoom.getId());
 
         // when & then
-        assertThatThrownBy(() -> chatRoomDeleteService.deleteChatRoom(command))
+        assertThatThrownBy(() -> chatRoomDeleteService.execute(command))
                 .isInstanceOf(ChatMemberErrorException.class);
     }
 
     @Test
     @DisplayName("채팅방에 속한 모든 멤버가 삭제된다.")
-    void shouldAllChatMembersDeletedWhenDeleteChatRoom() {
+    void shouldAllChatMembersDeletedWhenExecute() {
         // given
         var chatRoom = chatRoomRepository.save(ChatRoomFixture.PUBLIC_CHAT_ROOM.toEntityWithId(4L));
         var users = createUsers(10);
@@ -128,7 +128,7 @@ public class ChatRoomDeleteServiceIntegrationTest extends DomainServiceTestInfra
         ChatRoomDeleteCommand command = ChatRoomDeleteCommand.of(admin.getUser().getId(), chatRoom.getId());
 
         // when
-        chatRoomDeleteService.deleteChatRoom(command);
+        chatRoomDeleteService.execute(command);
 
         // then
         var chatMembers = chatMemberRepository.findAll();

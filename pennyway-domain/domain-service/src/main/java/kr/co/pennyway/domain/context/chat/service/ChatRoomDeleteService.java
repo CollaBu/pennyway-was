@@ -18,7 +18,7 @@ public class ChatRoomDeleteService {
     private final ChatRoomRdbService chatRoomRdbService;
 
     @Transactional
-    public void deleteChatRoom(ChatRoomDeleteCommand command) {
+    public void execute(ChatRoomDeleteCommand command) {
         var admin = chatMemberRdbService.readChatMember(command.userId(), command.chatRoomId())
                 .orElseThrow(() -> new ChatMemberErrorException(ChatMemberErrorCode.NOT_FOUND));
 
