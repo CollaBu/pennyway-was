@@ -6,6 +6,8 @@ import kr.co.pennyway.api.apis.chat.mapper.ChatRoomMapper;
 import kr.co.pennyway.api.apis.chat.service.*;
 import kr.co.pennyway.api.common.response.SliceResponseTemplate;
 import kr.co.pennyway.common.annotation.UseCase;
+import kr.co.pennyway.domain.context.chat.dto.ChatRoomDeleteCommand;
+import kr.co.pennyway.domain.context.chat.service.ChatRoomDeleteService;
 import kr.co.pennyway.domain.domains.chatroom.domain.ChatRoom;
 import kr.co.pennyway.domain.domains.chatroom.dto.ChatRoomDetail;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +24,7 @@ public class ChatRoomUseCase {
     private final ChatRoomSearchService chatRoomSearchService;
     private final ChatRoomWithParticipantsSearchService chatRoomWithParticipantsSearchService;
     private final ChatRoomPatchHelper chatRoomPatchHelper;
+    private final ChatRoomDeleteService chatRoomDeleteService;
 
     private final ChatMemberSearchService chatMemberSearchService;
 
@@ -58,5 +61,9 @@ public class ChatRoomUseCase {
         ChatRoom chatRoom = chatRoomPatchHelper.updateChatRoom(request);
 
         return ChatRoomMapper.toChatRoomResDetail(chatRoom, null, true, 1, 0);
+    }
+
+    public void deleteChatRoom(Long userId, Long chatRoomId) {
+        chatRoomDeleteService.execute(ChatRoomDeleteCommand.of(userId, chatRoomId));
     }
 }

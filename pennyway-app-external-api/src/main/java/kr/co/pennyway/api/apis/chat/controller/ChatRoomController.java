@@ -63,4 +63,13 @@ public class ChatRoomController implements ChatRoomApi {
     public ResponseEntity<?> updateChatRoom(@PathVariable("chatRoomId") Long chatRoomId, @Validated @RequestBody ChatRoomReq.Update request) {
         return ResponseEntity.ok(SuccessResponse.from(CHAT_ROOM, chatRoomUseCase.updateChatRoom(request)));
     }
+
+    @Override
+    @DeleteMapping("/{chatRoomId}")
+    @PreAuthorize("isAuthenticated() and @chatRoomManager.hasAdminPermission(principal.userId, #chatRoomId)")
+    public ResponseEntity<?> deleteChatRoom(@PathVariable("chatRoomId") Long chatRoomId, @AuthenticationPrincipal SecurityUserDetails user) {
+        chatRoomUseCase.deleteChatRoom(user.getUserId(), chatRoomId);
+
+        return ResponseEntity.ok(SuccessResponse.noContent());
+    }
 }
