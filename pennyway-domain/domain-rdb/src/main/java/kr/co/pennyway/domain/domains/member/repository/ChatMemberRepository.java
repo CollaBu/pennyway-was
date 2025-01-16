@@ -24,7 +24,7 @@ public interface ChatMemberRepository extends ExtendedRepository<ChatMember, Lon
 
     @Transactional(readOnly = true)
     @Query("SELECT cm FROM ChatMember cm WHERE cm.id = :chatMemberId")
-    Optional<ChatMember> findByChatRoom_Id(Long chatMemberId);
+    Optional<ChatMember> findByChatMember_Id(Long chatMemberId);
 
     @Transactional(readOnly = true)
     @Query("SELECT cm FROM ChatMember cm WHERE cm.chatRoom.id = :chatRoomId AND cm.user.id = :userId AND cm.deletedAt IS NULL")
