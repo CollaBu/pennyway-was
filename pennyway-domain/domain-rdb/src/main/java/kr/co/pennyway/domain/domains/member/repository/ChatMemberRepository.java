@@ -3,6 +3,7 @@ package kr.co.pennyway.domain.domains.member.repository;
 import kr.co.pennyway.domain.common.repository.ExtendedRepository;
 import kr.co.pennyway.domain.domains.member.domain.ChatMember;
 import kr.co.pennyway.domain.domains.member.type.ChatMemberRole;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,4 +41,9 @@ public interface ChatMemberRepository extends ExtendedRepository<ChatMember, Lon
     @Transactional(readOnly = true)
     @Query("SELECT cm.user.id FROM ChatMember cm WHERE cm.chatRoom.id = :chatRoomId AND cm.deletedAt IS NULL")
     Set<Long> findUserIdsByChatRoomId(Long chatRoomId);
+
+    @Transactional
+    @Modifying(clearAutomatically = true)
+    @Query("UPDATE ChatMember cm SET cm.deletedAt = NOW() WHERE cm.chatRoom.id = :chatRoomId")
+    void deleteAllByChatRoomId(Long chatRoomId);
 }
