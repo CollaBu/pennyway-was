@@ -155,4 +155,9 @@ public class ChatMemberRdbService {
     public void update(ChatMember chatMember) {
         chatMemberRepository.save(chatMember);
     }
+
+    @Transactional
+    public void deleteAllByChatRoomId(Long chatRoomId) {
+        chatMemberRepository.deleteAllByChatRoomId(chatRoomId);
+    }
 }
