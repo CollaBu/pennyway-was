@@ -37,14 +37,12 @@
 
         <!-- 에러 발생시 무시하도록 설정 -->
         <prudent>true</prudent>
-
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+        
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <!-- 롤링된 파일 명명 규칙 -->
             <fileNamePattern>${LOG_PATH}/%d{yyyy-MM-dd}/${LOG_FILE_NAME}.%i.log</fileNamePattern>
-            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-                <!-- 파일당 최대 크기 -->
-                <maxFileSize>${LOG_MAX_FILE_SIZE}</maxFileSize>
-            </timeBasedFileNamingAndTriggeringPolicy>
+            <!-- 파일당 최대 크기 -->
+            <maxFileSize>${LOG_MAX_FILE_SIZE}</maxFileSize>
             <!-- 보관 주기 -->
             <maxHistory>${LOG_MAX_HISTORY}</maxHistory>
             <!-- 총 파일 크기 제한 -->
