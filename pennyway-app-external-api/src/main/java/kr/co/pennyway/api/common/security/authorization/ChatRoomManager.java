@@ -38,7 +38,7 @@ public class ChatRoomManager {
     public boolean hasAdminPermission(Long userId, Long chatRoomId) {
         Optional<ChatMemberResult.Detail> admin = chatMemberService.readAdmin(chatRoomId);
 
-        return admin.map(detail -> detail.id().equals(userId)).orElseGet(
+        return admin.map(detail -> detail.userId().equals(userId)).orElseGet(
                 () -> {
                     log.error("{} 채팅방에서 관리자 정보를 찾을 수 없습니다.", chatRoomId);
                     return false;
