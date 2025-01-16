@@ -11,8 +11,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.co.pennyway.api.apis.chat.dto.ChatRoomReq;
 import kr.co.pennyway.api.apis.chat.dto.ChatRoomRes;
+import kr.co.pennyway.api.common.annotation.ApiExceptionExplanation;
+import kr.co.pennyway.api.common.annotation.ApiResponseExplanations;
 import kr.co.pennyway.api.common.response.SliceResponseTemplate;
 import kr.co.pennyway.api.common.security.authentication.SecurityUserDetails;
+import kr.co.pennyway.domain.domains.member.exception.ChatMemberErrorCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
@@ -50,4 +53,13 @@ public interface ChatRoomApi {
     @Parameter(name = "chatRoomId", description = "수정할 채팅방의 식별자", example = "1", required = true)
     @ApiResponse(responseCode = "200", description = "채팅방 수정 성공", content = @Content(schemaProperties = @SchemaProperty(name = "chatRoom", schema = @Schema(implementation = ChatRoomRes.Detail.class))))
     ResponseEntity<?> updateChatRoom(@PathVariable("chatRoomId") Long chatRoomId, @Validated @RequestBody ChatRoomReq.Update request);
+
+    @Operation(summary = "채팅방 삭제", method = "DELETE", description = "채팅방을 삭제한다. 채팅방 방장만이 가능하며, 채팅방을 삭제하면 채팅방에 참여한 모든 사용자가 채팅방에서 나가게 된다.")
+    @Parameter(name = "chatRoomId", description = "삭제할 채팅방의 식별자", example = "1", required = true)
+    @ApiResponseExplanations(errors = {
+            @ApiExceptionExplanation(value = ChatMemberErrorCode.class, constant = "NOT_FOUND", summary = "채팅방 멤버 정보를 찾을 수 없음"),
+            @ApiExceptionExplanation(value = ChatMemberErrorCode.class, constant = "NOT_ADMIN", summary = "권한 없음", description = "채팅방 방장이 아니라 채팅방을 삭제할 수 없습니다.")
+    })
+    @ApiResponse(responseCode = "200", description = "채팅방 삭제 성공")
+    ResponseEntity<?> deleteChatRoom(@PathVariable("chatRoomId") Long chatRoomId, @AuthenticationPrincipal SecurityUserDetails user);
 }
