@@ -12,4 +12,8 @@ public record ChatRoomDeleteCommand(
             throw new IllegalArgumentException("chatRoomId must not be null");
         }
     }
+
+    public static ChatRoomDeleteCommand of(Long userId, Long chatRoomId) {
+        return new ChatRoomDeleteCommand(userId, chatRoomId);
+    }
 }
