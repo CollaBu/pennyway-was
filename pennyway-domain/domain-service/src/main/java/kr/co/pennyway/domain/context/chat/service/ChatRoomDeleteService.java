@@ -28,5 +28,7 @@ public class ChatRoomDeleteService {
 
         chatMemberRdbService.deleteAllByChatRoomId(chatRoom.getId());
         chatRoomRdbService.delete(chatRoom);
+
+        log.info("채팅방이 삭제되었습니다. chatRoom: {}", chatRoom);
     }
 }
