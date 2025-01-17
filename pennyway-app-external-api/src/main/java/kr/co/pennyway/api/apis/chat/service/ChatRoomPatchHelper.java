@@ -15,14 +15,14 @@ public class ChatRoomPatchHelper {
     private final ChatRoomPatchService chatRoomPatchService;
     private final AwsS3Adapter awsS3Adapter;
 
-    public ChatRoom updateChatRoom(ChatRoomReq.Update request) {
+    public ChatRoom updateChatRoom(Long chatRoomId, ChatRoomReq.Update request) {
         String originImageUrl = null;
         if (request.backgroundImageUrl() != null) {
-            originImageUrl = awsS3Adapter.saveImage(request.backgroundImageUrl(), ActualIdProvider.createInstanceOfChatroomProfile(request.chatRoomId()));
+            originImageUrl = awsS3Adapter.saveImage(request.backgroundImageUrl(), ActualIdProvider.createInstanceOfChatroomProfile(chatRoomId));
         }
 
         Integer password = (request.password() == null) ? null : Integer.valueOf(request.password());
 
-        return chatRoomPatchService.execute(ChatRoomPatchCommand.of(request.chatRoomId(), request.title(), request.description(), originImageUrl, password));
+        return chatRoomPatchService.execute(ChatRoomPatchCommand.of(chatRoomId, request.title(), request.description(), originImageUrl, password));
     }
 }
