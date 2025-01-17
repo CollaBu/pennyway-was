@@ -37,9 +37,6 @@ public final class ChatRoomReq {
 
     @Schema(title = "채팅방 수정 요청 DTO")
     public record Update(
-            @NotNull
-            @Schema(description = "채팅방 ID", example = "1")
-            Long chatRoomId,
             @Size(min = 1, max = 50)
             @Schema(description = "채팅방 제목. NULL 혹은 공백은 허용하지 않으며, 1~50자 이내의 문자열이어야 한다.", example = "페니웨이")
             String title,
