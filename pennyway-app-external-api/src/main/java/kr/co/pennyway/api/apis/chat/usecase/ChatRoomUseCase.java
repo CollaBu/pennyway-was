@@ -57,8 +57,8 @@ public class ChatRoomUseCase {
     }
 
     // 채팅방 자체의 정보 외엔 무의미한 데이터를 반환한다.
-    public ChatRoomRes.Detail updateChatRoom(ChatRoomReq.Update request) {
-        ChatRoom chatRoom = chatRoomPatchHelper.updateChatRoom(request);
+    public ChatRoomRes.Detail updateChatRoom(Long chatRoomId, ChatRoomReq.Update request) {
+        ChatRoom chatRoom = chatRoomPatchHelper.updateChatRoom(chatRoomId, request);
 
         return ChatRoomMapper.toChatRoomResDetail(chatRoom, null, true, 1, 0);
     }

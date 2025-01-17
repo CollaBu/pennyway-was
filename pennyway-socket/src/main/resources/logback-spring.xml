@@ -28,6 +28,16 @@
         </layout>
     </appender>
 
+    <!-- INFO 이상만 허용하는 콘솔 Appender -->
+    <appender name="CONSOLE-INFO-ONLY" class="ch.qos.logback.core.ConsoleAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>INFO</level>
+        </filter>
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>${CONSOLE_LOG_PATTERN}</Pattern>
+        </layout>
+    </appender>
+
     <!-- 파일 출력 설정 -->
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <encoder>
@@ -37,13 +47,11 @@
         <!-- 에러 발생시 무시하도록 설정 -->
         <prudent>true</prudent>
 
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <!-- 롤링된 파일 명명 규칙 -->
             <fileNamePattern>${LOG_PATH}/%d{yyyy-MM-dd}/${LOG_FILE_NAME}.%i.log</fileNamePattern>
-            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-                <!-- 파일당 최대 크기 -->
-                <maxFileSize>${LOG_MAX_FILE_SIZE}</maxFileSize>
-            </timeBasedFileNamingAndTriggeringPolicy>
+            <!-- 파일당 최대 크기 -->
+            <maxFileSize>${LOG_MAX_FILE_SIZE}</maxFileSize>
             <!-- 보관 주기 -->
             <maxHistory>${LOG_MAX_HISTORY}</maxHistory>
             <!-- 총 파일 크기 제한 -->
@@ -56,6 +64,34 @@
         <root level="info">
             <appender-ref ref="CONSOLE"/>
         </root>
+
+        <!-- kr.co.pennyway 패키지에 대한 로그 설정 -->
+        <logger name="kr.co.pennyway" level="debug" additivity="false">
+            <appender-ref ref="CONSOLE"/>
+        </logger>
+
+        <!-- WebSocket 관련 로거 설정 -->
+        <logger name="org.springframework.web.socket" level="debug" additivity="false">
+            <appender-ref ref="CONSOLE"/>
+        </logger>
+
+        <logger name="org.springframework.messaging" level="debug" additivity="false">
+            <appender-ref ref="CONSOLE"/>
+        </logger>
+
+        <!-- 하이버네이트 SQL 쿼리 -->
+        <logger name="org.hibernate.SQL" level="debug" additivity="false">
+            <appender-ref ref="CONSOLE"/>
+        </logger>
+
+        <!-- 트랜잭션 관련 -->
+        <logger name="org.springframework.transaction" level="debug" additivity="false">
+            <appender-ref ref="CONSOLE"/>
+        </logger>
+
+        <logger name="org.springframework.orm.jpa.JpaTransactionManager" level="debug" additivity="false">
+            <appender-ref ref="CONSOLE"/>
+        </logger>
     </springProfile>
 
     <springProfile name="dev">
@@ -63,12 +99,32 @@
             <appender-ref ref="CONSOLE"/>
         </root>
 
+        <!-- kr.co.pennyway 패키지에 대한 로그 설정 -->
+        <logger name="kr.co.pennyway" level="debug" additivity="false">
+            <appender-ref ref="CONSOLE-INFO-ONLY"/>
+            <appender-ref ref="FILE"/>
+        </logger>
+
         <!-- WebSocket 관련 로거 설정 -->
         <logger name="org.springframework.web.socket" level="debug" additivity="false">
             <appender-ref ref="FILE"/>
         </logger>
 
         <logger name="org.springframework.messaging" level="debug" additivity="false">
+            <appender-ref ref="FILE"/>
+        </logger>
+
+        <!-- 하이버네이트 SQL 쿼리 -->
+        <logger name="org.hibernate.SQL" level="debug" additivity="false">
+            <appender-ref ref="FILE"/>
+        </logger>
+
+        <!-- 트랜잭션 관련 -->
+        <logger name="org.springframework.transaction" level="debug" additivity="false">
+            <appender-ref ref="FILE"/>
+        </logger>
+
+        <logger name="org.springframework.orm.jpa.JpaTransactionManager" level="debug" additivity="false">
             <appender-ref ref="FILE"/>
         </logger>
     </springProfile>
@@ -78,12 +134,32 @@
             <appender-ref ref="CONSOLE"/>
         </root>
 
+        <!-- kr.co.pennyway 패키지에 대한 로그 설정 -->
+        <logger name="kr.co.pennyway" level="debug" additivity="false">
+            <appender-ref ref="CONSOLE-INFO-ONLY"/>
+            <appender-ref ref="FILE"/>
+        </logger>
+
         <!-- WebSocket 관련 로거 설정 -->
         <logger name="org.springframework.web.socket" level="debug" additivity="false">
             <appender-ref ref="FILE"/>
         </logger>
 
         <logger name="org.springframework.messaging" level="debug" additivity="false">
+            <appender-ref ref="FILE"/>
+        </logger>
+
+        <!-- 하이버네이트 SQL 쿼리 -->
+        <logger name="org.hibernate.SQL" level="debug" additivity="false">
+            <appender-ref ref="FILE"/>
+        </logger>
+
+        <!-- 트랜잭션 관련 -->
+        <logger name="org.springframework.transaction" level="debug" additivity="false">
+            <appender-ref ref="FILE"/>
+        </logger>
+
+        <logger name="org.springframework.orm.jpa.JpaTransactionManager" level="debug" additivity="false">
             <appender-ref ref="FILE"/>
         </logger>
     </springProfile>
