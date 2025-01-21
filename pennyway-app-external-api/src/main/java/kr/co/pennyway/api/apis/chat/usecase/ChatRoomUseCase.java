@@ -34,6 +34,12 @@ public class ChatRoomUseCase {
         return ChatRoomMapper.toChatRoomResDetail(chatRoom, null, true, 1, 0);
     }
 
+    public ChatRoomRes.AdminView getChatRoom(Long chatRoomId) {
+        ChatRoom chatRoom = chatRoomSearchService.readChatRoom(chatRoomId);
+
+        return ChatRoomMapper.toChatRoomResAdminView(chatRoom);
+    }
+
     public List<ChatRoomRes.Detail> getChatRooms(Long userId) {
         List<ChatRoomRes.Info> chatRooms = chatRoomSearchService.readChatRooms(userId);
 
