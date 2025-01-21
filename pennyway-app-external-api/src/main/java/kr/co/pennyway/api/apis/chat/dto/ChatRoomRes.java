@@ -100,6 +100,30 @@ public final class ChatRoomRes {
         }
     }
 
+    @Schema(description = "채팅방 정보 (어드민용)")
+    public record AdminView(
+            @Schema(description = "채팅방 ID", type = "long")
+            Long id,
+            @Schema(description = "채팅방 제목")
+            String title,
+            @Schema(description = "채팅방 설명")
+            String description,
+            @Schema(description = "채팅방 배경 이미지 URL")
+            String backgroundImageUrl,
+            @Schema(description = "비밀번호")
+            Integer password
+    ) {
+        public static AdminView of(ChatRoom chatRoom) {
+            return new AdminView(
+                    chatRoom.getId(),
+                    chatRoom.getTitle(),
+                    chatRoom.getDescription(),
+                    chatRoom.getBackgroundImageUrl(),
+                    chatRoom.getPassword()
+            );
+        }
+    }
+
     @Schema(description = "채팅방 요약 정보")
     public record Summary(
             @Schema(description = "채팅방 ID 목록. 빈 목록일 경우 빈 배열이 반환된다. 각 요소는 long 타입이다.")
