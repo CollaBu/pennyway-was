@@ -5,7 +5,10 @@ import kr.co.pennyway.api.apis.chat.dto.ChatRoomRes;
 import kr.co.pennyway.domain.context.chat.service.ChatMessageService;
 import kr.co.pennyway.domain.context.chat.service.ChatMessageStatusService;
 import kr.co.pennyway.domain.context.chat.service.ChatRoomService;
+import kr.co.pennyway.domain.domains.chatroom.domain.ChatRoom;
 import kr.co.pennyway.domain.domains.chatroom.dto.ChatRoomDetail;
+import kr.co.pennyway.domain.domains.chatroom.exception.ChatRoomErrorCode;
+import kr.co.pennyway.domain.domains.chatroom.exception.ChatRoomErrorException;
 import kr.co.pennyway.domain.domains.message.domain.ChatMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,6 +47,11 @@ public class ChatRoomSearchService {
         }
 
         return result;
+    }
+
+    @Transactional(readOnly = true)
+    public ChatRoom readChatRoom(Long chatRoomId) {
+        return chatRoomService.readChatRoom(chatRoomId).orElseThrow(() -> new ChatRoomErrorException(ChatRoomErrorCode.NOT_FOUND_CHAT_ROOM));
     }
 
     @Transactional(readOnly = true)
