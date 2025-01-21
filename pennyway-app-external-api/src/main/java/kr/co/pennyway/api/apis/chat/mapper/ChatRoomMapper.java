@@ -93,4 +93,8 @@ public final class ChatRoomMapper {
                 .recentMessages(chatMessagesRes)
                 .build();
     }
+
+    public static ChatRoomRes.AdminView toChatRoomResAdminView(ChatRoom chatRoom) {
+        return ChatRoomRes.AdminView.of(chatRoom);
+    }
 }
