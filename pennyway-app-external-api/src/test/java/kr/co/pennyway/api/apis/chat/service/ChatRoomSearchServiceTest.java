@@ -45,8 +45,8 @@ class ChatRoomSearchServiceTest {
         // given
         Long userId = 1L;
         List<ChatRoomDetail> chatRooms = List.of(
-                new ChatRoomDetail(1L, "Room1", "", "", 123456, LocalDateTime.now(), true, 2),
-                new ChatRoomDetail(2L, "Room2", "", "", null, LocalDateTime.now(), false, 2)
+                new ChatRoomDetail(1L, "Room1", "", "", 123456, LocalDateTime.now(), true, 2, true),
+                new ChatRoomDetail(2L, "Room2", "", "", null, LocalDateTime.now(), false, 2, true)
         );
 
         given(chatRoomService.readChatRoomsByUserId(userId)).willReturn(chatRooms);
@@ -101,8 +101,8 @@ class ChatRoomSearchServiceTest {
         // given
         Long userId = 1L;
         List<ChatRoomDetail> chatRooms = List.of(
-                new ChatRoomDetail(1L, "Room1", "", "", 123456, LocalDateTime.now(), true, 2),
-                new ChatRoomDetail(2L, "Room2", "", "", null, LocalDateTime.now(), false, 2)
+                new ChatRoomDetail(1L, "Room1", "", "", 123456, LocalDateTime.now(), true, 2, true),
+                new ChatRoomDetail(2L, "Room2", "", "", null, LocalDateTime.now(), false, 2, true)
         );
 
         given(chatRoomService.readChatRoomsByUserId(userId)).willReturn(chatRooms);
@@ -124,7 +124,7 @@ class ChatRoomSearchServiceTest {
         // given
         Long userId = 1L;
         List<ChatRoomDetail> chatRooms = List.of(
-                new ChatRoomDetail(1L, "Room1", "", "", 123456, LocalDateTime.now(), true, 2)
+                new ChatRoomDetail(1L, "Room1", "", "", 123456, LocalDateTime.now(), true, 2, true)
         );
 
         InOrder inOrder = inOrder(chatRoomService, chatMessageStatusService, chatMessageService, chatMessageService);
