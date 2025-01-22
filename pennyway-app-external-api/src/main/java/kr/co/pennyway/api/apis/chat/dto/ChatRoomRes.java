@@ -100,6 +100,48 @@ public final class ChatRoomRes {
         }
     }
 
+    @Schema(description = "채팅방 상세 정보 ver.2")
+    public record Detailv2(
+            @Schema(description = "채팅방 ID", type = "long")
+            Long id,
+            @Schema(description = "채팅방 제목")
+            String title,
+            @Schema(description = "채팅방 설명")
+            String description,
+            @Schema(description = "채팅방 배경 이미지 URL")
+            String backgroundImageUrl,
+            @Schema(description = "채팅방 알림 설정")
+            boolean isNotifyEnabled,
+            @Schema(description = "채팅방 비공개 여부")
+            boolean isPrivate,
+            @Schema(description = "어드민 여부. 채팅방의 관리자라면 true, 아니라면 false")
+            boolean isAdmin,
+            @Schema(description = "채팅방 참여자 수")
+            int participantCount,
+            @Schema(description = "채팅방 개설일")
+            @JsonSerialize(using = LocalDateTimeSerializer.class)
+            @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+            LocalDateTime createdAt,
+            @Schema(description = "마지막 메시지 정보. 없을 경우 null이 반환된다.")
+            ChatRes.ChatDetail lastMessage,
+            @Schema(description = "읽지 않은 메시지 수. 100 이상의 값을 가지면, 100으로 표시된다.")
+            long unreadMessageCount
+    ) {
+        public Detailv2(Long id, String title, String description, String backgroundImageUrl, boolean isNotifyEnabled, boolean isPrivate, boolean isAdmin, int participantCount, LocalDateTime createdAt, ChatRes.ChatDetail lastMessage, long unreadMessageCount) {
+            this.id = id;
+            this.title = title;
+            this.description = Objects.toString(description, "");
+            this.backgroundImageUrl = Objects.toString(backgroundImageUrl, "");
+            this.isNotifyEnabled = isNotifyEnabled;
+            this.isPrivate = isPrivate;
+            this.isAdmin = isAdmin;
+            this.participantCount = participantCount;
+            this.createdAt = createdAt;
+            this.lastMessage = lastMessage;
+            this.unreadMessageCount = (unreadMessageCount > 100) ? 100 : unreadMessageCount;
+        }
+    }
+
     @Schema(description = "채팅방 정보 (어드민용)")
     public record AdminView(
             @Schema(description = "채팅방 ID", type = "long")
