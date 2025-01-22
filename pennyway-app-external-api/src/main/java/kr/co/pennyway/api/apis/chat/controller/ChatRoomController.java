@@ -64,6 +64,7 @@ public class ChatRoomController implements ChatRoomApi {
         return ResponseEntity.ok(SuccessResponse.from(CHAT_ROOM, chatRoomUseCase.getChatRoom(chatRoomId)));
     }
 
+    @Override
     @PatchMapping("/{chatRoomId}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> turnOnNotification(@PathVariable("chatRoomId") Long chatRoomId, @AuthenticationPrincipal SecurityUserDetails user) {
@@ -72,6 +73,7 @@ public class ChatRoomController implements ChatRoomApi {
         return ResponseEntity.ok(SuccessResponse.noContent());
     }
 
+    @Override
     @DeleteMapping("/{chatRoomId}/notification")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> turnOffNotification(@PathVariable("chatRoomId") Long chatRoomId, @AuthenticationPrincipal SecurityUserDetails user) {
