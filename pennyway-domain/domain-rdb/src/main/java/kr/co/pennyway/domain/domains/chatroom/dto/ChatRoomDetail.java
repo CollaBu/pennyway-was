@@ -10,6 +10,7 @@ public record ChatRoomDetail(
         Integer password,
         LocalDateTime createdAt,
         boolean isAdmin,
-        int participantCount
+        int participantCount,
+        boolean isNotifyEnabled
 ) {
 }
