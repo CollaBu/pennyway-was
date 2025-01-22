@@ -54,6 +54,16 @@ public interface ChatRoomApi {
     @ApiResponse(responseCode = "200", description = "채팅방 관리자 모드 조회 성공", content = @Content(schemaProperties = @SchemaProperty(name = "chatRoom", schema = @Schema(implementation = ChatRoomRes.AdminView.class))))
     ResponseEntity<?> getChatRoomAdmin(@PathVariable("chatRoomId") Long chatRoomId);
 
+    @Operation(summary = "채팅방 알림 켜기", method = "PATCH", description = "해당 채팅방의 요청자에 한해 알림을 켠다.")
+    @Parameter(name = "chatRoomId", description = "알림 설정을 변경할 채팅방의 식별자", example = "1", required = true)
+    @ApiResponse(responseCode = "200", description = "채팅방 알림 설정 변경 성공")
+    ResponseEntity<?> turnOnNotification(@PathVariable("chatRoomId") Long chatRoomId, @AuthenticationPrincipal SecurityUserDetails user);
+
+    @Operation(summary = "채팅방 알림 크기", method = "DELETE", description = "해당 채팅방의 요청자에 한해 알림을 끈다.")
+    @Parameter(name = "chatRoomId", description = "알림 설정을 해제할 채팅방의 식별자", example = "1", required = true)
+    @ApiResponse(responseCode = "200", description = "채팅방 알림 해제 성공")
+    ResponseEntity<?> turnOffNotification(@PathVariable("chatRoomId") Long chatRoomId, @AuthenticationPrincipal SecurityUserDetails user);
+
     @Operation(summary = "채팅방 수정", method = "PUT", description = "채팅방의 정보를 수정한다. 채팅방의 정보 수정에 성공하면 수정된 채팅방의 상세 정보를 반환한다.")
     @Parameter(name = "chatRoomId", description = "수정할 채팅방의 식별자", example = "1", required = true)
     @ApiResponse(responseCode = "200", description = "채팅방 수정 성공", content = @Content(schemaProperties = @SchemaProperty(name = "chatRoom", schema = @Schema(implementation = ChatRoomRes.Detail.class))))
