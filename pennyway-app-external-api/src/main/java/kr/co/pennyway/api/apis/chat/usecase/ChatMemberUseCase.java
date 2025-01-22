@@ -8,8 +8,10 @@ import kr.co.pennyway.api.apis.chat.service.ChatMemberJoinService;
 import kr.co.pennyway.api.apis.chat.service.ChatMemberSearchService;
 import kr.co.pennyway.common.annotation.UseCase;
 import kr.co.pennyway.domain.context.chat.dto.ChatMemberBanCommand;
+import kr.co.pennyway.domain.context.chat.dto.ChatRoomToggleCommand;
 import kr.co.pennyway.domain.context.chat.service.ChatMemberBanService;
 import kr.co.pennyway.domain.context.chat.service.ChatRoomLeaveService;
+import kr.co.pennyway.domain.context.chat.service.ChatRoomNotificationToggleService;
 import kr.co.pennyway.domain.domains.chatroom.domain.ChatRoom;
 import kr.co.pennyway.domain.domains.member.dto.ChatMemberResult;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +29,7 @@ public class ChatMemberUseCase {
     private final ChatMemberSearchService chatMemberSearchService;
     private final ChatRoomLeaveService chatRoomLeaveService;
     private final ChatMemberBanService chatMemberBanService;
+    private final ChatRoomNotificationToggleService chatRoomNotificationToggleService;
 
     public ChatRoomRes.Detail joinChatRoom(Long userId, Long chatRoomId, Integer password) {
         Triple<ChatRoom, Integer, Long> chatRoom = chatMemberJoinService.execute(userId, chatRoomId, password);
@@ -38,6 +41,14 @@ public class ChatMemberUseCase {
         List<ChatMemberResult.Detail> chatMembers = chatMemberSearchService.readChatMembers(chatRoomId, chatMemberIds);
 
         return ChatMemberMapper.toChatMemberResDetail(chatMembers);
+    }
+
+    public void turnOnNotification(Long userId, Long chatRoomId) {
+        chatRoomNotificationToggleService.turnOn(ChatRoomToggleCommand.of(userId, chatRoomId));
+    }
+
+    public void turnOffNotification(Long userId, Long chatRoomId) {
+        chatRoomNotificationToggleService.turnOff(ChatRoomToggleCommand.of(userId, chatRoomId));
     }
 
     public void leaveChatRoom(Long chatMemberId) {
