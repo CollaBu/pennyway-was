@@ -42,6 +42,7 @@ public class ChatRoom extends DateAuditable {
     private LocalDateTime deletedAt;
 
     @OneToMany(mappedBy = "chatRoom")
+    @SQLRestriction("deleted_at IS NULL")
     private List<ChatMember> chatMembers = new ArrayList<>();
 
     @Builder
