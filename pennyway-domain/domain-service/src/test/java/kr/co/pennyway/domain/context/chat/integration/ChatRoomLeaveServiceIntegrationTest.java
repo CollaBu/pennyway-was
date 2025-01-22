@@ -28,6 +28,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -116,5 +117,27 @@ public class ChatRoomLeaveServiceIntegrationTest extends DomainServiceTestInfraC
         ChatRoom unchangedRoom = chatRoomRepository.findById(chatRoom.getId()).orElseThrow();
         assertNull(unchangedMember.getDeletedAt());
         assertNull(unchangedRoom.getDeletedAt());
+    }
+
+    @Test
+    @Transactional
+    @DisplayName("방장 이외의 멤버가 가입하고 나갔을 때, 남아있는 채팅방 멤버는 한 명이이므로 방장이 나갈 수 있다")
+    void whenNormalMemberJoinsAndLeaves_thenRemainingMemberShouldBeOne() {
+        // given
+        var adminUser = userRepository.save(UserFixture.GENERAL_USER.toUser());
+        var normalUser = userRepository.save(UserFixture.GENERAL_USER.toUser());
+        var chatRoom = chatRoomRepository.save(ChatRoomFixture.PUBLIC_CHAT_ROOM.toEntityWithId(4L));
+
+        var adminMember = chatMemberRepository.save(ChatMember.of(adminUser, chatRoom, ChatMemberRole.ADMIN));
+        var normalMember = ChatMember.of(normalUser, chatRoom, ChatMemberRole.MEMBER);
+        normalMember.leave();
+        normalMember = chatMemberRepository.save(normalMember);
+
+        log.info("chatRoom: {}", chatRoom);
+        log.info("adminMember: {}", adminMember);
+        log.info("normalMember: {}", normalMember);
+
+        // when & then
+        assertDoesNotThrow(() -> chatRoomLeaveService.execute(adminMember.getId()));
     }
 }
