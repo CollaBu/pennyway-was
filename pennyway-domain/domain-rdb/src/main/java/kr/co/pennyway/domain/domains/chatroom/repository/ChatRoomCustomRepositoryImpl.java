@@ -52,8 +52,11 @@ public class ChatRoomCustomRepositoryImpl implements ChatRoomCustomRepository {
         EntityPath<ChatRoom> CHAT_ROOM_ENTITY_PATH = new EntityPathBase<>(ChatRoom.class, "chat_room");
 
         // 사용자가 가입한 방 필터링 서브쿼리
-        JPQLQuery<Long> myRoomsQuery = JPAExpressions
-                .select(Expressions.numberPath(Long.class, Chat_MEMBER_ENTITY_PATH, CHAT_ROOM_ID))
+        JPQLQuery<Tuple> myRoomsQuery = JPAExpressions
+                .select(
+                        Expressions.numberPath(Long.class, Chat_MEMBER_ENTITY_PATH, CHAT_ROOM_ID),
+                        Expressions.booleanPath(Chat_MEMBER_ENTITY_PATH, "notify_enabled").as(NOTIFY_ENABLED)
+                )
                 .from(Chat_MEMBER_ENTITY_PATH)
                 .where(
                         Expressions.numberPath(Long.class, Chat_MEMBER_ENTITY_PATH, "user_id").eq(userId),
@@ -68,8 +71,7 @@ public class ChatRoomCustomRepositoryImpl implements ChatRoomCustomRepository {
                         Expressions.booleanTemplate(
                                 "MAX(CASE WHEN user_id = {0} AND role = '0' THEN true ELSE false END)",
                                 userId
-                        ).as(IS_ADMIN),
-                        Expressions.booleanPath(Chat_MEMBER_ENTITY_PATH, "notify_enabled").as(NOTIFY_ENABLED)
+                        ).as(IS_ADMIN)
                 )
                 .from(Chat_MEMBER_ENTITY_PATH)
                 .where(Expressions.dateTimePath(LocalDateTime.class, Chat_MEMBER_ENTITY_PATH, "deleted_at").isNull())
@@ -91,7 +93,7 @@ public class ChatRoomCustomRepositoryImpl implements ChatRoomCustomRepository {
                         ),
                         Expressions.booleanPath(ROOM_STATS, IS_ADMIN),
                         Expressions.numberPath(Integer.class, ROOM_STATS, MEMBER_COUNT),
-                        Expressions.booleanPath(ROOM_STATS, NOTIFY_ENABLED)
+                        Expressions.booleanPath(MY_ROOMS, NOTIFY_ENABLED)
                 ))
                 .from(CHAT_ROOM_ENTITY_PATH)
                 .innerJoin(myRoomsQuery, MY_ROOMS)
