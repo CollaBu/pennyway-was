@@ -45,6 +45,7 @@ public class ChatRoomCustomRepositoryImpl implements ChatRoomCustomRepository {
         final String CHAT_ROOM_ID = "chat_room_id";
         final String MEMBER_COUNT = "member_count";
         final String IS_ADMIN = "is_admin";
+        final String NOTIFY_ENABLED = "notify_enabled";
 
         // EntityPath 정의
         EntityPath<ChatMember> Chat_MEMBER_ENTITY_PATH = new EntityPathBase<>(ChatMember.class, "chat_member");
@@ -67,7 +68,8 @@ public class ChatRoomCustomRepositoryImpl implements ChatRoomCustomRepository {
                         Expressions.booleanTemplate(
                                 "MAX(CASE WHEN user_id = {0} AND role = '0' THEN true ELSE false END)",
                                 userId
-                        ).as(IS_ADMIN)
+                        ).as(IS_ADMIN),
+                        Expressions.booleanPath(Chat_MEMBER_ENTITY_PATH, "notify_enabled").as(NOTIFY_ENABLED)
                 )
                 .from(Chat_MEMBER_ENTITY_PATH)
                 .where(Expressions.dateTimePath(LocalDateTime.class, Chat_MEMBER_ENTITY_PATH, "deleted_at").isNull())
@@ -88,7 +90,8 @@ public class ChatRoomCustomRepositoryImpl implements ChatRoomCustomRepository {
                                 "createdAt"
                         ),
                         Expressions.booleanPath(ROOM_STATS, IS_ADMIN),
-                        Expressions.numberPath(Integer.class, ROOM_STATS, MEMBER_COUNT)
+                        Expressions.numberPath(Integer.class, ROOM_STATS, MEMBER_COUNT),
+                        Expressions.booleanPath(ROOM_STATS, NOTIFY_ENABLED)
                 ))
                 .from(CHAT_ROOM_ENTITY_PATH)
                 .innerJoin(myRoomsQuery, MY_ROOMS)
@@ -173,7 +176,8 @@ public class ChatRoomCustomRepositoryImpl implements ChatRoomCustomRepository {
                                 "createdAt"
                         ),
                         Expressions.constant(false),
-                        Expressions.numberPath(Integer.class, CM_COUNT, MEMBER_COUNT)
+                        Expressions.numberPath(Integer.class, CM_COUNT, MEMBER_COUNT),
+                        Expressions.constant(false)
                 ))
                 .from(CHAT_ROOM_ENTITY_PATH)
                 .innerJoin(eligibleRoomsQuery, CM)

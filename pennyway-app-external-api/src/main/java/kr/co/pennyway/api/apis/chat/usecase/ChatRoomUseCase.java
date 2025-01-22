@@ -40,10 +40,17 @@ public class ChatRoomUseCase {
         return ChatRoomMapper.toChatRoomResAdminView(chatRoom);
     }
 
+    @Deprecated(since = "2025-01-22")
     public List<ChatRoomRes.Detail> getChatRooms(Long userId) {
         List<ChatRoomRes.Info> chatRooms = chatRoomSearchService.readChatRooms(userId);
 
         return ChatRoomMapper.toChatRoomResDetails(chatRooms);
+    }
+
+    public List<ChatRoomRes.Detailv2> getChatRoomDetails(Long userId) {
+        List<ChatRoomRes.Info> chatRooms = chatRoomSearchService.readChatRooms(userId);
+
+        return ChatRoomMapper.toChatRoomResDetailsV2(chatRooms);
     }
 
     public ChatRoomRes.RoomWithParticipants getChatRoomWithParticipants(Long userId, Long chatRoomId) {

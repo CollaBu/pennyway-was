@@ -70,6 +70,30 @@ public final class ChatRoomMapper {
         return responses;
     }
 
+    public static List<ChatRoomRes.Detailv2> toChatRoomResDetailsV2(List<ChatRoomRes.Info> details) {
+        List<ChatRoomRes.Detailv2> responses = new ArrayList<>();
+
+        for (ChatRoomRes.Info info : details) {
+            responses.add(
+                    new ChatRoomRes.Detailv2(
+                            info.chatRoom().id(),
+                            info.chatRoom().title(),
+                            info.chatRoom().description(),
+                            info.chatRoom().backgroundImageUrl(),
+                            info.chatRoom().isNotifyEnabled(),
+                            info.chatRoom().password() != null,
+                            info.chatRoom().isAdmin(),
+                            info.chatRoom().participantCount(),
+                            info.chatRoom().createdAt(),
+                            info.lastMessage(),
+                            info.unreadMessageCount()
+                    )
+            );
+        }
+
+        return responses;
+    }
+
     public static ChatRoomRes.Detail toChatRoomResDetail(ChatRoom chatRoom, ChatRes.ChatDetail lastMessage, boolean isAdmin, int participantCount, long unreadMessageCount) {
         return ChatRoomRes.Detail.of(chatRoom, lastMessage, isAdmin, participantCount, unreadMessageCount);
     }

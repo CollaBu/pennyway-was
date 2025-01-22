@@ -29,7 +29,7 @@ public interface ChatRoomApi {
     @ApiResponse(responseCode = "200", description = "채팅방 생성 성공", content = @Content(schemaProperties = @SchemaProperty(name = "chatRoom", schema = @Schema(implementation = ChatRoomRes.Detail.class))))
     ResponseEntity<?> createChatRoom(@RequestBody ChatRoomReq.Create request, @AuthenticationPrincipal SecurityUserDetails user);
 
-    @Operation(summary = "가입한 채팅방 목록 조회", method = "GET", description = "사용자가 가입한 채팅방 목록을 조회하며, 정렬 순서는 보장하지 않는다. 최근 활성화된 채팅방의 순서를 지정할 방법에 대해 추가 개선이 필요한 API이므로, 추후 기능이 일부 수정될 수도 있다.")
+    @Operation(summary = "가입한 채팅방 목록 조회", method = "GET", description = "사용자가 가입한 채팅방 목록을 조회하며, 정렬 순서는 보장하지 않는다. 최근 활성화된 채팅방의 순서를 지정할 방법에 대해 추가 개선이 필요한 API이므로, 추후 기능이 일부 수정될 수도 있다.", deprecated = true)
     @Parameter(name = "summary", description = "채팅방 요약 정보 조회 여부. true로 설정하면 채팅방의 상세 정보가 chatRoomIds 필드만 반환된다. (default=false)", example = "false")
     @ApiResponse(responseCode = "200", description = "가입한 채팅방 목록 조회 성공", content = @Content(schemaProperties = @SchemaProperty(name = "chatRooms", array = @ArraySchema(schema = @Schema(implementation = ChatRoomRes.Detail.class)))))
     ResponseEntity<?> getMyChatRooms(@RequestParam(name = "summary", required = false, defaultValue = "false") boolean query, @AuthenticationPrincipal SecurityUserDetails user);
