@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import kr.co.pennyway.domain.common.converter.ChatMemberRoleConverter;
 import kr.co.pennyway.domain.common.model.DateAuditable;
 import kr.co.pennyway.domain.domains.chatroom.domain.ChatRoom;
+import kr.co.pennyway.domain.domains.member.exception.ChatMemberErrorCode;
+import kr.co.pennyway.domain.domains.member.exception.ChatMemberErrorException;
 import kr.co.pennyway.domain.domains.member.type.ChatMemberRole;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import lombok.AccessLevel;
@@ -81,11 +83,11 @@ public class ChatMember extends DateAuditable {
 
     public void delegate(@NonNull ChatMember chatMember) {
         if (chatMember == null || this.equals(chatMember)) {
-            throw new IllegalStateException("chatMember가 null이거나 자기 자신일 수 없습니다.");
+            throw new IllegalArgumentException("chatMember가 null이거나 자기 자신일 수 없습니다.");
         }
 
         if (this.role != ChatMemberRole.ADMIN) {
-            throw new IllegalStateException("방장만 다른 멤버에게 방장 권한을 위임할 수 있습니다.");
+            throw new ChatMemberErrorException(ChatMemberErrorCode.NOT_ADMIN);
         }
 
         this.role = ChatMemberRole.MEMBER;
