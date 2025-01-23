@@ -140,6 +140,7 @@ public class ChatMember extends DateAuditable {
                 ", banned=" + banned +
                 ", notifyEnabled=" + notifyEnabled +
                 ", deletedAt=" + deletedAt +
+                ", role=" + role +
                 '}';
     }
 }
