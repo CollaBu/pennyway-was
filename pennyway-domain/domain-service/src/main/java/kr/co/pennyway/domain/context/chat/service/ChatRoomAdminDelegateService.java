@@ -2,6 +2,7 @@ package kr.co.pennyway.domain.context.chat.service;
 
 import kr.co.pennyway.common.annotation.DomainService;
 import kr.co.pennyway.domain.context.chat.collection.ChatRoomAdminDelegateOperation;
+import kr.co.pennyway.domain.domains.member.domain.ChatMember;
 import kr.co.pennyway.domain.domains.member.exception.ChatMemberErrorCode;
 import kr.co.pennyway.domain.domains.member.exception.ChatMemberErrorException;
 import kr.co.pennyway.domain.domains.member.service.ChatMemberRdbService;
@@ -18,8 +19,11 @@ public class ChatRoomAdminDelegateService {
     @Transactional
     public void execute(Long chatRoomId, Long chatAdminUserId, Long targetChatMemberId) {
         var chatAdmin = chatMemberRdbService.readChatMember(chatAdminUserId, chatRoomId)
+                .filter(ChatMember::isActive)
                 .orElseThrow(() -> new ChatMemberErrorException(ChatMemberErrorCode.NOT_FOUND));
+
         var targetMember = chatMemberRdbService.readChatMemberByChatMemberId(targetChatMemberId)
+                .filter(ChatMember::isActive)
                 .orElseThrow(() -> new ChatMemberErrorException(ChatMemberErrorCode.NOT_FOUND));
 
         new ChatRoomAdminDelegateOperation(chatAdmin, targetMember).execute();
