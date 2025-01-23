@@ -19,10 +19,10 @@ public class ChatRoomLeaveService {
     private final ChatRoomRdbService chatRoomRdbService;
 
     @Transactional
-    public void execute(Long chatMemberId) {
-        ChatMember chatMember = chatMemberRdbService.readChatMemberByChatMemberId(chatMemberId)
+    public void execute(Long userId, Long chatRoomId) {
+        ChatMember chatMember = chatMemberRdbService.readChatMember(userId, chatRoomId)
                 .orElseThrow(() -> {
-                    log.warn("채팅방 멤버를 찾을 수 없습니다. chatMemberId: {}", chatMemberId);
+                    log.warn("{}번 방에서 {}번 사용자의 채팅방 멤버 정보를를 찾을 수 없습니다.", chatRoomId, userId);
                     return new ChatMemberErrorException(ChatMemberErrorCode.NOT_FOUND);
                 });
 
