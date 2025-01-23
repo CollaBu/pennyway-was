@@ -67,7 +67,7 @@ public class ChatRoomLeaveServiceIntegrationTest extends DomainServiceTestInfraC
         ChatMember normalMember = chatMemberRepository.save(ChatMember.of(user, chatRoom, ChatMemberRole.MEMBER));
 
         // when
-        chatRoomLeaveService.execute(normalMember.getId());
+        chatRoomLeaveService.execute(user.getId(), chatRoom.getId());
 
         // then
         ChatMember deletedMember = chatMemberRepository.findById(normalMember.getId()).orElseThrow();
@@ -86,7 +86,7 @@ public class ChatRoomLeaveServiceIntegrationTest extends DomainServiceTestInfraC
         ChatMember adminMember = chatMemberRepository.save(ChatMember.of(user, chatRoom, ChatMemberRole.ADMIN));
 
         // when
-        chatRoomLeaveService.execute(adminMember.getId());
+        chatRoomLeaveService.execute(user.getId(), chatRoom.getId());
 
         // then
         ChatMember deletedMember = chatMemberRepository.findById(adminMember.getId()).orElseThrow();
@@ -108,7 +108,7 @@ public class ChatRoomLeaveServiceIntegrationTest extends DomainServiceTestInfraC
         chatMemberRepository.save(ChatMember.of(normalUser, chatRoom, ChatMemberRole.MEMBER));
 
         // when & then
-        assertThatThrownBy(() -> chatRoomLeaveService.execute(adminMember.getId()))
+        assertThatThrownBy(() -> chatRoomLeaveService.execute(adminUser.getId(), chatRoom.getId()))
                 .isInstanceOf(ChatMemberErrorException.class)
                 .hasFieldOrPropertyWithValue("chatMemberErrorCode", ChatMemberErrorCode.ADMIN_CANNOT_LEAVE);
 
@@ -138,6 +138,6 @@ public class ChatRoomLeaveServiceIntegrationTest extends DomainServiceTestInfraC
         log.info("normalMember: {}", normalMember);
 
         // when & then
-        assertDoesNotThrow(() -> chatRoomLeaveService.execute(adminMember.getId()));
+        assertDoesNotThrow(() -> chatRoomLeaveService.execute(adminUser.getId(), chatRoom.getId()));
     }
 }
