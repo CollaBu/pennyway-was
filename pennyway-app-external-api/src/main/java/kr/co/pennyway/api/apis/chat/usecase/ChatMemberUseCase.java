@@ -43,8 +43,8 @@ public class ChatMemberUseCase {
         return ChatMemberMapper.toChatMemberResDetail(chatMembers);
     }
 
-    public void leaveChatRoom(Long chatMemberId) {
-        chatRoomLeaveService.execute(chatMemberId);
+    public void leaveChatRoom(Long userId, Long chatRoomId) {
+        chatRoomLeaveService.execute(userId, chatRoomId);
     }
 
     public void banChatMember(Long userId, Long targetMemberId, Long chatRoomId) {
