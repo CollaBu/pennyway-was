@@ -26,7 +26,7 @@ public record ChatRoomPatchCommand(
             throw new IllegalArgumentException("채팅방 비밀번호는 Null 혹은, 6자리 정수여야 합니다.");
         }
 
-        if (backgroundImageUrl != null && backgroundImageUrl.startsWith("chatroom/")) {
+        if (backgroundImageUrl != null && !backgroundImageUrl.startsWith("chatroom/")) {
             throw new IllegalArgumentException("채팅방 배경 이미지 URL은 'chatroom/' 으로 시작해야 합니다.");
         }
     }

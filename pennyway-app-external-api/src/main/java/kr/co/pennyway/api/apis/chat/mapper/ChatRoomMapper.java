@@ -25,7 +25,7 @@ public final class ChatRoomMapper {
      * @param pageable
      * @return
      */
-    public static SliceResponseTemplate<ChatRoomRes.Detail> toChatRoomResDetails(Slice<ChatRoomDetail> details, Pageable pageable) {
+    public static SliceResponseTemplate<ChatRoomRes.Detail> toChatRoomResDetails(Slice<ChatRoomDetail> details, Pageable pageable, String objectPrefix) {
         List<ChatRoomRes.Detail> contents = new ArrayList<>();
         for (ChatRoomDetail detail : details.getContent()) {
             contents.add(
@@ -33,7 +33,7 @@ public final class ChatRoomMapper {
                             detail.id(),
                             detail.title(),
                             detail.description(),
-                            detail.backgroundImageUrl(),
+                            createBackGroundImageUrl(detail.backgroundImageUrl(), objectPrefix),
                             detail.password() != null,
                             detail.isAdmin(),
                             detail.participantCount(),
@@ -47,7 +47,7 @@ public final class ChatRoomMapper {
         return SliceResponseTemplate.of(contents, pageable, contents.size(), details.hasNext());
     }
 
-    public static List<ChatRoomRes.Detail> toChatRoomResDetails(List<ChatRoomRes.Info> details) {
+    public static List<ChatRoomRes.Detail> toChatRoomResDetails(List<ChatRoomRes.Info> details, String objectPrefix) {
         List<ChatRoomRes.Detail> responses = new ArrayList<>();
 
         for (ChatRoomRes.Info info : details) {
@@ -56,7 +56,7 @@ public final class ChatRoomMapper {
                             info.chatRoom().id(),
                             info.chatRoom().title(),
                             info.chatRoom().description(),
-                            info.chatRoom().backgroundImageUrl(),
+                            createBackGroundImageUrl(info.chatRoom().backgroundImageUrl(), objectPrefix),
                             info.chatRoom().password() != null,
                             info.chatRoom().isAdmin(),
                             info.chatRoom().participantCount(),
@@ -70,7 +70,7 @@ public final class ChatRoomMapper {
         return responses;
     }
 
-    public static List<ChatRoomRes.Detailv2> toChatRoomResDetailsV2(List<ChatRoomRes.Info> details) {
+    public static List<ChatRoomRes.Detailv2> toChatRoomResDetailsV2(List<ChatRoomRes.Info> details, String objectPrefix) {
         List<ChatRoomRes.Detailv2> responses = new ArrayList<>();
 
         for (ChatRoomRes.Info info : details) {
@@ -79,7 +79,7 @@ public final class ChatRoomMapper {
                             info.chatRoom().id(),
                             info.chatRoom().title(),
                             info.chatRoom().description(),
-                            info.chatRoom().backgroundImageUrl(),
+                            createBackGroundImageUrl(info.chatRoom().backgroundImageUrl(), objectPrefix),
                             info.chatRoom().isNotifyEnabled(),
                             info.chatRoom().password() != null,
                             info.chatRoom().isAdmin(),
@@ -94,8 +94,19 @@ public final class ChatRoomMapper {
         return responses;
     }
 
-    public static ChatRoomRes.Detail toChatRoomResDetail(ChatRoom chatRoom, ChatRes.ChatDetail lastMessage, boolean isAdmin, int participantCount, long unreadMessageCount) {
-        return ChatRoomRes.Detail.of(chatRoom, lastMessage, isAdmin, participantCount, unreadMessageCount);
+    public static ChatRoomRes.Detail toChatRoomResDetail(ChatRoom chatRoom, ChatRes.ChatDetail lastMessage, boolean isAdmin, int participantCount, long unreadMessageCount, String objectPrefix) {
+        return new ChatRoomRes.Detail(
+                chatRoom.getId(),
+                chatRoom.getTitle(),
+                chatRoom.getDescription(),
+                createBackGroundImageUrl(chatRoom.getBackgroundImageUrl(), objectPrefix),
+                chatRoom.getPassword() != null,
+                isAdmin,
+                participantCount,
+                chatRoom.getCreatedAt(),
+                lastMessage,
+                unreadMessageCount
+        );
     }
 
     public static ChatRoomRes.RoomWithParticipants toChatRoomResRoomWithParticipants(ChatMemberResult.Detail myInfo, List<ChatMemberResult.Detail> recentParticipants, List<ChatMemberResult.Summary> otherParticipants, List<ChatMessage> chatMessages) {
@@ -120,5 +131,9 @@ public final class ChatRoomMapper {
 
     public static ChatRoomRes.AdminView toChatRoomResAdminView(ChatRoom chatRoom) {
         return ChatRoomRes.AdminView.of(chatRoom);
+    }
+
+    private static String createBackGroundImageUrl(String chatRoomBackgroundImage, String objectPrefix) {
+        return (chatRoomBackgroundImage == null) ? "" : objectPrefix + chatRoomBackgroundImage;
     }
 }

@@ -46,6 +46,16 @@ public class AwsS3Adapter {
         awsS3Provider.deleteObject(key);
     }
 
+    /**
+     * Image URL에 해당하는 Object가 존재하는지 확인합니다.
+     */
+    public boolean isObjectExist(String imageUrl) {
+        return awsS3Provider.isObjectExist(imageUrl);
+    }
+
+    /**
+     * S3에 저장된 Object의 Prefix를 반환합니다.
+     */
     public String getObjectPrefix() {
         return awsS3Provider.getObjectPrefix();
     }

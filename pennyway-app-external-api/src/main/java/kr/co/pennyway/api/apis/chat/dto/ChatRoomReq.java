@@ -21,7 +21,6 @@ public final class ChatRoomReq {
             @Pattern(regexp = "^[0-9]{6}$", message = "채팅방 비밀번호는 6자리 정수여야 합니다.")
             String password,
             @Schema(description = "채팅방 배경 이미지 URL. NULL을 허용한다.", example = "delete/chatroom/{chatroom_id}/{uuid}_{timestamp}.{ext}")
-            @Pattern(regexp = "^delete/.*", message = "채팅방 배경 이미지 URL은 delete/로 시작해야 합니다.")
             String backgroundImageUrl
     ) {
         public ChatRoom toEntity(long chatRoomId, String originImageUrl) {
@@ -46,8 +45,7 @@ public final class ChatRoomReq {
             @Schema(description = "채팅방 비밀번호. NULL을 허용한다. 비밀번호는 6자리 정수만 허용", example = "123456")
             @Pattern(regexp = "^[0-9]{6}$", message = "채팅방 비밀번호는 6자리 정수여야 합니다.")
             String password,
-            @Schema(description = "채팅방 배경 이미지 URL. NULL을 허용한다.", example = "delete/chatroom/{chatroom_id}/{uuid}_{timestamp}.{ext}")
-            @Pattern(regexp = "^delete/.*", message = "채팅방 배경 이미지 URL은 delete/로 시작해야 합니다.")
+            @Schema(description = "채팅방 배경 이미지 URL은 신규 등록 혹은 수정의 경우 delete/로 시작해야 하며, 기존 이미지를 유지할 경우 https://cdn.dev.pennyway.co.kr/chatroom/로 시작해야 합니다. (없으면 NULL을 허용합니다.)", example = "delete/chatroom/{chatroom_id}/{uuid}_{timestamp}.{ext}")
             String backgroundImageUrl
     ) {
     }

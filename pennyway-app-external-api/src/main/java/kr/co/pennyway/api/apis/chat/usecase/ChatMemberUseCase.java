@@ -6,6 +6,7 @@ import kr.co.pennyway.api.apis.chat.mapper.ChatMemberMapper;
 import kr.co.pennyway.api.apis.chat.mapper.ChatRoomMapper;
 import kr.co.pennyway.api.apis.chat.service.ChatMemberJoinService;
 import kr.co.pennyway.api.apis.chat.service.ChatMemberSearchService;
+import kr.co.pennyway.api.common.storage.AwsS3Adapter;
 import kr.co.pennyway.common.annotation.UseCase;
 import kr.co.pennyway.domain.context.chat.dto.ChatMemberBanCommand;
 import kr.co.pennyway.domain.context.chat.service.ChatMemberBanService;
@@ -28,10 +29,12 @@ public class ChatMemberUseCase {
     private final ChatRoomLeaveService chatRoomLeaveService;
     private final ChatMemberBanService chatMemberBanService;
 
+    private final AwsS3Adapter awsS3Adapter;
+
     public ChatRoomRes.Detail joinChatRoom(Long userId, Long chatRoomId, Integer password) {
         Triple<ChatRoom, Integer, Long> chatRoom = chatMemberJoinService.execute(userId, chatRoomId, password);
 
-        return ChatRoomMapper.toChatRoomResDetail(chatRoom.getLeft(), null, false, chatRoom.getMiddle(), chatRoom.getRight());
+        return ChatRoomMapper.toChatRoomResDetail(chatRoom.getLeft(), null, false, chatRoom.getMiddle(), chatRoom.getRight(), awsS3Adapter.getObjectPrefix());
     }
 
     public List<ChatMemberRes.MemberDetail> readChatMembers(Long chatRoomId, Set<Long> chatMemberIds) {
