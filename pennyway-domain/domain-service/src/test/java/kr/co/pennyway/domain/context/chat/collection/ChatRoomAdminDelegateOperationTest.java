@@ -15,14 +15,15 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ChatRoomAdminDelegateOperationTest {
-    private ChatRoom chatRoom = ChatRoomFixture.PUBLIC_CHAT_ROOM.toEntity();
 
     @Test
     @DisplayName("방장은 다른 멤버에게 방장 권한을 위임할 수 있다")
     void shouldDelegateAdmin() {
         // given
-        var chatAdmin = createChatMember(1L, 1L, ChatMemberRole.ADMIN);
-        var chatMember = createChatMember(2L, 2L, ChatMemberRole.MEMBER);
+        var chatRoom = ChatRoomFixture.PUBLIC_CHAT_ROOM.toEntity();
+
+        var chatAdmin = createChatMember(1L, 1L, ChatMemberRole.ADMIN, chatRoom);
+        var chatMember = createChatMember(2L, 2L, ChatMemberRole.MEMBER, chatRoom);
 
         var operation = new ChatRoomAdminDelegateOperation(chatAdmin, chatMember);
 
@@ -38,8 +39,10 @@ public class ChatRoomAdminDelegateOperationTest {
     @DisplayName("방장이 아닌 멤버는 방장 권한을 위임할 수 없다")
     void shouldNotDelegateAdmin() {
         // given
-        var chatAdmin = createChatMember(1L, 1L, ChatMemberRole.MEMBER);
-        var chatMember = createChatMember(2L, 2L, ChatMemberRole.MEMBER);
+        var chatRoom = ChatRoomFixture.PUBLIC_CHAT_ROOM.toEntity();
+
+        var chatAdmin = createChatMember(1L, 1L, ChatMemberRole.MEMBER, chatRoom);
+        var chatMember = createChatMember(2L, 2L, ChatMemberRole.MEMBER, chatRoom);
 
         var operation = new ChatRoomAdminDelegateOperation(chatAdmin, chatMember);
 
@@ -53,7 +56,8 @@ public class ChatRoomAdminDelegateOperationTest {
     @DisplayName("방장은 자기자신에게 방장 권한을 위임할 수 없다")
     void shouldNotDelegateAdminToSelf() {
         // given
-        var chatAdmin = createChatMember(1L, 1L, ChatMemberRole.ADMIN);
+        var chatRoom = ChatRoomFixture.PUBLIC_CHAT_ROOM.toEntity();
+        var chatAdmin = createChatMember(1L, 1L, ChatMemberRole.ADMIN, chatRoom);
 
         var operation = new ChatRoomAdminDelegateOperation(chatAdmin, chatAdmin);
 
@@ -62,7 +66,24 @@ public class ChatRoomAdminDelegateOperationTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    private ChatMember createChatMember(Long userId, Long chatMemberId, ChatMemberRole role) {
+    @Test
+    @DisplayName("다른 채팅방의 멤버에게 방장 권한을 위임할 수 없다")
+    void shouldNotDelegateAdminToMemberInOtherChatRoom() {
+        // given
+        var chatRoom = ChatRoomFixture.PUBLIC_CHAT_ROOM.toEntityWithId(1L);
+        var otherChatRoom = ChatRoomFixture.PUBLIC_CHAT_ROOM.toEntityWithId(2L);
+
+        var chatAdmin = createChatMember(1L, 1L, ChatMemberRole.ADMIN, chatRoom);
+        var chatMember = createChatMember(2L, 2L, ChatMemberRole.MEMBER, otherChatRoom);
+
+        var operation = new ChatRoomAdminDelegateOperation(chatAdmin, chatMember);
+
+        // when & then
+        assertThatThrownBy(operation::execute)
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    private ChatMember createChatMember(Long userId, Long chatMemberId, ChatMemberRole role, ChatRoom chatRoom) {
         var user = UserFixture.GENERAL_USER.toUser();
         ReflectionTestUtils.setField(user, "id", userId);
 
