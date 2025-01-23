@@ -54,10 +54,10 @@ public class ChatMemberController implements ChatMemberApi {
     }
 
     @Override
-    @DeleteMapping("/{chatMemberId}")
-    @PreAuthorize("isAuthenticated() and @chatRoomManager.hasPermission(principal.userId, #chatRoomId, #chatMemberId)")
-    public ResponseEntity<?> leaveChatRoom(@PathVariable("chatRoomId") Long chatRoomId, @PathVariable("chatMemberId") Long chatMemberId) {
-        chatMemberUseCase.leaveChatRoom(chatMemberId);
+    @DeleteMapping("")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> leaveChatRoom(@PathVariable("chatRoomId") Long chatRoomId, @AuthenticationPrincipal SecurityUserDetails user) {
+        chatMemberUseCase.leaveChatRoom(user.getUserId(), chatRoomId);
 
         return ResponseEntity.ok(SuccessResponse.noContent());
     }
