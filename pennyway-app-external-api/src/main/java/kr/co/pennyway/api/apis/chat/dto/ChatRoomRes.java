@@ -68,36 +68,6 @@ public final class ChatRoomRes {
             this.lastMessage = lastMessage;
             this.unreadMessageCount = (unreadMessageCount > 100) ? 100 : unreadMessageCount;
         }
-
-        public static Detail of(ChatRoom chatRoom, ChatRes.ChatDetail lastMessage, boolean isAdmin, int participantCount, long unreadMessageCount) {
-            return new Detail(
-                    chatRoom.getId(),
-                    chatRoom.getTitle(),
-                    chatRoom.getDescription(),
-                    chatRoom.getBackgroundImageUrl(),
-                    chatRoom.getPassword() != null,
-                    isAdmin,
-                    participantCount,
-                    chatRoom.getCreatedAt(),
-                    lastMessage,
-                    unreadMessageCount
-            );
-        }
-
-        public static Detail from(ChatRoomRes.Info info) {
-            return new Detail(
-                    info.chatRoom().id(),
-                    info.chatRoom().title(),
-                    info.chatRoom().description(),
-                    info.chatRoom().backgroundImageUrl(),
-                    info.chatRoom().password() != null,
-                    info.chatRoom().isAdmin(),
-                    info.chatRoom().participantCount(),
-                    info.chatRoom().createdAt(),
-                    info.lastMessage(),
-                    info.unreadMessageCount()
-            );
-        }
     }
 
     @Schema(description = "채팅방 상세 정보 ver.2")
