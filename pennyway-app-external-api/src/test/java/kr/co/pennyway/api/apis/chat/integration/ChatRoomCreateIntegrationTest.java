@@ -55,7 +55,8 @@ public class ChatRoomCreateIntegrationTest extends ExternalApiDBTestConfig {
         // given
         User user = userService.createUser(UserFixture.GENERAL_USER.toUser());
         ChatRoomReq.Create request = ChatRoomFixture.PRIVATE_CHAT_ROOM.toCreateRequest();
-        given(awsS3Adapter.saveImage(eq(request.backgroundImageUrl()), any(ActualIdProvider.class))).willReturn("chatroom/1");
+        given(awsS3Adapter.saveImage(eq(request.backgroundImageUrl()), any(ActualIdProvider.class))).willReturn(ChatRoomFixture.getOriginImageUrl());
+        given(awsS3Adapter.getObjectPrefix()).willReturn("https://cdn.test.com/");
 
         // when
         ResponseEntity<SuccessResponse<Map<String, ChatRoomRes.Detail>>> response = postCreating(user, request);
@@ -65,7 +66,7 @@ public class ChatRoomCreateIntegrationTest extends ExternalApiDBTestConfig {
         Assertions.assertEquals(HttpStatus.OK, response.getStatusCode(), "200 OK 응답을 받아야 합니다.");
         Assertions.assertEquals(request.title(), detail.title(), "생성된 채팅방의 제목이 일치해야 합니다.");
         Assertions.assertEquals(request.description(), detail.description(), "생성된 채팅방의 설명이 일치해야 합니다.");
-        Assertions.assertEquals("chatroom/1", detail.backgroundImageUrl(), "생성된 채팅방의 배경 이미지 URL이 일치해야 합니다.");
+        Assertions.assertEquals("https://cdn.test.com/" + ChatRoomFixture.getOriginImageUrl(), detail.backgroundImageUrl(), "생성된 채팅방의 배경 이미지 URL이 일치해야 합니다.");
         Assertions.assertTrue(detail.isPrivate(), "생성된 채팅방은 비공개여야 합니다.");
     }
 
