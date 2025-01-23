@@ -1,6 +1,7 @@
 package kr.co.pennyway.api.apis.chat.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import kr.co.pennyway.api.apis.chat.dto.ChatRes;
 import kr.co.pennyway.api.apis.chat.dto.ChatRoomReq;
 import kr.co.pennyway.api.apis.chat.dto.ChatRoomRes;
 import kr.co.pennyway.api.apis.chat.usecase.ChatRoomUseCase;
@@ -52,7 +53,7 @@ public class ChatRoomSaveControllerUnitTest {
         // given
         ChatRoom fixture = ChatRoomFixture.PRIVATE_CHAT_ROOM.toEntity(1L);
         ChatRoomReq.Create request = ChatRoomFixture.PRIVATE_CHAT_ROOM.toCreateRequest();
-        given(chatRoomUseCase.createChatRoom(request, 1L)).willReturn(ChatRoomRes.Detail.of(fixture, null, true, 1, 10));
+        given(chatRoomUseCase.createChatRoom(request, 1L)).willReturn(createChatRoomResponse(fixture, null, true, 1, 10));
 
         // when
         ResultActions result = performPostChatRoom(request);
@@ -70,7 +71,7 @@ public class ChatRoomSaveControllerUnitTest {
         ChatRoom fixture = ChatRoomFixture.PUBLIC_CHAT_ROOM.toEntity(1L);
         ChatRoomReq.Create request = ChatRoomFixture.PUBLIC_CHAT_ROOM.toCreateRequest();
 
-        given(chatRoomUseCase.createChatRoom(request, 1L)).willReturn(ChatRoomRes.Detail.of(fixture, null, true, 1, 10));
+        given(chatRoomUseCase.createChatRoom(request, 1L)).willReturn(createChatRoomResponse(fixture, null, true, 1, 10));
 
         // when
         ResultActions result = performPostChatRoom(request);
@@ -99,5 +100,20 @@ public class ChatRoomSaveControllerUnitTest {
         return mockMvc.perform(MockMvcRequestBuilders.post("/v2/chat-rooms")
                 .contentType("application/json")
                 .content(objectMapper.writeValueAsString(request)));
+    }
+
+    private ChatRoomRes.Detail createChatRoomResponse(ChatRoom chatRoom, ChatRes.ChatDetail lastMessage, boolean isAdmin, int participantCount, long unreadMessageCount) {
+        return new ChatRoomRes.Detail(
+                chatRoom.getId(),
+                chatRoom.getTitle(),
+                chatRoom.getDescription(),
+                chatRoom.getBackgroundImageUrl(),
+                chatRoom.getPassword() != null,
+                isAdmin,
+                participantCount,
+                chatRoom.getCreatedAt(),
+                lastMessage,
+                unreadMessageCount
+        );
     }
 }
