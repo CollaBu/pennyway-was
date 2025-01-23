@@ -6,6 +6,7 @@ import kr.co.pennyway.api.config.fixture.ChatRoomFixture;
 import kr.co.pennyway.domain.context.chat.service.ChatRoomPatchService;
 import kr.co.pennyway.domain.context.chat.service.ChatRoomService;
 import kr.co.pennyway.domain.domains.chatroom.domain.ChatRoom;
+import kr.co.pennyway.infra.common.exception.StorageException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -130,7 +131,6 @@ class ChatRoomPatchHelperTest {
         ChatRoomReq.Update request = new ChatRoomReq.Update("title", "desc", null, "invalid/path/image.jpg");
 
         // when & then
-        assertThrows(IllegalArgumentException.class,
-                () -> chatRoomPatchHelper.updateChatRoom(CHATROOM_ID, request));
+        assertThrows(StorageException.class, () -> chatRoomPatchHelper.updateChatRoom(CHATROOM_ID, request));
     }
 }

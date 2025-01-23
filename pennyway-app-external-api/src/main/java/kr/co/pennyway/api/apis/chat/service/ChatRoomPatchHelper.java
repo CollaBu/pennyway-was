@@ -13,7 +13,9 @@ import kr.co.pennyway.infra.client.aws.s3.ActualIdProvider;
 import kr.co.pennyway.infra.common.exception.StorageErrorCode;
 import kr.co.pennyway.infra.common.exception.StorageException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Helper
 @RequiredArgsConstructor
 public class ChatRoomPatchHelper {
@@ -42,6 +44,7 @@ public class ChatRoomPatchHelper {
      */
     private String updateImage(String currentImageUrl, String requestImageUrl, Long chatRoomId) {
         if (currentImageUrl != null && shouldDeleteCurrentImage(requestImageUrl)) { // 현재 이미지가 있고, 다른 이미지(null 혹은 신규)로 변경하는 경우, 현재 이미지 삭제
+            log.info("현재 이미지 삭제: {}", currentImageUrl);
             awsS3Adapter.deleteImage(currentImageUrl);
         }
 
@@ -49,24 +52,29 @@ public class ChatRoomPatchHelper {
     }
 
     private boolean shouldDeleteCurrentImage(String requestImageUrl) {
-        return requestImageUrl == null || requestImageUrl.contains("/delete/");
+        return requestImageUrl == null || requestImageUrl.startsWith("delete/");
     }
 
     private String processRequestImage(String requestImageUrl, Long chatRoomId) {
         if (requestImageUrl == null) {
+            log.info("{}번 채팅방 신규 이미지 없음", chatRoomId);
+
             return null;
         }
 
-        if (requestImageUrl.contains("/delete/")) {
+        if (requestImageUrl.startsWith("delete/")) {
+            log.info("{}번 채팅방 신규 이미지 등록 요청: {}", chatRoomId, requestImageUrl);
+
             return awsS3Adapter.saveImage(requestImageUrl, ActualIdProvider.createInstanceOfChatroomProfile(chatRoomId));
         }
 
-        if (requestImageUrl.contains(awsS3Adapter.getObjectPrefix())) {
+        if (requestImageUrl.startsWith(awsS3Adapter.getObjectPrefix())) {
             validateExistingImage(requestImageUrl);
-            return requestImageUrl;
+
+            return requestImageUrl.substring(awsS3Adapter.getObjectPrefix().length());
         }
 
-        throw new IllegalArgumentException("Invalid image URL format: " + requestImageUrl);
+        throw new StorageException(StorageErrorCode.INVALID_IMAGE_PATH);
     }
 
     private void validateExistingImage(String imageUrl) {
