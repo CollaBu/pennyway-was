@@ -12,6 +12,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
+import org.springframework.lang.NonNull;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -76,6 +77,19 @@ public class ChatMember extends DateAuditable {
 
         chatRoom.getChatMembers().add(this);
         this.chatRoom = chatRoom;
+    }
+
+    public void delegate(@NonNull ChatMember chatMember) {
+        if (chatMember == null || this.equals(chatMember)) {
+            throw new IllegalStateException("chatMember가 null이거나 자기 자신일 수 없습니다.");
+        }
+
+        if (this.role != ChatMemberRole.ADMIN) {
+            throw new IllegalStateException("방장만 다른 멤버에게 방장 권한을 위임할 수 있습니다.");
+        }
+
+        this.role = ChatMemberRole.MEMBER;
+        chatMember.role = ChatMemberRole.ADMIN;
     }
 
     /**
