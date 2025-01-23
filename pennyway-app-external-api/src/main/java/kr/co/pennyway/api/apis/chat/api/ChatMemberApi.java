@@ -64,15 +64,12 @@ public interface ChatMemberApi {
     ResponseEntity<?> readChatMembers(@PathVariable("chatRoomId") Long chatRoomId, @Validated @NotEmpty @RequestParam("ids") Set<Long> ids);
 
     @Operation(summary = "채팅방 멤버 탈퇴", method = "DELETE", description = "채팅방에서 탈퇴한다. 채팅방장은 채팅 멤버가 한 명이라도 남아있으면 탈퇴할 수 없으며, 채팅방장이 탈퇴할 경우 채팅방이 삭제된다.")
-    @Parameters({
-            @Parameter(name = "chatRoomId", description = "채팅방 ID", required = true, in = ParameterIn.PATH),
-            @Parameter(name = "chatMemberId", description = "채팅방 멤버 ID (user id가 아님)", required = true, in = ParameterIn.PATH)
-    })
+    @Parameter(name = "chatRoomId", description = "채팅방 ID", required = true, in = ParameterIn.PATH)
     @ApiResponseExplanations(errors = {
             @ApiExceptionExplanation(value = ChatMemberErrorCode.class, constant = "ADMIN_CANNOT_LEAVE", summary = "채팅방장은 탈퇴할 수 없음", description = "채팅방장은 채팅방 멤버 탈퇴에 실패했습니다.")}
     )
     @ApiResponse(responseCode = "200", description = "채팅방 멤버 탈퇴 성공")
-    ResponseEntity<?> leaveChatRoom(@PathVariable("chatRoomId") Long chatRoomId, @PathVariable("chatMemberId") Long chatMemberId);
+    ResponseEntity<?> leaveChatRoom(@PathVariable("chatRoomId") Long chatRoomId, @AuthenticationPrincipal SecurityUserDetails user);
 
     @Operation(summary = "채팅방 멤버 추방", method = "DELETE", description = "채팅방 멤버를 추방한다. 채팅방장만이 채팅방 멤버를 추방할 수 있다.")
     @Parameters({
