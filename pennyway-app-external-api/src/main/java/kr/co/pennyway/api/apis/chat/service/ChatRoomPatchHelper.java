@@ -24,12 +24,12 @@ public class ChatRoomPatchHelper {
     private final AwsS3Adapter awsS3Adapter;
 
     public ChatRoom updateChatRoom(Long chatRoomId, ChatRoomReq.Update request) {
-        ChatRoom currentChatRoom = chatRoomService.readChatRoom(chatRoomId)
+        var currentChatRoom = chatRoomService.readChatRoom(chatRoomId)
                 .orElseThrow(() -> new ChatRoomErrorException(ChatRoomErrorCode.NOT_FOUND_CHAT_ROOM));
 
-        String originImageUrl = updateImage(currentChatRoom.getBackgroundImageUrl(), request.backgroundImageUrl(), chatRoomId);
+        var originImageUrl = updateImage(currentChatRoom.getBackgroundImageUrl(), request.backgroundImageUrl(), chatRoomId);
 
-        Integer password = (request.password() == null) ? null : Integer.valueOf(request.password());
+        var password = (request.password() == null) ? null : Integer.valueOf(request.password());
 
         return chatRoomPatchService.execute(ChatRoomPatchCommand.of(chatRoomId, request.title(), request.description(), originImageUrl, password));
     }
