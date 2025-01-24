@@ -1,6 +1,7 @@
 package kr.co.pennyway.domain.context.chat.service;
 
 import kr.co.pennyway.common.annotation.DomainService;
+import kr.co.pennyway.domain.common.annotation.DistributedLock;
 import kr.co.pennyway.domain.context.chat.collection.ChatRoomAdminDelegateOperation;
 import kr.co.pennyway.domain.domains.member.domain.ChatMember;
 import kr.co.pennyway.domain.domains.member.exception.ChatMemberErrorCode;
@@ -17,6 +18,7 @@ public class ChatRoomAdminDelegateService {
     private final ChatMemberRdbService chatMemberRdbService;
 
     @Transactional
+    @DistributedLock(key = "'chat-room-admin-delegate-' + #chatRoomId")
     public void execute(Long chatRoomId, Long chatAdminUserId, Long targetChatMemberId) {
         var chatAdmin = chatMemberRdbService.readChatMember(chatAdminUserId, chatRoomId)
                 .filter(ChatMember::isActive)
