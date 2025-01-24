@@ -71,6 +71,7 @@ public class ChatMemberController implements ChatMemberApi {
         return ResponseEntity.ok(SuccessResponse.noContent());
     }
 
+    @Override
     @PatchMapping("/{chatMemberId}/delegate")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> delegateAdmin(

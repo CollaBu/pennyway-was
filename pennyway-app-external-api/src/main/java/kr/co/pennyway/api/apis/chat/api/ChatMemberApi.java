@@ -82,4 +82,17 @@ public interface ChatMemberApi {
     })
     @ApiResponse(responseCode = "200", description = "채팅방 멤버 추방 성공")
     ResponseEntity<?> banChatMember(@PathVariable("chatRoomId") Long chatRoomId, @PathVariable("chatMemberId") Long chatMemberId, @AuthenticationPrincipal SecurityUserDetails user);
+
+    @Operation(summary = "채팅방 관리자 위임", method = "PATCH", description = "채팅방 관리자를 위임한다. 채팅방장만이 채팅방 관리자를 위임할 수 있다.")
+    @Parameters({
+            @Parameter(name = "chatRoomId", description = "채팅방 ID", required = true, in = ParameterIn.PATH),
+            @Parameter(name = "chatMemberId", description = "위임할 채팅방 멤버 ID (user id가 아님)", required = true, in = ParameterIn.PATH)
+    })
+    @ApiResponseExplanations(errors = {
+            @ApiExceptionExplanation(value = ChatMemberErrorCode.class, constant = "NOT_FOUND", summary = "채팅방 멤버를 찾을 수 없음", description = "채팅방 멤버를 찾을 수 없어 채팅방 관리자 위임에 실패했습니다."),
+            @ApiExceptionExplanation(value = ChatMemberErrorCode.class, constant = "NOT_ADMIN", summary = "권한 없음", description = "권한이 없어 채팅방 관리자 위임에 실패했습니다."),
+            @ApiExceptionExplanation(value = ChatMemberErrorCode.class, constant = "NOT_SAME_CHAT_ROOM", summary = "다른 채팅방 멤버", description = "위임할 채팅방 멤버가 다른 채팅방 멤버여서 채팅방 관리자 위임에 실패했습니다.")
+    })
+    @ApiResponse(responseCode = "200", description = "채팅방 관리자 위임 성공")
+    ResponseEntity<?> delegateAdmin(@PathVariable("chatRoomId") Long chatRoomId, @PathVariable("chatMemberId") Long chatMemberId, @AuthenticationPrincipal SecurityUserDetails user);
 }
