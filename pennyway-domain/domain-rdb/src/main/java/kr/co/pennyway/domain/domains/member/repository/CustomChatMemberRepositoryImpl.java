@@ -60,7 +60,8 @@ public class CustomChatMemberRepositoryImpl implements CustomChatMemberRepositor
                                         chatMember.role,
                                         chatMember.notifyEnabled,
                                         chatMember.user.id,
-                                        chatMember.createdAt
+                                        chatMember.createdAt,
+                                        chatMember.user.profileImageUrl
                                 )
                         )
                         .from(chatMember)
