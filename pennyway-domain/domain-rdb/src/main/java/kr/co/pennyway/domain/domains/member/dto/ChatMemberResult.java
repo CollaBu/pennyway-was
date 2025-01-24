@@ -11,7 +11,8 @@ public final class ChatMemberResult {
             ChatMemberRole role,
             boolean notifyEnabled,
             Long userId,
-            LocalDateTime createdAt
+            LocalDateTime createdAt,
+            String profileImageUrl
     ) {
     }
 

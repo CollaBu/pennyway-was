@@ -109,9 +109,9 @@ public final class ChatRoomMapper {
         );
     }
 
-    public static ChatRoomRes.RoomWithParticipants toChatRoomResRoomWithParticipants(ChatMemberResult.Detail myInfo, List<ChatMemberResult.Detail> recentParticipants, List<ChatMemberResult.Summary> otherParticipants, List<ChatMessage> chatMessages) {
+    public static ChatRoomRes.RoomWithParticipants toChatRoomResRoomWithParticipants(ChatMemberResult.Detail myInfo, List<ChatMemberResult.Detail> recentParticipants, List<ChatMemberResult.Summary> otherParticipants, List<ChatMessage> chatMessages, String objectPrefix) {
         List<ChatMemberRes.MemberDetail> recentParticipantsRes = recentParticipants.stream()
-                .map(participant -> ChatMemberRes.MemberDetail.from(participant, false))
+                .map(participant -> createMemberDetail(participant, false, objectPrefix))
                 .toList();
         List<ChatMemberRes.MemberSummary> otherParticipantsRes = otherParticipants.stream()
                 .map(ChatMemberRes.MemberSummary::from)
@@ -122,7 +122,7 @@ public final class ChatRoomMapper {
                 .toList();
 
         return ChatRoomRes.RoomWithParticipants.builder()
-                .myInfo(ChatMemberRes.MemberDetail.from(myInfo, true))
+                .myInfo(createMemberDetail(myInfo, true, objectPrefix))
                 .recentParticipants(recentParticipantsRes)
                 .otherParticipants(otherParticipantsRes)
                 .recentMessages(chatMessagesRes)
@@ -135,5 +135,17 @@ public final class ChatRoomMapper {
 
     private static String createBackGroundImageUrl(String chatRoomBackgroundImage, String objectPrefix) {
         return (chatRoomBackgroundImage == null) ? "" : objectPrefix + chatRoomBackgroundImage;
+    }
+
+    private static ChatMemberRes.MemberDetail createMemberDetail(ChatMemberResult.Detail chatMember, boolean isMe, String objectPrefix) {
+        return new ChatMemberRes.MemberDetail(
+                chatMember.id(),
+                chatMember.userId(),
+                chatMember.name(),
+                chatMember.role(),
+                isMe ? chatMember.notifyEnabled() : null,
+                chatMember.createdAt(),
+                chatMember.profileImageUrl() == null ? "" : objectPrefix + chatMember.profileImageUrl()
+        );
     }
 }

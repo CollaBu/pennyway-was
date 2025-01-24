@@ -1,6 +1,7 @@
 package kr.co.pennyway.api.apis.chat.service;
 
 import kr.co.pennyway.api.apis.chat.dto.ChatRoomRes;
+import kr.co.pennyway.api.common.storage.AwsS3Adapter;
 import kr.co.pennyway.api.config.fixture.ChatMemberFixture;
 import kr.co.pennyway.api.config.fixture.ChatRoomFixture;
 import kr.co.pennyway.api.config.fixture.UserFixture;
@@ -51,6 +52,8 @@ public class ChatRoomWithParticipantsSearchServiceTest {
     private ChatMemberService chatMemberService;
     @Mock
     private ChatMessageService chatMessageService;
+    @Mock
+    private AwsS3Adapter awsS3Adapter;
 
     @BeforeEach
     void setUp() {
@@ -99,7 +102,7 @@ public class ChatRoomWithParticipantsSearchServiceTest {
     public void memberSuccessToRetrieveChatRoomWithParticipantsIncludingAdmin() {
         // given
         ChatMember myInfo = createChatMember(userId, UserFixture.GENERAL_USER.toUser(), chatRoom, ChatMemberRole.MEMBER);
-        ChatMemberResult.Detail adminDetail = new ChatMemberResult.Detail(2L, "Admin", ChatMemberRole.ADMIN, true, 2L, LocalDateTime.now());
+        ChatMemberResult.Detail adminDetail = new ChatMemberResult.Detail(2L, "Admin", ChatMemberRole.ADMIN, true, 2L, LocalDateTime.now(), myInfo.getUser().getProfileImageUrl());
         List<ChatMessage> recentMessages = createRecentMessages();
         List<ChatMemberResult.Detail> recentParticipants = createRecentParticipantDetails();
         List<ChatMemberResult.Summary> otherParticipants = createOtherParticipantSummaries();
@@ -149,8 +152,8 @@ public class ChatRoomWithParticipantsSearchServiceTest {
 
     private List<ChatMemberResult.Detail> createRecentParticipantDetails() {
         return List.of(
-                new ChatMemberResult.Detail(2L, "User2", ChatMemberRole.MEMBER, true, 20L, LocalDateTime.now()),
-                new ChatMemberResult.Detail(3L, "User3", ChatMemberRole.MEMBER, true, 30L, LocalDateTime.now())
+                new ChatMemberResult.Detail(2L, "User2", ChatMemberRole.MEMBER, true, 20L, LocalDateTime.now(), null),
+                new ChatMemberResult.Detail(3L, "User3", ChatMemberRole.MEMBER, true, 30L, LocalDateTime.now(), null)
         );
     }
 

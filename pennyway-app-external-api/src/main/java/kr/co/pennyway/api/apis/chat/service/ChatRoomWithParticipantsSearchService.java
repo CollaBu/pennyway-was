@@ -2,6 +2,7 @@ package kr.co.pennyway.api.apis.chat.service;
 
 import kr.co.pennyway.api.apis.chat.dto.ChatRoomRes;
 import kr.co.pennyway.api.apis.chat.mapper.ChatRoomMapper;
+import kr.co.pennyway.api.common.storage.AwsS3Adapter;
 import kr.co.pennyway.domain.context.account.service.UserService;
 import kr.co.pennyway.domain.context.chat.service.ChatMemberService;
 import kr.co.pennyway.domain.context.chat.service.ChatMessageService;
@@ -32,6 +33,8 @@ public class ChatRoomWithParticipantsSearchService {
     private final ChatMemberService chatMemberService;
     private final ChatMessageService chatMessageService;
 
+    private final AwsS3Adapter awsS3Adapter;
+
     @Transactional(readOnly = true)
     public ChatRoomRes.RoomWithParticipants execute(Long userId, Long chatRoomId) {
         // 내 정보 조회
@@ -40,7 +43,7 @@ public class ChatRoomWithParticipantsSearchService {
 
         ChatMember myInfo = chatMemberService.readChatMember(userId, chatRoomId)
                 .orElseThrow(() -> new ChatMemberErrorException(ChatMemberErrorCode.NOT_FOUND));
-        ChatMemberResult.Detail myDetail = new ChatMemberResult.Detail(myInfo.getId(), me.getName(), myInfo.getRole(), myInfo.isNotifyEnabled(), userId, myInfo.getCreatedAt());
+        ChatMemberResult.Detail myDetail = new ChatMemberResult.Detail(myInfo.getId(), me.getName(), myInfo.getRole(), myInfo.isNotifyEnabled(), userId, myInfo.getCreatedAt(), me.getProfileImageUrl());
 
         // 최근 메시지 조회 (15건)
         List<ChatMessage> chatMessages = chatMessageService.readRecentMessages(chatRoomId, MESSAGE_LIMIT);
@@ -68,6 +71,6 @@ public class ChatRoomWithParticipantsSearchService {
         // 채팅방에 속한 다른 사용자 요약 정보 조회
         List<ChatMemberResult.Summary> otherMemberIds = chatMemberService.readChatMemberIdsByUserIdsNotIn(chatRoomId, recentParticipantIds);
 
-        return ChatRoomMapper.toChatRoomResRoomWithParticipants(myDetail, recentParticipants, otherMemberIds, chatMessages);
+        return ChatRoomMapper.toChatRoomResRoomWithParticipants(myDetail, recentParticipants, otherMemberIds, chatMessages, awsS3Adapter.getObjectPrefix());
     }
 }

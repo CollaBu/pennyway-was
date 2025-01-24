@@ -27,18 +27,10 @@ public final class ChatMemberRes {
             @Schema(description = "채팅방 가입일")
             @JsonSerialize(using = LocalDateTimeSerializer.class)
             @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-            LocalDateTime createdAt
+            LocalDateTime createdAt,
+            @Schema(description = "채팅방 참여자 프로필 이미지 URL")
+            String profileImageUrl
     ) {
-        public static MemberDetail from(ChatMemberResult.Detail chatMember, boolean isContainNotifyEnabled) {
-            return new MemberDetail(
-                    chatMember.id(),
-                    chatMember.userId(),
-                    chatMember.name(),
-                    chatMember.role(),
-                    isContainNotifyEnabled ? chatMember.notifyEnabled() : null,
-                    chatMember.createdAt()
-            );
-        }
     }
 
     @Schema(description = "채팅방 참여자 요약 정보")

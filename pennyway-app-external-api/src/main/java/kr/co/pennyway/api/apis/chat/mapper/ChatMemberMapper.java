@@ -8,9 +8,21 @@ import java.util.List;
 
 @Mapper
 public final class ChatMemberMapper {
-    public static List<ChatMemberRes.MemberDetail> toChatMemberResDetail(List<ChatMemberResult.Detail> chatMembers) {
+    public static List<ChatMemberRes.MemberDetail> toChatMemberResDetail(List<ChatMemberResult.Detail> chatMembers, String objectPrefix) {
         return chatMembers.stream()
-                .map(chatMember -> ChatMemberRes.MemberDetail.from(chatMember, false))
+                .map(chatMember -> createMemberDetail(chatMember, false, objectPrefix))
                 .toList();
+    }
+
+    private static ChatMemberRes.MemberDetail createMemberDetail(ChatMemberResult.Detail chatMember, boolean isMe, String objectPrefix) {
+        return new ChatMemberRes.MemberDetail(
+                chatMember.id(),
+                chatMember.userId(),
+                chatMember.name(),
+                chatMember.role(),
+                isMe ? chatMember.notifyEnabled() : null,
+                chatMember.createdAt(),
+                chatMember.profileImageUrl() == null ? "" : objectPrefix + chatMember.profileImageUrl()
+        );
     }
 }
