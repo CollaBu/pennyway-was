@@ -19,7 +19,7 @@ public class ChatRoomAdminDelegateService {
     private final ChatMemberRdbService chatMemberRdbService;
 
     @Transactional
-    @DistributedLock(key = "'chat-room-admin-delegate-' + #chatRoomId")
+    @DistributedLock(key = "'chat-room-admin-delegate-' + #command.chatRoomId()")
     public void execute(ChatRoomAdminDelegateCommand command) {
         var chatAdmin = chatMemberRdbService.readChatMember(command.chatAdminUserId(), command.chatRoomId())
                 .filter(ChatMember::isActive)
