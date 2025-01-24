@@ -40,7 +40,7 @@ public class ChatRoomWithParticipantsSearchService {
 
         ChatMember myInfo = chatMemberService.readChatMember(userId, chatRoomId)
                 .orElseThrow(() -> new ChatMemberErrorException(ChatMemberErrorCode.NOT_FOUND));
-        ChatMemberResult.Detail myDetail = new ChatMemberResult.Detail(myInfo.getId(), me.getName(), myInfo.getRole(), myInfo.isNotifyEnabled(), userId, myInfo.getCreatedAt());
+        ChatMemberResult.Detail myDetail = new ChatMemberResult.Detail(myInfo.getId(), me.getName(), myInfo.getRole(), myInfo.isNotifyEnabled(), userId, myInfo.getCreatedAt(), me.getProfileImageUrl());
 
         // 최근 메시지 조회 (15건)
         List<ChatMessage> chatMessages = chatMessageService.readRecentMessages(chatRoomId, MESSAGE_LIMIT);

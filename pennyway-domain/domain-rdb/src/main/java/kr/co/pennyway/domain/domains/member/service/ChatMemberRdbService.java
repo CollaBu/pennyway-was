@@ -80,6 +80,7 @@ public class ChatMemberRdbService {
         bindings.put("notification", qChatMember.notifyEnabled);
         bindings.put("userId", qChatMember.user.id);
         bindings.put("createdAt", qChatMember.createdAt);
+        bindings.put("profileImageUrl", qChatMember.user.profileImageUrl);
 
         return chatMemberRepository.selectList(predicate, ChatMemberResult.Detail.class, bindings, null, null);
     }
@@ -97,6 +98,7 @@ public class ChatMemberRdbService {
         bindings.put("notification", qChatMember.notifyEnabled);
         bindings.put("userId", qChatMember.user.id);
         bindings.put("createdAt", qChatMember.createdAt);
+        bindings.put("profileImageUrl", qChatMember.user.profileImageUrl);
 
         return chatMemberRepository.selectList(predicate, ChatMemberResult.Detail.class, bindings, null, null);
     }
