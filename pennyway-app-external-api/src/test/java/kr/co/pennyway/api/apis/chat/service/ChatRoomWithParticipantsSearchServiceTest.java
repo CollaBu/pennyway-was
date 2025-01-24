@@ -1,6 +1,7 @@
 package kr.co.pennyway.api.apis.chat.service;
 
 import kr.co.pennyway.api.apis.chat.dto.ChatRoomRes;
+import kr.co.pennyway.api.common.storage.AwsS3Adapter;
 import kr.co.pennyway.api.config.fixture.ChatMemberFixture;
 import kr.co.pennyway.api.config.fixture.ChatRoomFixture;
 import kr.co.pennyway.api.config.fixture.UserFixture;
@@ -51,6 +52,8 @@ public class ChatRoomWithParticipantsSearchServiceTest {
     private ChatMemberService chatMemberService;
     @Mock
     private ChatMessageService chatMessageService;
+    @Mock
+    private AwsS3Adapter awsS3Adapter;
 
     @BeforeEach
     void setUp() {
