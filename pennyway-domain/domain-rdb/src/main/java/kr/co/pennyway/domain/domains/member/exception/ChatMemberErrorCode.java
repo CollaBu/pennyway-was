@@ -16,6 +16,7 @@ public enum ChatMemberErrorCode implements BaseErrorCode {
     NOT_FOUND(StatusCode.NOT_FOUND, ReasonCode.REQUESTED_RESOURCE_NOT_FOUND, "회원을 찾을 수 없습니다."),
 
     /* 409 Conflict */
+    NOT_SAME_CHAT_ROOM(StatusCode.CONFLICT, ReasonCode.REQUEST_CONFLICTS_WITH_CURRENT_STATE_OF_RESOURCE, "가입한 채팅방 정보가 일치하지 않습니다."),
     ADMIN_CANNOT_LEAVE(StatusCode.CONFLICT, ReasonCode.REQUEST_CONFLICTS_WITH_CURRENT_STATE_OF_RESOURCE, "채팅방에 사용자가 남아 있다면, 채팅방 방장은 채팅방을 탈퇴할 수 없습니다."),
     ALREADY_JOINED(StatusCode.CONFLICT, ReasonCode.RESOURCE_ALREADY_EXISTS, "이미 가입한 회원입니다."),
     ;

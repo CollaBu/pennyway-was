@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import kr.co.pennyway.domain.common.converter.ChatMemberRoleConverter;
 import kr.co.pennyway.domain.common.model.DateAuditable;
 import kr.co.pennyway.domain.domains.chatroom.domain.ChatRoom;
+import kr.co.pennyway.domain.domains.member.exception.ChatMemberErrorCode;
+import kr.co.pennyway.domain.domains.member.exception.ChatMemberErrorException;
 import kr.co.pennyway.domain.domains.member.type.ChatMemberRole;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import lombok.AccessLevel;
@@ -12,6 +14,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
+import org.springframework.lang.NonNull;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -78,6 +81,23 @@ public class ChatMember extends DateAuditable {
         this.chatRoom = chatRoom;
     }
 
+    public void delegate(@NonNull ChatMember chatMember) {
+        if (chatMember == null || this.equals(chatMember)) {
+            throw new IllegalArgumentException("chatMember가 null이거나 자기 자신일 수 없습니다.");
+        }
+
+        if (!this.getChatRoom().equals(chatMember.getChatRoom())) {
+            throw new ChatMemberErrorException(ChatMemberErrorCode.NOT_SAME_CHAT_ROOM);
+        }
+
+        if (this.role != ChatMemberRole.ADMIN) {
+            throw new ChatMemberErrorException(ChatMemberErrorCode.NOT_ADMIN);
+        }
+
+        this.role = ChatMemberRole.MEMBER;
+        chatMember.role = ChatMemberRole.ADMIN;
+    }
+
     /**
      * 사용자 데이터가 삭제되었는지 확인한다.
      *
@@ -124,6 +144,7 @@ public class ChatMember extends DateAuditable {
                 ", banned=" + banned +
                 ", notifyEnabled=" + notifyEnabled +
                 ", deletedAt=" + deletedAt +
+                ", role=" + role +
                 '}';
     }
 }

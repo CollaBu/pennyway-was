@@ -70,4 +70,17 @@ public class ChatMemberController implements ChatMemberApi {
 
         return ResponseEntity.ok(SuccessResponse.noContent());
     }
+
+    @Override
+    @PatchMapping("/{chatMemberId}/delegate")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> delegateAdmin(
+            @PathVariable("chatRoomId") Long chatRoomId,
+            @PathVariable("chatMemberId") Long chatMemberId,
+            @AuthenticationPrincipal SecurityUserDetails user
+    ) {
+        chatMemberUseCase.delegate(user.getUserId(), chatMemberId, chatRoomId);
+
+        return ResponseEntity.ok(SuccessResponse.noContent());
+    }
 }
