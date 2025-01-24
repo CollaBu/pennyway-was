@@ -3,6 +3,7 @@ package kr.co.pennyway.domain.context.chat.service;
 import kr.co.pennyway.common.annotation.DomainService;
 import kr.co.pennyway.domain.common.annotation.DistributedLock;
 import kr.co.pennyway.domain.context.chat.collection.ChatRoomAdminDelegateOperation;
+import kr.co.pennyway.domain.context.chat.dto.ChatRoomAdminDelegateCommand;
 import kr.co.pennyway.domain.domains.member.domain.ChatMember;
 import kr.co.pennyway.domain.domains.member.exception.ChatMemberErrorCode;
 import kr.co.pennyway.domain.domains.member.exception.ChatMemberErrorException;
@@ -19,12 +20,12 @@ public class ChatRoomAdminDelegateService {
 
     @Transactional
     @DistributedLock(key = "'chat-room-admin-delegate-' + #chatRoomId")
-    public void execute(Long chatRoomId, Long chatAdminUserId, Long targetChatMemberId) {
-        var chatAdmin = chatMemberRdbService.readChatMember(chatAdminUserId, chatRoomId)
+    public void execute(ChatRoomAdminDelegateCommand command) {
+        var chatAdmin = chatMemberRdbService.readChatMember(command.chatAdminUserId(), command.chatRoomId())
                 .filter(ChatMember::isActive)
                 .orElseThrow(() -> new ChatMemberErrorException(ChatMemberErrorCode.NOT_FOUND));
 
-        var targetMember = chatMemberRdbService.readChatMemberByChatMemberId(targetChatMemberId)
+        var targetMember = chatMemberRdbService.readChatMemberByChatMemberId(command.targetChatMemberId())
                 .filter(ChatMember::isActive)
                 .orElseThrow(() -> new ChatMemberErrorException(ChatMemberErrorCode.NOT_FOUND));
 

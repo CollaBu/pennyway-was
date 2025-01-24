@@ -4,6 +4,7 @@ import kr.co.pennyway.domain.common.repository.ExtendedRepositoryFactory;
 import kr.co.pennyway.domain.config.DomainServiceIntegrationProfileResolver;
 import kr.co.pennyway.domain.config.DomainServiceTestInfraConfig;
 import kr.co.pennyway.domain.config.JpaTestConfig;
+import kr.co.pennyway.domain.context.chat.dto.ChatRoomAdminDelegateCommand;
 import kr.co.pennyway.domain.context.chat.service.ChatRoomAdminDelegateService;
 import kr.co.pennyway.domain.context.common.fixture.ChatRoomFixture;
 import kr.co.pennyway.domain.context.common.fixture.UserFixture;
@@ -61,7 +62,7 @@ public class ChatRoomAdminDelegateServiceIntegrationTest extends DomainServiceTe
         var chatMember = createChatMember(ChatMemberRole.MEMBER, chatRoom);
 
         // when
-        sut.execute(chatRoom.getId(), chatAdmin.getUser().getId(), chatMember.getId());
+        sut.execute(ChatRoomAdminDelegateCommand.of(chatRoom.getId(), chatAdmin.getUser().getId(), chatMember.getId()));
 
         // then
         assertEquals(ChatMemberRole.ADMIN, chatMember.getRole());
