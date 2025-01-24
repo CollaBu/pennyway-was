@@ -3,12 +3,16 @@ package kr.co.pennyway.api.apis.chat.usecase;
 import kr.co.pennyway.api.apis.chat.dto.ChatRoomReq;
 import kr.co.pennyway.api.apis.chat.dto.ChatRoomRes;
 import kr.co.pennyway.api.apis.chat.mapper.ChatRoomMapper;
-import kr.co.pennyway.api.apis.chat.service.*;
+import kr.co.pennyway.api.apis.chat.service.ChatRoomPatchHelper;
+import kr.co.pennyway.api.apis.chat.service.ChatRoomSaveService;
+import kr.co.pennyway.api.apis.chat.service.ChatRoomSearchService;
+import kr.co.pennyway.api.apis.chat.service.ChatRoomWithParticipantsSearchService;
 import kr.co.pennyway.api.common.response.SliceResponseTemplate;
 import kr.co.pennyway.api.common.storage.AwsS3Adapter;
 import kr.co.pennyway.common.annotation.UseCase;
 import kr.co.pennyway.domain.context.chat.dto.ChatRoomDeleteCommand;
 import kr.co.pennyway.domain.context.chat.dto.ChatRoomToggleCommand;
+import kr.co.pennyway.domain.context.chat.service.ChatMemberService;
 import kr.co.pennyway.domain.context.chat.service.ChatRoomDeleteService;
 import kr.co.pennyway.domain.context.chat.service.ChatRoomNotificationToggleService;
 import kr.co.pennyway.domain.domains.chatroom.domain.ChatRoom;
@@ -30,7 +34,7 @@ public class ChatRoomUseCase {
     private final ChatRoomDeleteService chatRoomDeleteService;
     private final ChatRoomNotificationToggleService chatRoomNotificationToggleService;
 
-    private final ChatMemberSearchService chatMemberSearchService;
+    private final ChatMemberService chatMemberService;
 
     private final AwsS3Adapter awsS3Adapter;
 
@@ -64,7 +68,7 @@ public class ChatRoomUseCase {
     }
 
     public ChatRoomRes.Summary readJoinedChatRoomIds(Long userId) {
-        Set<Long> chatRoomIds = chatMemberSearchService.readJoinedChatRoomIds(userId);
+        Set<Long> chatRoomIds = chatMemberService.readChatRoomIdsByUserId(userId);
 
         return new ChatRoomRes.Summary(chatRoomIds);
     }
