@@ -43,7 +43,7 @@ public class ChatMemberUseCase {
     public List<ChatMemberRes.MemberDetail> readChatMembers(Long chatRoomId, Set<Long> chatMemberIds) {
         List<ChatMemberResult.Detail> chatMembers = chatMemberService.readChatMembersByMemberIds(chatRoomId, chatMemberIds);
 
-        return ChatMemberMapper.toChatMemberResDetail(chatMembers);
+        return ChatMemberMapper.toChatMemberResDetail(chatMembers, awsS3Adapter.getObjectPrefix());
     }
 
     public void leaveChatRoom(Long userId, Long chatRoomId) {
