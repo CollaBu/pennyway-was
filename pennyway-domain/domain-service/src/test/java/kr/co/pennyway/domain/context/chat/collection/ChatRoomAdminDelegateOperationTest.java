@@ -80,7 +80,8 @@ public class ChatRoomAdminDelegateOperationTest {
 
         // when & then
         assertThatThrownBy(operation::execute)
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(ChatMemberErrorException.class)
+                .hasFieldOrPropertyWithValue("chatMemberErrorCode", ChatMemberErrorCode.NOT_SAME_CHAT_ROOM);
     }
 
     private ChatMember createChatMember(Long userId, Long chatMemberId, ChatMemberRole role, ChatRoom chatRoom) {
