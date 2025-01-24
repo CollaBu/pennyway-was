@@ -87,7 +87,7 @@ public class ChatMember extends DateAuditable {
         }
 
         if (!this.getChatRoom().equals(chatMember.getChatRoom())) {
-            throw new IllegalArgumentException("ChatMember가 다른 ChatRoom에 속해있습니다.");
+            throw new ChatMemberErrorException(ChatMemberErrorCode.NOT_SAME_CHAT_ROOM);
         }
 
         if (this.role != ChatMemberRole.ADMIN) {
