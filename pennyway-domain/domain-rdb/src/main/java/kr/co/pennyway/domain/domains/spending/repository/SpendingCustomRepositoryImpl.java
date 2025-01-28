@@ -61,4 +61,18 @@ public class SpendingCustomRepositoryImpl implements SpendingCustomRepository {
                 .orderBy(orderSpecifiers.toArray(new OrderSpecifier[0]))
                 .fetch();
     }
+
+    @Override
+    public List<Spending> findByYearAndMonthAndDay(Long userId, int year, int month, int day) {
+        Sort sort = Sort.by(Sort.Order.desc("spendAt"));
+
+        return queryFactory.selectFrom(spending)
+                .leftJoin(spending.spendingCustomCategory, spendingCustomCategory).fetchJoin()
+                .where(spending.spendAt.year().eq(year)
+                        .and(spending.spendAt.month().eq(month))
+                        .and(spending.spendAt.dayOfMonth().eq(day))
+                        .and(spending.user.id.eq(userId))
+                )
+                .fetch();
+    }
 }

@@ -10,4 +10,6 @@ public interface SpendingCustomRepository {
     Optional<TotalSpendingAmount> findTotalSpendingAmountByUserId(Long userId, int year, int month);
 
     List<Spending> findByYearAndMonth(Long userId, int year, int month);
+
+    List<Spending> findByYearAndMonthAndDay(Long userId, int year, int month, int day);
 }
