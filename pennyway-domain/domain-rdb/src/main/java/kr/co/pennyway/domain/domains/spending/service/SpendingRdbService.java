@@ -51,6 +51,11 @@ public class SpendingRdbService {
     }
 
     @Transactional(readOnly = true)
+    public List<Spending> readSpendings(Long userId, int year, int month, int day) {
+        return spendingRepository.findByYearAndMonthAndDay(userId, year, month, day);
+    }
+
+    @Transactional(readOnly = true)
     public int readSpendingTotalCountByCategoryId(Long userId, Long categoryId) {
         return spendingRepository.countByUser_IdAndSpendingCustomCategory_Id(userId, categoryId);
     }
