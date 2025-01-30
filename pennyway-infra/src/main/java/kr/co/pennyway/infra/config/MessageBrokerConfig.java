@@ -11,6 +11,7 @@ import kr.co.pennyway.infra.common.importer.PennywayInfraConfig;
 import kr.co.pennyway.infra.common.properties.ChatExchangeProperties;
 import kr.co.pennyway.infra.common.properties.ChatJoinEventExchangeProperties;
 import kr.co.pennyway.infra.common.properties.RabbitMqProperties;
+import kr.co.pennyway.infra.common.properties.SpendingChatShareExchangeProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Binding;
@@ -35,7 +36,7 @@ import org.springframework.context.annotation.Primary;
 @Slf4j
 @EnableRabbit
 @RequiredArgsConstructor
-@EnableConfigurationProperties({ChatExchangeProperties.class, ChatJoinEventExchangeProperties.class, RabbitMqProperties.class})
+@EnableConfigurationProperties({ChatExchangeProperties.class, ChatJoinEventExchangeProperties.class, RabbitMqProperties.class, SpendingChatShareExchangeProperties.class})
 public class MessageBrokerConfig implements PennywayInfraConfig {
     private final RabbitMqProperties rabbitMqProperties;
     private final ChatExchangeProperties chatExchangeProperties;
