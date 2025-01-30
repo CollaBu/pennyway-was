@@ -1,14 +1,12 @@
 package kr.co.pennyway.infra.common.event;
 
-import org.springframework.data.util.Pair;
-
 import java.util.List;
 import java.util.Objects;
 
 public record SpendingChatShareEvent(
         Long chatRoomId,
         String name,
-        List<Pair<SpendingOnDate, Long>> spendingOnDates
+        List<SpendingOnDate> spendingOnDates
 ) {
     public SpendingChatShareEvent {
         Objects.requireNonNull(chatRoomId, "chatRoomId는 null일 수 없습니다.");
@@ -16,7 +14,7 @@ public record SpendingChatShareEvent(
         Objects.requireNonNull(spendingOnDates, "spendingOnDates는 null일 수 없습니다.");
     }
 
-    private record SpendingOnDate(
+    public record SpendingOnDate(
             boolean isCustom,
             Long categoryId,
             String name,
