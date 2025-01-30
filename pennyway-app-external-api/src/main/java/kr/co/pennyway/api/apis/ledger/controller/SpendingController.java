@@ -83,6 +83,7 @@ public class SpendingController implements SpendingApi {
         return ResponseEntity.ok(SuccessResponse.noContent());
     }
 
+    @Override
     @GetMapping("/share")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> shareSpending(
