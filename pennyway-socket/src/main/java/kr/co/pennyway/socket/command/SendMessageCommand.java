@@ -1,5 +1,6 @@
 package kr.co.pennyway.socket.command;
 
+import jakarta.annotation.Nullable;
 import kr.co.pennyway.domain.domains.message.type.MessageCategoryType;
 import kr.co.pennyway.domain.domains.message.type.MessageContentType;
 import kr.co.pennyway.socket.common.constants.SystemMessageConstants;
@@ -16,7 +17,8 @@ public record SendMessageCommand(
         MessageCategoryType categoryType,
         long senderId,
         String senderName,
-        Map<String, Object> messageIdHeader
+        Map<String, Object> messageIdHeader,
+        @Nullable Map<String, Object> headers
 ) {
     public SendMessageCommand {
         if (chatRoomId <= 0) {
@@ -51,6 +53,7 @@ public record SendMessageCommand(
                 MessageCategoryType.SYSTEM,
                 SystemMessageConstants.SYSTEM_SENDER_ID,
                 null,
+                null,
                 null
         );
     }
@@ -74,11 +77,12 @@ public record SendMessageCommand(
                 MessageCategoryType.NORMAL,
                 senderId,
                 senderName,
-                messageIdHeader
+                messageIdHeader,
+                null
         );
     }
 
-    public static SendMessageCommand createMessage(long chatRoomId, String content, MessageContentType contentType, MessageCategoryType categoryType, long senderId, String senderName, Map<String, Object> messageIdHeader) {
+    public static SendMessageCommand createMessage(long chatRoomId, String content, MessageContentType contentType, MessageCategoryType categoryType, long senderId, String senderName, Map<String, Object> messageIdHeader, @Nullable Map<String, Object> headers) {
         return new SendMessageCommand(
                 chatRoomId,
                 content,
@@ -86,7 +90,8 @@ public record SendMessageCommand(
                 categoryType,
                 senderId,
                 senderName,
-                messageIdHeader
+                messageIdHeader,
+                headers
         );
     }
 }

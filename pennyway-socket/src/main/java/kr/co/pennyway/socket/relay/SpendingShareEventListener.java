@@ -18,6 +18,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Component
@@ -48,7 +49,8 @@ public class SpendingShareEventListener {
                         MessageCategoryType.SHARE,
                         event.senderId(),
                         event.name(),
-                        null
+                        null,
+                        Map.of("Content-Type", "application/json")
                 )
         );
     }
