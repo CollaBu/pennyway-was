@@ -77,4 +77,16 @@ public record SendMessageCommand(
                 messageIdHeader
         );
     }
+
+    public static SendMessageCommand createMessage(long chatRoomId, String content, MessageContentType contentType, MessageCategoryType categoryType, long senderId, String senderName, Map<String, Object> messageIdHeader) {
+        return new SendMessageCommand(
+                chatRoomId,
+                content,
+                contentType,
+                categoryType,
+                senderId,
+                senderName,
+                messageIdHeader
+        );
+    }
 }
