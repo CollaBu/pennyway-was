@@ -1,5 +1,7 @@
 package kr.co.pennyway.infra.common.event;
 
+import org.springframework.util.StringUtils;
+
 import java.util.List;
 import java.util.Objects;
 
@@ -34,7 +36,7 @@ public record SpendingChatShareEvent(
                 throw new IllegalArgumentException("사용자 정의 카테고리는 OTHER가 될 수 없습니다.");
             }
 
-            if (!name.isEmpty()) {
+            if (!StringUtils.hasText(name)) {
                 throw new IllegalArgumentException("name은 null이거나 빈 문자열일 수 없습니다.");
             }
         }
