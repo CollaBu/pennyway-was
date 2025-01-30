@@ -9,7 +9,8 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public enum MessageCategoryType {
     NORMAL("0", "NORMAL"),
-    SYSTEM("1", "SYSTEM");
+    SYSTEM("1", "SYSTEM"),
+    SHARE("2", "SHARE");
 
     private static final Map<String, MessageCategoryType> stringToEnum = Stream.of(values()).collect(java.util.stream.Collectors.toMap(Object::toString, e -> e));
     private final String code;
