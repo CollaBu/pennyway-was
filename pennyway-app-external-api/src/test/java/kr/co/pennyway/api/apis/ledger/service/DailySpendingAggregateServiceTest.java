@@ -45,7 +45,7 @@ public class DailySpendingAggregateServiceTest extends ExternalApiDBTestConfig {
     }
 
     @Test
-    public void test() {
+    public void shouldReturnDailySpendingDescOrder() {
         // given
         var user = userRepository.save(UserFixture.GENERAL_USER.toUser());
         var spendingCustomCategory1 = spendingCustomCategoryRepository.save(SpendingCustomCategory.of("커스텀1", SpendingCategory.EDUCATION, user));
