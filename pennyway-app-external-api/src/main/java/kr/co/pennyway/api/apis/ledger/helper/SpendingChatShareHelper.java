@@ -43,7 +43,7 @@ public class SpendingChatShareHelper {
         chatRoomIds.stream()
                 .filter(joinedChatRoomIds::contains)
                 .forEach(chatRoomId -> {
-                    eventPublisher.publishEvent(new SpendingChatShareEvent(chatRoomId, user.getName(), spendingOnDate));
+                    eventPublisher.publishEvent(new SpendingChatShareEvent(chatRoomId, user.getName(), user.getId(), spendingOnDate));
                 });
     }
 }
