@@ -8,11 +8,13 @@ import java.util.Objects;
 public record SpendingChatShareEvent(
         Long chatRoomId,
         String name,
+        Long senderId,
         List<SpendingOnDate> spendingOnDates
 ) {
     public SpendingChatShareEvent {
         Objects.requireNonNull(chatRoomId, "chatRoomId는 null일 수 없습니다.");
         Objects.requireNonNull(name, "name은 null일 수 없습니다.");
+        Objects.requireNonNull(senderId, "senderId는 null일 수 없습니다.");
         Objects.requireNonNull(spendingOnDates, "spendingOnDates는 null일 수 없습니다.");
     }
 
