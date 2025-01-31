@@ -38,7 +38,7 @@ class ChatMessageSendService(
             )
         }
 
-        command.senderName.takeIf { it.isNotBlank() }?.let { senderName ->
+        command.senderName?.takeIf { it.isNotBlank() }?.let { senderName ->
             simpMessagingTemplate.convertAndSendToUser(
                 senderName,
                 "/queue/success",
