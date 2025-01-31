@@ -50,7 +50,7 @@ class SpendingShareEventListener(
                         event.senderId(),
                         event.name(),
                         null,
-                        mapOf("Content-Type" to "application/json")
+                        mapOf("Content-Type" to "application/json", "date" to event.date())
                     )
                 )
             }
