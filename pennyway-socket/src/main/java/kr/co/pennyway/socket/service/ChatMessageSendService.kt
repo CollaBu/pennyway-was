@@ -33,7 +33,8 @@ class ChatMessageSendService(
             messageBrokerAdapter.convertAndSend(
                 exchange,
                 "chat.room.${command.chatRoomId}",
-                ChatMessageDto.Response.from(message)
+                ChatMessageDto.Response.from(message),
+                command.headers
             )
         }
 

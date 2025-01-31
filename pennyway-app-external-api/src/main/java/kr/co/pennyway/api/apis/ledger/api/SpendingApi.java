@@ -4,16 +4,14 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.ExampleObject;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.media.SchemaProperty;
+import io.swagger.v3.oas.annotations.media.*;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.co.pennyway.api.apis.ledger.dto.SpendingIdsDto;
 import kr.co.pennyway.api.apis.ledger.dto.SpendingReq;
 import kr.co.pennyway.api.apis.ledger.dto.SpendingSearchRes;
+import kr.co.pennyway.api.apis.ledger.dto.SpendingShareReq;
 import kr.co.pennyway.api.common.annotation.ApiExceptionExplanation;
 import kr.co.pennyway.api.common.annotation.ApiResponseExplanations;
 import kr.co.pennyway.api.common.security.authentication.SecurityUserDetails;
@@ -109,4 +107,25 @@ public interface SpendingApi {
             )
     }))
     ResponseEntity<?> deleteSpendings(@RequestBody SpendingIdsDto spendingIds, @AuthenticationPrincipal SecurityUserDetails user);
+
+    @Operation(summary = "지출 내역 공유", method = "GET", description = """
+            사용자의 지출 내역을 공유하고 공유된 지출 내역을 반환합니다. <br/>
+            <채팅방 공유 시> 전송할 채팅방 아이디를 누락한 경우 예외를 발생시키지만, 가입하지 않은 채팅방 아이디를 전송한 경우는 유효한 방에만 전송하고 별도의 예외를 발생시키지 않습니다.
+            """)
+    @Parameters({
+            @Parameter(name = "type", description = "공유할 목적지(타입)", required = true, in = ParameterIn.QUERY, examples = {
+                    @ExampleObject(name = "채팅방 공유", value = "CHAT_ROOM")
+            }),
+            @Parameter(name = "year", description = "년도", example = "2025", required = true, in = ParameterIn.QUERY),
+            @Parameter(name = "month", description = "월", example = "1", required = true, in = ParameterIn.QUERY),
+            @Parameter(name = "day", description = "일", example = "28", required = true, in = ParameterIn.QUERY),
+            @Parameter(name = "chatRoomIds", description = "공유할 채팅방 ID 목록 배열 (채팅방 공유 시, null 혹은 빈 배열 허용하지 않음.)", in = ParameterIn.QUERY, array = @ArraySchema(schema = @Schema(type = "long"))),
+            @Parameter(name = "query", hidden = true)
+    })
+    @ApiResponseExplanations(errors = {
+            @ApiExceptionExplanation(name = "전송 타입 오류", description = "유효하지 않은 목적지로 지출 내용을 공유할 수 없습니다.", value = SpendingErrorCode.class, constant = "INVALID_SHARE_TYPE"),
+            @ApiExceptionExplanation(name = "채팅방 공유 파라미터 누락", description = "지출 내역 공유 시 필수 파라미터가 누락되었습니다.", value = SpendingErrorCode.class, constant = "MISSING_SHARE_PARAM")
+    })
+    @ApiResponse(responseCode = "200")
+    ResponseEntity<?> shareSpending(@Validated SpendingShareReq.ShareQueryParam query, @AuthenticationPrincipal SecurityUserDetails user);
 }

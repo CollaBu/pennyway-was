@@ -7,10 +7,12 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import kr.co.pennyway.infra.client.broker.MessageBrokerAdapter;
 import kr.co.pennyway.infra.common.event.ChatRoomJoinEventHandler;
+import kr.co.pennyway.infra.common.event.SpendingChatShareEventHandler;
 import kr.co.pennyway.infra.common.importer.PennywayInfraConfig;
 import kr.co.pennyway.infra.common.properties.ChatExchangeProperties;
 import kr.co.pennyway.infra.common.properties.ChatJoinEventExchangeProperties;
 import kr.co.pennyway.infra.common.properties.RabbitMqProperties;
+import kr.co.pennyway.infra.common.properties.SpendingChatShareExchangeProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Binding;
@@ -35,11 +37,12 @@ import org.springframework.context.annotation.Primary;
 @Slf4j
 @EnableRabbit
 @RequiredArgsConstructor
-@EnableConfigurationProperties({ChatExchangeProperties.class, ChatJoinEventExchangeProperties.class, RabbitMqProperties.class})
+@EnableConfigurationProperties({ChatExchangeProperties.class, ChatJoinEventExchangeProperties.class, RabbitMqProperties.class, SpendingChatShareExchangeProperties.class})
 public class MessageBrokerConfig implements PennywayInfraConfig {
     private final RabbitMqProperties rabbitMqProperties;
     private final ChatExchangeProperties chatExchangeProperties;
     private final ChatJoinEventExchangeProperties chatJoinEventExchangeProperties;
+    private final SpendingChatShareExchangeProperties spendingChatShareExchangeProperties;
 
     @Bean
     public TopicExchange chatExchange() {
@@ -57,6 +60,11 @@ public class MessageBrokerConfig implements PennywayInfraConfig {
     }
 
     @Bean
+    public Queue spendingChatShareQueue(SpendingChatShareExchangeProperties spendingChatShareExchangeProperties) {
+        return new Queue(spendingChatShareExchangeProperties.getQueue(), true);
+    }
+
+    @Bean
     public Binding chatBinding(Queue chatQueue, TopicExchange chatExchange) {
         return BindingBuilder
                 .bind(chatQueue)
@@ -70,6 +78,14 @@ public class MessageBrokerConfig implements PennywayInfraConfig {
                 .bind(chatJoinEventQueue)
                 .to(chatExchange)
                 .with(chatJoinEventExchangeProperties.getRoutingKey());
+    }
+
+    @Bean
+    public Binding spendingShareEventBinding(Queue spendingChatShareQueue, TopicExchange chatExchange) {
+        return BindingBuilder
+                .bind(spendingChatShareQueue)
+                .to(chatExchange)
+                .with(spendingChatShareExchangeProperties.getRoutingKey());
     }
 
     @Bean
@@ -150,5 +166,10 @@ public class MessageBrokerConfig implements PennywayInfraConfig {
     @Bean
     public ChatRoomJoinEventHandler chatRoomJoinEventHandler(MessageBrokerAdapter messageBrokerAdapter, ChatExchangeProperties chatExchangeProperties, ChatJoinEventExchangeProperties chatJoinEventExchangeProperties) {
         return new ChatRoomJoinEventHandler(messageBrokerAdapter, chatExchangeProperties, chatJoinEventExchangeProperties);
+    }
+
+    @Bean
+    public SpendingChatShareEventHandler spendingChatShareEventHandler(MessageBrokerAdapter messageBrokerAdapter, ChatExchangeProperties chatExchangeProperties, SpendingChatShareExchangeProperties spendingChatShareExchangeProperties) {
+        return new SpendingChatShareEventHandler(messageBrokerAdapter, chatExchangeProperties, spendingChatShareExchangeProperties);
     }
 }

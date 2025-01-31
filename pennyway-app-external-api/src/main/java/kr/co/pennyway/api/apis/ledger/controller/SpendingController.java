@@ -3,7 +3,9 @@ package kr.co.pennyway.api.apis.ledger.controller;
 import kr.co.pennyway.api.apis.ledger.api.SpendingApi;
 import kr.co.pennyway.api.apis.ledger.dto.SpendingIdsDto;
 import kr.co.pennyway.api.apis.ledger.dto.SpendingReq;
+import kr.co.pennyway.api.apis.ledger.dto.SpendingShareReq;
 import kr.co.pennyway.api.apis.ledger.usecase.SpendingUseCase;
+import kr.co.pennyway.api.common.query.SpendingShareType;
 import kr.co.pennyway.api.common.response.SuccessResponse;
 import kr.co.pennyway.api.common.security.authentication.SecurityUserDetails;
 import kr.co.pennyway.domain.domains.spending.exception.SpendingErrorCode;
@@ -16,6 +18,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
 
 @Slf4j
 @RestController
@@ -76,6 +80,28 @@ public class SpendingController implements SpendingApi {
     @PreAuthorize("isAuthenticated() and @spendingManager.hasPermissions(#user.getUserId(), #spendingIds.spendingIds())")
     public ResponseEntity<?> deleteSpendings(@RequestBody SpendingIdsDto spendingIds, @AuthenticationPrincipal SecurityUserDetails user) {
         spendingUseCase.deleteSpendings(spendingIds.spendingIds());
+        return ResponseEntity.ok(SuccessResponse.noContent());
+    }
+
+    @Override
+    @GetMapping("/share")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> shareSpending(
+            @Validated SpendingShareReq.ShareQueryParam query,
+            @AuthenticationPrincipal SecurityUserDetails user
+    ) {
+        var date = LocalDate.of(query.year(), query.month(), query.day());
+
+        if (query.type().equals(SpendingShareType.CHAT_ROOM)) {
+            if (query.chatRoomIds() == null || query.chatRoomIds().isEmpty()) {
+                throw new SpendingErrorException(SpendingErrorCode.MISSING_SHARE_PARAM);
+            }
+
+            spendingUseCase.shareToChatRoom(user.getUserId(), query.chatRoomIds(), date);
+        } else {
+            throw new SpendingErrorException(SpendingErrorCode.INVALID_SHARE_TYPE);
+        }
+
         return ResponseEntity.ok(SuccessResponse.noContent());
     }
 
