@@ -2,6 +2,7 @@ package kr.co.pennyway.infra.common.event;
 
 import org.springframework.util.StringUtils;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 
@@ -9,12 +10,14 @@ public record SpendingChatShareEvent(
         Long chatRoomId,
         String name,
         Long senderId,
+        LocalDate date,
         List<SpendingOnDate> spendingOnDates
 ) {
     public SpendingChatShareEvent {
         Objects.requireNonNull(chatRoomId, "chatRoomId는 null일 수 없습니다.");
         Objects.requireNonNull(name, "name은 null일 수 없습니다.");
         Objects.requireNonNull(senderId, "senderId는 null일 수 없습니다.");
+        Objects.requireNonNull(date, "date는 null일 수 없습니다.");
         Objects.requireNonNull(spendingOnDates, "spendingOnDates는 null일 수 없습니다.");
     }
 
