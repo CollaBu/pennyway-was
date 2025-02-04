@@ -69,9 +69,11 @@ public class ChatRoomPatchHelper {
         }
 
         if (requestImageUrl.startsWith(awsS3Adapter.getObjectPrefix())) {
-            validateExistingImage(requestImageUrl);
+            var originImageUrl = requestImageUrl.substring(awsS3Adapter.getObjectPrefix().length());
 
-            return requestImageUrl.substring(awsS3Adapter.getObjectPrefix().length());
+            validateExistingImage(originImageUrl);
+
+            return originImageUrl;
         }
 
         throw new StorageException(StorageErrorCode.INVALID_IMAGE_PATH);

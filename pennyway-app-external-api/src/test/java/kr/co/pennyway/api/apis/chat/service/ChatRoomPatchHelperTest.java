@@ -105,7 +105,7 @@ class ChatRoomPatchHelperTest {
 
         when(chatRoomService.readChatRoom(CHATROOM_ID)).thenReturn(Optional.of(chatRoom));
         when(awsS3Adapter.getObjectPrefix()).thenReturn("https://cdn.test.com/");
-        when(awsS3Adapter.isObjectExist("https://cdn.test.com/" + ORIGIN_PATH)).thenReturn(true);
+        when(awsS3Adapter.isObjectExist(ORIGIN_PATH)).thenReturn(true);
 
         ChatRoomReq.Update request = new ChatRoomReq.Update("title", "desc", null, "https://cdn.test.com/" + ORIGIN_PATH);
 
@@ -115,7 +115,7 @@ class ChatRoomPatchHelperTest {
         // then
         verify(awsS3Adapter, never()).deleteImage(anyString());
         verify(awsS3Adapter, never()).saveImage(anyString(), any());
-        verify(awsS3Adapter).isObjectExist("https://cdn.test.com/" + ORIGIN_PATH);
+        verify(awsS3Adapter).isObjectExist(ORIGIN_PATH);
     }
 
     @Test
