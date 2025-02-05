@@ -47,6 +47,11 @@ public class ChatMemberJoinService {
     public Triple<ChatRoom, Integer, Long> execute(Long userId, Long chatRoomId, Integer password) {
         ChatRoom chatRoom = chatRoomService.readChatRoom(chatRoomId).orElseThrow(() -> new ChatRoomErrorException(ChatRoomErrorCode.NOT_FOUND_CHAT_ROOM));
 
+        if (chatMemberService.isExists(chatRoomId, userId)) {
+            log.warn("이미 채팅방에 참여한 사용자입니다. chatRoomId: {}, userId: {}", chatRoomId, userId);
+            throw new ChatRoomErrorException(ChatRoomErrorCode.AREADY_JOINED);
+        }
+
         Long currentMemberCount = chatMemberService.countActiveMembers(chatRoomId);
         if (isFullRoom(currentMemberCount)) {
             log.warn("채팅방이 가득 찼습니다. chatRoomId: {}", chatRoomId);
