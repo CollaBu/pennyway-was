@@ -15,6 +15,7 @@ import org.springframework.amqp.rabbit.annotation.QueueBinding
 import org.springframework.amqp.rabbit.annotation.RabbitListener
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.stereotype.Component
+import java.time.LocalDate
 
 @Slf4j
 @Component
@@ -27,6 +28,11 @@ class SpendingShareEventListener(
         private val log = logger()
     }
 
+    private data class Payload(
+        val date: LocalDate,
+        val spendingOnDates: List<SpendingChatShareEvent.SpendingOnDate>
+    )
+
     @RabbitListener(
         containerFactory = "simpleRabbitListenerContainerFactory",
         bindings = [QueueBinding(
@@ -38,7 +44,7 @@ class SpendingShareEventListener(
     fun handle(event: SpendingChatShareEvent) {
         log.debug("handle: {}", event)
 
-        convertToJson(event.spendingOnDates())
+        convertToJson(Payload(event.date(), event.spendingOnDates()))
             .getOrNull()
             ?.let { payload ->
                 chatMessageSendService.execute(
@@ -50,15 +56,15 @@ class SpendingShareEventListener(
                         event.senderId(),
                         event.name(),
                         null,
-                        mapOf("Content-Type" to "application/json", "date" to event.date())
+                        mapOf("Content-Type" to "application/json")
                     )
                 )
             }
     }
 
-    private fun convertToJson(spendingOnDates: List<SpendingChatShareEvent.SpendingOnDate>): Result<String> =
+    private fun convertToJson(payload: Payload): Result<String> =
         runCatching {
-            objectMapper.writeValueAsString(spendingOnDates)
+            objectMapper.writeValueAsString(payload)
         }.onFailure {
             log.error("Failed to serialize spendingOnDates", it)
         }
