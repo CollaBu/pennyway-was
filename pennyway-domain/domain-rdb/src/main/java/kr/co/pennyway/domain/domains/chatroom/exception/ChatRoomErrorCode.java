@@ -16,7 +16,7 @@ public enum ChatRoomErrorCode implements BaseErrorCode {
 
     /* 409 Conflict */
     FULL_CHAT_ROOM(StatusCode.CONFLICT, ReasonCode.REQUESTED_RESPONSE_FORMAT_NOT_SUPPORTED, "채팅방 인원이 가득 찼습니다."),
-    AREADY_JOINED(StatusCode.CONFLICT, ReasonCode.RESOURCE_ALREADY_EXISTS, "이미 채팅방에 참여한 사용자입니다.");
+    ;
 
     private final StatusCode statusCode;
     private final ReasonCode reasonCode;

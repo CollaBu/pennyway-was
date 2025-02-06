@@ -9,6 +9,8 @@ import kr.co.pennyway.domain.domains.chatroom.domain.ChatRoom;
 import kr.co.pennyway.domain.domains.chatroom.exception.ChatRoomErrorCode;
 import kr.co.pennyway.domain.domains.chatroom.exception.ChatRoomErrorException;
 import kr.co.pennyway.domain.domains.member.domain.ChatMember;
+import kr.co.pennyway.domain.domains.member.exception.ChatMemberErrorCode;
+import kr.co.pennyway.domain.domains.member.exception.ChatMemberErrorException;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorCode;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorException;
@@ -49,7 +51,7 @@ public class ChatMemberJoinService {
 
         if (chatMemberService.isExists(chatRoomId, userId)) {
             log.warn("이미 채팅방에 참여한 사용자입니다. chatRoomId: {}, userId: {}", chatRoomId, userId);
-            throw new ChatRoomErrorException(ChatRoomErrorCode.AREADY_JOINED);
+            throw new ChatMemberErrorException(ChatMemberErrorCode.ALREADY_JOINED);
         }
 
         Long currentMemberCount = chatMemberService.countActiveMembers(chatRoomId);
