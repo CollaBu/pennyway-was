@@ -19,7 +19,7 @@ public class ChatMemberJoinOperation {
     private final ChatRoom chatRoom;
     private final Long currentMemberCount;
 
-    public ChatMemberJoinOperation(@NonNull User user, @NonNull ChatRoom chatRoom, @NonNull Long currentMemberCount,) {
+    public ChatMemberJoinOperation(@NonNull User user, @NonNull ChatRoom chatRoom, @NonNull Long currentMemberCount) {
         this.user = user;
         this.chatRoom = chatRoom;
         this.currentMemberCount = currentMemberCount;
