@@ -9,8 +9,6 @@ import kr.co.pennyway.domain.domains.chatroom.domain.ChatRoom;
 import kr.co.pennyway.domain.domains.chatroom.exception.ChatRoomErrorCode;
 import kr.co.pennyway.domain.domains.chatroom.exception.ChatRoomErrorException;
 import kr.co.pennyway.domain.domains.member.domain.ChatMember;
-import kr.co.pennyway.domain.domains.member.exception.ChatMemberErrorCode;
-import kr.co.pennyway.domain.domains.member.exception.ChatMemberErrorException;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorCode;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorException;
@@ -48,11 +46,6 @@ public class ChatMemberJoinService {
     @DistributedLock(key = "'chat-room-join-' + #chatRoomId")
     public Triple<ChatRoom, Integer, Long> execute(Long userId, Long chatRoomId, Integer password) {
         ChatRoom chatRoom = chatRoomService.readChatRoom(chatRoomId).orElseThrow(() -> new ChatRoomErrorException(ChatRoomErrorCode.NOT_FOUND_CHAT_ROOM));
-
-        if (chatMemberService.isExists(chatRoomId, userId)) {
-            log.warn("이미 채팅방에 참여한 사용자입니다. chatRoomId: {}, userId: {}", chatRoomId, userId);
-            throw new ChatMemberErrorException(ChatMemberErrorCode.ALREADY_JOINED);
-        }
 
         Long currentMemberCount = chatMemberService.countActiveMembers(chatRoomId);
         if (isFullRoom(currentMemberCount)) {

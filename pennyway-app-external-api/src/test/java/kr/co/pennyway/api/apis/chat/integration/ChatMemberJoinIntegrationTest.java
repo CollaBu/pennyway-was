@@ -15,6 +15,7 @@ import kr.co.pennyway.api.config.fixture.UserFixture;
 import kr.co.pennyway.domain.domains.chatroom.domain.ChatRoom;
 import kr.co.pennyway.domain.domains.chatroom.exception.ChatRoomErrorCode;
 import kr.co.pennyway.domain.domains.chatroom.repository.ChatRoomRepository;
+import kr.co.pennyway.domain.domains.member.exception.ChatMemberErrorCode;
 import kr.co.pennyway.domain.domains.member.repository.ChatMemberRepository;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.repository.UserRepository;
@@ -220,7 +221,44 @@ public class ChatMemberJoinIntegrationTest extends ExternalApiDBTestConfig {
 
         // then
         assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
 
+    @Test
+    @DisplayName("같은 사용자가 하나의 채팅방에 동시에 100개의 요청을 보내면, 100개의 가입 요청 중 1개만 성공한다")
+    void concurrentJoinRequestsFromSameUser() throws InterruptedException {
+        // given
+        User admin = userRepository.save(UserFixture.GENERAL_USER.toUser());
+        ChatRoom chatRoom = chatRoomRepository.save(ChatRoomFixture.PUBLIC_CHAT_ROOM.toEntity(idGenerator.generate()));
+        chatMemberRepository.save(ChatMemberFixture.ADMIN.toEntity(admin, chatRoom));
+
+        User user = userRepository.save(UserFixture.GENERAL_USER.toUser());
+
+        // when
+        CountDownLatch latch = new CountDownLatch(100);
+        List<CompletableFuture<JoinResult>> futures = IntStream.range(0, 100)
+                .mapToObj(i -> CompletableFuture.supplyAsync(() -> {
+                    try {
+                        return JoinResult.from(
+                                postJoining(user, chatRoom.getId(), new ChatMemberReq.Join(null))
+                        );
+                    } finally {
+                        latch.countDown();
+                    }
+                }))
+                .toList();
+
+        latch.await();
+
+        List<JoinResult> results = futures.stream()
+                .map(CompletableFuture::join)
+                .toList();
+
+        // then
+        assertAll(
+                () -> assertEquals(1, results.stream().filter(JoinResult::isSuccess).count()),
+                () -> assertEquals(99, results.stream().filter(JoinResult::isAlreadyJoinedError).count()),
+                () -> assertEquals(2, chatMemberRepository.countByChatRoomIdAndActive(chatRoom.getId()))
+        );
     }
 
     private ResponseEntity<?> postJoining(User user, Long chatRoomId, ChatMemberReq.Join request) {
@@ -279,6 +317,13 @@ public class ChatMemberJoinIntegrationTest extends ExternalApiDBTestConfig {
         public boolean isFullRoomError() {
             if (!isSuccess && body instanceof ErrorResponse errorResponse) {
                 return errorResponse.getCode().equals(ChatRoomErrorCode.FULL_CHAT_ROOM.causedBy().getCode());
+            }
+            return false;
+        }
+
+        public boolean isAlreadyJoinedError() {
+            if (!isSuccess && body instanceof ErrorResponse errorResponse) {
+                return errorResponse.getCode().equals(ChatMemberErrorCode.ALREADY_JOINED.causedBy().getCode());
             }
             return false;
         }
