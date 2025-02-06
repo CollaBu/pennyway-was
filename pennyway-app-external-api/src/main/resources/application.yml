@@ -60,7 +60,7 @@ springdoc:
 log:
   config:
     filename: app-dev
-    maxHistory: 7
+    maxHistory: 3
     maxFileSize: 10MB
     totalSizeCap: 500MB
 
