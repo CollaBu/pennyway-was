@@ -33,6 +33,6 @@ public class ChatMemberJoinService {
                 .execute(command.password());
         chatMemberRdbService.createMember(newChatMember.getUser(), newChatMember.getChatRoom());
 
-        return ChatMemberJoinResult.of(chatRoom, currentMemberCount);
+        return ChatMemberJoinResult.of(chatRoom, user.getName(), currentMemberCount);
     }
 }

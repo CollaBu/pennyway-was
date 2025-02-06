@@ -4,9 +4,16 @@ import kr.co.pennyway.domain.domains.chatroom.domain.ChatRoom;
 
 public record ChatMemberJoinResult(
         ChatRoom chatRoom,
+        String memberName,
         Long currentMemberCount
 ) {
-    public static ChatMemberJoinResult of(ChatRoom chatRoom, Long currentMemberCount) {
-        return new ChatMemberJoinResult(chatRoom, currentMemberCount);
+    public ChatMemberJoinResult(ChatRoom chatRoom, String memberName, Long currentMemberCount) {
+        this.chatRoom = chatRoom;
+        this.memberName = memberName;
+        this.currentMemberCount = currentMemberCount + 1;
+    }
+
+    public static ChatMemberJoinResult of(ChatRoom chatRoom, String memberName, Long currentMemberCount) {
+        return new ChatMemberJoinResult(chatRoom, memberName, currentMemberCount);
     }
 }
