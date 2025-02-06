@@ -2,9 +2,9 @@ package kr.co.pennyway.api.apis.chat.usecase;
 
 import kr.co.pennyway.api.apis.chat.dto.ChatMemberRes;
 import kr.co.pennyway.api.apis.chat.dto.ChatRoomRes;
+import kr.co.pennyway.api.apis.chat.helper.ChatMemberJoinHelper;
 import kr.co.pennyway.api.apis.chat.mapper.ChatMemberMapper;
 import kr.co.pennyway.api.apis.chat.mapper.ChatRoomMapper;
-import kr.co.pennyway.api.apis.chat.service.ChatMemberJoinService;
 import kr.co.pennyway.api.common.storage.AwsS3Adapter;
 import kr.co.pennyway.common.annotation.UseCase;
 import kr.co.pennyway.domain.context.chat.dto.ChatMemberBanCommand;
@@ -26,7 +26,7 @@ import java.util.Set;
 @UseCase
 @RequiredArgsConstructor
 public class ChatMemberUseCase {
-    private final ChatMemberJoinService chatMemberJoinService;
+    private final ChatMemberJoinHelper chatMemberJoinHelper;
     private final ChatRoomLeaveService chatRoomLeaveService;
     private final ChatMemberBanService chatMemberBanService;
     private final ChatRoomAdminDelegateService chatRoomAdminDelegateService;
@@ -35,7 +35,7 @@ public class ChatMemberUseCase {
     private final AwsS3Adapter awsS3Adapter;
 
     public ChatRoomRes.Detail joinChatRoom(Long userId, Long chatRoomId, Integer password) {
-        Triple<ChatRoom, Integer, Long> chatRoom = chatMemberJoinService.execute(userId, chatRoomId, password);
+        Triple<ChatRoom, Integer, Long> chatRoom = chatMemberJoinHelper.execute(userId, chatRoomId, password);
 
         return ChatRoomMapper.toChatRoomResDetail(chatRoom.getLeft(), null, false, chatRoom.getMiddle(), chatRoom.getRight(), awsS3Adapter.getObjectPrefix());
     }
