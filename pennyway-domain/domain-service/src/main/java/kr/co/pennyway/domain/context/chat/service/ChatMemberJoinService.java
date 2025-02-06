@@ -23,7 +23,7 @@ public class ChatMemberJoinService {
     private final ChatRoomRdbService chatRoomRdbService;
     private final ChatMemberRdbService chatMemberRdbService;
 
-    @DistributedLock(key = "'chat-room-join-' + #command.chatRoomId()")
+    @DistributedLock(key = "'chat-room-join-' + #command.chatRoomId()", leaseTime = 10L)
     public ChatMemberJoinResult execute(ChatMemberJoinCommand command) {
         var user = userRdbService.readUser(command.userId()).orElseThrow(() -> new UserErrorException(UserErrorCode.NOT_FOUND));
         var chatRoom = chatRoomRdbService.readChatRoom(command.chatRoomId()).orElseThrow(() -> new ChatRoomErrorException(ChatRoomErrorCode.NOT_FOUND_CHAT_ROOM));
