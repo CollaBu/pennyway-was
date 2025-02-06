@@ -69,6 +69,6 @@ public class ChatMemberJoinOperation {
     }
 
     private boolean matchPassword(Integer password) {
-        return chatRoom.isPrivateRoom() && chatRoom.matchPassword(password);
+        return chatRoom.isPrivateRoom() && !chatRoom.matchPassword(password);
     }
 }
