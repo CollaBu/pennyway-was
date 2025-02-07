@@ -15,6 +15,8 @@ import kr.co.pennyway.domain.domains.user.service.UserRdbService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.stream.Collectors;
+
 @Slf4j
 @DomainService
 @RequiredArgsConstructor
@@ -27,7 +29,9 @@ public class ChatMemberJoinService {
     public ChatMemberJoinResult execute(ChatMemberJoinCommand command) {
         var user = userRdbService.readUser(command.userId()).orElseThrow(() -> new UserErrorException(UserErrorCode.NOT_FOUND));
         var chatRoom = chatRoomRdbService.readChatRoom(command.chatRoomId()).orElseThrow(() -> new ChatRoomErrorException(ChatRoomErrorCode.NOT_FOUND_CHAT_ROOM));
-        var chatMembers = chatMemberRdbService.readChatMembersByChatRoomId(command.chatRoomId());
+        var chatMembers = chatMemberRdbService.readChatMembersByChatRoomId(command.chatRoomId())
+                .stream().filter(chatMember -> chatMember.isActive() && !chatMember.isBanned())
+                .collect(Collectors.toSet());
 
         var newChatMember = new ChatMemberJoinOperation(user, chatRoom, chatMembers)
                 .execute(command.password());
