@@ -40,9 +40,8 @@ public class ChatMember extends DateAuditable {
     @ColumnDefault("NULL")
     private LocalDateTime deletedAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
+    @Column(name = "user_id")
+    private Long userId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chat_room_id")
@@ -52,7 +51,7 @@ public class ChatMember extends DateAuditable {
     protected ChatMember(User user, ChatRoom chatRoom, ChatMemberRole role) {
         validate(user, chatRoom, role);
 
-        this.user = user;
+        this.userId = user.getId();
         this.participate(chatRoom);
         this.role = role;
         this.notifyEnabled = true;

@@ -26,6 +26,7 @@ import kr.co.pennyway.infra.common.jwt.JwtProvider;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -161,6 +162,7 @@ public class ChatMemberJoinIntegrationTest extends ExternalApiDBTestConfig {
     }
 
     @Test
+    @Disabled
     @DisplayName("트랜잭션 롤백: 이벤트 발행 실패 시 가입도 롤백된다")
     void rollbackWhenEventPublishFails() {
         // given

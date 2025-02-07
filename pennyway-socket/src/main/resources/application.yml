@@ -52,7 +52,7 @@ spring:
 log:
   config:
     filename: socket-dev
-    maxHistory: 7
+    maxHistory: 3
     maxFileSize: 10MB
     totalSizeCap: 500MB
 

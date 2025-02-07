@@ -62,7 +62,7 @@ public class ChatRoomAdminDelegateServiceIntegrationTest extends DomainServiceTe
         var chatMember = createChatMember(ChatMemberRole.MEMBER, chatRoom);
 
         // when
-        sut.execute(ChatRoomAdminDelegateCommand.of(chatRoom.getId(), chatAdmin.getUser().getId(), chatMember.getId()));
+        sut.execute(ChatRoomAdminDelegateCommand.of(chatRoom.getId(), chatAdmin.getUserId(), chatMember.getId()));
 
         // then
         assertEquals(ChatMemberRole.ADMIN, chatMember.getRole());
