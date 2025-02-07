@@ -19,6 +19,9 @@ public interface ChatMemberRepository extends ExtendedRepository<ChatMember, Lon
     Optional<ChatMember> findByChatRoom_IdAndRole(Long chatRoomId, ChatMemberRole role);
 
     @Transactional(readOnly = true)
+    Set<ChatMember> findByChatRoom_Id(Long chatRoomId);
+
+    @Transactional(readOnly = true)
     @Query("SELECT cm FROM ChatMember cm WHERE cm.chatRoom.id = :chatRoomId AND cm.id IN :chatMemberIds")
     List<ChatMember> findByChatRoom_IdAndIdIn(Long chatRoomId, Set<Long> chatMemberIds);
 
