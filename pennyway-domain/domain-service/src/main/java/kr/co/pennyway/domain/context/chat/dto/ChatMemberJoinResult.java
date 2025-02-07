@@ -10,7 +10,7 @@ public record ChatMemberJoinResult(
     public ChatMemberJoinResult(ChatRoom chatRoom, String memberName, Long currentMemberCount) {
         this.chatRoom = chatRoom;
         this.memberName = memberName;
-        this.currentMemberCount = currentMemberCount + 1;
+        this.currentMemberCount = currentMemberCount;
     }
 
     public static ChatMemberJoinResult of(ChatRoom chatRoom, String memberName, Long currentMemberCount) {
