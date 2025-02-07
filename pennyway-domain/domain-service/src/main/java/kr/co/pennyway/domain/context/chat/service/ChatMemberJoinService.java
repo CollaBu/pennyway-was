@@ -27,12 +27,12 @@ public class ChatMemberJoinService {
     public ChatMemberJoinResult execute(ChatMemberJoinCommand command) {
         var user = userRdbService.readUser(command.userId()).orElseThrow(() -> new UserErrorException(UserErrorCode.NOT_FOUND));
         var chatRoom = chatRoomRdbService.readChatRoom(command.chatRoomId()).orElseThrow(() -> new ChatRoomErrorException(ChatRoomErrorCode.NOT_FOUND_CHAT_ROOM));
-        var currentMemberCount = chatMemberRdbService.countActiveMembers(command.chatRoomId());
+        var chatMembers = chatMemberRdbService.readChatMembersByChatRoomId(command.chatRoomId());
 
-        var newChatMember = new ChatMemberJoinOperation(user, chatRoom, currentMemberCount)
+        var newChatMember = new ChatMemberJoinOperation(user, chatRoom, chatMembers)
                 .execute(command.password());
-        chatMemberRdbService.createMember(newChatMember.getUser(), newChatMember.getChatRoom());
+        chatMemberRdbService.create(newChatMember);
 
-        return ChatMemberJoinResult.of(chatRoom, user.getName(), currentMemberCount);
+        return ChatMemberJoinResult.of(chatRoom, user.getName(), Long.valueOf(chatMembers.size()));
     }
 }

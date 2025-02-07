@@ -11,18 +11,20 @@ import kr.co.pennyway.domain.domains.user.domain.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.NonNull;
 
+import java.util.Set;
+
 @Slf4j
 public class ChatMemberJoinOperation {
     private static final long MAX_MEMBER_COUNT = 300;
 
     private final User user;
     private final ChatRoom chatRoom;
-    private final Long currentMemberCount;
+    private final Set<ChatMember> chatMembers;
 
-    public ChatMemberJoinOperation(@NonNull User user, @NonNull ChatRoom chatRoom, @NonNull Long currentMemberCount) {
+    public ChatMemberJoinOperation(@NonNull User user, @NonNull ChatRoom chatRoom, @NonNull Set<ChatMember> chatMembers) {
         this.user = user;
         this.chatRoom = chatRoom;
-        this.currentMemberCount = currentMemberCount;
+        this.chatMembers = chatMembers;
     }
 
     /**
@@ -42,9 +44,11 @@ public class ChatMemberJoinOperation {
      * @throws ChatRoomErrorException   {@link ChatRoomErrorCode#INVALID_PASSWORD} : 비밀번호가 일치하지 않는 경우
      */
     public ChatMember execute(Integer password) {
-        if (isAlreadyJoined()) {
-            // 이 규칙은 현재 ChatMemberRdbService의 createMember 메서드에서 처리하고 있습니다.
-            // 도메인 규칙의 누수 여부를 검증하기 전까지는 이 규칙을 구현하지 않습니다.
+        var chatMember = ChatMember.of(user, chatRoom, ChatMemberRole.MEMBER);
+
+        if (isAlreadyJoined(chatMember)) {
+            log.warn("이미 채팅방에 참여한 사용자입니다. chatRoomId: {}, userId: {}", chatRoom.getId(), user.getId());
+            throw new ChatMemberErrorException(ChatMemberErrorCode.ALREADY_JOINED);
         }
 
         if (isFullRoom()) {
@@ -57,15 +61,15 @@ public class ChatMemberJoinOperation {
             throw new ChatRoomErrorException(ChatRoomErrorCode.INVALID_PASSWORD);
         }
 
-        return ChatMember.of(user, chatRoom, ChatMemberRole.MEMBER);
+        return chatMember;
     }
 
-    private boolean isAlreadyJoined() {
-        return false;
+    private boolean isAlreadyJoined(ChatMember chatMember) {
+        return chatMembers.contains(chatMember);
     }
 
     private boolean isFullRoom() {
-        return currentMemberCount >= MAX_MEMBER_COUNT;
+        return chatMembers.size() >= MAX_MEMBER_COUNT;
     }
 
     private boolean matchPassword(Integer password) {
