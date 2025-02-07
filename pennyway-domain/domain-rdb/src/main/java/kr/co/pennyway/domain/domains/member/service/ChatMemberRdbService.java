@@ -27,6 +27,11 @@ public class ChatMemberRdbService {
     private final QChatMember qChatMember = QChatMember.chatMember;
 
     @Transactional
+    public ChatMember create(ChatMember chatMember) {
+        return chatMemberRepository.save(chatMember);
+    }
+
+    @Transactional
     public ChatMember createAdmin(User user, ChatRoom chatRoom) {
         ChatMember chatMember = ChatMember.of(user, chatRoom, ChatMemberRole.ADMIN);
 
@@ -65,6 +70,11 @@ public class ChatMemberRdbService {
     @Transactional(readOnly = true)
     public Optional<ChatMemberResult.Detail> readAdmin(Long chatRoomId) {
         return chatMemberRepository.findAdminByChatRoomId(chatRoomId);
+    }
+
+    @Transactional(readOnly = true)
+    public Set<ChatMember> readChatMembersByChatRoomId(Long chatRoomId) {
+        return chatMemberRepository.findByChatRoom_Id(chatRoomId);
     }
 
     @Transactional(readOnly = true)
