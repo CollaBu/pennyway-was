@@ -44,9 +44,7 @@ public class ChatMemberJoinOperation {
      * @throws ChatRoomErrorException   {@link ChatRoomErrorCode#INVALID_PASSWORD} : 비밀번호가 일치하지 않는 경우
      */
     public ChatMember execute(Integer password) {
-        var chatMember = ChatMember.of(user, chatRoom, ChatMemberRole.MEMBER);
-
-        if (isAlreadyJoined(chatMember)) {
+        if (isAlreadyJoined()) {
             log.warn("이미 채팅방에 참여한 사용자입니다. chatRoomId: {}, userId: {}", chatRoom.getId(), user.getId());
             throw new ChatMemberErrorException(ChatMemberErrorCode.ALREADY_JOINED);
         }
@@ -61,12 +59,12 @@ public class ChatMemberJoinOperation {
             throw new ChatRoomErrorException(ChatRoomErrorCode.INVALID_PASSWORD);
         }
 
-        return chatMember;
+        return ChatMember.of(user, chatRoom, ChatMemberRole.MEMBER);
     }
 
-    private boolean isAlreadyJoined(ChatMember chatMember) {
+    private boolean isAlreadyJoined() {
         return chatMembers.stream()
-                .anyMatch(member -> member.getUserId().equals(chatMember.getUserId()));
+                .anyMatch(member -> member.getUserId().equals(user.getId()));
     }
 
     private boolean isFullRoom() {
