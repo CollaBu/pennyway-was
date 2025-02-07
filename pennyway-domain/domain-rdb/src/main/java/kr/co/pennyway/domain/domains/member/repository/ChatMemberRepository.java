@@ -13,7 +13,7 @@ import java.util.Set;
 
 public interface ChatMemberRepository extends ExtendedRepository<ChatMember, Long>, CustomChatMemberRepository {
     @Transactional(readOnly = true)
-    Set<ChatMember> findByChatRoom_IdAndUser_Id(Long chatRoomId, Long userId);
+    Set<ChatMember> findByChatRoom_IdAndUserId(Long chatRoomId, Long userId);
 
     @Transactional(readOnly = true)
     Optional<ChatMember> findByChatRoom_IdAndRole(Long chatRoomId, ChatMemberRole role);
@@ -30,7 +30,7 @@ public interface ChatMemberRepository extends ExtendedRepository<ChatMember, Lon
     Optional<ChatMember> findByChatMember_Id(Long chatMemberId);
 
     @Transactional(readOnly = true)
-    @Query("SELECT cm FROM ChatMember cm WHERE cm.chatRoom.id = :chatRoomId AND cm.user.id = :userId AND cm.deletedAt IS NULL")
+    @Query("SELECT cm FROM ChatMember cm WHERE cm.chatRoom.id = :chatRoomId AND cm.userId = :userId AND cm.deletedAt IS NULL")
     Optional<ChatMember> findActiveChatMember(Long chatRoomId, Long userId);
 
     @Transactional(readOnly = true)
@@ -38,11 +38,11 @@ public interface ChatMemberRepository extends ExtendedRepository<ChatMember, Lon
     long countByChatRoomIdAndActive(Long chatRoomId);
 
     @Transactional(readOnly = true)
-    @Query("SELECT cm.chatRoom.id FROM ChatMember cm WHERE cm.user.id = :userId AND cm.deletedAt IS NULL")
+    @Query("SELECT cm.chatRoom.id FROM ChatMember cm WHERE cm.userId = :userId AND cm.deletedAt IS NULL")
     Set<Long> findChatRoomIdsByUserId(Long userId);
 
     @Transactional(readOnly = true)
-    @Query("SELECT cm.user.id FROM ChatMember cm WHERE cm.chatRoom.id = :chatRoomId AND cm.deletedAt IS NULL")
+    @Query("SELECT cm.userId FROM ChatMember cm WHERE cm.chatRoom.id = :chatRoomId AND cm.deletedAt IS NULL")
     Set<Long> findUserIdsByChatRoomId(Long chatRoomId);
 
     @Transactional

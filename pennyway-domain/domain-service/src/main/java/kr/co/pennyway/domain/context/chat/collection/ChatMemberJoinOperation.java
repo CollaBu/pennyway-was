@@ -11,7 +11,7 @@ import kr.co.pennyway.domain.domains.user.domain.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.NonNull;
 
-import java.util.Set;
+import java.util.Collection;
 
 @Slf4j
 public class ChatMemberJoinOperation {
@@ -19,9 +19,9 @@ public class ChatMemberJoinOperation {
 
     private final User user;
     private final ChatRoom chatRoom;
-    private final Set<ChatMember> chatMembers;
+    private final Collection<ChatMember> chatMembers;
 
-    public ChatMemberJoinOperation(@NonNull User user, @NonNull ChatRoom chatRoom, @NonNull Set<ChatMember> chatMembers) {
+    public ChatMemberJoinOperation(@NonNull User user, @NonNull ChatRoom chatRoom, @NonNull Collection<ChatMember> chatMembers) {
         this.user = user;
         this.chatRoom = chatRoom;
         this.chatMembers = chatMembers;
@@ -65,7 +65,8 @@ public class ChatMemberJoinOperation {
     }
 
     private boolean isAlreadyJoined(ChatMember chatMember) {
-        return chatMembers.contains(chatMember);
+        return chatMembers.stream()
+                .anyMatch(member -> member.getUserId().equals(chatMember.getUserId()));
     }
 
     private boolean isFullRoom() {

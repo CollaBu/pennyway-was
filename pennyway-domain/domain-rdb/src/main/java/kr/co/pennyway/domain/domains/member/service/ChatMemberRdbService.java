@@ -3,6 +3,7 @@ package kr.co.pennyway.domain.domains.member.service;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Predicate;
 import kr.co.pennyway.common.annotation.DomainService;
+import kr.co.pennyway.domain.common.repository.QueryHandler;
 import kr.co.pennyway.domain.domains.chatroom.domain.ChatRoom;
 import kr.co.pennyway.domain.domains.member.domain.ChatMember;
 import kr.co.pennyway.domain.domains.member.domain.QChatMember;
@@ -11,6 +12,7 @@ import kr.co.pennyway.domain.domains.member.exception.ChatMemberErrorCode;
 import kr.co.pennyway.domain.domains.member.exception.ChatMemberErrorException;
 import kr.co.pennyway.domain.domains.member.repository.ChatMemberRepository;
 import kr.co.pennyway.domain.domains.member.type.ChatMemberRole;
+import kr.co.pennyway.domain.domains.user.domain.QUser;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +26,7 @@ import java.util.*;
 public class ChatMemberRdbService {
     private final ChatMemberRepository chatMemberRepository;
 
+    private final QUser qUser = QUser.user;
     private final QChatMember qChatMember = QChatMember.chatMember;
 
     @Transactional
@@ -40,7 +43,7 @@ public class ChatMemberRdbService {
 
     @Transactional
     public ChatMember createMember(User user, ChatRoom chatRoom) {
-        Set<ChatMember> chatMembers = chatMemberRepository.findByChatRoom_IdAndUser_Id(chatRoom.getId(), user.getId());
+        Set<ChatMember> chatMembers = chatMemberRepository.findByChatRoom_IdAndUserId(chatRoom.getId(), user.getId());
 
         if (chatMembers.stream().anyMatch(ChatMember::isActive)) {
             log.warn("사용자는 이미 채팅방에 가입되어 있습니다. chatRoomId: {}, userId: {}", chatRoom.getId(), user.getId());
@@ -79,51 +82,57 @@ public class ChatMemberRdbService {
 
     @Transactional(readOnly = true)
     public List<ChatMemberResult.Detail> readChatMembersByIdIn(Long chatRoomId, Set<Long> chatMemberIds) {
+        QueryHandler queryHandler = query -> query.innerJoin(qUser).on(qChatMember.userId.eq(qUser.id));
+
         Predicate predicate = qChatMember.chatRoom.id.eq(chatRoomId)
                 .and(qChatMember.id.in(chatMemberIds))
                 .and(qChatMember.deletedAt.isNull());
 
         Map<String, Expression<?>> bindings = new LinkedHashMap<>();
         bindings.put("id", qChatMember.id);
-        bindings.put("name", qChatMember.user.name);
+        bindings.put("name", qUser.name);
         bindings.put("role", qChatMember.role);
         bindings.put("notification", qChatMember.notifyEnabled);
-        bindings.put("userId", qChatMember.user.id);
+        bindings.put("userId", qUser.id);
         bindings.put("createdAt", qChatMember.createdAt);
-        bindings.put("profileImageUrl", qChatMember.user.profileImageUrl);
+        bindings.put("profileImageUrl", qUser.profileImageUrl);
 
-        return chatMemberRepository.selectList(predicate, ChatMemberResult.Detail.class, bindings, null, null);
+        return chatMemberRepository.selectList(predicate, ChatMemberResult.Detail.class, bindings, queryHandler, null);
     }
 
     @Transactional(readOnly = true)
     public List<ChatMemberResult.Detail> readChatMembersByUserIdIn(Long chatRoomId, Set<Long> userIds) {
+        QueryHandler queryHandler = query -> query.innerJoin(qUser).on(qChatMember.userId.eq(qUser.id));
+
         Predicate predicate = qChatMember.chatRoom.id.eq(chatRoomId)
-                .and(qChatMember.user.id.in(userIds))
+                .and(qUser.id.in(userIds))
                 .and(qChatMember.deletedAt.isNull());
 
         Map<String, Expression<?>> bindings = new LinkedHashMap<>();
-        bindings.put("id", qChatMember.id);
-        bindings.put("name", qChatMember.user.name);
+        bindings.put("id", qUser.id);
+        bindings.put("name", qUser.name);
         bindings.put("role", qChatMember.role);
         bindings.put("notification", qChatMember.notifyEnabled);
-        bindings.put("userId", qChatMember.user.id);
+        bindings.put("userId", qUser.id);
         bindings.put("createdAt", qChatMember.createdAt);
-        bindings.put("profileImageUrl", qChatMember.user.profileImageUrl);
+        bindings.put("profileImageUrl", qUser.profileImageUrl);
 
-        return chatMemberRepository.selectList(predicate, ChatMemberResult.Detail.class, bindings, null, null);
+        return chatMemberRepository.selectList(predicate, ChatMemberResult.Detail.class, bindings, queryHandler, null);
     }
 
     @Transactional(readOnly = true)
     public List<ChatMemberResult.Summary> readChatMemberIdsByUserIdNotIn(Long chatRoomId, Set<Long> userIds) {
+        QueryHandler queryHandler = query -> query.innerJoin(qUser).on(qChatMember.userId.eq(qUser.id));
+
         Predicate predicate = qChatMember.chatRoom.id.eq(chatRoomId)
-                .and(qChatMember.user.id.notIn(userIds))
+                .and(qUser.id.notIn(userIds))
                 .and(qChatMember.deletedAt.isNull());
 
         Map<String, Expression<?>> bindings = new LinkedHashMap<>();
         bindings.put("id", qChatMember.id);
-        bindings.put("name", qChatMember.user.name);
+        bindings.put("name", qUser.name);
 
-        return chatMemberRepository.selectList(predicate, ChatMemberResult.Summary.class, bindings, null, null);
+        return chatMemberRepository.selectList(predicate, ChatMemberResult.Summary.class, bindings, queryHandler, null);
     }
 
     @Transactional(readOnly = true)

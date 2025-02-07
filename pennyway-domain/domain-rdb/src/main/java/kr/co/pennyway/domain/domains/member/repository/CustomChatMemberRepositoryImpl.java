@@ -6,6 +6,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import kr.co.pennyway.domain.domains.member.domain.QChatMember;
 import kr.co.pennyway.domain.domains.member.dto.ChatMemberResult;
 import kr.co.pennyway.domain.domains.member.type.ChatMemberRole;
+import kr.co.pennyway.domain.domains.user.domain.QUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -17,13 +18,14 @@ public class CustomChatMemberRepositoryImpl implements CustomChatMemberRepositor
     private final JPAQueryFactory queryFactory;
 
     private final QChatMember chatMember = QChatMember.chatMember;
+    private final QUser user = QUser.user;
 
     @Override
     public boolean existsByChatRoomIdAndUserId(Long chatRoomId, Long userId) {
         return queryFactory.select(ConstantImpl.create(1))
                 .from(chatMember)
                 .where(chatMember.chatRoom.id.eq(chatRoomId)
-                        .and(chatMember.user.id.eq(userId))
+                        .and(chatMember.userId.eq(userId))
                         .and(chatMember.deletedAt.isNull()))
                 .fetchFirst() != null;
     }
@@ -32,7 +34,7 @@ public class CustomChatMemberRepositoryImpl implements CustomChatMemberRepositor
     public boolean existsOwnershipChatRoomByUserId(Long userId) {
         return queryFactory.select(ConstantImpl.create(1))
                 .from(chatMember)
-                .where(chatMember.user.id.eq(userId)
+                .where(chatMember.userId.eq(userId)
                         .and(chatMember.role.eq(ChatMemberRole.ADMIN))
                         .and(chatMember.deletedAt.isNull()))
                 .fetchFirst() != null;
@@ -43,7 +45,7 @@ public class CustomChatMemberRepositoryImpl implements CustomChatMemberRepositor
         return queryFactory.select(ConstantImpl.create(1))
                 .from(chatMember)
                 .where(chatMember.chatRoom.id.eq(chatRoomId)
-                        .and(chatMember.user.id.eq(userId))
+                        .and(chatMember.userId.eq(userId))
                         .and(chatMember.id.eq(chatMemberId))
                         .and(chatMember.deletedAt.isNull()))
                 .fetchFirst() != null;
@@ -56,15 +58,16 @@ public class CustomChatMemberRepositoryImpl implements CustomChatMemberRepositor
                                 Projections.constructor(
                                         ChatMemberResult.Detail.class,
                                         chatMember.id,
-                                        chatMember.user.name,
+                                        user.name,
                                         chatMember.role,
                                         chatMember.notifyEnabled,
-                                        chatMember.user.id,
+                                        user.id,
                                         chatMember.createdAt,
-                                        chatMember.user.profileImageUrl
+                                        user.profileImageUrl
                                 )
                         )
                         .from(chatMember)
+                        .innerJoin(user).on(chatMember.userId.eq(user.id))
                         .where(chatMember.chatRoom.id.eq(chatRoomId)
                                 .and(chatMember.role.eq(ChatMemberRole.ADMIN))
                                 .and(chatMember.deletedAt.isNull()))

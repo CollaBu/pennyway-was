@@ -125,7 +125,7 @@ public class ChatRoomDeleteServiceIntegrationTest extends DomainServiceTestInfra
         var admin = chatMemberRepository.save(ChatMember.of(users.get(0), chatRoom, ChatMemberRole.ADMIN));
         var members = createGeneralChatMembers(users.subList(1, users.size()), chatRoom);
 
-        ChatRoomDeleteCommand command = ChatRoomDeleteCommand.of(admin.getUser().getId(), chatRoom.getId());
+        ChatRoomDeleteCommand command = ChatRoomDeleteCommand.of(admin.getUserId(), chatRoom.getId());
 
         // when
         chatRoomDeleteService.execute(command);

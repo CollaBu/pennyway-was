@@ -101,8 +101,9 @@ public class ChatRoomWithParticipantsSearchServiceTest {
     @DisplayName("일반 회원이 채팅방 참여자 정보와 최근 메시지를 조회하면 관리자 정보도 함께 조회된다")
     public void memberSuccessToRetrieveChatRoomWithParticipantsIncludingAdmin() {
         // given
-        ChatMember myInfo = createChatMember(userId, UserFixture.GENERAL_USER.toUser(), chatRoom, ChatMemberRole.MEMBER);
-        ChatMemberResult.Detail adminDetail = new ChatMemberResult.Detail(2L, "Admin", ChatMemberRole.ADMIN, true, 2L, LocalDateTime.now(), myInfo.getUser().getProfileImageUrl());
+        User user = UserFixture.GENERAL_USER.toUser();
+        ChatMember myInfo = createChatMember(userId, user, chatRoom, ChatMemberRole.MEMBER);
+        ChatMemberResult.Detail adminDetail = new ChatMemberResult.Detail(2L, "Admin", ChatMemberRole.ADMIN, true, 2L, LocalDateTime.now(), user.getProfileImageUrl());
         List<ChatMessage> recentMessages = createRecentMessages();
         List<ChatMemberResult.Detail> recentParticipants = createRecentParticipantDetails();
         List<ChatMemberResult.Summary> otherParticipants = createOtherParticipantSummaries();
