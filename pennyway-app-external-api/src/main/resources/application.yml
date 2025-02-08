@@ -16,6 +16,9 @@ jwt:
 pennyway:
   rabbitmq:
     validate-connection: true
+  admin:
+    phone: ${PENNYWAY_ADMIN_PHONE:1234567890}
+    password: ${PENNYWAY_ADMIN_PASSWORD:1234567890}
 
 ---
 spring:

@@ -6,8 +6,8 @@ import kr.co.pennyway.api.common.exception.PhoneVerificationException;
 import kr.co.pennyway.domain.context.account.service.PhoneCodeService;
 import kr.co.pennyway.domain.domains.phone.type.PhoneCodeKeyType;
 import kr.co.pennyway.infra.common.event.PushCodeEvent;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
@@ -16,10 +16,24 @@ import java.util.concurrent.ThreadLocalRandom;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class PhoneVerificationService {
     private final PhoneCodeService phoneCodeService;
     private final ApplicationEventPublisher eventPublisher;
+
+    private final String adminPhone;
+    private final String adminCode;
+
+    public PhoneVerificationService(
+            PhoneCodeService phoneCodeService,
+            ApplicationEventPublisher eventPublisher,
+            @Value("${pennyway.admin.phone}") String adminPhone,
+            @Value("${pennyway.admin.password}") String adminCode
+    ) {
+        this.phoneCodeService = phoneCodeService;
+        this.eventPublisher = eventPublisher;
+        this.adminPhone = adminPhone;
+        this.adminCode = adminCode;
+    }
 
     /**
      * 휴대폰 번호로 인증 코드를 발송하고 캐싱한다. (5분간 유효)
@@ -47,6 +61,11 @@ public class PhoneVerificationService {
      */
     public Boolean isValidCode(PhoneVerificationDto.VerifyCodeReq request, PhoneCodeKeyType codeType) throws IllegalArgumentException {
         String expectedCode;
+
+        if (byPassVerificationCode(request.phone(), request.code(), codeType)) {
+            return Boolean.TRUE;
+        }
+
         try {
             expectedCode = phoneCodeService.readByPhone(request.phone(), codeType);
         } catch (IllegalArgumentException e) {
@@ -66,5 +85,25 @@ public class PhoneVerificationService {
             sb.append(ThreadLocalRandom.current().nextInt(0, 10));
         }
         return sb.toString();
+    }
+
+    private boolean byPassVerificationCode(String phone, String code, PhoneCodeKeyType codeType) {
+        if (codeType.equals(PhoneCodeKeyType.FIND_PASSWORD) || codeType.equals(PhoneCodeKeyType.FIND_USERNAME)) {
+            return Boolean.FALSE;
+        }
+
+        if (isAdminPhone(phone)) {
+            if (!adminCode.equals(code))
+                throw new PhoneVerificationException(PhoneVerificationErrorCode.IS_NOT_VALID_CODE);
+            log.info("관리자 전화번호로 인증되었습니다.");
+
+            return Boolean.TRUE;
+        }
+
+        return Boolean.FALSE;
+    }
+
+    private boolean isAdminPhone(String phone) {
+        return adminPhone.equals(phone);
     }
 }
