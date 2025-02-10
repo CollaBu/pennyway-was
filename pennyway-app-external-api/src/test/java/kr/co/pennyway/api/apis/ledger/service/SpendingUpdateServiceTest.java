@@ -1,13 +1,12 @@
 package kr.co.pennyway.api.apis.ledger.service;
 
 import kr.co.pennyway.api.apis.ledger.dto.SpendingReq;
-import kr.co.pennyway.api.common.security.authorization.SpendingCategoryManager;
 import kr.co.pennyway.api.config.fixture.UserFixture;
+import kr.co.pennyway.domain.context.finance.service.SpendingCategoryService;
+import kr.co.pennyway.domain.context.finance.service.SpendingService;
 import kr.co.pennyway.domain.domains.spending.domain.Spending;
 import kr.co.pennyway.domain.domains.spending.domain.SpendingCustomCategory;
 import kr.co.pennyway.domain.domains.spending.exception.SpendingErrorException;
-import kr.co.pennyway.domain.domains.spending.service.SpendingCustomCategoryService;
-import kr.co.pennyway.domain.domains.spending.service.SpendingService;
 import kr.co.pennyway.domain.domains.spending.type.SpendingCategory;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import lombok.extern.slf4j.Slf4j;
@@ -29,11 +28,9 @@ import static org.mockito.BDDMockito.given;
 public class SpendingUpdateServiceTest {
     private SpendingUpdateService spendingUpdateService;
     @Mock
-    private SpendingCustomCategoryService spendingCustomCategoryService;
+    private SpendingCategoryService spendingCategoryService;
     @Mock
     private SpendingService spendingService;
-    @Mock
-    private SpendingCategoryManager spendingCategoryManager;
 
     private Spending spending;
     private Spending spendingWithCustomCategory;
@@ -45,7 +42,7 @@ public class SpendingUpdateServiceTest {
 
     @BeforeEach
     void setUp() {
-        spendingUpdateService = new SpendingUpdateService(spendingService, spendingCustomCategoryService, spendingCategoryManager);
+        spendingUpdateService = new SpendingUpdateService(spendingService, spendingCategoryService);
 
         request = new SpendingReq(10000, -1L, SpendingCategory.FOOD, LocalDate.now(), "소비처", "메모");
         requestWithCustomCategory = new SpendingReq(10000, 1L, SpendingCategory.CUSTOM, LocalDate.now(), "소비처", "메모");
@@ -64,7 +61,7 @@ public class SpendingUpdateServiceTest {
         // given
         Long spendingId = 1L;
         given(spendingService.readSpending(spendingId)).willReturn(Optional.of(spending));
-        given(spendingCustomCategoryService.readSpendingCustomCategory(1L)).willReturn(Optional.empty());
+        given(spendingCategoryService.readSpendingCustomCategory(1L)).willReturn(Optional.empty());
 
         // when - then
         SpendingErrorException exception = assertThrows(SpendingErrorException.class, () -> {
@@ -79,7 +76,7 @@ public class SpendingUpdateServiceTest {
         // given
         Long spendingId = 1L;
         given(spendingService.readSpending(spendingId)).willReturn(Optional.of(spending));
-        given(spendingCustomCategoryService.readSpendingCustomCategory(1L)).willReturn(Optional.of(customCategory));
+        given(spendingCategoryService.readSpendingCustomCategory(1L)).willReturn(Optional.of(customCategory));
 
         // when - then
         assertDoesNotThrow(() -> spendingUpdateService.updateSpending(spendingId, requestWithCustomCategory));

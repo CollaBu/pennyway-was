@@ -13,6 +13,8 @@ import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.util.concurrent.TimeUnit;
+
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -20,6 +22,7 @@ public class SpendingNotifyScheduler {
     private final JobLauncher jobLauncher;
     private final Job dailyNotificationJob;
     private final Job monthlyNotificationJob;
+    private final Job lastMessageIdJob;
 
     @Scheduled(cron = "0 0 20 * * ?")
     public void runDailyNotificationJob() {
@@ -46,6 +49,20 @@ public class SpendingNotifyScheduler {
         } catch (JobExecutionAlreadyRunningException | JobRestartException
                  | JobInstanceAlreadyCompleteException | JobParametersInvalidException e) {
             log.error("Failed to run monthlyNotificationJob", e);
+        }
+    }
+
+    @Scheduled(fixedRate = 30, timeUnit = TimeUnit.MINUTES)
+    public void runLastMessageIdJob() {
+        JobParameters jobParameters = new JobParametersBuilder()
+                .addLong("time", System.currentTimeMillis())
+                .toJobParameters();
+
+        try {
+            jobLauncher.run(lastMessageIdJob, jobParameters);
+        } catch (JobExecutionAlreadyRunningException | JobRestartException
+                 | JobInstanceAlreadyCompleteException | JobParametersInvalidException e) {
+            log.error("Failed to run lastMessageIdJob", e);
         }
     }
 }

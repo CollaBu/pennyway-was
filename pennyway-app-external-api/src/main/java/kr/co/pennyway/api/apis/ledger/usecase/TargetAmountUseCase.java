@@ -7,7 +7,7 @@ import kr.co.pennyway.api.apis.ledger.service.TargetAmountDeleteService;
 import kr.co.pennyway.api.apis.ledger.service.TargetAmountSaveService;
 import kr.co.pennyway.api.apis.ledger.service.TargetAmountSearchService;
 import kr.co.pennyway.common.annotation.UseCase;
-import kr.co.pennyway.domain.common.redisson.DistributedLockPrefix;
+import kr.co.pennyway.domain.common.annotation.DistributedLockPrefix;
 import kr.co.pennyway.domain.domains.spending.dto.TotalSpendingAmount;
 import kr.co.pennyway.domain.domains.target.domain.TargetAmount;
 import lombok.RequiredArgsConstructor;

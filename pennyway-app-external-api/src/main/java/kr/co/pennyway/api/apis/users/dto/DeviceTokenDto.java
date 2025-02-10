@@ -10,10 +10,16 @@ public class DeviceTokenDto {
     public record RegisterReq(
             @Schema(description = "디바이스 FCM 토큰", requiredMode = Schema.RequiredMode.REQUIRED)
             @NotBlank(message = "token은 필수입니다.")
-            String token
+            String token,
+            @Schema(description = "디바이스 ID", requiredMode = Schema.RequiredMode.REQUIRED)
+            @NotBlank(message = "deviceId는 필수입니다.")
+            String deviceId,
+            @Schema(description = "디바이스 이름", requiredMode = Schema.RequiredMode.REQUIRED)
+            @NotBlank(message = "deviceName은 필수입니다.")
+            String deviceName
     ) {
         public DeviceToken toEntity(User user) {
-            return DeviceToken.of(token, user);
+            return DeviceToken.of(token, deviceId, deviceName, user);
         }
     }
 

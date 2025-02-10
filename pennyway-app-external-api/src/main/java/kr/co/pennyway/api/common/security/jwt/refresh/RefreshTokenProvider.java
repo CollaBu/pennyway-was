@@ -5,7 +5,6 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import kr.co.pennyway.api.common.annotation.RefreshTokenStrategy;
-import kr.co.pennyway.api.common.security.jwt.access.AccessTokenClaim;
 import kr.co.pennyway.common.util.DateUtil;
 import kr.co.pennyway.infra.common.exception.JwtErrorCode;
 import kr.co.pennyway.infra.common.exception.JwtErrorException;
@@ -23,8 +22,7 @@ import java.util.Base64;
 import java.util.Date;
 import java.util.Map;
 
-import static kr.co.pennyway.api.common.security.jwt.refresh.RefreshTokenClaimKeys.ROLE;
-import static kr.co.pennyway.api.common.security.jwt.refresh.RefreshTokenClaimKeys.USER_ID;
+import static kr.co.pennyway.api.common.security.jwt.refresh.RefreshTokenClaimKeys.*;
 
 @Slf4j
 @Component
@@ -57,7 +55,11 @@ public class RefreshTokenProvider implements JwtProvider {
     @Override
     public JwtClaims getJwtClaimsFromToken(String token) {
         Claims claims = getClaimsFromToken(token);
-        return AccessTokenClaim.of(Long.parseLong(claims.get(USER_ID.getValue(), String.class)), claims.get(ROLE.getValue(), String.class));
+        return RefreshTokenClaim.of(
+                Long.parseLong(claims.get(USER_ID.getValue(), String.class)),
+                claims.get(DEVICE_ID.getValue(), String.class),
+                claims.get(ROLE.getValue(), String.class)
+        );
     }
 
     @Override

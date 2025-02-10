@@ -1,5 +1,7 @@
 package kr.co.pennyway.infra.client.aws.s3;
 
+import kr.co.pennyway.infra.client.aws.s3.url.generator.UrlGenerator;
+import kr.co.pennyway.infra.client.aws.s3.url.properties.PresignedUrlPropertyFactory;
 import kr.co.pennyway.infra.common.exception.StorageErrorCode;
 import kr.co.pennyway.infra.common.exception.StorageException;
 import kr.co.pennyway.infra.config.AwsS3Config;
@@ -13,15 +15,11 @@ import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequ
 
 import java.net.URI;
 import java.time.Duration;
-import java.util.Map;
-import java.util.Set;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class AwsS3Provider {
-    private static final Set<String> extensionSet = Set.of("jpg", "png", "jpeg");
-
     private final AwsS3Config awsS3Config;
     private final S3Presigner s3Presigner;
     private final S3Client s3Client;
@@ -29,22 +27,14 @@ public class AwsS3Provider {
     /**
      * type에 해당하는 확장자를 가진 파일을 S3에 저장하기 위한 Presigned URL을 생성한다.
      *
-     * @param type       : ObjectKeyType (PROFILE, FEED, CHATROOM_PROFILE, CHAT, CHAT_PROFILE)
-     * @param ext        : 파일 확장자 (jpg, png, jpeg)
-     * @param userId     : 사용자 ID (PK) - PROFILE, CHAT_PROFILE
-     * @param chatroomId : 채팅방 ID (PK) - CHATROOM_PROFILE, CHAT, CHAT_PROFILE
+     * @param factory {@link PresignedUrlPropertyFactory} : Presigned URL 생성을 위한 Property Factory
      * @return Presigned URL
-     * @throws Exception
      */
-    public URI generatedPresignedUrl(String type, String ext, String userId, String chatroomId) {
+    public URI generatedPresignedUrl(PresignedUrlPropertyFactory factory) {
         try {
-            if (!extensionSet.contains(ext)) {
-                throw new StorageException(StorageErrorCode.INVALID_EXTENSION);
-            }
-
             PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                     .bucket(awsS3Config.getBucketName())
-                    .key(generateObjectKey(type, ext, userId, chatroomId))
+                    .key(generateObjectKey(factory))
                     .build();
 
             PresignedPutObjectRequest presignedRequest = s3Presigner.presignPutObject(r -> r.putObjectRequest(putObjectRequest)
@@ -60,38 +50,11 @@ public class AwsS3Provider {
     /**
      * type에 해당하는 ObjectKeyTemplate을 적용하여 ObjectKey(S3에 저장하기 위한 정적 파일의 경로 및 이름)를 생성한다.
      *
-     * @param type       : ObjectKeyType (PROFILE, FEED, CHATROOM_PROFILE, CHAT, CHAT_PROFILE)
-     * @param ext        : 파일 확장자 (jpg, png, jpeg)
-     * @param userId     : 사용자 ID (PK) - PROFILE, CHAT_PROFILE
-     * @param chatroomId : 채팅방 ID (PK) - CHATROOM_PROFILE, CHAT, CHAT_PROFILE
+     * @param factory {@link PresignedUrlPropertyFactory} : Presigned URL 생성을 위한 Property Factory
      * @return ObjectKey
      */
-    private String generateObjectKey(String type, String ext, String userId, String chatroomId) {
-        ObjectKeyTemplate objectKeyTemplate = new ObjectKeyTemplate(ObjectKeyType.valueOf(type).getDeleteTemplate());
-        Map<String, String> variables = generateObjectKeyVariables(type, ext, userId, chatroomId);
-        String objectKey = objectKeyTemplate.apply(variables);
-        return objectKey;
-
-    }
-
-    /**
-     * ObjectKey에 사용될 변수들을 Template에 적용하기 위한 Map에 담아 반환한다.
-     *
-     * @param type       : ObjectKeyType (PROFILE, FEED, CHATROOM_PROFILE, CHAT, CHAT_PROFILE)
-     * @param ext        : 파일 확장자 (jpg, png, jpeg)
-     * @param userId     : 사용자 ID (PK) - PROFILE, CHAT_PROFILE
-     * @param chatroomId : 채팅방 ID (PK) - CHATROOM_PROFILE, CHAT, CHAT_PROFILE
-     */
-    private Map<String, String> generateObjectKeyVariables(String type, String ext, String userId, String chatroomId) {
-        ObjectKeyType objectType;
-        try {
-            objectType = ObjectKeyType.valueOf(type);
-        } catch (IllegalArgumentException e) {
-            throw new StorageException(StorageErrorCode.INVALID_TYPE);
-        }
-
-        UrlGenerator urlGenerator = UrlGeneratorFactory.getUrlGenerator(objectType);
-        return urlGenerator.generate(type, ext, userId, chatroomId);
+    private String generateObjectKey(PresignedUrlPropertyFactory factory) {
+        return UrlGenerator.createDeleteUrl(factory.getProperty());
     }
 
     /**
@@ -120,12 +83,12 @@ public class AwsS3Provider {
     /**
      * S3에 저장된 파일을 복사한다.
      *
-     * @param type      : ObjectKeyType (PROFILE, FEED, CHATROOM_PROFILE, CHAT, CHAT_PROFILE)
-     * @param sourceKey : 복사할 파일의 키
+     * @param type      {@link ActualIdProvider} : 실제 ID를 제공하는 클래스
+     * @param sourceKey String : 복사할 파일의 키
      * @return 복사된 파일의 키
      */
-    public String copyObject(ObjectKeyType type, String sourceKey) {
-        String originKey = type.convertDeleteKeyToOriginKey(sourceKey);
+    public String copyObject(ActualIdProvider type, String sourceKey) {
+        String originKey = UrlGenerator.convertDeleteToOriginUrl(type, sourceKey);
 
         try {
             CopyObjectRequest copyObjRequest = CopyObjectRequest.builder()

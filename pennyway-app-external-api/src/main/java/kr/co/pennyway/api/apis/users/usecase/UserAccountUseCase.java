@@ -8,11 +8,12 @@ import kr.co.pennyway.api.apis.users.mapper.UserProfileMapper;
 import kr.co.pennyway.api.apis.users.service.*;
 import kr.co.pennyway.api.common.storage.AwsS3Adapter;
 import kr.co.pennyway.common.annotation.UseCase;
+import kr.co.pennyway.domain.context.account.service.DeviceTokenRegisterService;
 import kr.co.pennyway.domain.domains.device.domain.DeviceToken;
 import kr.co.pennyway.domain.domains.oauth.domain.Oauth;
 import kr.co.pennyway.domain.domains.user.domain.NotifySetting;
 import kr.co.pennyway.domain.domains.user.domain.User;
-import kr.co.pennyway.infra.client.aws.s3.ObjectKeyType;
+import kr.co.pennyway.infra.client.aws.s3.ActualIdProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,7 +37,7 @@ public class UserAccountUseCase {
 
     @Transactional
     public DeviceTokenDto.RegisterRes registerDeviceToken(Long userId, DeviceTokenDto.RegisterReq request) {
-        DeviceToken deviceToken = deviceTokenRegisterService.execute(userId, request.token());
+        DeviceToken deviceToken = deviceTokenRegisterService.execute(userId, request.deviceId(), request.deviceName(), request.token());
         return DeviceTokenMapper.toRegisterRes(deviceToken);
     }
 
@@ -69,7 +70,7 @@ public class UserAccountUseCase {
     }
 
     public String updateProfileImage(Long userId, UserProfileUpdateDto.ProfileImageReq request) {
-        String originImageUrl = awsS3Adapter.saveImage(request.profileImageUrl(), ObjectKeyType.PROFILE);
+        String originImageUrl = awsS3Adapter.saveImage(request.profileImageUrl(), ActualIdProvider.createInstanceOfProfile());
         String oldImageUrl = userProfileUpdateService.updateProfileImage(userId, originImageUrl);
 
         if (oldImageUrl != null) {

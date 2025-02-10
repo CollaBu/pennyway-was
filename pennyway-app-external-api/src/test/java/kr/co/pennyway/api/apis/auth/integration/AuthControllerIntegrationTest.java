@@ -7,14 +7,14 @@ import kr.co.pennyway.api.common.exception.PhoneVerificationErrorCode;
 import kr.co.pennyway.api.config.ExternalApiDBTestConfig;
 import kr.co.pennyway.api.config.ExternalApiIntegrationTest;
 import kr.co.pennyway.api.config.fixture.UserFixture;
-import kr.co.pennyway.domain.common.redis.phone.PhoneCodeKeyType;
-import kr.co.pennyway.domain.common.redis.phone.PhoneCodeService;
+import kr.co.pennyway.domain.context.account.service.OauthService;
+import kr.co.pennyway.domain.context.account.service.PhoneCodeService;
+import kr.co.pennyway.domain.context.account.service.UserService;
 import kr.co.pennyway.domain.domains.oauth.domain.Oauth;
-import kr.co.pennyway.domain.domains.oauth.service.OauthService;
 import kr.co.pennyway.domain.domains.oauth.type.Provider;
+import kr.co.pennyway.domain.domains.phone.type.PhoneCodeKeyType;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorCode;
-import kr.co.pennyway.domain.domains.user.service.UserService;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -43,6 +43,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class AuthControllerIntegrationTest extends ExternalApiDBTestConfig {
     private final String expectedPhone = "010-1234-5678";
     private final String expectedCode = "123456";
+    private final String expectedDeviceId = "AA-BB-CC-DD";
 
     @Autowired
     private MockMvc mockMvc;
@@ -224,7 +225,7 @@ public class AuthControllerIntegrationTest extends ExternalApiDBTestConfig {
         }
 
         private ResultActions performGeneralSignUpRequest(String code) throws Exception {
-            SignUpReq.General request = new SignUpReq.General(UserFixture.GENERAL_USER.getUsername(), "pennyway", "dkssudgktpdy1", expectedPhone, code);
+            SignUpReq.General request = new SignUpReq.General(UserFixture.GENERAL_USER.getUsername(), "pennyway", "dkssudgktpdy1", expectedPhone, code, expectedDeviceId);
             return mockMvc.perform(
                     post("/v1/auth/sign-up")
                             .contentType(MediaType.APPLICATION_JSON)
@@ -286,7 +287,7 @@ public class AuthControllerIntegrationTest extends ExternalApiDBTestConfig {
         }
 
         private ResultActions performSyncWithOauthSignUpRequest(String expectedPhone, String code) throws Exception {
-            SignUpReq.SyncWithOauth request = new SignUpReq.SyncWithOauth("dkssudgktpdy1", expectedPhone, code);
+            SignUpReq.SyncWithOauth request = new SignUpReq.SyncWithOauth("dkssudgktpdy1", expectedPhone, code, expectedDeviceId);
             return mockMvc.perform(
                     post("/v1/auth/link-oauth")
                             .contentType(MediaType.APPLICATION_JSON)

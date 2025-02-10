@@ -1,11 +1,11 @@
 package kr.co.pennyway.api.apis.ledger.service;
 
 import kr.co.pennyway.api.common.query.SpendingCategoryType;
+import kr.co.pennyway.domain.context.finance.service.SpendingService;
 import kr.co.pennyway.domain.domains.spending.domain.Spending;
 import kr.co.pennyway.domain.domains.spending.dto.TotalSpendingAmount;
 import kr.co.pennyway.domain.domains.spending.exception.SpendingErrorCode;
 import kr.co.pennyway.domain.domains.spending.exception.SpendingErrorException;
-import kr.co.pennyway.domain.domains.spending.service.SpendingService;
 import kr.co.pennyway.domain.domains.spending.type.SpendingCategory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -66,7 +66,7 @@ public class SpendingSearchService {
 
     @Transactional(readOnly = true)
     public Optional<TotalSpendingAmount> readTotalSpendingAmountByUserIdThatMonth(Long userId, LocalDate date) {
-        return spendingService.readTotalSpendingAmountByUserId(userId, date);
+        return spendingService.readTotalSpendingAmount(userId, date);
     }
 
     @Transactional(readOnly = true)

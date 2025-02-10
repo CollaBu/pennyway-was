@@ -7,12 +7,12 @@ import kr.co.pennyway.api.config.ExternalApiIntegrationTest;
 import kr.co.pennyway.api.config.fixture.SpendingCustomCategoryFixture;
 import kr.co.pennyway.api.config.fixture.SpendingFixture;
 import kr.co.pennyway.api.config.fixture.UserFixture;
+import kr.co.pennyway.domain.context.account.service.UserService;
+import kr.co.pennyway.domain.context.finance.service.SpendingCategoryService;
+import kr.co.pennyway.domain.context.finance.service.SpendingService;
 import kr.co.pennyway.domain.domains.spending.domain.Spending;
 import kr.co.pennyway.domain.domains.spending.domain.SpendingCustomCategory;
-import kr.co.pennyway.domain.domains.spending.service.SpendingCustomCategoryService;
-import kr.co.pennyway.domain.domains.spending.service.SpendingService;
 import kr.co.pennyway.domain.domains.user.domain.User;
-import kr.co.pennyway.domain.domains.user.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
@@ -39,7 +39,7 @@ class SpendingSearchServiceTest extends ExternalApiDBTestConfig {
     @Autowired
     private NamedParameterJdbcTemplate jdbcTemplate;
     @Autowired
-    private SpendingCustomCategoryService spendingCustomCategoryService;
+    private SpendingCategoryService spendingCategoryService;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -65,7 +65,7 @@ class SpendingSearchServiceTest extends ExternalApiDBTestConfig {
         // given
         User user = userService.createUser(UserFixture.GENERAL_USER.toUser());
         SpendingCustomCategory spendingCustomCategory = SpendingCustomCategoryFixture.GENERAL_SPENDING_CUSTOM_CATEGORY.toCustomSpendingCategory(user);
-        spendingCustomCategoryService.createSpendingCustomCategory(spendingCustomCategory);
+        spendingCategoryService.createSpendingCustomCategory(spendingCustomCategory);
         SpendingFixture.bulkInsertSpending(user, 100, spendingCustomCategory.getId(), jdbcTemplate);
 
         // when

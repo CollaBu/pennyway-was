@@ -1,6 +1,6 @@
 package kr.co.pennyway.api.common.security.authorization;
 
-import kr.co.pennyway.domain.domains.notification.service.NotificationService;
+import kr.co.pennyway.domain.context.alter.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;

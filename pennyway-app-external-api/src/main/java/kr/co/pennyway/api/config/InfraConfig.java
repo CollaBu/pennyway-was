@@ -17,7 +17,10 @@ import org.springframework.context.annotation.Configuration;
         KakaoOidcProperties.class
 })
 @EnablePennywayInfraConfig({
-        PennywayInfraConfigGroup.FCM
+        PennywayInfraConfigGroup.FCM,
+        PennywayInfraConfigGroup.DISTRIBUTED_COORDINATION_CONFIG,
+        PennywayInfraConfigGroup.GUID_GENERATOR_CONFIG,
+        PennywayInfraConfigGroup.MESSAGE_BROKER_CONFIG
 })
 public class InfraConfig {
 }

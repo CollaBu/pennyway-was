@@ -2,10 +2,10 @@ package kr.co.pennyway.api.apis.auth.service;
 
 import kr.co.pennyway.api.apis.auth.dto.UserSyncDto;
 import kr.co.pennyway.api.config.fixture.UserFixture;
+import kr.co.pennyway.domain.context.account.service.UserService;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorCode;
 import kr.co.pennyway.domain.domains.user.exception.UserErrorException;
-import kr.co.pennyway.domain.domains.user.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

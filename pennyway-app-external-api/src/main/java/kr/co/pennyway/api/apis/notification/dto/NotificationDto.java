@@ -23,6 +23,16 @@ public class NotificationDto {
     ) {
     }
 
+    @Schema(title = "푸시 알림 리스트 응답")
+    public record ListRes(
+            @Schema(description = "푸시 알림 리스트")
+            List<Info> notifications
+    ) {
+        public static ListRes from(List<Info> notifications) {
+            return new ListRes(notifications);
+        }
+    }
+
     @Schema(title = "푸시 알림 슬라이스 응답")
     public record SliceRes(
             @Schema(description = "푸시 알림 리스트")

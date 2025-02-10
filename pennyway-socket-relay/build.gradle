@@ -1,0 +1,19 @@
+plugins {
+    id 'java'
+}
+
+bootJar { enabled = true }
+jar { enabled = false }
+
+group = 'kr.co.pennyway.relay'
+version = '0.0.1-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation project(':pennyway-common')
+    implementation project(':pennyway-domain')
+    implementation project(':pennyway-infra')
+}

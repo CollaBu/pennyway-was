@@ -10,11 +10,11 @@ import kr.co.pennyway.api.apis.auth.service.PhoneVerificationService;
 import kr.co.pennyway.api.apis.auth.service.UserOauthSignService;
 import kr.co.pennyway.api.common.security.jwt.Jwts;
 import kr.co.pennyway.common.annotation.UseCase;
-import kr.co.pennyway.domain.common.redis.phone.PhoneCodeKeyType;
-import kr.co.pennyway.domain.common.redis.phone.PhoneCodeService;
+import kr.co.pennyway.domain.context.account.service.PhoneCodeService;
 import kr.co.pennyway.domain.domains.oauth.exception.OauthErrorCode;
 import kr.co.pennyway.domain.domains.oauth.exception.OauthException;
 import kr.co.pennyway.domain.domains.oauth.type.Provider;
+import kr.co.pennyway.domain.domains.phone.type.PhoneCodeKeyType;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.infra.common.oidc.OidcDecodePayload;
 import lombok.RequiredArgsConstructor;
@@ -39,23 +39,27 @@ public class OauthUseCase {
 
         User user = userOauthSignService.readUser(request.oauthId(), provider);
 
-        return (user != null) ? Pair.of(user.getId(), jwtAuthHelper.createToken(user)) : Pair.of(-1L, null);
+        return (user != null) ? Pair.of(user.getId(), jwtAuthHelper.createToken(user, request.deviceId())) : Pair.of(-1L, null);
     }
 
     @Transactional(readOnly = true)
     public PhoneVerificationDto.VerifyCodeRes verifyCode(Provider provider, PhoneVerificationDto.VerifyCodeReq request) {
-        Boolean isValidCode = phoneVerificationService.isValidCode(request, PhoneCodeKeyType.getOauthSignUpTypeByProvider(provider));
+        PhoneCodeKeyType type = getOauthSignUpTypeByProvider(provider);
+
+        Boolean isValidCode = phoneVerificationService.isValidCode(request, type);
         UserSyncDto userSync = checkSignUpUserNotOauthByProvider(provider, request.phone());
 
-        phoneCodeService.extendTimeToLeave(request.phone(), PhoneCodeKeyType.getOauthSignUpTypeByProvider(provider));
+        phoneCodeService.extendTimeToLeave(request.phone(), type);
 
         return PhoneVerificationDto.VerifyCodeRes.valueOfOauth(isValidCode, userSync.isExistAccount(), userSync.username());
     }
 
     @Transactional
     public Pair<Long, Jwts> signUp(Provider provider, SignUpReq.OauthInfo request) {
-        phoneVerificationService.isValidCode(PhoneVerificationDto.VerifyCodeReq.from(request), PhoneCodeKeyType.getOauthSignUpTypeByProvider(provider));
-        phoneCodeService.delete(request.phone(), PhoneCodeKeyType.getOauthSignUpTypeByProvider(provider));
+        PhoneCodeKeyType type = getOauthSignUpTypeByProvider(provider);
+
+        phoneVerificationService.isValidCode(PhoneVerificationDto.VerifyCodeReq.from(request), type);
+        phoneCodeService.delete(request.phone(), type);
 
         UserSyncDto userSync = checkSignUpUserNotOauthByProvider(provider, request.phone());
 
@@ -67,7 +71,7 @@ public class OauthUseCase {
         OidcDecodePayload payload = oauthOidcHelper.getPayload(provider, request.oauthId(), request.idToken(), request.nonce());
         User user = userOauthSignService.saveUser(request, userSync, provider, payload.sub());
 
-        return Pair.of(user.getId(), jwtAuthHelper.createToken(user));
+        return Pair.of(user.getId(), jwtAuthHelper.createToken(user, request.deviceId()));
     }
 
     /**
@@ -77,7 +81,7 @@ public class OauthUseCase {
         UserSyncDto userSync = userOauthSignService.isSignUpAllowed(provider, phone);
 
         if (!userSync.isSignUpAllowed()) {
-            phoneCodeService.delete(phone, PhoneCodeKeyType.getOauthSignUpTypeByProvider(provider));
+            phoneCodeService.delete(phone, getOauthSignUpTypeByProvider(provider));
             throw new OauthException(OauthErrorCode.ALREADY_SIGNUP_OAUTH);
         }
 
@@ -96,5 +100,14 @@ public class OauthUseCase {
 
     private boolean isOauthSyncRequest(SignUpReq.OauthInfo request) {
         return request.username() != null;
+    }
+
+    private PhoneCodeKeyType getOauthSignUpTypeByProvider(Provider provider) {
+        return switch (provider) {
+            case KAKAO -> PhoneCodeKeyType.OAUTH_SIGN_UP_KAKAO;
+            case GOOGLE -> PhoneCodeKeyType.OAUTH_SIGN_UP_GOOGLE;
+            case APPLE -> PhoneCodeKeyType.OAUTH_SIGN_UP_APPLE;
+            default -> throw new IllegalArgumentException("Unexpected value: " + provider);
+        };
     }
 }

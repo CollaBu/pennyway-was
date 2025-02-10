@@ -2,6 +2,7 @@ package kr.co.pennyway.api.apis.ledger.usecase;
 
 import kr.co.pennyway.api.apis.ledger.dto.SpendingReq;
 import kr.co.pennyway.api.apis.ledger.dto.SpendingSearchRes;
+import kr.co.pennyway.api.apis.ledger.helper.SpendingChatShareHelper;
 import kr.co.pennyway.api.apis.ledger.mapper.SpendingMapper;
 import kr.co.pennyway.api.apis.ledger.service.SpendingDeleteService;
 import kr.co.pennyway.api.apis.ledger.service.SpendingSaveService;
@@ -13,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Slf4j
@@ -23,6 +25,8 @@ public class SpendingUseCase {
     private final SpendingSearchService spendingSearchService;
     private final SpendingUpdateService spendingUpdateService;
     private final SpendingDeleteService spendingDeleteService;
+
+    private final SpendingChatShareHelper spendingChatShareHelper;
 
     @Transactional
     public SpendingSearchRes.Individual createSpending(Long userId, SpendingReq request) {
@@ -62,4 +66,7 @@ public class SpendingUseCase {
         spendingDeleteService.deleteSpendings(spendingIds);
     }
 
+    public void shareToChatRoom(Long userId, List<Long> chatRoomIds, LocalDate date) {
+        spendingChatShareHelper.execute(userId, chatRoomIds, date);
+    }
 }

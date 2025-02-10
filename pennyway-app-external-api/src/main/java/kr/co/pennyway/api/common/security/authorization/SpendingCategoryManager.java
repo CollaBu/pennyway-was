@@ -1,7 +1,7 @@
 package kr.co.pennyway.api.common.security.authorization;
 
 import kr.co.pennyway.api.common.query.SpendingCategoryType;
-import kr.co.pennyway.domain.domains.spending.service.SpendingCustomCategoryService;
+import kr.co.pennyway.domain.context.finance.service.SpendingCategoryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -11,11 +11,11 @@ import org.springframework.transaction.annotation.Transactional;
 @Component("spendingCategoryManager")
 @RequiredArgsConstructor
 public class SpendingCategoryManager {
-    private final SpendingCustomCategoryService spendingCustomCategoryService;
+    private final SpendingCategoryService spendingCategoryService;
 
     @Transactional(readOnly = true)
     public boolean hasPermission(Long userId, Long categoryId) {
-        return spendingCustomCategoryService.isExistsSpendingCustomCategory(userId, categoryId);
+        return spendingCategoryService.isExistsSpendingCustomCategory(userId, categoryId);
     }
 
     /**
@@ -30,7 +30,7 @@ public class SpendingCategoryManager {
             return true;
         }
 
-        return spendingCustomCategoryService.isExistsSpendingCustomCategory(userId, categoryId);
+        return spendingCategoryService.isExistsSpendingCustomCategory(userId, categoryId);
     }
 
     /**

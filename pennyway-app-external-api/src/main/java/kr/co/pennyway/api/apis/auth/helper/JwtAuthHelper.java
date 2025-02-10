@@ -2,20 +2,20 @@ package kr.co.pennyway.api.apis.auth.helper;
 
 import kr.co.pennyway.api.common.annotation.AccessTokenStrategy;
 import kr.co.pennyway.api.common.annotation.RefreshTokenStrategy;
-import kr.co.pennyway.api.common.security.jwt.JwtClaimsParserUtil;
 import kr.co.pennyway.api.common.security.jwt.Jwts;
 import kr.co.pennyway.api.common.security.jwt.access.AccessTokenClaim;
 import kr.co.pennyway.api.common.security.jwt.refresh.RefreshTokenClaim;
 import kr.co.pennyway.api.common.security.jwt.refresh.RefreshTokenClaimKeys;
 import kr.co.pennyway.common.annotation.Helper;
-import kr.co.pennyway.domain.common.redis.forbidden.ForbiddenTokenService;
-import kr.co.pennyway.domain.common.redis.refresh.RefreshToken;
-import kr.co.pennyway.domain.common.redis.refresh.RefreshTokenService;
+import kr.co.pennyway.domain.context.account.service.ForbiddenTokenService;
+import kr.co.pennyway.domain.context.account.service.RefreshTokenService;
+import kr.co.pennyway.domain.domains.refresh.domain.RefreshToken;
 import kr.co.pennyway.domain.domains.user.domain.User;
 import kr.co.pennyway.infra.common.exception.JwtErrorCode;
 import kr.co.pennyway.infra.common.exception.JwtErrorException;
 import kr.co.pennyway.infra.common.jwt.JwtClaims;
 import kr.co.pennyway.infra.common.jwt.JwtProvider;
+import kr.co.pennyway.infra.common.util.JwtClaimsParserUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -46,14 +46,15 @@ public class JwtAuthHelper {
      * 사용자 정보 기반으로 access token과 refresh token을 생성하는 메서드 <br/>
      * refresh token은 redis에 저장된다.
      *
-     * @param user {@link User}
+     * @param user     {@link User} : 사용자 정보
+     * @param deviceId String : 사용자의 디바이스 고유 식별자
      * @return {@link Jwts}
      */
-    public Jwts createToken(User user) {
+    public Jwts createToken(User user, String deviceId) {
         String accessToken = accessTokenProvider.generateToken(AccessTokenClaim.of(user.getId(), user.getRole().getType()));
-        String refreshToken = refreshTokenProvider.generateToken(RefreshTokenClaim.of(user.getId(), user.getRole().getType()));
+        String refreshToken = refreshTokenProvider.generateToken(RefreshTokenClaim.of(user.getId(), deviceId, user.getRole().getType()));
 
-        refreshTokenService.save(RefreshToken.of(user.getId(), refreshToken, toSeconds(refreshTokenProvider.getExpiryDate(refreshToken))));
+        refreshTokenService.create(RefreshToken.of(user.getId(), deviceId, refreshToken, toSeconds(refreshTokenProvider.getExpiryDate(refreshToken))));
         return Jwts.of(accessToken, refreshToken);
     }
 
@@ -62,11 +63,12 @@ public class JwtAuthHelper {
 
         Long userId = JwtClaimsParserUtil.getClaimsValue(claims, RefreshTokenClaimKeys.USER_ID.getValue(), Long::parseLong);
         String role = JwtClaimsParserUtil.getClaimsValue(claims, RefreshTokenClaimKeys.ROLE.getValue(), String.class);
-        log.debug("refresh token userId : {}, role : {}", userId, role);
+        String deviceId = JwtClaimsParserUtil.getClaimsValue(claims, RefreshTokenClaimKeys.DEVICE_ID.getValue(), String.class);
+        log.debug("refresh token userId : {}, deviceId: {}, role : {}", userId, deviceId, role);
 
         RefreshToken newRefreshToken;
         try {
-            newRefreshToken = refreshTokenService.refresh(userId, refreshToken, refreshTokenProvider.generateToken(RefreshTokenClaim.of(userId, role)));
+            newRefreshToken = refreshTokenService.refresh(userId, deviceId, refreshToken, refreshTokenProvider.generateToken(RefreshTokenClaim.of(userId, deviceId, role)));
             log.debug("new refresh token : {}", newRefreshToken.getToken());
         } catch (IllegalArgumentException e) {
             throw new JwtErrorException(JwtErrorCode.EXPIRED_TOKEN);
@@ -102,22 +104,23 @@ public class JwtAuthHelper {
         }
 
         if (jwtClaims != null) {
-            deleteRefreshToken(userId, jwtClaims, refreshToken);
+            deleteRefreshToken(userId, jwtClaims);
         }
 
         deleteAccessToken(userId, accessToken);
     }
 
-    private void deleteRefreshToken(Long userId, JwtClaims jwtClaims, String refreshToken) {
-        Long refreshTokenUserId = Long.parseLong((String) jwtClaims.getClaims().get(RefreshTokenClaimKeys.USER_ID.getValue()));
-        log.info("로그아웃 요청 refresh token id : {}", refreshTokenUserId);
+    private void deleteRefreshToken(Long userId, JwtClaims jwtClaims) {
+        Long refreshTokenUserId = JwtClaimsParserUtil.getClaimsValue(jwtClaims, RefreshTokenClaimKeys.USER_ID.getValue(), Long::parseLong);
+        String refreshTokenDeviceId = JwtClaimsParserUtil.getClaimsValue(jwtClaims, RefreshTokenClaimKeys.DEVICE_ID.getValue(), String.class);
+        log.info("로그아웃 요청 refresh token userId : {}, deviceId : {}", refreshTokenUserId, refreshTokenDeviceId);
 
         if (!userId.equals(refreshTokenUserId)) {
             throw new JwtErrorException(JwtErrorCode.WITHOUT_OWNERSHIP_REFRESH_TOKEN);
         }
 
         try {
-            refreshTokenService.delete(refreshTokenUserId, refreshToken);
+            refreshTokenService.deleteAll(refreshTokenUserId);
         } catch (IllegalArgumentException e) {
             log.warn("refresh token not found. id : {}", userId);
         }

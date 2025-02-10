@@ -3,7 +3,7 @@ package kr.co.pennyway.api.config.security;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.pennyway.api.common.security.filter.JwtAuthenticationFilter;
 import kr.co.pennyway.api.common.security.filter.JwtExceptionFilter;
-import kr.co.pennyway.domain.common.redis.forbidden.ForbiddenTokenService;
+import kr.co.pennyway.domain.context.account.service.ForbiddenTokenService;
 import kr.co.pennyway.infra.common.jwt.JwtProvider;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;

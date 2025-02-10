@@ -1,0 +1,48 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
+plugins {
+    id 'java'
+    id 'org.jetbrains.kotlin.jvm' version '1.8.21'
+    id 'org.jetbrains.kotlin.plugin.spring' version '1.8.21'
+}
+
+bootJar { enabled = true }
+jar { enabled = false }
+
+group = 'kr.co'
+version = '0.0.1-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation project(':pennyway-common')
+    implementation project(':pennyway-domain:domain-service')
+    implementation project(':pennyway-domain:domain-rdb')
+    implementation project(':pennyway-domain:domain-redis')
+    implementation project(':pennyway-infra')
+
+    /* Web Socket */
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-websocket', version: '3.3.4'
+
+    /* Reactor Netty */
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-reactor-netty', version: '3.3.4'
+
+    /* RabbitMQ (for listener) */
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-amqp', version: '3.3.4'
+
+    /* jackson */
+    implementation group: 'org.openapitools', name: 'jackson-databind-nullable', version: '0.2.6'
+
+    implementation 'org.springframework.boot:spring-boot-starter-validation:3.2.3'
+    implementation "org.jetbrains.kotlin:kotlin-reflect:1.9.22"
+}
+
+tasks.withType(KotlinCompile) {
+    kotlinOptions {
+        freeCompilerArgs = ['-Xjsr305=strict']
+        javaParameters = true
+        jvmTarget = '17'
+    }
+}

@@ -102,6 +102,28 @@ public class SwaggerConfig {
     }
 
     @Bean
+    public GroupedOpenApi socketApi() {
+        String[] targets = {"kr.co.pennyway.api.apis.socket"};
+
+        return GroupedOpenApi.builder()
+                .packagesToScan(targets)
+                .group("서비스 탐색 서비스")
+                .addOperationCustomizer(customizer())
+                .build();
+    }
+
+    @Bean
+    public GroupedOpenApi chatApi() {
+        String[] targets = {"kr.co.pennyway.api.apis.chat"};
+
+        return GroupedOpenApi.builder()
+                .packagesToScan(targets)
+                .group("채팅")
+                .addOperationCustomizer(customizer())
+                .build();
+    }
+
+    @Bean
     public GroupedOpenApi backOfficeApi() {
         String[] targets = {"kr.co.pennyway.api.apis.question"};
 

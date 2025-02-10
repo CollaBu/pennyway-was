@@ -7,6 +7,6 @@ public class ExternalApiIntegrationProfileResolver implements ActiveProfilesReso
     @Override
     @NonNull
     public String[] resolve(@NonNull Class<?> testClass) {
-        return new String[]{"common", "infra", "domain"};
+        return new String[]{"common", "infra", "domain-service", "domain-rdb", "domain-redis"};
     }
 }

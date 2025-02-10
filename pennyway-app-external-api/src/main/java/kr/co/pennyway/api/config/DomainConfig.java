@@ -1,12 +1,12 @@
 package kr.co.pennyway.api.config;
 
-import kr.co.pennyway.domain.common.importer.EnablePennywayDomainConfig;
-import kr.co.pennyway.domain.common.importer.PennywayDomainConfigGroup;
+import kr.co.pennyway.domain.common.importer.EnablePennywayRedisDomainConfig;
+import kr.co.pennyway.domain.common.importer.PennywayRedisDomainConfigGroup;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@EnablePennywayDomainConfig({
-        PennywayDomainConfigGroup.REDISSON
+@EnablePennywayRedisDomainConfig(value = {
+        PennywayRedisDomainConfigGroup.REDISSON_INFRA
 })
 public class DomainConfig {
 }

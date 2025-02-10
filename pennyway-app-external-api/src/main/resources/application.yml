@@ -1,8 +1,8 @@
 spring:
   profiles:
     group:
-      local: common, domain, infra
-      dev: common, domain, infra
+      local: common, domain-service, domain-rdb, domain-redis, infra
+      dev: common, domain-service, domain-rdb, domain-redis, infra
 
 jwt:
   secret-key:
@@ -12,6 +12,13 @@ jwt:
     # milliseconds 단위
     access-token: ${JWT_ACCESS_EXPIRATION_TIME:1800000} # 30m (30 * 60 * 1000)
     refresh-token: ${JWT_REFRESH_EXPIRATION_TIME:604800000} # 7d (7 * 24 * 60 * 60 * 1000)
+
+pennyway:
+  rabbitmq:
+    validate-connection: true
+  admin:
+    phone: ${PENNYWAY_ADMIN_PHONE:1234567890}
+    password: ${PENNYWAY_ADMIN_PASSWORD:1234567890}
 
 ---
 spring:
@@ -31,6 +38,10 @@ springdoc:
     groups:
       enabled: true
 
+log:
+  config:
+    filename: app-local
+
 ---
 spring:
   config:
@@ -49,8 +60,19 @@ springdoc:
     groups:
       enabled: true
 
+log:
+  config:
+    filename: app-dev
+    maxHistory: 3
+    maxFileSize: 10MB
+    totalSizeCap: 500MB
+
 ---
 spring:
   config:
     activate:
       on-profile: test
+
+pennyway:
+  rabbitmq:
+    validate-connection: false

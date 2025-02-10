@@ -59,7 +59,7 @@ public class GetNotificationsControllerUnitTest {
         Notification notification = NotificationFixture.ANNOUNCEMENT_DAILY_SPENDING.toEntity(UserFixture.GENERAL_USER.toUser());
         NotificationDto.Info info = NotificationDto.Info.from(notification);
 
-        given(notificationUseCase.getNotifications(eq(1L), any())).willReturn(NotificationDto.SliceRes.from(List.of(info), pa, numberOfElements, false));
+        given(notificationUseCase.getReadNotifications(eq(1L), any())).willReturn(NotificationDto.SliceRes.from(List.of(info), pa, numberOfElements, false));
 
         // when
         ResultActions result = performGetNotifications(page);
@@ -82,7 +82,7 @@ public class GetNotificationsControllerUnitTest {
         NotificationDto.Info info = NotificationDto.Info.from(notification);
         NotificationDto.SliceRes sliceRes = NotificationDto.SliceRes.from(List.of(info), pa, numberOfElements, false);
 
-        given(notificationUseCase.getNotifications(eq(1L), any())).willReturn(sliceRes);
+        given(notificationUseCase.getReadNotifications(eq(1L), any())).willReturn(sliceRes);
 
         // when
         ResultActions result = performGetNotifications(page);
